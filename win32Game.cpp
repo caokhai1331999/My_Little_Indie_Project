@@ -608,6 +608,8 @@ int CALLBACK WinMain
     QueryPerformanceCounter(&PerfCountFrequencyResult);
     // NOTE: Actually, this the counts per second
     // TODO: Try to find out why the PerfCountFrequency is too large.
+
+    // NOTE: This one count is for counting the frame
     int64 PerfCountFrequency = (int64)(PerfCountFrequencyResult.QuadPart);                
     win32LoadXInput();
     WNDCLASSA WindowClass = {};
