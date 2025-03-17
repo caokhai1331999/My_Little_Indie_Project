@@ -82,6 +82,7 @@ global_variable x_input_get_state* XinputGetState_  = XinputGetStateStub;
 // So finally we have a pointer name XinputGetState point to the function
 // XinputGetStateStub(DWORD ....) which basically X_INPUT_GET_STATE() function
 #define XinputGetState XinputGetState_
+
 // This one is to replace the XinputGetState which already been called in Xinput.h
 // with the XinputGetState                                                 
 // ==================================================================
