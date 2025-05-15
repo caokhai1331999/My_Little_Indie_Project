@@ -7,6 +7,8 @@
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
 
+#include "handmade.h"
+
 struct win32Dimension{
     int Height{720};
     int Width{1280};

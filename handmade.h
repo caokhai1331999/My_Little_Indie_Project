@@ -16,8 +16,43 @@
   NOTE: Services that the platform layer provide to the game layer
  */
 
+#include <stdio.h>
+#include <cmath>
+#include <iostream>
+#include <Windows.h>
+#include <GL/gl.h>
+#include <xinput.h>
+#include <DSound.h>
+#include <combaseapi.h>
+#include <mmdeviceapi.h>
+#include <endpointvolume.h>
+
+#include <audioclient.h>
+
+using namespace std;
 
 #define ArrayCount(Array) (sizeof(Array) / sizeof(Array[0]))
+#define internal static
+#define local_persist static
+#define global_variable static
+
+#define Pi32 3.14159265359f
+
+typedef int16_t int16;
+typedef int8_t int8;
+typedef int32_t int32;
+typedef int64_t int64;
+typedef uint64_t uint64;
+
+typedef bool bool16;
+typedef bool bool32;
+
+typedef uint8_t uint8;
+typedef uint16_t uint16;
+typedef uint32_t uint32;
+
+typedef float real32;
+typedef double real64;
 
 
 
@@ -75,7 +110,7 @@ union Game_Controller_Input{
 
 struct Game_Input{
     Game_Controller_Input Controller[4];
-}Input;
+};
 
 struct Game_Memory{
     bool32 IsInitialized; 
@@ -92,10 +127,10 @@ struct Game_State{
 // TODO: Allow the sample offset here for more robust platform options
 
 internal void GameOutputSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz);
-
 internal void RenderSplendidGradient(Game_OffScreen_Buffer* OBuffer, int XOffset, int YOffset);
+void GameUpdateAndRender(Game_Memory* Memory = nullptr ,Game_Input* Input = nullptr ,Game_OffScreen_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr);
 
-void GameUpdateAndRender(Game_Input* Input ,Game_OffScreen_Buffer* OBuffer, Game_Sound_OutPut* SoundBuffer);
+void InitOpenGL(HWND window);
 
 #define HANDMADE_H
 #endif

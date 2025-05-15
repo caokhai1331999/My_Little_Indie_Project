@@ -25,46 +25,7 @@
    Just a partial list if you want to get the game in a complete shipping state
    
  */
-#include <stdio.h>
-#include <cmath>
-#include <iostream>
-#include <Windows.h>
-#include <GL/gl.h>
-#include <xinput.h>
-#include <DSound.h>
-#include <combaseapi.h>
-#include <mmdeviceapi.h>
-#include <endpointvolume.h>
-
-#include <audioclient.h>
-
-
-using namespace std;
-
-#define internal static
-#define local_persist static
-#define global_variable static
-
-#define Pi32 3.14159265359f
-
-typedef int16_t int16;
-typedef int8_t int8;
-typedef int32_t int32;
-typedef int64_t int64;
-typedef uint64_t uint64;
-
-typedef bool bool16;
-typedef bool bool32;
-
-typedef uint8_t uint8;
-typedef uint16_t uint16;
-typedef uint32_t uint32;
-
-typedef float real32;
-typedef double real64;
-
 #include "win32Game.h"
-
 // NOTE: This is all about calling the function in the Xinput.h without the noticing from the compiler
 #define X_INPUT_GET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex,XINPUT_STATE *pState)
 typedef X_INPUT_GET_STATE(x_input_get_state);
@@ -113,8 +74,6 @@ typedef CO_CREATE_INSTANCE (Co_Create_Instance);
 #define ENUM_AUDIO_ENDPOINTS(name) HRESULT name (EDataFlow dataFlow, DWORD        dwStateMask, LPVOID  FAR * ppv);
 typedef ENUM_AUDIO_ENDPOINTS (Enum_Audio_Endpoints);
 // ==================================================================
-
-#include "handmade.cpp"
 
 global_variable bool  GlobalRunning;
 global_variable HWND Window;
@@ -635,6 +594,7 @@ int CALLBACK WinMain
             0,
             Instance ,
             0);
+        InitOpenGL(Window);
         if(Window) {
             GlobalRunning = true; 
             //NOTE: we create a second buffer last for 2 second with
@@ -754,7 +714,15 @@ int CALLBACK WinMain
                 Vibration.wLeftMotorSpeed = 350;
                 Vibration.wRightMotorSpeed = 350;
                 XinputSetState(0, &Vibration);
-                
+
+                // NOTE: Check whether OpenGL work or not
+                // Define the boundary of what we want to render
+                glViewport(0, 0, 70, 40);
+                glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT);
+                // Display on the screen
+                SwapBuffers(DeviceContext);
+
                 // RenderSplendidGradient(&BackBuffer, XOffset, YOffset);
 
                 // ===========================================================
@@ -814,7 +782,7 @@ int CALLBACK WinMain
                 // NOTE: Don't know why compiler couldn't find this function
                 // implementation after a little remove of few arguments
                 
-                GameUpdateAndRender(NewInput, &ScreenBuffer, &SoundBuffer);
+                GameUpdateAndRender(NULL, NewInput, &ScreenBuffer, &SoundBuffer);
                 
                 // TODO: This function just being called once
                 

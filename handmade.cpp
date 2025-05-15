@@ -72,11 +72,11 @@ internal void GameOutPutSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz) {
     OutputDebugStringA(Output);                      
 }
 
-void GameUpdateAndRender(Game_Memory* Memory,Game_Input* Input, Game_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer){
+void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer){
 
     Game_State* State = new Game_State;
 
-    if(Memory->Isnitialized){
+    if(Memory->IsInitialized){
         State->Hz = 256;
         State->BlueOffset = 0;
         State->GreenOffset = 0;
@@ -85,16 +85,31 @@ void GameUpdateAndRender(Game_Memory* Memory,Game_Input* Input, Game_OffScreen_B
     Game_Controller_Input* Input0 = &Input->Controller[0];
     
     if(Input0->IsAnalog){
-    Hz = (int)(128.0f*(Input0->EndX));
-    BlueOffset = (int)(4.0f*(Input0->EndY));        
+    State->Hz = (int)(128.0f*(Input0->EndX));
+    State->BlueOffset = (int)(4.0f*(Input0->EndY));        
     } else {
         
     }
     
     if(Input0->Down.EndedDown){
-        GreenOffset += 1;
+        State->GreenOffset += 1;
     }
     
-    RenderSplendidGradient(OBuffer, BlueOffset, GreenOffset);
-    GameOutPutSound(SoundBuffer, Hz);
+    RenderSplendidGradient(OBuffer, State->BlueOffset, State->GreenOffset);
+    GameOutPutSound(SoundBuffer, State->Hz);
+}
+
+void InitOpenGL(HWND window){
+    // first device context gotten from current window
+    HDC windowDC = GetDC(window);
+    // Then create rendering context of opengl from it
+    HGLRC openglRC = wglCreateContext(windowDC);
+    // Then init it
+    if(wglMakeCurrent(windowDC, openglRC)){
+        
+    } else {
+        // TODO: Diagnostic
+    };
+    // Release unused DC
+    ReleaseDC(window, windowDC);
 }

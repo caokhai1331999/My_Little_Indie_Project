@@ -3,13 +3,15 @@ pushd build
 
 del *.obj *.pdb
 
+set LIB_=user32.lib gdi32.lib opengl32.lib
+set INCLUDE_=..\*.h
 rem remember to add these to use address sanitizer /EHsc /fsanitize=address
 @echo off
 rem -fsanitize=address -DEBUG
 rem for %%f in (..\*.cpp) do (
 rem     cl /FC /Zi -Fe:"win32Game" %%f -link user32.lib gdi32.lib
 rem  )
-    cl /FC /Zi -Fe:"win32Game" ..\win32Game.cpp -link user32.lib gdi32.lib
+    cl /FC /Zi -Fe:"win32Game"  ..\handmade.cpp ..\win32Game.cpp -I%INCLUDE_% -link %LIB_%
 rem if %ERRORLEVEL% EQU 0 (
 rem    @echo Announce: " compilation succeeded (^ w ^) "
 rem ) else (
