@@ -5,13 +5,13 @@ del *.obj *.pdb
 
 set LIB_=user32.lib gdi32.lib opengl32.lib
 set INCLUDE_=..\*.h
-rem remember to add these to use address sanitizer /EHsc /fsanitize=address
 @echo off
+rem remember to add these to use address sanitizer /EHsc /fsanitize=address
 rem -fsanitize=address -DEBUG
 rem for %%f in (..\*.cpp) do (
 rem     cl /FC /Zi -Fe:"win32Game" %%f -link user32.lib gdi32.lib
 rem  )
-    cl /FC /Zi -Fe:"win32Game"  ..\handmade.cpp ..\win32Game.cpp -I%INCLUDE_% -link %LIB_%
+    cl /FC /Zi -Fe:"win32Game" ..\main.cpp  ..\win32Game.cpp ..\handmade.cpp  -fsanitize=address -I%INCLUDE_% -link %LIB_% -DEBUG
 rem if %ERRORLEVEL% EQU 0 (
 rem    @echo Announce: " compilation succeeded (^ w ^) "
 rem ) else (

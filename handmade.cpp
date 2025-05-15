@@ -104,12 +104,43 @@ void InitOpenGL(HWND window){
     HDC windowDC = GetDC(window);
     // Then create rendering context of opengl from it
     HGLRC openglRC = wglCreateContext(windowDC);
-    // Then init it
-    if(wglMakeCurrent(windowDC, openglRC)){
-        
+    // Create the pixel format features
+    PIXELFORMATDESCRIPTOR desiredPixelFormat = {};
+    desiredPixelFormat.nSize = sizeof(desiredPixelFormat);
+    desiredPixelFormat.nVersion =  1;
+    desiredPixelFormat.iPixelType = PFD_TYPE_RGBA;
+    desiredPixelFormat.cColorBits = 24;
+    desiredPixelFormat.cAlphaBits = 8;
+    desiredPixelFormat.dwFlags = PFD_SUPPORT_OPENGL|PFD_DRAW_TO_WINDOW;
+
+    // Assign to an index
+    int suggestedPixelFormatIndex = ChoosePixelFormat(windowDC, &desiredPixelFormat);
+
+    // Create a format from that index
+    PIXELFORMATDESCRIPTOR suggestedPixelFormat;
+
+    DescribePixelFormat(
+        windowDC,
+        suggestedPixelFormatIndex,
+        sizeof(suggestedPixelFormat),
+        &suggestedPixelFormat);
+
+    if ( SetPixelFormat(
+             windowDC,
+             suggestedPixelFormatIndex,
+             &suggestedPixelFormat)
+         )
+    {
+         // Then init it
+        if(wglMakeCurrent(windowDC, openglRC)){
+            printf("Succeed to init OpenGl\n");
+        } else {
+            // TODO: Diagnostic
+        };   
+
     } else {
-        // TODO: Diagnostic
-    };
+        printf("Failed to init OpenGl\n");
+    }
     // Release unused DC
     ReleaseDC(window, windowDC);
 }
