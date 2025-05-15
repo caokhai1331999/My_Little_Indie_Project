@@ -21,17 +21,11 @@
 #include <iostream>
 #include <Windows.h>
 #include <GL/gl.h>
-#include <xinput.h>
-#include <DSound.h>
-#include <combaseapi.h>
-#include <mmdeviceapi.h>
-#include <endpointvolume.h>
-
-#include <audioclient.h>
 
 using namespace std;
 
 #define ArrayCount(Array) (sizeof(Array) / sizeof(Array[0]))
+
 #define internal static
 #define local_persist static
 #define global_variable static
