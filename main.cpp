@@ -282,9 +282,154 @@ internal void Win32FillSoundBuffer(win32_Sound_OutPut* SoundOutPut, DWORD ByteTo
                             ++SoundOutPut->RunningSampleIndex;                            
                         }                                                GlobalSecondBuffer->Unlock(Region1, Region1Size, Region2, Region2Size);
                     }
-
 }
 
+
+LRESULT CALLBACK MainWindowCallBack(
+    HWND Window,
+    UINT Message,
+    WPARAM Wparam,
+    LPARAM Lparam    
+                                    )
+{
+    printf("Track to here\n");
+    LRESULT result;
+    switch(Message) {
+        case WM_SIZE:
+        {
+            DeviceContext = GetDC(Window);
+            GetWindowDimension(Window);
+            // NOTE: Whenever the window is resized, this function capture the size
+            // of the new window and update a new proper DIB for that
+            // DIB is a table where store BIT color infor
+            Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
+            // Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height,  &Buffer);
+            OutputDebugStringA("WM_SIZE\n");
+        }break;
+        
+        case WM_CLOSE:
+        {
+            GlobalRunning = false;
+            OutputDebugStringA("WM_CLOSE\n");
+        }break;
+
+        case WM_KEYDOWN:
+        {            
+            bool IsDown = ((Lparam &(1 << 31)) == 0);
+            uint32 vkCode = Wparam;
+            if(vkCode == VK_LEFT) {
+                
+                OutputDebugStringA("Left Button :");
+                if(IsDown) {                    
+                    OutputDebugStringA(" Is Down");
+                }
+                OutputDebugStringA("\n");
+            }            
+        }break;
+
+        case WM_SYSKEYDOWN:
+        {
+            uint32 vkCode = Wparam;
+            bool AltkeyisDown = ((Lparam &(1 << 29)) != 0);
+            if((vkCode == VK_F4) && AltkeyisDown) {
+                GlobalRunning = false;
+            }                                        
+            OutputDebugStringA("WM_SYSKEYDOWN\n");            
+        }break;
+
+        case WM_SYSKEYUP:
+        {            
+            OutputDebugStringA("WM_SYSKEYUP\n");            
+        }break;
+
+        case WM_KEYUP:
+        {
+            uint32 vkCode = Wparam;
+            // NOTE: This is whether bit 30 or 0 (never 1).
+            // So if it is bit 30 it is down 
+            bool WasDown = ((Lparam &(1 << 30)) != 0);
+            bool IsDown = ((Lparam &(1 << 31)) == 0);            
+            if (WasDown != IsDown) {
+
+                if(vkCode == VK_UP) {
+                    // YOffset -= 10;
+                }
+
+                else if(vkCode == VK_DOWN) {
+                    // YOffset += 10;
+                }
+
+                else if(vkCode == VK_LEFT) {
+                    // XOffset -= 10;
+                    OutputDebugStringA("Left Button :");
+                    if(WasDown) {                    
+                        OutputDebugStringA(" Was Down");
+                    }
+                    OutputDebugStringA("\n");
+                }
+
+                else if(vkCode == VK_RIGHT) {
+                    // XOffset += 10;                    
+                }
+                
+                else if(vkCode == VK_TAB) {
+                    if(SoundOutPut.hz == 128){
+                        SoundOutPut.hz = 256;
+                    } else if (SoundOutPut.hz == 256) {
+                        SoundOutPut.hz = 512;
+                    } else {
+                        SoundOutPut.hz = 128;                        
+                    }
+                    // char Output[256];
+                    // sprintf(Output, "TAB button hitted, Current Hert is: %d\n", SoundOutPut.hz);
+                    SoundOutPut.WavePeriod = SoundOutPut.SamplePerSecond/SoundOutPut.hz;
+                    
+                    OutputDebugStringA("TAB button hitted");                  
+                }
+            }                
+            }break;
+
+        case WM_DESTROY:
+        {
+            GlobalRunning = false;
+            PostQuitMessage(0);
+            OutputDebugStringA("WM_DESTROY\n");            
+        }break;
+
+        
+        case WM_PAINT:            
+        {
+            PAINTSTRUCT Paint;
+            DeviceContext = BeginPaint(Window, &Paint);
+
+            // int X = Paint.rcPaint.left;
+            // int Y = Paint.rcPaint.top;
+            
+            // int width = Paint.rcPaint.right - Paint.rcPaint.left;
+            // int height = Paint.rcPaint.bottom - Paint.rcPaint.top;
+
+            GetWindowDimension(Window);
+            // local_persist DWORD Operation = WHITENESS;
+
+            // if (Operation == WHITENESS) {
+            //     Operation = BLACKNESS;
+            // }else {
+            //     Operation = WHITENESS;
+            // }
+            
+            Win32DisplayBufferWindow(DeviceContext,Dimens.Width, Dimens.Height, &BackBuffer);
+            EndPaint(Window, &Paint);
+            OutputDebugStringA("WM_PAINT\n");
+        }break;
+        
+        default:
+        {
+            OutputDebugStringA("DEFAULT\n");
+            result = DefWindowProc(Window, Message, Wparam, Lparam);
+        }break;
+    }
+    return result;
+}
 
 int CALLBACK WinMain
 (HINSTANCE Instance,
@@ -292,7 +437,6 @@ int CALLBACK WinMain
  PSTR cmdline,
  int cmdshow)
 {    
-    printf("Track to here\n");
     LARGE_INTEGER PerfCountFrequencyResult;
     QueryPerformanceCounter(&PerfCountFrequencyResult);
     // NOTE: Actually, this the counts per second
@@ -557,13 +701,13 @@ int CALLBACK WinMain
                 real32 McPerFrame = (real32)((real32)CyclesElapsed/(1000.f * 1000.f));
                 real32 MsPerFrame = (real32)((1000 * (real32)ElapsedCounter) / (real32)PerfCountFrequency);
                 real32 FPS = (real32)((real32)PerfCountFrequency/(real32)ElapsedCounter);
-#if 0                
+// #if 0                
                 char Buffer[256];
                 // NOTE: The '%' is to decide the format of the next thing to print
                 // for example: %d is the 32 bit integer
                 sprintf(Buffer, "%f Miliseconds/Frame, %f FPS, %f Mc/f \n ", MsPerFrame, FPS, MsPerFrame);
                 OutputDebugStringA(Buffer);
-#endif                
+// #endif                
                 LastCounter = EndCounter;
                 LastCycleCounts = EndCycleCounts;
                 // MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per register 
@@ -577,6 +721,7 @@ int CALLBACK WinMain
             
         }else{
             // TODO: Logging
+            printf("Window is NULL\n");
         }
     } else {
         // TODO: Logging

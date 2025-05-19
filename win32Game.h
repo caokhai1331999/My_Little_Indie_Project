@@ -78,25 +78,20 @@ X_INPUT_SET_STATE(XinputSetStateStub) {
 global_variable x_input_set_state* XinputSetState_  = XinputSetStateStub;
 #define XinputSetState XinputSetState_
 // ==================================================================
-
+ 
 global_variable bool  GlobalRunning;
 global_variable HWND Window;
 global_variable RECT ClientRect;
 global_variable HDC DeviceContext;
 // global_variable int  XOffset{0}, YOffset{0};
-global_variable Win32_OffScreen_Buffer BackBuffer = {};
 global_variable LPDIRECTSOUNDBUFFER GlobalSecondBuffer;
+global_variable Win32_OffScreen_Buffer BackBuffer = {};
 
 const global_variable int Height{720};
 const global_variable int Width{1280};
 
 void win32LoadXInput(void);
 void* PlatformLoadFile(char* FileName);
-LRESULT CALLBACK MainWindowCallBack(
-    HWND Window,
-    UINT Message,
-    WPARAM Wparam,
-    LPARAM Lparam);
 void Win32DisplayBufferWindow (HDC DeviceContext, int WindowWidth, int WindowHeight, Win32_OffScreen_Buffer* OBuffer);
 
 void ProcessXinputDigitalButton(DWORD XInputButtonState ,Game_Button_State* OldState ,DWORD ButtonBit, Game_Button_State* NewState);
