@@ -17,37 +17,6 @@
 #include <xinput.h>
 #include "handmade.h"
 
-struct win32Dimension{
-    int Height{720};
-    int Width{1280};
-}Dimens;
-
-struct Win32_OffScreen_Buffer{  
-    BITMAPINFO Bitmapinfo;
-    HBITMAP BitmapHandle;
-    void* BitmapMemory;
-    int BitmapWidth;
-    int BitmapHeight;
-    int Pitch;
-    const int BytesPerPixel = 4;
-};
-
-struct win32_Sound_OutPut{
-    int SamplePerSecond;
-    int BytesPerSample;
-    // Hert(hz) is cycles per second
-    int32 SecondBufferSize;
-    uint32 RunningSampleIndex;
-    real32 tsine;
-    int hz;
-    int LatencySampleCount;
-    int WavePeriod;
-    int SquareWaveCount;
-    int ToneVolume;
-    // Sample per cycle is SquareWave Period    
-}SoundOutPut;
-
-
 // NOTE: This is all about calling the function in the Xinput.h without the noticing from the compiler
 #define X_INPUT_GET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex,XINPUT_STATE *pState)
 typedef X_INPUT_GET_STATE(x_input_get_state);
@@ -78,7 +47,40 @@ X_INPUT_SET_STATE(XinputSetStateStub) {
 global_variable x_input_set_state* XinputSetState_  = XinputSetStateStub;
 #define XinputSetState XinputSetState_
 // ==================================================================
- 
+
+
+struct win32Dimension{
+    int Height{720};
+    int Width{1280};
+}Dimens;
+
+struct Win32_OffScreen_Buffer{  
+    BITMAPINFO Bitmapinfo;
+    HBITMAP BitmapHandle;
+    void* BitmapMemory = nullptr;
+    int BitmapWidth;
+    int BitmapHeight;
+    int Pitch;
+    const int BytesPerPixel = 4;
+};
+
+struct win32_Sound_OutPut{
+    int SamplePerSecond;
+    int BytesPerSample;
+    // Hert(hz) is cycles per second
+    int32 SecondBufferSize;
+    uint32 RunningSampleIndex;
+    real32 tsine;
+    int hz;
+    int LatencySampleCount;
+    int WavePeriod;
+    int SquareWaveCount;
+    int ToneVolume;
+    // Sample per cycle is SquareWave Period    
+}SoundOutPut;
+
+
+
 global_variable bool  GlobalRunning;
 global_variable HWND Window;
 global_variable RECT ClientRect;
@@ -87,17 +89,26 @@ global_variable HDC DeviceContext;
 global_variable LPDIRECTSOUNDBUFFER GlobalSecondBuffer;
 global_variable Win32_OffScreen_Buffer BackBuffer = {};
 
+global_variable Game_State State = {};
+
 const global_variable int Height{720};
 const global_variable int Width{1280};
 
-void win32LoadXInput(void);
 void* PlatformLoadFile(char* FileName);
-void Win32DisplayBufferWindow (HDC DeviceContext, int WindowWidth, int WindowHeight, Win32_OffScreen_Buffer* OBuffer);
 
+void win32LoadXInput(void);
 void ProcessXinputDigitalButton(DWORD XInputButtonState ,Game_Button_State* OldState ,DWORD ButtonBit, Game_Button_State* NewState);
 
-void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Height);
 void GetWindowDimension(HWND Window);
+void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Height);
+void RenderSplendidGradient(Game_OffScreen_Buffer* OBuffer, int XOffset, int YOffset);
+void Win32DisplayBufferWindow (HDC DeviceContext, int WindowWidth, int WindowHeight, Win32_OffScreen_Buffer* OBuffer);
+
+void GameOutputSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz);
+
+void GameUpdateAndRender(Game_Memory* Memory = nullptr ,Game_Input* Input = nullptr, Game_State* State = nullptr ,Game_OffScreen_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr);
+
+void InitOpenGL(HWND window);
 
 #define WIN32GAME_H
 #endif

@@ -110,7 +110,7 @@ struct Game_Memory{
     bool32 IsInitialized; 
     uint32 MemorySize;
     void* PermanentStorage;
-};
+}GMemory;
 
 struct Game_State{
     int BlueOffset = 0;
@@ -122,9 +122,6 @@ struct Game_State{
 
 internal void GameOutputSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz);
 internal void RenderSplendidGradient(Game_OffScreen_Buffer* OBuffer, int XOffset, int YOffset);
-void GameUpdateAndRender(Game_Memory* Memory = nullptr ,Game_Input* Input = nullptr ,Game_OffScreen_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr);
-
-void InitOpenGL(HWND window);
 
 #define HANDMADE_H
 #endif

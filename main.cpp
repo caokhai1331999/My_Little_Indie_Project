@@ -292,7 +292,6 @@ LRESULT CALLBACK MainWindowCallBack(
     LPARAM Lparam    
                                     )
 {
-    printf("Track to here\n");
     LRESULT result;
     switch(Message) {
         case WM_SIZE:
@@ -324,7 +323,12 @@ LRESULT CALLBACK MainWindowCallBack(
                     OutputDebugStringA(" Is Down");
                 }
                 OutputDebugStringA("\n");
-            }            
+            }
+
+            if(vkCode == VK_ESCAPE){
+                GlobalRunning = false;
+            }
+            
         }break;
 
         case WM_SYSKEYDOWN:
@@ -352,11 +356,12 @@ LRESULT CALLBACK MainWindowCallBack(
             if (WasDown != IsDown) {
 
                 if(vkCode == VK_UP) {
-                    // YOffset -= 10;
+                    State.BlueOffset += 10;
                 }
 
                 else if(vkCode == VK_DOWN) {
                     // YOffset += 10;
+                    State.GreenOffset += 10;
                 }
 
                 else if(vkCode == VK_LEFT) {
@@ -388,7 +393,6 @@ LRESULT CALLBACK MainWindowCallBack(
                 }
             }                
             }break;
-
         case WM_DESTROY:
         {
             GlobalRunning = false;
@@ -436,7 +440,8 @@ int CALLBACK WinMain
  HINSTANCE hInstPrev,
  PSTR cmdline,
  int cmdshow)
-{    
+{
+    GMemory = {};
     LARGE_INTEGER PerfCountFrequencyResult;
     QueryPerformanceCounter(&PerfCountFrequencyResult);
     // NOTE: Actually, this the counts per second
@@ -467,6 +472,7 @@ int CALLBACK WinMain
             0,
             Instance ,
             0);
+        // Wrong order
         // Init here
         InitOpenGL(Window);
 
@@ -506,7 +512,7 @@ int CALLBACK WinMain
             Game_Input* NewInput = &Input[1];
 
             LastCycleCounts = __rdtsc();
-            
+            InitOpenGL(Window);
             while(GlobalRunning) {
                 MSG Message;
                 // NOTE: This is where receiving the message to change
@@ -590,15 +596,6 @@ int CALLBACK WinMain
                 Vibration.wRightMotorSpeed = 350;
                 XinputSetState(0, &Vibration);
 
-                // NOTE: Check whether OpenGL work or not
-                // Define the boundary of what we want to render
-                printf("Draw something here\n");
-                glViewport(0, 0, 70, 40);
-                glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
-                glClear(GL_COLOR_BUFFER_BIT);
-                // Display on the screen
-                SwapBuffers(DeviceContext);
-
                 // RenderSplendidGradient(&BackBuffer, XOffset, YOffset);
 
                 // ===========================================================
@@ -658,8 +655,6 @@ int CALLBACK WinMain
                 // NOTE: Don't know why compiler couldn't find this function
                 // implementation after a little remove of few arguments
                 
-                GameUpdateAndRender(NULL, NewInput, &ScreenBuffer, &SoundBuffer);
-                
                 // TODO: This function just being called once
                 
 
@@ -671,14 +666,14 @@ int CALLBACK WinMain
                 }                                                    
                                 
                 // =============================================================
-                if(Message.message != WM_KEYDOWN && Message.message != WM_KEYUP)
-                {
-                    // XOffset++;
-                }
                 
                 DeviceContext = GetDC(Window);                                    
-                // RenderSplendidGradient(&BackBuffer, XOffset, YOffset);
+
+                // Display here                
                 Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height, &BackBuffer);
+                GameUpdateAndRender(&GMemory, NewInput, &State, &ScreenBuffer, &SoundBuffer);
+                // NOTE: Check whether OpenGL work or not
+                // Define the boundary of what we want to render
                 
                 LARGE_INTEGER EndCounter;
                 QueryPerformanceCounter(&EndCounter);
