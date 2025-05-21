@@ -157,21 +157,38 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
         DIB_RGB_COLORS,
         SRCCOPY
                   );    
-    
+
+    // NOTE: The 2 triangles was expected to fill the screen
+    // But they didn't cause the fixed fx didn'take the verticles data
+    // to actually did according to these
+
+    // Why Flickering???
     printf("Draw something here\n");
-    glViewport(0, 0, 70, 40);
+    glViewport(0, 0, WindowWidth, WindowHeight);
     glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();    
+
     glBegin(GL_TRIANGLES);
+
+    real32 p = 0.7f;
+    
     // Upper triangle
-    glVertex2i(0, 0);
-    glVertex2i(Width, Height);
-    glVertex2i(0, Height);
+    glColor3f(1.0f, 0.0f, 0.5f);
+    glVertex2f(-p, p);
+    glVertex2f(-p, -p);
+    glVertex2f(p, -p);
     // Below triangle
-    glVertex2i(0, 0);
-    glVertex2i(Width, Height);
-    glVertex2i(Width, 0);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glVertex2f(-p, p);
+    glVertex2f(p, p);
+    glVertex2f(p, -p);
+
     glEnd();
     // Display on the screen
     SwapBuffers(DeviceContext);
@@ -196,11 +213,11 @@ void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* Sta
         
     }
     
-    if(Input0->Down.EndedDown){
-        State->GreenOffset += 1;
-    }
+    // if(Input0->Down.EndedDown){
+    //     State->GreenOffset += 1;
+    // }
     
-    RenderSplendidGradient(OBuffer, State->BlueOffset, State->GreenOffset);
+    // RenderSplendidGradient(OBuffer, State->BlueOffset, State->GreenOffset);
     GameOutPutSound(SoundBuffer, State->Hz);
 }
 

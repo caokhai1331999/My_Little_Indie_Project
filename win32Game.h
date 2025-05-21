@@ -50,6 +50,8 @@ global_variable x_input_set_state* XinputSetState_  = XinputSetStateStub;
 
 
 struct win32Dimension{
+    int PosX{0};
+    int PosY{0};
     int Height{720};
     int Width{1280};
 }Dimens;
@@ -90,9 +92,8 @@ global_variable LPDIRECTSOUNDBUFFER GlobalSecondBuffer;
 global_variable Win32_OffScreen_Buffer BackBuffer = {};
 
 global_variable Game_State State = {};
-
-const global_variable int Height{720};
-const global_variable int Width{1280};
+const global_variable int Height = 720;
+const global_variable int Width = 1280;
 
 void* PlatformLoadFile(char* FileName);
 

@@ -48,8 +48,6 @@ typedef uint32_t uint32;
 typedef float real32;
 typedef double real64;
 
-
-
 struct Game_OffScreen_Buffer{  
     // BITMAPINFO Bitmapinfo;
     // HBITMAP BitmapHandle;
