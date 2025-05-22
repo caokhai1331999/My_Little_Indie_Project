@@ -69,7 +69,6 @@ void RenderSplendidGradient(Game_OffScreen_Buffer* OBuffer, int XOffset, int YOf
         // we just need to reuse the Pixel pointer pass it to row where it was already moved
         Row = (uint8 *)Pixel;        
     }
-
 }
 
 void GameOutPutSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz) {
@@ -157,12 +156,12 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
         DIB_RGB_COLORS,
         SRCCOPY
                   );    
-
     // NOTE: The 2 triangles was expected to fill the screen
     // But they didn't cause the fixed fx didn'take the verticles data
     // to actually did according to these
 
     // Why Flickering???
+    // Put the pixel drawing fx in the window/app loop
     printf("Draw something here\n");
     glViewport(0, 0, WindowWidth, WindowHeight);
     glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
@@ -179,9 +178,11 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
     real32 p = 0.7f;
     
     // Upper triangle
-    glColor3f(1.0f, 0.0f, 0.5f);
+    glColor3f(1.0f, 0.0f, 0.0f);
     glVertex2f(-p, p);
+    glColor3f(0.0f, 1.0f, 0.0f);
     glVertex2f(-p, -p);
+    glColor3f(0.0f, 0.0f, 1.0f);
     glVertex2f(p, -p);
     // Below triangle
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -196,7 +197,7 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
 }
 
 
-void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* State, Game_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer){
+void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* State, Game_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){
 
     if(Memory->IsInitialized){
         State->Hz = 256;
@@ -213,11 +214,15 @@ void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* Sta
         
     }
     
-    // if(Input0->Down.EndedDown){
-    //     State->GreenOffset += 1;
-    // }
-    
-    // RenderSplendidGradient(OBuffer, State->BlueOffset, State->GreenOffset);
+    if(Input0->Down.EndedDown){
+        State->GreenOffset += 1;
+    }
+    RenderSplendidGradient(OBuffer, State->BlueOffset, State->GreenOffset);                
+
+    // The flickering bug is due to thes Swapbuffer inside the app
+    // loop
+    // SwapBuffers(DeviceContext);
+
     GameOutPutSound(SoundBuffer, State->Hz);
 }
 
@@ -265,4 +270,11 @@ void InitOpenGL(HWND window){
     }
     // Release unused DC
     ReleaseDC(window, windowDC);
+}
+
+void OpenConsole() {
+    AllocConsole();                             // Allocate a new console
+    freopen("CONOUT$", "w", stdout);            // Redirect printf to console
+    // freopen("CONOUT$", "w", stderr);            // Redirect stderr
+    // freopen("CONIN$", "r", stdin);              // Redirect stdin (optional)
 }

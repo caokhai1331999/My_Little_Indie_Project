@@ -293,6 +293,8 @@ LRESULT CALLBACK MainWindowCallBack(
                                     )
 {
     LRESULT result;
+    bool fDraw = false;
+    POINT ptPrevious;
     switch(Message) {
         case WM_SIZE:
         {
@@ -399,7 +401,6 @@ LRESULT CALLBACK MainWindowCallBack(
             PostQuitMessage(0);
             OutputDebugStringA("WM_DESTROY\n");            
         }break;
-
         
         case WM_PAINT:            
         {
@@ -424,14 +425,43 @@ LRESULT CALLBACK MainWindowCallBack(
             Win32DisplayBufferWindow(DeviceContext,Dimens.Width, Dimens.Height, &BackBuffer);
             EndPaint(Window, &Paint);
             OutputDebugStringA("WM_PAINT\n");
-        }break;
-        
+        }
+        break;
+        case WM_LBUTTONDOWN: 
+            fDraw = TRUE; 
+            ptPrevious.x = LOWORD(Lparam); 
+            ptPrevious.y = HIWORD(Lparam);
+            return 0L; 
+            // break;
+        case WM_LBUTTONUP: 
+            if (fDraw) 
+            { 
+                DeviceContext = GetDC(Window); 
+                MoveToEx(DeviceContext, ptPrevious.x, ptPrevious.y, NULL); 
+                LineTo(DeviceContext, LOWORD(Lparam), HIWORD(Lparam)); 
+                ReleaseDC(Window, DeviceContext); 
+            } 
+            fDraw = FALSE; 
+            return 0L; 
+            // break; 
+        case WM_MOUSEMOVE: 
+            if (fDraw) 
+            { 
+                DeviceContext = GetDC(Window); 
+                MoveToEx(DeviceContext, ptPrevious.x, ptPrevious.y, NULL); 
+                LineTo(DeviceContext, ptPrevious.x = LOWORD(Lparam), 
+                ptPrevious.y = HIWORD(Lparam)); 
+                ReleaseDC(Window, DeviceContext); 
+            }
+            return 0L; 
+            // break;            
         default:
         {
             OutputDebugStringA("DEFAULT\n");
             result = DefWindowProc(Window, Message, Wparam, Lparam);
         }break;
     }
+    // return 0L;         
     return result;
 }
 
@@ -444,6 +474,7 @@ int CALLBACK WinMain
     GMemory = {};
     LARGE_INTEGER PerfCountFrequencyResult;
     QueryPerformanceCounter(&PerfCountFrequencyResult);
+    OpenConsole();
     // NOTE: Actually, this the counts per second
     // TODO: Try to find out why the PerfCountFrequency is too large.
 
@@ -513,6 +544,7 @@ int CALLBACK WinMain
 
             LastCycleCounts = __rdtsc();
             InitOpenGL(Window);
+            int MaxControllerCount = XUSER_MAX_COUNT;
             while(GlobalRunning) {
                 MSG Message;
                 // NOTE: This is where receiving the message to change
@@ -525,7 +557,6 @@ int CALLBACK WinMain
                     TranslateMessage(&Message);
                 }
 
-                int MaxControllerCount = XUSER_MAX_COUNT;
                 if( MaxControllerCount > ArrayCount(Input->Controller)) {
                     MaxControllerCount = ArrayCount(Input->Controller);   
                 }
@@ -596,8 +627,6 @@ int CALLBACK WinMain
                 Vibration.wRightMotorSpeed = 350;
                 XinputSetState(0, &Vibration);
 
-                // RenderSplendidGradient(&BackBuffer, XOffset, YOffset);
-
                 // ===========================================================
                 // NOTE: The writting cursor create data and the play one will pick
                 // everyone of them and send to sound card to make sound .
@@ -615,6 +644,8 @@ int CALLBACK WinMain
                 DWORD ByteToWrite;
                 DWORD TargetCursor;
                 bool32 SoundIsValid = false ;
+
+                // Constantly write sound===============================
                 if(SUCCEEDED(GlobalSecondBuffer->GetCurrentPosition(&PlayCursor,            &WriteCursor))) {
                     
                     ByteToLock = (SoundOutPut.RunningSampleIndex* SoundOutPut.BytesPerSample)% SoundOutPut.SecondBufferSize;
@@ -656,7 +687,6 @@ int CALLBACK WinMain
                 // implementation after a little remove of few arguments
                 
                 // TODO: This function just being called once
-                
 
                 if (SoundIsValid){
                     // TODO: Devle more about why I had to mod SecondBufferSize
@@ -669,9 +699,8 @@ int CALLBACK WinMain
                 
                 DeviceContext = GetDC(Window);                                    
 
-                // Display here                
-                Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height, &BackBuffer);
-                GameUpdateAndRender(&GMemory, NewInput, &State, &ScreenBuffer, &SoundBuffer);
+                // Update here                
+                GameUpdateAndRender(&GMemory, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
                 // NOTE: Check whether OpenGL work or not
                 // Define the boundary of what we want to render
                 

@@ -107,9 +107,10 @@ void Win32DisplayBufferWindow (HDC DeviceContext, int WindowWidth, int WindowHei
 
 void GameOutputSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz);
 
-void GameUpdateAndRender(Game_Memory* Memory = nullptr ,Game_Input* Input = nullptr, Game_State* State = nullptr ,Game_OffScreen_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr);
+void GameUpdateAndRender(Game_Memory* Memory = nullptr ,Game_Input* Input = nullptr, Game_State* State = nullptr ,Game_OffScreen_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr, HDC DeviceContext = NULL);
 
 void InitOpenGL(HWND window);
+void OpenConsole();
 
 #define WIN32GAME_H
 #endif

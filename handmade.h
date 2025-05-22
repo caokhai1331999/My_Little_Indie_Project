@@ -119,7 +119,7 @@ struct Game_State{
 // TODO: Allow the sample offset here for more robust platform options
 
 internal void GameOutputSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz);
-internal void RenderSplendidGradient(Game_OffScreen_Buffer* OBuffer, int XOffset, int YOffset);
+// internal void RenderSplendidGradient(Game_OffScreen_Buffer* OBuffer, int XOffset, int YOffset);
 
 #define HANDMADE_H
 #endif
