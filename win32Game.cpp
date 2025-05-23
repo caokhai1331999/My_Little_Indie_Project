@@ -47,7 +47,7 @@ win32LoadXInput(void) {
     }
 }
 
-void RenderSplendidGradient(Game_OffScreen_Buffer* OBuffer, int XOffset, int YOffset) {
+void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, int XOffset, int YOffset) {
     // RR GG BB
     // Row is a pointer to every line of bitmapMemory
     // While pitch is data length of everyline of bitmap
@@ -162,43 +162,15 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
 
     // Why Flickering???
     // Put the pixel drawing fx in the window/app loop
-    printf("Draw something here\n");
-    glViewport(0, 0, WindowWidth, WindowHeight);
-    glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
     
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();    
-
-    glBegin(GL_TRIANGLES);
-
-    real32 p = 0.7f;
-    
-    // Upper triangle
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glVertex2f(-p, p);
-    glColor3f(0.0f, 1.0f, 0.0f);
-    glVertex2f(-p, -p);
-    glColor3f(0.0f, 0.0f, 1.0f);
-    glVertex2f(p, -p);
-    // Below triangle
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glVertex2f(-p, p);
-    glVertex2f(p, p);
-    glVertex2f(p, -p);
-
-    glEnd();
-    // Display on the screen
-    SwapBuffers(DeviceContext);
-
 }
 
 
-void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* State, Game_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){
+void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){
 
+    bool32 initTexture = false;
+    GLuint textureHandle = 0;
+    
     if(Memory->IsInitialized){
         State->Hz = 256;
         // State->BlueOffset = 0;
@@ -217,19 +189,83 @@ void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* Sta
     if(Input0->Down.EndedDown){
         State->GreenOffset += 1;
     }
-    RenderSplendidGradient(OBuffer, State->BlueOffset, State->GreenOffset);                
 
+    Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height, OBuffer );
+    
     // The flickering bug is due to thes Swapbuffer inside the app
     // loop
-    // SwapBuffers(DeviceContext);
+    // Draw pixel here    
+    // printf("Draw something here\n");
+    RenderSplendidGradient(OBuffer, State->BlueOffset, State->GreenOffset);
 
+    if(!initTexture){
+        glGenTextures(1, &textureHandle);
+        initTexture = true;
+        printf("Succeed Init texture\n");
+    }
+
+    glBindTexture(GL_TEXTURE_2D, textureHandle);
+    //last argument This is where point to the image data
+    // Why this doesn't work
+    glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, BackBuffer.BitmapMemory);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+    glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glEnable(GL_TEXTURE_2D);
+    glMatrixMode(GL_TEXTURE);
+    glLoadIdentity();
+    
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();    
+    
+    glBegin(GL_TRIANGLES);
+
+    real32 p = 0.7f;
+    
+    // // Upper triangle
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex2f(-p, p);
+    glColor3f(0.0f, 1.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex2f(-p, -p);
+    glTexCoord2f(1.0f, 0.0f);
+    glColor3f(0.0f, 0.0f, 1.0f);
+    glVertex2f(p, -p);
+    // // Below triangle
+    // glColor3f(p, p, p);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex2f(-p, p);
+    glTexCoord2f(p, p);
+    glVertex2f(p, p);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex2f(p, -p);
+
+    glEnd();    
+    // Display on the screen
+    SwapBuffers(DeviceContext);
+    // Release unused DC    
     GameOutPutSound(SoundBuffer, State->Hz);
 }
 
-void InitOpenGL(HWND window){
+
+void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer){
     // first device context gotten from current window
     HDC windowDC = GetDC(window);
     HGLRC openglRC = wglCreateContext(windowDC);
+    
     // Then create rendering context of opengl from it
     // Create the pixel format features
     PIXELFORMATDESCRIPTOR desiredPixelFormat = {};
@@ -261,14 +297,19 @@ void InitOpenGL(HWND window){
          // Then init it
         if(wglMakeCurrent(windowDC, openglRC)){
             printf("Succeed to init OpenGl\n");
+            // Time to create texture
+            // Create texture
+            // Bind it
+            // and set some parameter
+
         } else {
             // TODO: Diagnostic
+            printf("Failed to init OpenGl\n");            
         };   
 
     } else {
         printf("Failed to init OpenGl\n");
     }
-    // Release unused DC
     ReleaseDC(window, windowDC);
 }
 

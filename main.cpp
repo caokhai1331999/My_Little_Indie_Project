@@ -412,8 +412,8 @@ LRESULT CALLBACK MainWindowCallBack(
             
             // int width = Paint.rcPaint.right - Paint.rcPaint.left;
             // int height = Paint.rcPaint.bottom - Paint.rcPaint.top;
-
             GetWindowDimension(Window);
+
             // local_persist DWORD Operation = WHITENESS;
 
             // if (Operation == WHITENESS) {
@@ -488,7 +488,6 @@ int CALLBACK WinMain
     Win32ResizeDIBSection(&BackBuffer, Dimens.Height, Dimens.Width);
 
     if(RegisterClassA(&WindowClass)) {
-        
         Window = CreateWindowExA(
             // NOTE: The window didn't show up is because the first argument
             0,
@@ -505,12 +504,10 @@ int CALLBACK WinMain
             0);
         // Wrong order
         // Init here
-        InitOpenGL(Window);
 
         if(Window) {
             GlobalRunning = true; 
             //NOTE: we create a second buffer last for 2 second with
-
             // int16* SSamples = nullptr;
             // NOTE: Don't call _alloc in the app loop it cause bug (it doesn't clean up entirely but just barely in the function)
 
@@ -543,7 +540,6 @@ int CALLBACK WinMain
             Game_Input* NewInput = &Input[1];
 
             LastCycleCounts = __rdtsc();
-            InitOpenGL(Window);
             int MaxControllerCount = XUSER_MAX_COUNT;
             while(GlobalRunning) {
                 MSG Message;
@@ -677,7 +673,7 @@ int CALLBACK WinMain
                 SoundBuffer.Samples = nullptr;
                 SoundBuffer.Samples = SSamples;
                 
-                Game_OffScreen_Buffer ScreenBuffer = {};
+                Win32_OffScreen_Buffer ScreenBuffer = {};
                 ScreenBuffer.BitmapMemory = BackBuffer.BitmapMemory;
                 ScreenBuffer.BitmapWidth = BackBuffer.BitmapWidth;
                 ScreenBuffer.BitmapHeight = BackBuffer.BitmapHeight;
@@ -698,11 +694,16 @@ int CALLBACK WinMain
                 // =============================================================
                 
                 DeviceContext = GetDC(Window);                                    
-
+                InitOpenGL(Window, &BackBuffer);
                 // Update here                
+                // Why This function show the drawn pixel
+                Win32DisplayBufferWindow(DeviceContext,Dimens.Width, Dimens.Height, &BackBuffer); // Back Buffer contain the already drawn pixels with no OpenGL involved
+                // Why this no longer show triangles
+                // The Screen Buffer with OpenGL involved have no data 
                 GameUpdateAndRender(&GMemory, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
+
                 // NOTE: Check whether OpenGL work or not
-                // Define the boundary of what we want to render
+                // Define the boundary of what we want to rende
                 
                 LARGE_INTEGER EndCounter;
                 QueryPerformanceCounter(&EndCounter);

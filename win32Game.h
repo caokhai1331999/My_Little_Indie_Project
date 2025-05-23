@@ -102,14 +102,16 @@ void ProcessXinputDigitalButton(DWORD XInputButtonState ,Game_Button_State* OldS
 
 void GetWindowDimension(HWND Window);
 void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Height);
+
 void RenderSplendidGradient(Game_OffScreen_Buffer* OBuffer, int XOffset, int YOffset);
+
 void Win32DisplayBufferWindow (HDC DeviceContext, int WindowWidth, int WindowHeight, Win32_OffScreen_Buffer* OBuffer);
 
 void GameOutputSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz);
 
-void GameUpdateAndRender(Game_Memory* Memory = nullptr ,Game_Input* Input = nullptr, Game_State* State = nullptr ,Game_OffScreen_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr, HDC DeviceContext = NULL);
+void GameUpdateAndRender(Game_Memory* Memory = nullptr ,Game_Input* Input = nullptr, Game_State* State = nullptr ,Win32_OffScreen_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr, HDC DeviceContext = NULL);
 
-void InitOpenGL(HWND window);
+void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer);
 void OpenConsole();
 
 #define WIN32GAME_H
