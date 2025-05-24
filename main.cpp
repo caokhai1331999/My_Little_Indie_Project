@@ -422,7 +422,7 @@ LRESULT CALLBACK MainWindowCallBack(
             //     Operation = WHITENESS;
             // }
             
-            Win32DisplayBufferWindow(DeviceContext,Dimens.Width, Dimens.Height, &BackBuffer);
+            // Win32DisplayBufferWindow(DeviceContext,Dimens.Width, Dimens.Height, &BackBuffer);
             EndPaint(Window, &Paint);
             OutputDebugStringA("WM_PAINT\n");
         }
@@ -697,7 +697,8 @@ int CALLBACK WinMain
                 InitOpenGL(Window, &BackBuffer);
                 // Update here                
                 // Why This function show the drawn pixel
-                Win32DisplayBufferWindow(DeviceContext,Dimens.Width, Dimens.Height, &BackBuffer); // Back Buffer contain the already drawn pixels with no OpenGL involved
+                // Back Buffer contain the already drawn pixels with no OpenGL involved
+                // Win32DisplayBufferWindow(DeviceContext,Dimens.Width, Dimens.Height, &BackBuffer);
                 // Why this no longer show triangles
                 // The Screen Buffer with OpenGL involved have no data 
                 GameUpdateAndRender(&GMemory, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);

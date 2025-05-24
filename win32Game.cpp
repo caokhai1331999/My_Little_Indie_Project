@@ -162,15 +162,10 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
 
     // Why Flickering???
     // Put the pixel drawing fx in the window/app loop
-    
 }
 
 
-void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){
-
-    bool32 initTexture = false;
-    GLuint textureHandle = 0;
-    
+void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){    
     if(Memory->IsInitialized){
         State->Hz = 256;
         // State->BlueOffset = 0;
@@ -190,25 +185,18 @@ void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* Sta
         State->GreenOffset += 1;
     }
 
-    Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height, OBuffer );
-    
+    // Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height, OBuffer );
+   
     // The flickering bug is due to thes Swapbuffer inside the app
     // loop
     // Draw pixel here    
     // printf("Draw something here\n");
+
     RenderSplendidGradient(OBuffer, State->BlueOffset, State->GreenOffset);
-
-    if(!initTexture){
-        glGenTextures(1, &textureHandle);
-        initTexture = true;
-        printf("Succeed Init texture\n");
-    }
-
-    glBindTexture(GL_TEXTURE_2D, textureHandle);
     //last argument This is where point to the image data
     // Why this doesn't work
     glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, BackBuffer.BitmapMemory);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -219,8 +207,6 @@ void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* Sta
 
     glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-
-    glEnable(GL_TEXTURE_2D);
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
     
@@ -232,26 +218,26 @@ void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* Sta
     
     glBegin(GL_TRIANGLES);
 
-    real32 p = 0.7f;
+    real32 p = 0.9f;
     
     // // Upper triangle
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glTexCoord2f(0.0f, 1.0f);
     glVertex2f(-p, p);
-    glColor3f(0.0f, 1.0f, 0.0f);
-    glTexCoord2f(0.0f, 0.0f);
+    // glColor3f(1.0f, 0.0f, 0.0f);
+    glTexCoord2f(0.0f, 1.0f);
     glVertex2f(-p, -p);
-    glTexCoord2f(1.0f, 0.0f);
-    glColor3f(0.0f, 0.0f, 1.0f);
+    // glColor3f(0.0f, 1.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);
     glVertex2f(p, -p);
+    // glColor3f(0.0f, 0.0f, 1.0f);
+    glTexCoord2f(1.0f, 0.0f);
     // // Below triangle
     // glColor3f(p, p, p);
-    glTexCoord2f(0.0f, 1.0f);
     glVertex2f(-p, p);
-    glTexCoord2f(p, p);
+    glTexCoord2f(0.0f, 1.0f);
     glVertex2f(p, p);
-    glTexCoord2f(1.0f, 0.0f);
+    glTexCoord2f(1.0f, 1.0f);
     glVertex2f(p, -p);
+    glTexCoord2f(1.0f, 0.0f);
 
     glEnd();    
     // Display on the screen
@@ -281,6 +267,8 @@ void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer){
 
     // Create a format from that index
     PIXELFORMATDESCRIPTOR suggestedPixelFormat;
+    bool32 initTexture = false;
+    GLuint textureHandle = 0;
 
     DescribePixelFormat(
         windowDC,
@@ -296,7 +284,16 @@ void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer){
     {
          // Then init it
         if(wglMakeCurrent(windowDC, openglRC)){
-            printf("Succeed to init OpenGl\n");
+            // printf("Succeed to init OpenGl\n");
+
+            // if(!initTexture){
+            //     glGenTextures(1, &textureHandle);
+            //     initTexture = true;
+            //     // printf("Succeed Init texture\n");
+            // }
+            textureHandle = 1;
+            glBindTexture(GL_TEXTURE_2D, textureHandle);
+            glEnable(GL_TEXTURE_2D);
             // Time to create texture
             // Create texture
             // Bind it
