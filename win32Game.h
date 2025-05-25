@@ -113,6 +113,5 @@ void GameUpdateAndRender(Game_Memory* Memory = nullptr ,Game_Input* Input = null
 
 void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer);
 void OpenConsole();
-
 #define WIN32GAME_H
 #endif

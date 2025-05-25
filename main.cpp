@@ -413,7 +413,6 @@ LRESULT CALLBACK MainWindowCallBack(
             // int width = Paint.rcPaint.right - Paint.rcPaint.left;
             // int height = Paint.rcPaint.bottom - Paint.rcPaint.top;
             GetWindowDimension(Window);
-
             // local_persist DWORD Operation = WHITENESS;
 
             // if (Operation == WHITENESS) {
@@ -502,11 +501,9 @@ int CALLBACK WinMain
             0,
             Instance ,
             0);
-        // Wrong order
-        // Init here
-
         if(Window) {
             GlobalRunning = true; 
+
             //NOTE: we create a second buffer last for 2 second with
             // int16* SSamples = nullptr;
             // NOTE: Don't call _alloc in the app loop it cause bug (it doesn't clean up entirely but just barely in the function)
@@ -541,7 +538,22 @@ int CALLBACK WinMain
 
             LastCycleCounts = __rdtsc();
             int MaxControllerCount = XUSER_MAX_COUNT;
+
+            // Init here
+            // NOTE: Why InitOpenGL only work while in window loop
+            // May be this is related to Window and DC that hasn't been
+            // initialized yet
+            Game_Sound_OutPut SoundBuffer = {};
+            Win32_OffScreen_Buffer ScreenBuffer = {};
+            // Why InitOpenGl only work in the app loop
+                
+            ScreenBuffer.BitmapMemory = BackBuffer.BitmapMemory;
+            ScreenBuffer.BitmapWidth = BackBuffer.BitmapWidth;
+            ScreenBuffer.BitmapHeight = BackBuffer.BitmapHeight;
+            ScreenBuffer.Pitch = BackBuffer.Pitch;
+
             while(GlobalRunning) {
+                InitOpenGL(Window, &ScreenBuffer);
                 MSG Message;
                 // NOTE: This is where receiving the message to change
                 // for any change in window
@@ -665,20 +677,16 @@ int CALLBACK WinMain
                     SoundIsValid  = true; 
                 }                
 
-                // NOTE: this function throw this memory on the stack and I know
-                // it will go away when it function is done
-                Game_Sound_OutPut SoundBuffer = {};
+
                 SoundBuffer.SamplePerSecond = SoundOutPut.SamplePerSecond;
                 SoundBuffer.SampleCounts = ByteToWrite/SoundOutPut.BytesPerSample;
                 SoundBuffer.Samples = nullptr;
-                SoundBuffer.Samples = SSamples;
+                SoundBuffer.Samples = SSamples;                
                 
-                Win32_OffScreen_Buffer ScreenBuffer = {};
-                ScreenBuffer.BitmapMemory = BackBuffer.BitmapMemory;
-                ScreenBuffer.BitmapWidth = BackBuffer.BitmapWidth;
-                ScreenBuffer.BitmapHeight = BackBuffer.BitmapHeight;
-                ScreenBuffer.Pitch = BackBuffer.Pitch;
+                // NOTE: this function throw this memory on the stack and I know
+                // it will go away when it function is done
                 GlobalSecondBuffer->Play( 0, 0, DSBPLAY_LOOPING);
+
                 // NOTE: Don't know why compiler couldn't find this function
                 // implementation after a little remove of few arguments
                 
@@ -694,13 +702,8 @@ int CALLBACK WinMain
                 // =============================================================
                 
                 DeviceContext = GetDC(Window);                                    
-                InitOpenGL(Window, &BackBuffer);
+                // WHY????
                 // Update here                
-                // Why This function show the drawn pixel
-                // Back Buffer contain the already drawn pixels with no OpenGL involved
-                // Win32DisplayBufferWindow(DeviceContext,Dimens.Width, Dimens.Height, &BackBuffer);
-                // Why this no longer show triangles
-                // The Screen Buffer with OpenGL involved have no data 
                 GameUpdateAndRender(&GMemory, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
 
                 // NOTE: Check whether OpenGL work or not

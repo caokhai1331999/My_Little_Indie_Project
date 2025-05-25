@@ -134,6 +134,7 @@ void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Heigh
              
     BitMapMemorySize = OBuffer->BytesPerPixel*(OBuffer->BitmapWidth*OBuffer->BitmapHeight);
     OBuffer->BitmapMemory = VirtualAlloc(0 ,BitMapMemorySize ,MEM_COMMIT, PAGE_READWRITE);
+
 }
 
 // NOTE: Keep in mind that try to all what you need to release back to memory
@@ -191,53 +192,27 @@ void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* Sta
     // loop
     // Draw pixel here    
     // printf("Draw something here\n");
-
-    RenderSplendidGradient(OBuffer, State->BlueOffset, State->GreenOffset);
-    //last argument This is where point to the image data
-    // Why this doesn't work
-    glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-    glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glMatrixMode(GL_TEXTURE);
-    glLoadIdentity();
-    
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();    
-    
     glBegin(GL_TRIANGLES);
-
     real32 p = 0.9f;
-    
+    RenderSplendidGradient(OBuffer, State->BlueOffset, State->GreenOffset);
     // // Upper triangle
+    glTexCoord2f(0.0f, 1.0f);
     glVertex2f(-p, p);
     // glColor3f(1.0f, 0.0f, 0.0f);
-    glTexCoord2f(0.0f, 1.0f);
+    glTexCoord2f(0.0f, 0.0f);
     glVertex2f(-p, -p);
     // glColor3f(0.0f, 1.0f, 0.0f);
-    glTexCoord2f(0.0f, 0.0f);
+    glTexCoord2f(1.0f, 0.0f);
     glVertex2f(p, -p);
     // glColor3f(0.0f, 0.0f, 1.0f);
-    glTexCoord2f(1.0f, 0.0f);
     // // Below triangle
     // glColor3f(p, p, p);
-    glVertex2f(-p, p);
     glTexCoord2f(0.0f, 1.0f);
-    glVertex2f(p, p);
+    glVertex2f(-p, p);
     glTexCoord2f(1.0f, 1.0f);
-    glVertex2f(p, -p);
+    glVertex2f(p, p);
     glTexCoord2f(1.0f, 0.0f);
+    glVertex2f(p, -p);
 
     glEnd();    
     // Display on the screen
@@ -249,6 +224,7 @@ void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* Sta
 
 void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer){
     // first device context gotten from current window
+    printf("Start to init OpenGL\n");
     HDC windowDC = GetDC(window);
     HGLRC openglRC = wglCreateContext(windowDC);
     
@@ -283,27 +259,52 @@ void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer){
          )
     {
          // Then init it
+            // Time to create texture
+            // Create texture
+            // Bind it
+            // and set some parameter
         if(wglMakeCurrent(windowDC, openglRC)){
+
             // printf("Succeed to init OpenGl\n");
 
             // if(!initTexture){
             //     glGenTextures(1, &textureHandle);
             //     initTexture = true;
-            //     // printf("Succeed Init texture\n");
             // }
-            textureHandle = 1;
-            glBindTexture(GL_TEXTURE_2D, textureHandle);
-            glEnable(GL_TEXTURE_2D);
-            // Time to create texture
-            // Create texture
-            // Bind it
-            // and set some parameter
 
+            printf("Succeed create OpenGL Context\n");
+            glGenTextures(1, &textureHandle);
+            glBindTexture(GL_TEXTURE_2D, textureHandle);
+
+            //last argument This is where point to the image data
+            // Why this doesn't work
+            glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+            glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            glMatrixMode(GL_TEXTURE);
+            glLoadIdentity();
+    
+            glMatrixMode(GL_MODELVIEW);
+            glLoadIdentity();
+
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();    
+
+            glEnable(GL_TEXTURE_2D);
         } else {
             // TODO: Diagnostic
             printf("Failed to init OpenGl\n");            
         };   
-
     } else {
         printf("Failed to init OpenGl\n");
     }
@@ -315,4 +316,8 @@ void OpenConsole() {
     freopen("CONOUT$", "w", stdout);            // Redirect printf to console
     // freopen("CONOUT$", "w", stderr);            // Redirect stderr
     // freopen("CONIN$", "r", stdin);              // Redirect stdin (optional)
+}
+
+void LoadTileMap(){
+    Tile
 }
