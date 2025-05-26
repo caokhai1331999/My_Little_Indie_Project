@@ -12,11 +12,19 @@
 
 using namespace std;
 
+struct 3DPos{
+    real32 x;
+    real32 y;
+    real32 z;
+};
+
 struct Tile{
-    int x;
-    int y;
-    int z;
+    3DPos Pos;
     int ID;
+    Tile(){
+        Pos = {};
+        ID = 0;;
+    };
 };
 
 // void LoadTileMap();
