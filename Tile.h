@@ -16,6 +16,11 @@ struct 3DPos{
     real32 x;
     real32 y;
     real32 z;
+    3DPos(){
+        x = 0;  
+        y = 0;  
+        z = 0;  
+    };
 };
 
 struct Tile{
