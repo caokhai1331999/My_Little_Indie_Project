@@ -193,11 +193,11 @@ void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* Sta
     // Draw pixel here    
     // printf("Draw something here\n");
     glBegin(GL_TRIANGLES);
-    real32 a =;
-    real32 b =;
-    real32 proj[]={
+    // real32 a =;
+    // real32 b =;
+    // real32 proj[]={
         
-    }
+    // }
     real32 p = 0.9f;
     RenderSplendidGradient(OBuffer, State->BlueOffset, State->GreenOffset);
     // // Upper triangle
@@ -229,7 +229,7 @@ void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* Sta
 
 void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer){
     // first device context gotten from current window
-    printf("Start to init OpenGL\n");
+    // printf("Start to init OpenGL\n");
     HDC windowDC = GetDC(window);
     HGLRC openglRC = wglCreateContext(windowDC);
     
@@ -277,7 +277,7 @@ void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer){
             //     initTexture = true;
             // }
 
-            printf("Succeed create OpenGL Context\n");
+            // printf("Succeed create OpenGL Context\n");
             glGenTextures(1, &textureHandle);
             glBindTexture(GL_TEXTURE_2D, textureHandle);
 
@@ -323,14 +323,14 @@ void OpenConsole() {
     // freopen("CONIN$", "r", stdin);              // Redirect stdin (optional)
 }
 
-void LoadTileMap(){
-    Tile
-}
+// void LoadTileMap(){
+//     Tile
+// }
 
 real32 saferatioN(real32 numerator, real32 divisor, real32 N){
     real32 result = N;
     if(divisor!=0.0f){
-        result = (real32)(numberator/divisor);
+        result = (real32)(numerator/divisor);
     }
     return result;
 }

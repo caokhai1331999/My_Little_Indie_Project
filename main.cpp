@@ -504,6 +504,12 @@ int CALLBACK WinMain
         if(Window) {
             GlobalRunning = true; 
 
+            HDC devicecontext = GetDC(Window);
+            int refreshRate = GetDeviceCaps(devicecontext, VREFRESH);
+            ReleaseDC(devicecontext);
+            if(refreshRate > 1){
+                printf("Refresh rate is : %dHz", refreshRate);
+            };
             //NOTE: we create a second buffer last for 2 second with
             // int16* SSamples = nullptr;
             // NOTE: Don't call _alloc in the app loop it cause bug (it doesn't clean up entirely but just barely in the function)
