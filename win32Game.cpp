@@ -210,7 +210,7 @@ void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* Sta
     glTexCoord2f(1.0f, 0.0f);
     glVertex2f(p, -p);
     // glColor3f(0.0f, 0.0f, 1.0f);
-    // // Below triangle
+    // Below triangle
     // glColor3f(p, p, p);
     glTexCoord2f(0.0f, 1.0f);
     glVertex2f(-p, p);
@@ -219,6 +219,21 @@ void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* Sta
     glTexCoord2f(1.0f, 0.0f);
     glVertex2f(p, -p);
 
+    glBitmap(
+         Dimens.Width * 0.9,
+         Dimens.Height * 0.9,
+         Dimens.Width * 0.1,
+         Dimens.Height * 0.1,
+         0,0,
+         LoadBitmapA(
+             NULL,
+             "media\Harry and Accomplices.jpg"             
+                     )
+         );
+
+if(glGetError() != GL_NO_ERROR){
+    printf("OpenGL Error: %s\n", glGetError());
+};
     glEnd();    
     // Display on the screen
     SwapBuffers(DeviceContext);

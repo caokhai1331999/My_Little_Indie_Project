@@ -481,7 +481,7 @@ int CALLBACK WinMain
     int64 PerfCountFrequency = (int64)(PerfCountFrequencyResult.QuadPart);                
     win32LoadXInput();
     WNDCLASSA WindowClass = {};
-    WindowClass.lpfnWndProc = MainWindowCallBack;
+    WindowClass.wlpfnWndProc = MainWindowCallBack;
     WindowClass.hInstance = Instance;
     WindowClass.lpszClassName = "First Game Window Class";
     Win32ResizeDIBSection(&BackBuffer, Dimens.Height, Dimens.Width);
@@ -506,7 +506,7 @@ int CALLBACK WinMain
 
             HDC devicecontext = GetDC(Window);
             int refreshRate = GetDeviceCaps(devicecontext, VREFRESH);
-            ReleaseDC(devicecontext);
+            ReleaseDC(Window, devicecontext);
             if(refreshRate > 1){
                 printf("Refresh rate is : %dHz", refreshRate);
             };

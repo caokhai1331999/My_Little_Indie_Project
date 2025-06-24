@@ -24,7 +24,7 @@ internal void GameOutPutSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz) {
     local_persist int WavePeriod = 0;
     WavePeriod = SecondSoundBuffer->SamplePerSecond/Hz;
     
-    // int16 SampleValue = ((RunningSampleIndex++/          (SquareWavePeriod/2))% 2) ? ToneVolume : -ToneVolume;
+    // int16 SampleValue = ((RunningSampleIndex++/(SquareWavePeriod/2))% 2) ? ToneVolume : -ToneVolume;
     int16* SampleOut = nullptr;
     SampleOut = SecondSoundBuffer->Samples;
 
