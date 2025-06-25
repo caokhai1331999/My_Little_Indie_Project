@@ -97,6 +97,10 @@ const global_variable int Width = 1280;
 
 void* PlatformLoadFile(char* FileName);
 
+void* DEBUGReadFileWhole(char* filename);
+bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory);
+void DEBUGFreeFileMemory(void* memory);
+
 void win32LoadXInput(void);
 void ProcessXinputDigitalButton(DWORD XInputButtonState ,Game_Button_State* OldState ,DWORD ButtonBit, Game_Button_State* NewState);
 

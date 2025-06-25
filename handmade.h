@@ -39,7 +39,7 @@ typedef int64_t int64;
 typedef uint64_t uint64;
 
 typedef bool bool16;
-typedef bool bool32;
+typedef int32 bool32;
 
 typedef uint8_t uint8;
 typedef uint16_t uint16;
@@ -106,9 +106,9 @@ struct Game_Input{
 
 struct Game_Memory{
     bool32 IsInitialized; 
-    uint32 MemorySize;
+    uint64 MemorySize;
     void* PermanentStorage;
-}GMemory;
+};
 
 struct Game_State{
     int BlueOffset = 0;

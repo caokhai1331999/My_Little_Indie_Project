@@ -510,6 +510,13 @@ int CALLBACK WinMain
             if(refreshRate > 1){
                 printf("Refresh rate is : %dHz", refreshRate);
             };
+
+            // ===============================================
+            Game_Memory game_memory = {};
+            game_memory.MemorySize = Megabytes(64);
+            game_memory.PermanentStorage = VirtualAlloc(0 , game_memory.MemorySize,  MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+            // ==============================================
+
             //NOTE: we create a second buffer last for 2 second with
             // int16* SSamples = nullptr;
             // NOTE: Don't call _alloc in the app loop it cause bug (it doesn't clean up entirely but just barely in the function)
@@ -697,20 +704,17 @@ int CALLBACK WinMain
                 // implementation after a little remove of few arguments
                 
                 // TODO: This function just being called once
-
                 if (SoundIsValid){
                     // TODO: Devle more about why I had to mod SecondBufferSize
                     // to Byte based on index to create bytetolock
-
                     Win32FillSoundBuffer(&SoundOutPut, ByteToLock, ByteToWrite, &SoundBuffer);
                 }                                                    
-                                
+                                                
                 // =============================================================
-                
                 DeviceContext = GetDC(Window);                                    
                 // WHY????
-                // Update here                
-                GameUpdateAndRender(&GMemory, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
+                // Update here
+                GameUpdateAndRender(&game_memory, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
 
                 // NOTE: Check whether OpenGL work or not
                 // Define the boundary of what we want to rende

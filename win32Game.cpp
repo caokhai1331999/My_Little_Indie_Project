@@ -27,6 +27,20 @@
  */
 #include "win32Game.h"
 
+
+void* DEBUGReadFileWhole(char* filename){
+    
+}
+
+bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory){
+    
+}
+
+void DEBUGFreeFileMemory(void* memory){
+    
+}
+
+
 void
 win32LoadXInput(void) {
     HMODULE XInputLibrary = LoadLibrary("xinput1_4.dll");
@@ -166,11 +180,18 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
 }
 
 
-void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){    
-    if(Memory->IsInitialized){
+void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){
+    
+    if(!Memory->IsInitialized){
         State->Hz = 256;
         // State->BlueOffset = 0;
         // State->GreenOffset = 0;
+        char* FileName = "";
+        void* BitMapMemory = DEBUGReadFileWhole(FileName);
+        if(BitMapMemory){
+            DEBUGFreeFileMemory(BitMapMemory);
+        };
+        ;
     }
     
     Game_Controller_Input* Input0 = &Input->Controller[0];
