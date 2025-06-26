@@ -28,8 +28,48 @@
 #include "win32Game.h"
 
 
-void* DEBUGReadFileWhole(char* filename){
-    
+internal void* DEBUGReadFileWhole(char* filename){
+
+    void* result;
+    HANDLE FileHandle = CreateFileA(
+        "",
+        GENERIC_READ|GENERIC_WRITE,
+        FILE_SHARE_READ|FILE_SHARE_WRITE,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
+
+    if(FileHandle != INVALID_HANDLE_VALUE){
+        LARGE_INTEGER filesize;
+        if(GetFileSize(FileHandle,&filesize))
+        {
+            result = VirtualAlloc(result, filesize.QuadPart, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE)
+                if(result){
+                    if(ReadFile(FileHandle, result, filesize.QuadPart, &BytesRead,0))
+                    {
+                        
+                    } else {
+                        // debug
+                        
+                    }
+                } else {
+                    DEBUGFreeFileMemory(result);
+                    result = nullptr;
+                    // debug
+                }
+        }
+
+        if(CloseHandle(FileHandle)){
+            free
+        }else{
+            // debug
+        }        
+
+    }else{
+        
+    }
+
 }
 
 bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory){
@@ -37,7 +77,7 @@ bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory){
 }
 
 void DEBUGFreeFileMemory(void* memory){
-    
+    VirtualFree(memory, 0, MEM_RELEASE);
 }
 
 

@@ -25,6 +25,11 @@
 using namespace std;
 
 #define ArrayCount(Array) (sizeof(Array) / sizeof(Array[0]))
+#define Assert(Expression) if(!Expression){* (int* ) 0 = 0}
+
+#define Kilobytes(data) (data*1024)
+#define Megabytes(data) (Kilobytes(data)*1024)
+#define Gigabytes(data) (Megabytes(data)*1024)
 
 #define internal static
 #define local_persist static
@@ -47,6 +52,21 @@ typedef uint32_t uint32;
 
 typedef float real32;
 typedef double real64;
+
+#if DEBUG_IO
+typedef struct debug_read_file_result{
+    uint32 ContentSize;
+    void* Contents;
+}debug_read_file_result;
+
+#define DEBUG_READ_WHOLE_FILE(name) void* name(char* filename);
+typedef DEBUG_READ_WHOLE_FILE(debug_read_whole_file);
+#define DEBUG_WRITE_WHOLE_FILE(name) bool32 name(char* filename, uint32 memorysize, void* memory);
+typedef DEBUG_WRITE_WHOLE_FILE(debug_write_whole_file);
+#define DEBUG_FREE_FILE_MEMORY(name) void name(void* memory);
+typedef  DEBUG_FREE_FILE_MEMORY(debug_free_file_memory);
+
+#endif
 
 struct Game_OffScreen_Buffer{  
     // BITMAPINFO Bitmapinfo;
