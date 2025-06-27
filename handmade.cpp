@@ -47,33 +47,6 @@ internal void GameOutPutSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz) {
     OutputDebugStringA(Output);                      
 }
 
-void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer){
-
-    Game_State* State = new Game_State;
-
-    if(Memory->IsInitialized){
-        State->Hz = 256;
-        State->BlueOffset = 0;
-        State->GreenOffset = 0;
-    }
-    
-    Game_Controller_Input* Input0 = &Input->Controller[0];
-    
-    if(Input0->IsAnalog){
-    State->Hz = (int)(128.0f*(Input0->EndX));
-    State->BlueOffset = (int)(4.0f*(Input0->EndY));        
-    } else {
-        
-    }
-    
-    if(Input0->Down.EndedDown){
-        State->GreenOffset += 1;
-    }
-    
-    RenderSplendidGradient(OBuffer, State->BlueOffset, State->GreenOffset);
-    GameOutPutSound(SoundBuffer, State->Hz);
-}
-
 void InitOpenGL(HWND window){
     // first device context gotten from current window
     HDC windowDC = GetDC(window);
@@ -118,4 +91,28 @@ void InitOpenGL(HWND window){
     }
     // Release unused DC
     ReleaseDC(window, windowDC);
+}
+
+uint32 safetruncateUint64(uint64 value){
+    Assert(value <= 0xFFFFFFFF);
+    uint32 result = value;
+    return result;
+}
+
+real32 saferatioN(real32 numerator, real32 divisor, real32 N){
+    real32 result = N;
+    if(divisor!=0.0f){
+        result = (real32)(numerator/divisor);
+    }
+    return result;
+}
+
+real32 saferatio0(real32 numberator, real32 divisor){
+    real32 result = saferatioN(numberator, divisor, 0.0f);
+    return result;
+}
+
+real32 saferatio1(real32 numberator, real32 divisor){
+    real32 result = saferatioN(numberator, divisor, 1.0f);
+    return result;        
 }

@@ -26,6 +26,7 @@ typedef CO_CREATE_INSTANCE (Co_Create_Instance);
 typedef ENUM_AUDIO_ENDPOINTS (Enum_Audio_Endpoints);
 // ==================================================================
 
+
 internal void Win32FillSoundBuffer(win32_Sound_OutPut* SoundOutPut, DWORD ByteToLock, DWORD ByteToWrite, Game_Sound_OutPut* SoundSourceBuffer);
 internal void Win32ClearSoundBuffer(win32_Sound_OutPut* SoundOutPut);
 internal void win32InitDSound(HWND window, int32 SamplePerSecond, int32 SecondBufferSize);
@@ -470,7 +471,6 @@ int CALLBACK WinMain
  PSTR cmdline,
  int cmdshow)
 {
-    GMemory = {};
     LARGE_INTEGER PerfCountFrequencyResult;
     QueryPerformanceCounter(&PerfCountFrequencyResult);
     OpenConsole();
@@ -481,7 +481,7 @@ int CALLBACK WinMain
     int64 PerfCountFrequency = (int64)(PerfCountFrequencyResult.QuadPart);                
     win32LoadXInput();
     WNDCLASSA WindowClass = {};
-    WindowClass.wlpfnWndProc = MainWindowCallBack;
+    WindowClass.lpfnWndProc = MainWindowCallBack;
     WindowClass.hInstance = Instance;
     WindowClass.lpszClassName = "First Game Window Class";
     Win32ResizeDIBSection(&BackBuffer, Dimens.Height, Dimens.Width);

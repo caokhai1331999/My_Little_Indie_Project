@@ -42,11 +42,13 @@ internal void* DEBUGReadFileWhole(char* filename){
 
     if(FileHandle != INVALID_HANDLE_VALUE){
         LARGE_INTEGER filesize;
-        if(GetFileSize(FileHandle,&filesize))
+        if(GetFileSizeEx(FileHandle,  &filesize))
         {
-            result = VirtualAlloc(result, filesize.QuadPart, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE)
+            uint32 filesize32 = safetruncateUint64(filesize.QuadPart);
+            result = VirtualAlloc(result, filesize32, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
                 if(result){
-                    if(ReadFile(FileHandle, result, filesize.QuadPart, &BytesRead,0))
+                    DWORD BytesRead;
+                    if(ReadFile(FileHandle, result, filesize32, &BytesRead,0) && ( BytesRead == filesize32))
                     {
                         
                     } else {
@@ -60,20 +62,23 @@ internal void* DEBUGReadFileWhole(char* filename){
                 }
         }
 
-        if(CloseHandle(FileHandle)){
-            free
-        }else{
-            // debug
-        }        
-
+        CloseHandle(FileHandle);
     }else{
-        
+        // logging
     }
-
+    return result;
 }
 
 bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory){
-    
+    bool32 result = false;
+    HANDLE filehandle = CreateFileA(
+        filename,
+        GENERIC_READ|GENERIC_WRITE,
+        FILE_SHARE_READ|FILE_SHARE_WRITE,
+        NULL,
+        ALWAYS_OPEN,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
 }
 
 void DEBUGFreeFileMemory(void* memory){
@@ -280,17 +285,17 @@ void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* Sta
     glTexCoord2f(1.0f, 0.0f);
     glVertex2f(p, -p);
 
-    glBitmap(
-         Dimens.Width * 0.9,
-         Dimens.Height * 0.9,
-         Dimens.Width * 0.1,
-         Dimens.Height * 0.1,
-         0,0,
-         LoadBitmapA(
-             NULL,
-             "media\Harry and Accomplices.jpg"             
-                     )
-         );
+    // glBitmap(
+    //      Dimens.Width * 0.9,
+    //      Dimens.Height * 0.9,
+    //      Dimens.Width * 0.1,
+    //      Dimens.Height * 0.1,
+    //      0,0,
+    //      LoadBitmapA(
+    //          NULL,
+    //          "media\Harry and Accomplices.jpg"             
+    //                  )
+    //      );
 
 if(glGetError() != GL_NO_ERROR){
     printf("OpenGL Error: %s\n", glGetError());
@@ -402,21 +407,3 @@ void OpenConsole() {
 // void LoadTileMap(){
 //     Tile
 // }
-
-real32 saferatioN(real32 numerator, real32 divisor, real32 N){
-    real32 result = N;
-    if(divisor!=0.0f){
-        result = (real32)(numerator/divisor);
-    }
-    return result;
-}
-
-real32 saferatio0(real32 numberator, real32 divisor){
-    real32 result = saferatioN(numberator, divisor, 0.0f);
-    return result;
-}
-
-real32 saferatio1(real32 numberator, real32 divisor){
-    real32 result = saferatioN(numberator, divisor, 1.0f);
-    return result;        
-}

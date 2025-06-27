@@ -117,10 +117,5 @@ void GameUpdateAndRender(Game_Memory* Memory = nullptr ,Game_Input* Input = null
 
 void OpenConsole();
 void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer);
-
-real32 saferatioN(real32 numerator, real32 divisor);
-real32 saferatio0(real32 numerator, real32 divisor);
-real32 saferatio1(real32 numerator, real32 divisor);
-
 #define WIN32GAME_H
 #endif

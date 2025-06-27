@@ -25,7 +25,7 @@
 using namespace std;
 
 #define ArrayCount(Array) (sizeof(Array) / sizeof(Array[0]))
-#define Assert(Expression) if(!Expression){* (int* ) 0 = 0}
+#define Assert(Expression) if(!Expression){* (int* ) 0 = 0;}
 
 #define Kilobytes(data) (data*1024)
 #define Megabytes(data) (Kilobytes(data)*1024)
@@ -140,6 +140,12 @@ struct Game_State{
 
 internal void GameOutputSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz);
 // internal void RenderSplendidGradient(Game_OffScreen_Buffer* OBuffer, int XOffset, int YOffset);
+
+uint32 safetruncateUint64(uint64 value);
+real32 saferatioN(real32 numerator, real32 divisor);
+real32 saferatio0(real32 numerator, real32 divisor);
+real32 saferatio1(real32 numerator, real32 divisor);
+
 
 #define HANDMADE_H
 #endif
