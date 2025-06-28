@@ -1,18 +1,21 @@
+@echo off
 mkdir build
 pushd build
 
 del *.obj
 del *.pdb > NUL 2> NUL
 
+set DIRECTIVES_FLAG=/D:DEBUG=1 /D:INTERNAL=0
+set COMPILE_FLAG=/FC /Zi  
 set LIB_=user32.lib gdi32.lib uuid.lib strmiids.lib opengl32.lib 
 set INCLUDE_=..\*.h
-@echo off
+set FILES= ..\main.cpp ..\handmade.cpp ..\win32Game.cpp
 rem remember to add these to use address sanitizer /EHsc /fsanitize=address
 rem -fsanitize=address -DEBUG
 rem for %%f in (..\*.cpp) do (
 rem     cl /FC /Zi -Fe:"win32Game" %%f -I%INCLUDE_% -link %LIB_% -DEBUG /FORCE:MULTIPLE /IGNORE:4006
 rem  )
-    cl /FC /Zi /D: -Fe:"win32Game" ..\main.cpp ..\handmade.cpp ..\win32Game.cpp  -I%INCLUDE_% -link %LIB_% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006
+    cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES% -I%INCLUDE_% -link %LIB_% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006
 rem if %ERRORLEVEL% EQU 0 (
 rem    @echo Announce: " compilation succeeded (^ w ^) "
 rem ) else (

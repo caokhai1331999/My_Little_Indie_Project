@@ -97,7 +97,8 @@ const global_variable int Width = 1280;
 
 void* PlatformLoadFile(char* FileName);
 
-void* DEBUGReadFileWhole(char* filename);
+debug_read_file_result* DEBUGReadFileWhole(char* filename);
+void DEBUGReadBMP(char* filename);
 bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory);
 void DEBUGFreeFileMemory(void* memory);
 

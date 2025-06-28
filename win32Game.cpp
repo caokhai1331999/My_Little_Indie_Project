@@ -22,48 +22,43 @@
    - Hardware Acceleration (OpenGl or Direct3D or Both)
    - Get Keyboard layout (For French layout, international WASD support)
 
-   Just a partial list if you want to get the game in a complete shipping state
-   
+   Just a partial list if you want to get the game in a complete shipping state   
  */
 #include "win32Game.h"
 
 
-internal void* DEBUGReadFileWhole(char* filename){
+internal debug_read_file_result* DEBUGReadFileWhole(char* filename){
 
-    void* result;
-    HANDLE FileHandle = CreateFileA(
-        "",
-        GENERIC_READ|GENERIC_WRITE,
-        FILE_SHARE_READ|FILE_SHARE_WRITE,
-        NULL,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL);
+    debug_read_file_result* result;
+    HANDLE FileHandle = CreateFileA( filename, GENERIC_READ, 0,  NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
     if(FileHandle != INVALID_HANDLE_VALUE){
         LARGE_INTEGER filesize;
         if(GetFileSizeEx(FileHandle,  &filesize))
         {
-            uint32 filesize32 = safetruncateUint64(filesize.QuadPart);
-            result = VirtualAlloc(result, filesize32, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
-                if(result){
-                    DWORD BytesRead;
-                    if(ReadFile(FileHandle, result, filesize32, &BytesRead,0) && ( BytesRead == filesize32))
-                    {
-                        
-                    } else {
-                        // debug
-                        
-                    }
-                } else {
-                    DEBUGFreeFileMemory(result);
-                    result = nullptr;
-                    // debug
+            result->ContentSize = safetruncateUint64(filesize.QuadPart);
+            result->Content = VirtualAlloc(0, result->ContentSize, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+            if(result->Content)
+            {
+                DWORD BytesRead;
+                if(ReadFile(FileHandle, result->Content, result->ContentSize, &BytesRead,0) && ( BytesRead == result->ContentSize))
+                {
+                    printf("Read image successfully\n");
                 }
+                else
+                {
+                    // debug                        
+                }
+            }
+            else
+            {
+                DEBUGFreeFileMemory(result->Content);
+                result = nullptr;
+                // debug
+            }
         }
-
         CloseHandle(FileHandle);
-    }else{
+    } else {
         // logging
     }
     return result;
@@ -71,20 +66,35 @@ internal void* DEBUGReadFileWhole(char* filename){
 
 bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory){
     bool32 result = false;
-    HANDLE filehandle = CreateFileA(
-        filename,
-        GENERIC_READ|GENERIC_WRITE,
-        FILE_SHARE_READ|FILE_SHARE_WRITE,
-        NULL,
-        ALWAYS_OPEN,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL);
+    HANDLE FileHandle = CreateFileA(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);    
+    if(FileHandle != INVALID_HANDLE_VALUE){
+            if(result){
+                DWORD bytewritten;
+                    if(WriteFile(FileHandle, memory, memorysize, &bytewritten, 0))
+                    {
+                        result = (memorysize == bytewritten);
+                    } else {
+                        // debug
+                        
+                    }
+                } else {
+                    // debug
+                }
+        CloseHandle(FileHandle);
+    }else{
+        // logging
+    }
+    return result;
 }
 
 void DEBUGFreeFileMemory(void* memory){
     VirtualFree(memory, 0, MEM_RELEASE);
 }
 
+
+void DEBUGReadBMP(char* filename){
+    debug_read_file_result* ReadResult = DEBUGReadFileWhole(filename);
+}
 
 void
 win32LoadXInput(void) {
@@ -226,17 +236,13 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
 
 
 void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){
-    
+
     if(!Memory->IsInitialized){
         State->Hz = 256;
         // State->BlueOffset = 0;
         // State->GreenOffset = 0;
-        char* FileName = "";
-        void* BitMapMemory = DEBUGReadFileWhole(FileName);
-        if(BitMapMemory){
-            DEBUGFreeFileMemory(BitMapMemory);
-        };
-        ;
+        char* FileName = "Harry and Accomplices.bmp";
+        DEBUGReadBMP(FileName);
     }
     
     Game_Controller_Input* Input0 = &Input->Controller[0];
@@ -298,7 +304,7 @@ void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* Sta
     //      );
 
 if(glGetError() != GL_NO_ERROR){
-    printf("OpenGL Error: %s\n", glGetError());
+    printf("OpenGL Error: %d\n", glGetError());
 };
     glEnd();    
     // Display on the screen

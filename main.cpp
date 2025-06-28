@@ -511,17 +511,27 @@ int CALLBACK WinMain
                 printf("Refresh rate is : %dHz", refreshRate);
             };
 
+#if INTERNAL
+                LPVOID BaseAddress = megabytes(5);
+#else
+                LPVOID BaseAddress = 0;
+#endif
+
             // ===============================================
             Game_Memory game_memory = {};
-            game_memory.MemorySize = Megabytes(64);
-            game_memory.PermanentStorage = VirtualAlloc(0 , game_memory.MemorySize,  MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+            game_memory.PermanentStorageSize = Megabytes(64);
+            game_memory.TransientStorageSize = Megabytes((uint64)6);
+
+            uint64 TotalSize = game_memory.PermanentStorageSize + game_memory.TransientStorageSize;
+            
+            game_memory.PermanentStorage = VirtualAlloc(BaseAddress , TotalSize,  MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+            game_memory.TransientStorage = ((uint8*)game_memory.PermanentStorage + game_memory.PermanentStorageSize);
             // ==============================================
 
+            if(game_memory.TransientStorage && game_memory.PermanentStorage){
             //NOTE: we create a second buffer last for 2 second with
             // int16* SSamples = nullptr;
             // NOTE: Don't call _alloc in the app loop it cause bug (it doesn't clean up entirely but just barely in the function)
-
-            
             // win32_Sound_OutPut SoundOutPut = {};
             SoundOutPut.SamplePerSecond = 48000;
             SoundOutPut.RunningSampleIndex = 0;
@@ -713,7 +723,7 @@ int CALLBACK WinMain
                 // =============================================================
                 DeviceContext = GetDC(Window);                                    
                 // WHY????
-                // Update here
+                // Update here                
                 GameUpdateAndRender(&game_memory, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
 
                 // NOTE: Check whether OpenGL work or not
@@ -756,15 +766,16 @@ int CALLBACK WinMain
                 Game_Input* Temp = NewInput;
                 NewInput = OldInput; // ???? still don't understand
                 OldInput = Temp;
-            }
-            
-        }else{
+            }            
+            }                
+        }
+        else{
             // TODO: Logging
             printf("Window is NULL\n");
         }
     } else {
         // TODO: Logging
     }   
-    return (0);
+        return (0);
 }
 

@@ -25,7 +25,12 @@
 using namespace std;
 
 #define ArrayCount(Array) (sizeof(Array) / sizeof(Array[0]))
+
+#if DEBUG
 #define Assert(Expression) if(!Expression){* (int* ) 0 = 0;}
+#else
+#define Assert(Expression)
+#endif
 
 #define Kilobytes(data) (data*1024)
 #define Megabytes(data) (Kilobytes(data)*1024)
@@ -124,10 +129,17 @@ struct Game_Input{
     Game_Controller_Input Controller[4];
 };
 
+typedef struct debug_read_file_result{
+    uint32 ContentSize;
+    void* Content;
+} debug_read_file_result;
+
 struct Game_Memory{
     bool32 IsInitialized; 
-    uint64 MemorySize;
+    uint64 PermanentStorageSize;
+    uint64 TransientStorageSize;
     void* PermanentStorage;
+    void* TransientStorage;
 };
 
 struct Game_State{
