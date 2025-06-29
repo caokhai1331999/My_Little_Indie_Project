@@ -98,7 +98,7 @@ const global_variable int Width = 1280;
 void* PlatformLoadFile(char* FileName);
 
 debug_read_file_result* DEBUGReadFileWhole(char* filename);
-void DEBUGReadBMP(char* filename);
+void DEBUGReadBMP(char* filename, debug_read_file_result* result);
 bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory);
 void DEBUGFreeFileMemory(void* memory);
 
@@ -114,7 +114,7 @@ void Win32DisplayBufferWindow (HDC DeviceContext, int WindowWidth, int WindowHei
 
 void GameOutputSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz);
 
-void GameUpdateAndRender(Game_Memory* Memory = nullptr ,Game_Input* Input = nullptr, Game_State* State = nullptr ,Win32_OffScreen_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr, HDC DeviceContext = NULL);
+void GameUpdateAndRender(Game_Memory* Memory = nullptr, debug_read_file_result* readresult = nullptr ,Game_Input* Input = nullptr, Game_State* State = nullptr ,Win32_OffScreen_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr, HDC DeviceContext = NULL);
 
 void OpenConsole();
 void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer);

@@ -23,8 +23,9 @@
    - Get Keyboard layout (For French layout, international WASD support)
 
    Just a partial list if you want to get the game in a complete shipping state   
- */
+*/ 
 #include "win32Game.h"
+
 
 
 internal debug_read_file_result* DEBUGReadFileWhole(char* filename){
@@ -62,8 +63,8 @@ internal debug_read_file_result* DEBUGReadFileWhole(char* filename){
         // logging
     }
     return result;
-}
 
+}
 bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory){
     bool32 result = false;
     HANDLE FileHandle = CreateFileA(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);    
@@ -74,8 +75,7 @@ bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory){
                     {
                         result = (memorysize == bytewritten);
                     } else {
-                        // debug
-                        
+                        // debug                        
                     }
                 } else {
                     // debug
@@ -92,8 +92,8 @@ void DEBUGFreeFileMemory(void* memory){
 }
 
 
-void DEBUGReadBMP(char* filename){
-    debug_read_file_result* ReadResult = DEBUGReadFileWhole(filename);
+void DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
+     ReadResult = DEBUGReadFileWhole(filename);
 }
 
 void
@@ -235,14 +235,13 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
 }
 
 
-void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){
+void GameUpdateAndRender(Game_Memory* Memory, debug_read_file_result* readresult ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){
 
     if(!Memory->IsInitialized){
         State->Hz = 256;
         // State->BlueOffset = 0;
         // State->GreenOffset = 0;
         char* FileName = "Harry and Accomplices.bmp";
-        DEBUGReadBMP(FileName);
     }
     
     Game_Controller_Input* Input0 = &Input->Controller[0];
@@ -291,17 +290,16 @@ void GameUpdateAndRender(Game_Memory* Memory ,Game_Input* Input, Game_State* Sta
     glTexCoord2f(1.0f, 0.0f);
     glVertex2f(p, -p);
 
-    // glBitmap(
-    //      Dimens.Width * 0.9,
-    //      Dimens.Height * 0.9,
-    //      Dimens.Width * 0.1,
-    //      Dimens.Height * 0.1,
-    //      0,0,
-    //      LoadBitmapA(
-    //          NULL,
-    //          "media\Harry and Accomplices.jpg"             
-    //                  )
-    //      );
+    char* filename = "Harry and Accomplices.bmp";
+    
+     glBitmap(
+          Dimens.Width * 0.9,
+          Dimens.Height * 0.9,
+          Dimens.Width * 0.1,
+          Dimens.Height * 0.1,
+          0,0,
+          filename
+              );
 
 if(glGetError() != GL_NO_ERROR){
     printf("OpenGL Error: %d\n", glGetError());
