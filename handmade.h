@@ -58,11 +58,32 @@ typedef uint32_t uint32;
 typedef float real32;
 typedef double real64;
 
-#if DEBUG_IO
 typedef struct debug_read_file_result{
     uint32 ContentSize;
     void* Contents;
 }debug_read_file_result;
+
+struct BMP_HEADER{
+    // BMP INFO header
+    dword biSize;
+    LONG  biWidth;
+    LONG  biHeight;
+    WORD  biPlanes;
+    WORD  biBitCount;
+    DWORD biCompression;
+    DWORD biSizeImage;
+    LONG  biXPelsPerMeter;
+    LONG  biYPelsPerMeter;
+    DWORD biClrUsed;
+    DWORD biClrImportant;  
+
+    //BMP header
+    WORD  bfType;
+    DWORD bfSize;
+    WORD  bfReserved1;
+    WORD  bfReserved2;
+    DWORD bfOffBits;
+};
 
 #define DEBUG_READ_WHOLE_FILE(name) void* name(char* filename);
 typedef DEBUG_READ_WHOLE_FILE(debug_read_whole_file);

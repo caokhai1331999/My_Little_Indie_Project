@@ -94,6 +94,7 @@ void DEBUGFreeFileMemory(void* memory){
 
 void DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
      ReadResult = DEBUGReadFileWhole(filename);
+
 }
 
 void
