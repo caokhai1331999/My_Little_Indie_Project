@@ -465,6 +465,32 @@ LRESULT CALLBACK MainWindowCallBack(
     return result;
 }
 
+void ErrorExit() 
+{ 
+    // Retrieve the system error message for the last-error code
+
+    LPVOID lpMsgBuf;
+    DWORD dw = GetLastError(); 
+
+    if (FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &lpMsgBuf,
+        0, NULL) == 0) {
+        MessageBox(NULL, TEXT("FormatMessage failed"), TEXT("Error"), MB_OK);
+        ExitProcess(dw);
+    }
+
+    MessageBox(NULL, (LPCTSTR)lpMsgBuf, TEXT("Error"), MB_OK);
+
+    LocalFree(lpMsgBuf);
+    ExitProcess(dw); 
+}
+
 int CALLBACK WinMain
 (HINSTANCE Instance,
  HINSTANCE hInstPrev,
@@ -473,10 +499,8 @@ int CALLBACK WinMain
 {
     LARGE_INTEGER PerfCountFrequencyResult;
     QueryPerformanceCounter(&PerfCountFrequencyResult);
-    OpenConsole();
     //NOTE: Actually, this the counts per second
     //TODO: Try to find out why the PerfCountFrequency is too large.
-
     //NOTE: This one count is for counting the frame
     int64 PerfCountFrequency = (int64)(PerfCountFrequencyResult.QuadPart);                
     win32LoadXInput();
@@ -485,6 +509,8 @@ int CALLBACK WinMain
     WindowClass.hInstance = Instance;
     WindowClass.lpszClassName = "First Game Window Class";
     Win32ResizeDIBSection(&BackBuffer, Dimens.Height, Dimens.Width);
+    OpenConsole();
+    printf("Up to here before window created step\n");
 
     if(RegisterClassA(&WindowClass)) {
         Window = CreateWindowExA(
@@ -492,14 +518,14 @@ int CALLBACK WinMain
             0,
             WindowClass.lpszClassName,
             "win32GameWithoutEngine",
-            WS_OVERLAPPEDWINDOW|WS_VISIBLE,
+            WS_VISIBLE,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
             0,
             0,
-            Instance ,
+            Instance,
             0);
         if(Window) {
             GlobalRunning = true; 
@@ -529,8 +555,8 @@ int CALLBACK WinMain
             //======================================================
             debug_read_file_result result;
             if(game_memory.TransientStorage && game_memory.PermanentStorage){
-
-                DEBUGReadBMP("Harry and Accomplices.bmp", &result);
+                printf("About to read image\n");
+                uint32* imageContent = DEBUGReadBMP("Harry and Accomplices.bmp", &result);
               //NOTE: we create a second buffer last for 2 second with
              int16* SSamples = nullptr;
              //NOTE: Don't call _alloc in the app loop it cause bug (it doesn't clean up entirely but just barely in the function)
@@ -731,7 +757,7 @@ int CALLBACK WinMain
                 DeviceContext = GetDC(Window);                                    
                  //WHY????
                  //Update here                
-                GameUpdateAndRender(&game_memory, &result, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
+                GameUpdateAndRender(&game_memory, imageContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
 
                 //NOTE: Check whether OpenGL work or not
                  //Define the boundary of what we want to rende
@@ -781,11 +807,19 @@ int CALLBACK WinMain
         }
         else{
             //TODO: Logging
-            printf("Window is NULL\n");
+            //printf("Window is NULL\n");
+            if (!GetProcessId(NULL)){
+                    ErrorExit();
+            }
+            DWORD errorCode = GetLastError();
+            char buffer[256] = {};
+            FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, buffer, sizeof(buffer), NULL);
+            if(buffer[0] != 0){
+                printf("CreateWindowExA failed with error: %s\n", buffer);
+            };
         }
     } else {
         //TODO: Logging
     }   
         return (0);
 }
-

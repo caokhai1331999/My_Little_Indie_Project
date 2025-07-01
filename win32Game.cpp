@@ -22,7 +22,7 @@
    - Hardware Acceleration (OpenGl or Direct3D or Both)
    - Get Keyboard layout (For French layout, international WASD support)
 
-   Just a partial list if you want to get the game in a complete shipping state   
+   Just a partial list if you want to get the game in a complete shipping state
 */ 
 #include "win32Game.h"
 
@@ -37,12 +37,12 @@ internal debug_read_file_result* DEBUGReadFileWhole(char* filename){
         LARGE_INTEGER filesize;
         if(GetFileSizeEx(FileHandle,  &filesize))
         {
-            result->ContentSize = safetruncateUint64(filesize.QuadPart);
-            result->Content = VirtualAlloc(0, result->ContentSize, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+            result->Size = safetruncateUint64(filesize.QuadPart);
+            result->Content = VirtualAlloc(0, result->Size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
             if(result->Content)
             {
                 DWORD BytesRead;
-                if(ReadFile(FileHandle, result->Content, result->ContentSize, &BytesRead,0) && ( BytesRead == result->ContentSize))
+                if(ReadFile(FileHandle, result->Content, result->Size, &BytesRead,0) && ( BytesRead == result->Size))
                 {
                     printf("Read image successfully\n");
                 }
@@ -67,7 +67,7 @@ internal debug_read_file_result* DEBUGReadFileWhole(char* filename){
 }
 bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory){
     bool32 result = false;
-    HANDLE FileHandle = CreateFileA(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);    
+    HANDLE FileHandle = CreateFileA(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if(FileHandle != INVALID_HANDLE_VALUE){
             if(result){
                 DWORD bytewritten;
@@ -82,6 +82,7 @@ bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory){
                 }
         CloseHandle(FileHandle);
     }else{
+
         // logging
     }
     return result;
@@ -91,10 +92,16 @@ void DEBUGFreeFileMemory(void* memory){
     VirtualFree(memory, 0, MEM_RELEASE);
 }
 
-
-void DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
+uint32* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
      ReadResult = DEBUGReadFileWhole(filename);
-
+     uint32* result = 0;
+     if(ReadResult->Size != 0){
+         BITMAP_HEADER *bmpContent = (BITMAP_HEADER*)ReadResult->Content;
+         //Why plus ???
+         uint32* pixel = (uint32* )((uint8 *)ReadResult->Content + bmpContent->bfOffBits);
+         result = pixel;
+     }
+     return result;
 }
 
 void
@@ -117,7 +124,7 @@ win32LoadXInput(void) {
     }
 }
 
-void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, int XOffset, int YOffset) {
+void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, uint32* ImageContent, int XOffset, int YOffset) {
     // RR GG BB
     // Row is a pointer to every line of bitmapMemory
     // While pitch is data length of everyline of bitmap
@@ -131,9 +138,10 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, int XOffset, int YO
         for(int X{0}; X < Width; X++) {
             uint8 Blue = ( X + XOffset);
             uint8 Green = ( Y + YOffset);
-            // NOTE: AA RR GG BB()
+             //NOTE: AA RR GG BB()
             // Because I limit the size of Pixels so it can not add Green color to its storage
-            *Pixel++ = ( (Green<<8) | Blue);
+            *Pixel++ = *ImageContent++;
+            //*Pixel++ = (Green << 8|Blue);
         }
         // Instead of manually move row pointer every y axis (by add it to the pitch)
         // we just need to reuse the Pixel pointer pass it to row where it was already moved
@@ -236,7 +244,7 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
 }
 
 
-void GameUpdateAndRender(Game_Memory* Memory, debug_read_file_result* readresult ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){
+void GameUpdateAndRender(Game_Memory* Memory, uint32* ImageContent ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){
 
     if(!Memory->IsInitialized){
         State->Hz = 256;
@@ -271,7 +279,7 @@ void GameUpdateAndRender(Game_Memory* Memory, debug_read_file_result* readresult
         
     // }
     real32 p = 0.9f;
-    RenderSplendidGradient(OBuffer, State->BlueOffset, State->GreenOffset);
+    RenderSplendidGradient(OBuffer, ImageContent, State->BlueOffset, State->GreenOffset);
     // // Upper triangle
     glTexCoord2f(0.0f, 1.0f);
     glVertex2f(-p, p);
@@ -293,14 +301,14 @@ void GameUpdateAndRender(Game_Memory* Memory, debug_read_file_result* readresult
 
     char* filename = "Harry and Accomplices.bmp";
     
-     glBitmap(
-          Dimens.Width * 0.9,
-          Dimens.Height * 0.9,
-          Dimens.Width * 0.1,
-          Dimens.Height * 0.1,
-          0,0,
-          filename
-              );
+     //glBitmap(
+          //Dimens.Width * 0.9,
+          //Dimens.Height * 0.9,
+          //Dimens.Width * 0.1,
+          //Dimens.Height * 0.1,
+          //0,0,
+          //filename
+              //);
 
 if(glGetError() != GL_NO_ERROR){
     printf("OpenGL Error: %d\n", glGetError());

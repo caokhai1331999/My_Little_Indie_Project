@@ -59,31 +59,41 @@ typedef float real32;
 typedef double real64;
 
 typedef struct debug_read_file_result{
-    uint32 ContentSize;
-    void* Contents;
+    uint32 Size;
+    void* Content;
 }debug_read_file_result;
 
-struct BMP_HEADER{
+//NOTE: Pragma pack is to back data of the struct to one byte aligned structure
+
+#pragma pack(push, 1)
+struct BITMAP_HEADER{
     // BMP INFO header
-    dword biSize;
-    LONG  biWidth;
-    LONG  biHeight;
-    WORD  biPlanes;
-    WORD  biBitCount;
-    DWORD biCompression;
-    DWORD biSizeImage;
-    LONG  biXPelsPerMeter;
-    LONG  biYPelsPerMeter;
-    DWORD biClrUsed;
-    DWORD biClrImportant;  
+    //DWORD biSize;
+    //LONG  biWidth;
+    //LONG  biHeight;
+    //WORD  biPlanes;
+    //WORD  biBitCount;
+    //DWORD biCompression;
+    //DWORD biSizeImage;
+    //LONG  biXPelsPerMeter;
+    //LONG  biYPelsPerMeter;
+    //DWORD biClrUsed;
+    //DWORD biClrImportant;
 
     //BMP header
-    WORD  bfType;
-    DWORD bfSize;
-    WORD  bfReserved1;
-    WORD  bfReserved2;
-    DWORD bfOffBits;
+    uint16 bfType;
+    uint32 bfSize;
+    uint16  bfReserved1;
+    uint16  bfReserved2;
+    uint32  bfOffBits;
+
+    uint32 Size;
+    int32 Width;
+    int32 Height;
+    uint16 Planes;
+    uint16 BitsPerPixel;
 };
+#pragma pack(pop)
 
 #define DEBUG_READ_WHOLE_FILE(name) void* name(char* filename);
 typedef DEBUG_READ_WHOLE_FILE(debug_read_whole_file);
@@ -91,8 +101,6 @@ typedef DEBUG_READ_WHOLE_FILE(debug_read_whole_file);
 typedef DEBUG_WRITE_WHOLE_FILE(debug_write_whole_file);
 #define DEBUG_FREE_FILE_MEMORY(name) void name(void* memory);
 typedef  DEBUG_FREE_FILE_MEMORY(debug_free_file_memory);
-
-#endif
 
 struct Game_OffScreen_Buffer{  
     // BITMAPINFO Bitmapinfo;
@@ -150,11 +158,6 @@ struct Game_Input{
     Game_Controller_Input Controller[4];
 };
 
-typedef struct debug_read_file_result{
-    uint32 ContentSize;
-    void* Content;
-} debug_read_file_result;
-
 struct Game_Memory{
     bool32 IsInitialized; 
     uint64 PermanentStorageSize;
@@ -178,7 +181,6 @@ uint32 safetruncateUint64(uint64 value);
 real32 saferatioN(real32 numerator, real32 divisor);
 real32 saferatio0(real32 numerator, real32 divisor);
 real32 saferatio1(real32 numerator, real32 divisor);
-
 
 #define HANDMADE_H
 #endif

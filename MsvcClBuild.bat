@@ -6,7 +6,7 @@ del *.obj
 del *.pdb > NUL 2> NUL
 
 set DIRECTIVES_FLAG=/D:DEBUG=1 /D:INTERNAL=0
-set COMPILE_FLAG=/FC /Zi  
+set COMPILE_FLAG=/FC /Zi
 set LIB_=user32.lib gdi32.lib uuid.lib strmiids.lib opengl32.lib 
 set INCLUDE_=..\*.h
 set FILES= ..\main.cpp ..\handmade.cpp ..\win32Game.cpp
