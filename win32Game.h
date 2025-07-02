@@ -59,6 +59,7 @@ struct win32Dimension{
 struct Win32_OffScreen_Buffer{  
     BITMAPINFO Bitmapinfo;
     HBITMAP BitmapHandle;
+
     void* BitmapMemory = nullptr;
     int BitmapWidth;
     int BitmapHeight;
@@ -107,7 +108,7 @@ void ProcessXinputDigitalButton(DWORD XInputButtonState ,Game_Button_State* OldS
 
 void GetWindowDimension(HWND Window);
 void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Height);
-void RenderSplendidGradient(Game_OffScreen_Buffer* OBuffer, uint32* ImageContent, int XOffset, int YOffset);
+void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, uint32* ImageContent, int XOffset, int YOffset);
 
 void Win32DisplayBufferWindow (HDC DeviceContext, int WindowWidth, int WindowHeight, Win32_OffScreen_Buffer* OBuffer);
 

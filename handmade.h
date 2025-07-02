@@ -102,15 +102,15 @@ typedef DEBUG_WRITE_WHOLE_FILE(debug_write_whole_file);
 #define DEBUG_FREE_FILE_MEMORY(name) void name(void* memory);
 typedef  DEBUG_FREE_FILE_MEMORY(debug_free_file_memory);
 
-struct Game_OffScreen_Buffer{  
-    // BITMAPINFO Bitmapinfo;
-    // HBITMAP BitmapHandle;
-    void* BitmapMemory;
-    int BitmapWidth;
-    int BitmapHeight;
-    int Pitch;
-    const int BytesPerPixel = 4;
-};
+//struct Game_OffScreen_Buffer{  
+     //BITMAPINFO Bitmapinfo;
+     //HBITMAP BitmapHandle;
+    //void* BitmapMemory;
+    //int BitmapWidth;
+    //int BitmapHeight;
+    //int Pitch;
+    //const int BytesPerPixel = 4;
+//};
 
 struct Game_Sound_OutPut{  
     int16 SamplePerSecond;

@@ -295,8 +295,11 @@ LRESULT CALLBACK MainWindowCallBack(
 {
     LRESULT result;
     bool fDraw = false;
-    POINT ptPrevious;
+    POINT ptPrevious = {};
     switch(Message) {
+        //case WM_CREATE:
+            //printf("On Window creating stage\n");
+            //break;
         case WM_SIZE:
         {
             DeviceContext = GetDC(Window);
@@ -458,10 +461,10 @@ LRESULT CALLBACK MainWindowCallBack(
         default:
         {
             OutputDebugStringA("DEFAULT\n");
-            result = DefWindowProc(Window, Message, Wparam, Lparam);
+            result = DefWindowProcA(Window, Message, Wparam, Lparam);
         }break;
     }
-     return 0L;         
+     //return 0L;         
     return result;
 }
 
@@ -510,15 +513,14 @@ int CALLBACK WinMain
     WindowClass.lpszClassName = "First Game Window Class";
     Win32ResizeDIBSection(&BackBuffer, Dimens.Height, Dimens.Width);
     OpenConsole();
-    printf("Up to here before window created step\n");
-
+    HWND Window = {};
     if(RegisterClassA(&WindowClass)) {
         Window = CreateWindowExA(
             //NOTE: The window didn't show up is because the first argument
             0,
             WindowClass.lpszClassName,
             "win32GameWithoutEngine",
-            WS_VISIBLE,
+            WS_OVERLAPPED|WS_VISIBLE,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
@@ -527,6 +529,7 @@ int CALLBACK WinMain
             0,
             Instance,
             0);
+
         if(Window) {
             GlobalRunning = true; 
 
@@ -757,6 +760,7 @@ int CALLBACK WinMain
                 DeviceContext = GetDC(Window);                                    
                  //WHY????
                  //Update here                
+                printf("Just before Game update and render\n");
                 GameUpdateAndRender(&game_memory, imageContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
 
                 //NOTE: Check whether OpenGL work or not
@@ -807,19 +811,26 @@ int CALLBACK WinMain
         }
         else{
             //TODO: Logging
-            //printf("Window is NULL\n");
+
+            if(!IsWindow(Window)){
+                printf("Window is NULL\n");
+                DWORD errorCode = GetLastError();
+                char buffer[256] = {};
+                FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, buffer, sizeof(buffer), NULL);
+                printf("%s\n", buffer);
+            }
+
             if (!GetProcessId(NULL)){
                     ErrorExit();
             }
-            DWORD errorCode = GetLastError();
-            char buffer[256] = {};
-            FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, buffer, sizeof(buffer), NULL);
-            if(buffer[0] != 0){
-                printf("CreateWindowExA failed with error: %s\n", buffer);
-            };
+
         }
     } else {
         //TODO: Logging
+        DWORD errorCode = GetLastError();
+        char buffer[256] = {};
+        FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, buffer, sizeof(buffer), NULL);
+        printf("%s\n", buffer);
     }   
         return (0);
 }

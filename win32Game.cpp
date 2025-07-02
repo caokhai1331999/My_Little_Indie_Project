@@ -30,7 +30,7 @@
 
 internal debug_read_file_result* DEBUGReadFileWhole(char* filename){
 
-    debug_read_file_result* result;
+    debug_read_file_result* result = nullptr;
     HANDLE FileHandle = CreateFileA( filename, GENERIC_READ, 0,  NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
     if(FileHandle != INVALID_HANDLE_VALUE){
@@ -131,6 +131,7 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, uint32* ImageConten
     int Width = OBuffer->BitmapWidth;
     int Height = OBuffer->BitmapHeight;    
     int Pitch = OBuffer->Pitch;
+    // We take memory from BitmapMemory of main Bufer to write on it
     uint8* Row = (uint8 *)OBuffer->BitmapMemory;
     
     for (int Y{0}; Y < Height; Y++) {
@@ -215,7 +216,7 @@ void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Heigh
 
 }
 
-// NOTE: Keep in mind that try to all what you need to release back to memory
+// NOTE: Keep in mind that try to do all what you need to release back to memory
 // in a total thing so that I can release it in aggregate
 
 void ProcessXinputDigitalButton(DWORD XInputButtonState ,Game_Button_State* OldState ,DWORD ButtonBit, Game_Button_State* NewState){
@@ -235,12 +236,10 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
         DIB_RGB_COLORS,
         SRCCOPY
                   );    
-    // NOTE: The 2 triangles was expected to fill the screen
-    // But they didn't cause the fixed fx didn'take the verticles data
-    // to actually did according to these
-
-    // Why Flickering???
-    // Put the pixel drawing fx in the window/app loop
+/*
+     Why Flickering???
+     Put the pixel drawing fx in the window/app loop
+*/
 }
 
 
