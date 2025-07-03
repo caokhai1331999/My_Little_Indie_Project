@@ -242,6 +242,7 @@ internal void Win32FillSoundBuffer(win32_Sound_OutPut* SoundOutPut, DWORD ByteTo
                         DWORD Region1SampleCounts = Region1Size/SoundOutPut->BytesPerSample;
                         int16* SampleOut = (int16* )Region1;
                         int16* SourceSample = SoundSourceBuffer->Samples;
+                        //SoundSourceBuffer->Samples;
                         //NOTE: Basically what we want to do is remembering where
                         //we were and how many sound we're outputting and able
                         //to lock the buffer at whatever we left off
@@ -513,7 +514,7 @@ int CALLBACK WinMain
     WindowClass.lpszClassName = "First Game Window Class";
     Win32ResizeDIBSection(&BackBuffer, Dimens.Height, Dimens.Width);
     OpenConsole();
-    HWND Window = {};
+    HWND Window;
     if(RegisterClassA(&WindowClass)) {
         Window = CreateWindowExA(
             //NOTE: The window didn't show up is because the first argument
@@ -558,10 +559,9 @@ int CALLBACK WinMain
             //======================================================
             debug_read_file_result result;
             if(game_memory.TransientStorage && game_memory.PermanentStorage){
-                printf("About to read image\n");
+                //printf("About to read image\n");
                 uint32* imageContent = DEBUGReadBMP("Harry and Accomplices.bmp", &result);
               //NOTE: we create a second buffer last for 2 second with
-             int16* SSamples = nullptr;
              //NOTE: Don't call _alloc in the app loop it cause bug (it doesn't clean up entirely but just barely in the function)
              win32_Sound_OutPut SoundOutPut = {};
              SoundOutPut.SamplePerSecond = 48000;
@@ -576,7 +576,7 @@ int CALLBACK WinMain
              //Hert(hz) is cycles per second
              SoundOutPut.SecondBufferSize = 2*SoundOutPut.BytesPerSample*SoundOutPut.SamplePerSecond;
             
-             //int16* SSamples = (int16* )VirtualAlloc(0 , SoundOutPut.SecondBufferSize ,MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+             int16* SSamples = (int16* )VirtualAlloc(0 , SoundOutPut.SecondBufferSize ,MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
             
              win32InitDSound(Window, SoundOutPut.SamplePerSecond, SoundOutPut.SecondBufferSize);
              Win32ClearSoundBuffer(&SoundOutPut);
@@ -609,7 +609,6 @@ int CALLBACK WinMain
             ScreenBuffer.Pitch = BackBuffer.Pitch;
 
             while(GlobalRunning) {
-                InitOpenGL(Window, &ScreenBuffer);
                 MSG Message;
                 //NOTE: This is where receiving the message to change
                 // for any change in window
@@ -739,7 +738,6 @@ int CALLBACK WinMain
 
                 SoundBuffer.SamplePerSecond = SoundOutPut.SamplePerSecond;
                 SoundBuffer.SampleCounts = ByteToWrite/SoundOutPut.BytesPerSample;
-                SoundBuffer.Samples = nullptr;
                 SoundBuffer.Samples = SSamples;                
                 
                 //NOTE: this function throw this memory on the stack and I know
@@ -760,9 +758,9 @@ int CALLBACK WinMain
                 DeviceContext = GetDC(Window);                                    
                  //WHY????
                  //Update here                
-                printf("Just before Game update and render\n");
+                //printf("Just before Game update and render\n");
+                InitOpenGL(Window, &ScreenBuffer, imageContent);
                 GameUpdateAndRender(&game_memory, imageContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
-
                 //NOTE: Check whether OpenGL work or not
                  //Define the boundary of what we want to rende
                 

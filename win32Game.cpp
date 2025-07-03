@@ -31,6 +31,7 @@
 internal debug_read_file_result* DEBUGReadFileWhole(char* filename){
 
     debug_read_file_result* result = nullptr;
+    result = (debug_read_file_result*)malloc(sizeof(struct debug_read_file_result));
     HANDLE FileHandle = CreateFileA( filename, GENERIC_READ, 0,  NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
     if(FileHandle != INVALID_HANDLE_VALUE){
@@ -141,8 +142,8 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, uint32* ImageConten
             uint8 Green = ( Y + YOffset);
              //NOTE: AA RR GG BB()
             // Because I limit the size of Pixels so it can not add Green color to its storage
-            *Pixel++ = *ImageContent++;
-            //*Pixel++ = (Green << 8|Blue);
+            //*Pixel++ = *ImageContent++;
+            *Pixel++ = (Green << 8|Blue);
         }
         // Instead of manually move row pointer every y axis (by add it to the pitch)
         // we just need to reuse the Pixel pointer pass it to row where it was already moved
@@ -238,7 +239,7 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
                   );    
 /*
      Why Flickering???
-     Put the pixel drawing fx in the window/app loop
+     CAUSE: the pixel drawing fx in the window/app loop
 */
 }
 
@@ -270,16 +271,28 @@ void GameUpdateAndRender(Game_Memory* Memory, uint32* ImageContent ,Game_Input* 
     // The flickering bug is due to thes Swapbuffer inside the app
     // loop
     // Draw pixel here    
-    // printf("Draw something here\n");
     glBegin(GL_TRIANGLES);
     // real32 a =;
     // real32 b =;
-    // real32 proj[]={
-        
+    // real32 proj[]={        
     // }
+
     real32 p = 0.9f;
+    //printf("Draw something here\n");
     RenderSplendidGradient(OBuffer, ImageContent, State->BlueOffset, State->GreenOffset);
-    // // Upper triangle
+
+    char* filename = "Harry and Accomplices.bmp";
+    
+     glBitmap(
+          Dimens.Width * 0.9,
+          Dimens.Height * 0.9,
+          Dimens.Width * 0.1,
+          Dimens.Height * 0.1,
+          0,0,
+          (GLubyte *)filename
+              );
+
+    //Upper triangle
     glTexCoord2f(0.0f, 1.0f);
     glVertex2f(-p, p);
     // glColor3f(1.0f, 0.0f, 0.0f);
@@ -298,17 +311,6 @@ void GameUpdateAndRender(Game_Memory* Memory, uint32* ImageContent ,Game_Input* 
     glTexCoord2f(1.0f, 0.0f);
     glVertex2f(p, -p);
 
-    char* filename = "Harry and Accomplices.bmp";
-    
-     //glBitmap(
-          //Dimens.Width * 0.9,
-          //Dimens.Height * 0.9,
-          //Dimens.Width * 0.1,
-          //Dimens.Height * 0.1,
-          //0,0,
-          //filename
-              //);
-
 if(glGetError() != GL_NO_ERROR){
     printf("OpenGL Error: %d\n", glGetError());
 };
@@ -320,13 +322,13 @@ if(glGetError() != GL_NO_ERROR){
 }
 
 
-void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer){
+void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageContent){
     // first device context gotten from current window
     // printf("Start to init OpenGL\n");
     HDC windowDC = GetDC(window);
     HGLRC openglRC = wglCreateContext(windowDC);
     
-    // Then create rendering context of opengl from it
+    // Then create rendersplendidgradienting context of opengl from it
     // Create the pixel format features
     PIXELFORMATDESCRIPTOR desiredPixelFormat = {};
     desiredPixelFormat.nSize = sizeof(desiredPixelFormat);
@@ -343,6 +345,7 @@ void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer){
     PIXELFORMATDESCRIPTOR suggestedPixelFormat;
     bool32 initTexture = false;
     GLuint textureHandle = 0;
+    GLuint textureHandle_1 = 0;
 
     DescribePixelFormat(
         windowDC,
@@ -370,14 +373,19 @@ void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer){
             //     initTexture = true;
             // }
 
-            // printf("Succeed create OpenGL Context\n");
+            //printf("Succeed create OpenGL Context\n");
             glGenTextures(1, &textureHandle);
             glBindTexture(GL_TEXTURE_2D, textureHandle);
+
+            glGenTextures(1, &textureHandle_1);
+            glBindTexture(GL_TEXTURE_2D, textureHandle_1);
 
             //last argument This is where point to the image data
             // Why this doesn't work
             glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
+
+            //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, imageContent);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

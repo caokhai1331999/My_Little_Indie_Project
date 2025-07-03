@@ -26,6 +26,7 @@ internal void GameOutPutSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz) {
     
     // int16 SampleValue = ((RunningSampleIndex++/(SquareWavePeriod/2))% 2) ? ToneVolume : -ToneVolume;
     int16* SampleOut = nullptr;
+    SampleOut = (int16 *)malloc(sizeof(int16));
     SampleOut = SecondSoundBuffer->Samples;
 
     for (int SampleIndex{0};
