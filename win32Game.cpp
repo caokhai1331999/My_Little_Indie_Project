@@ -99,8 +99,16 @@ uint32* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
      if(ReadResult->Size != 0){
          BITMAP_HEADER *bmpContent = (BITMAP_HEADER*)ReadResult->Content;
          //Why plus ???
-         uint32* pixel = (uint32* )((uint8 *)ReadResult->Content + bmpContent->bfOffBits);
-         result = pixel;
+         uint32* pixels = (uint32* )((uint8 *)ReadResult->Content + bmpContent->bfOffBits);
+         uint32* SourceDest = pixels;
+         for(int32 Y = 0; Y < 40; Y++){
+             for(int32 X = 0; X < 60; X++){
+                 //How to reverse byte order from AA BB GG RR => BB GG RR AA
+                 *SourceDest = (*SourceDest << 8) | (*SourceDest >> 24);
+                 SourceDest++;
+             }
+         };
+         result = pixels;
      }
      return result;
 }
@@ -134,16 +142,17 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, uint32* ImageConten
     int Pitch = OBuffer->Pitch;
     // We take memory from BitmapMemory of main Bufer to write on it
     uint8* Row = (uint8 *)OBuffer->BitmapMemory;
-    
-    for (int Y{0}; Y < Height; Y++) {
+    uint32* reversedImagePointer = ImageContent;
+    reversedImagePointer += 2400;
+    for (int Y{0}; Y < 40; Y++) {
         uint32* Pixel = (uint32 *)Row;
-        for(int X{0}; X < Width; X++) {
+        for(int X{0}; X < 60; X++) {
             uint8 Blue = ( X + XOffset);
             uint8 Green = ( Y + YOffset);
              //NOTE: AA RR GG BB()
             // Because I limit the size of Pixels so it can not add Green color to its storage
-            //*Pixel++ = *ImageContent++;
-            *Pixel++ = (Green << 8|Blue);
+            *Pixel++ = *reversedImagePointer--;
+            //*Pixel++ = (Green << 8|Blue);
         }
         // Instead of manually move row pointer every y axis (by add it to the pitch)
         // we just need to reuse the Pixel pointer pass it to row where it was already moved
@@ -248,10 +257,10 @@ void GameUpdateAndRender(Game_Memory* Memory, uint32* ImageContent ,Game_Input* 
 
     if(!Memory->IsInitialized){
         State->Hz = 256;
-        // State->BlueOffset = 0;
-        // State->GreenOffset = 0;
-        char* FileName = "Harry and Accomplices.bmp";
+         State->BlueOffset = 0;
+         State->GreenOffset = 0;
     }
+    char* FileName = "structured_color_map.bmp";
     
     Game_Controller_Input* Input0 = &Input->Controller[0];
     
@@ -281,15 +290,13 @@ void GameUpdateAndRender(Game_Memory* Memory, uint32* ImageContent ,Game_Input* 
     //printf("Draw something here\n");
     RenderSplendidGradient(OBuffer, ImageContent, State->BlueOffset, State->GreenOffset);
 
-    char* filename = "Harry and Accomplices.bmp";
-    
      glBitmap(
           Dimens.Width * 0.9,
           Dimens.Height * 0.9,
           Dimens.Width * 0.1,
           Dimens.Height * 0.1,
           0,0,
-          (GLubyte *)filename
+          (GLubyte *)FileName
               );
 
     //Upper triangle
@@ -384,8 +391,9 @@ void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
             // Why this doesn't work
             glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
 
-            //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, imageContent);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
+
+            //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, imageContent);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

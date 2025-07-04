@@ -560,6 +560,8 @@ int CALLBACK WinMain
             debug_read_file_result result;
             if(game_memory.TransientStorage && game_memory.PermanentStorage){
                 //printf("About to read image\n");
+                // NOTE: ???? Why when I change to different bmp image it crashed
+                //byte order: AA BB GG RR bottom up  
                 uint32* imageContent = DEBUGReadBMP("Harry and Accomplices.bmp", &result);
               //NOTE: we create a second buffer last for 2 second with
              //NOTE: Don't call _alloc in the app loop it cause bug (it doesn't clean up entirely but just barely in the function)
