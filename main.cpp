@@ -518,10 +518,10 @@ int CALLBACK WinMain
     if(RegisterClassA(&WindowClass)) {
         Window = CreateWindowExA(
             //NOTE: The window didn't show up is because the first argument
-            0,
+            WS_EX_APPWINDOW,
             WindowClass.lpszClassName,
             "win32GameWithoutEngine",
-            WS_OVERLAPPED|WS_VISIBLE,
+            WS_OVERLAPPEDWINDOW|WS_VISIBLE,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
@@ -549,7 +549,7 @@ int CALLBACK WinMain
 
             //=======================================================
             Game_Memory game_memory = {};
-            game_memory.PermanentStorageSize = Megabytes(64);
+            game_memory.PermanentStorageSize = Megabytes(128);
             game_memory.TransientStorageSize = Megabytes((uint64)6);
 
             uint64 TotalSize = game_memory.PermanentStorageSize + game_memory.TransientStorageSize;
@@ -562,9 +562,9 @@ int CALLBACK WinMain
                 //printf("About to read image\n");
                 // NOTE: ???? Why when I change to different bmp image it crashed
                 //byte order: AA BB GG RR bottom up  
-                uint32* imageContent = DEBUGReadBMP("Harry and Accomplices.bmp", &result);
-              //NOTE: we create a second buffer last for 2 second with
-             //NOTE: Don't call _alloc in the app loop it cause bug (it doesn't clean up entirely but just barely in the function)
+                uint32* imageContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
+                //NOTE: we create a second buffer last for 2 second with
+                //NOTE: Don't call _alloc in the app loop it cause bug (it doesn't clean up entirely but just barely in the function)
              win32_Sound_OutPut SoundOutPut = {};
              SoundOutPut.SamplePerSecond = 48000;
              SoundOutPut.RunningSampleIndex = 0;
@@ -761,6 +761,7 @@ int CALLBACK WinMain
                  //WHY????
                  //Update here                
                 //printf("Just before Game update and render\n");
+
                 InitOpenGL(Window, &ScreenBuffer, imageContent);
                 GameUpdateAndRender(&game_memory, imageContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
                 //NOTE: Check whether OpenGL work or not

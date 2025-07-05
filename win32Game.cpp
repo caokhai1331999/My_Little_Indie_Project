@@ -36,6 +36,7 @@ internal debug_read_file_result* DEBUGReadFileWhole(char* filename){
 
     if(FileHandle != INVALID_HANDLE_VALUE){
         LARGE_INTEGER filesize;
+// NOTE: This should read the right size here
         if(GetFileSizeEx(FileHandle,  &filesize))
         {
             result->Size = safetruncateUint64(filesize.QuadPart);
@@ -94,17 +95,27 @@ void DEBUGFreeFileMemory(void* memory){
 }
 
 uint32* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
-     ReadResult = DEBUGReadFileWhole(filename);
      uint32* result = 0;
+     ReadResult = DEBUGReadFileWhole(filename);
      if(ReadResult->Size != 0){
-         BITMAP_HEADER *bmpContent = (BITMAP_HEADER*)ReadResult->Content;
+
+         BITMAP_HEADER *HeadResult = (BITMAP_HEADER*)ReadResult->Content;
          //Why plus ???
-         uint32* pixels = (uint32* )((uint8 *)ReadResult->Content + bmpContent->bfOffBits);
+
+         uint32* pixels = (uint32* )((uint8 *)ReadResult->Content + HeadResult->bfOffBits);
+
+         //result = pixels;
+
          uint32* SourceDest = pixels;
-         for(int32 Y = 0; Y < 40; Y++){
-             for(int32 X = 0; X < 60; X++){
-                 //How to reverse byte order from AA BB GG RR => BB GG RR AA
-                 *SourceDest = (*SourceDest << 8) | (*SourceDest >> 24);
+         //Why Height is inside the width loop
+         for(uint32 Y = 0; Y < HeadResult->Width; Y++){
+             for(uint32 X = 0; X < HeadResult->Height; X++){
+         //for (int32 Y{0}; Y < 1320; Y++) {
+             //for(int32 X{0}; X < 1952; X++) {
+                 //How to reverse byte order from AA BB GG RR
+                 //                            => RR GG BB AA
+                 //*SourceDest = (*SourceDest >> 8) | (*SourceDest << 24);
+                 *SourceDest = ((*SourceDest >> 24) | ((*SourceDest << 8) >> 16) | ((*SourceDest << 16) >> 8) | (*SourceDest >> 24));
                  SourceDest++;
              }
          };
@@ -137,26 +148,50 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, uint32* ImageConten
     // RR GG BB
     // Row is a pointer to every line of bitmapMemory
     // While pitch is data length of everyline of bitmap
-    int Width = OBuffer->BitmapWidth;
-    int Height = OBuffer->BitmapHeight;    
-    int Pitch = OBuffer->Pitch;
+    int32 Width = OBuffer->BitmapWidth;
+    int32 Height = OBuffer->BitmapHeight;    
+    int32 Pitch = OBuffer->Pitch;
+
+    int32 PixelWidth = 1320;
+    int32 PixelHeight = 1950;
+    
+    int32 BlitWidth =  PixelWidth;
+    int32 BlitHeight = PixelHeight;
+
+    if(BlitWidth > Width){
+        BlitWidth = Width;
+    }
+
+    if(BlitHeight > Height){
+        BlitHeight = Height;
+    }
+    
     // We take memory from BitmapMemory of main Bufer to write on it
     uint8* Row = (uint8 *)OBuffer->BitmapMemory;
     uint32* reversedImagePointer = ImageContent;
-    reversedImagePointer += 2400;
-    for (int Y{0}; Y < 40; Y++) {
+    //reversedImagePointer += (BlitHeight * BlitWidth);
+    //reversedImagePointer+= 1320 * 1950;
+//NOTE: For Gradient version
+    for (int32 Y{0}; Y < BlitHeight; Y++) {
         uint32* Pixel = (uint32 *)Row;
-        for(int X{0}; X < 60; X++) {
-            uint8 Blue = ( X + XOffset);
-            uint8 Green = ( Y + YOffset);
-             //NOTE: AA RR GG BB()
+        for(int32 X{0}; X < BlitWidth; X++) {
+
+//NOTE: Transfer image pixel
+    //for (int32 Y{0}; Y < 1320; Y++) {
+        //uint32* Pixel = (uint32 *)Row;
+        //for(int32 X{0}; X < 1952; X++) {
+
+            //uint8 Blue = ( X + XOffset);
+            //uint8 Green = ( Y + YOffset);
+
+            //NOTE: AA RR GG BB()
             // Because I limit the size of Pixels so it can not add Green color to its storage
-            *Pixel++ = *reversedImagePointer--;
             //*Pixel++ = (Green << 8|Blue);
+            *Pixel++ = *reversedImagePointer++;
         }
         // Instead of manually move row pointer every y axis (by add it to the pitch)
         // we just need to reuse the Pixel pointer pass it to row where it was already moved
-        Row = (uint8 *)Pixel;        
+        Row += OBuffer->Pitch;
     }
 }
 
@@ -260,7 +295,7 @@ void GameUpdateAndRender(Game_Memory* Memory, uint32* ImageContent ,Game_Input* 
          State->BlueOffset = 0;
          State->GreenOffset = 0;
     }
-    char* FileName = "structured_color_map.bmp";
+    //char* FileName = "structured_color_map.bmp";
     
     Game_Controller_Input* Input0 = &Input->Controller[0];
     
@@ -275,10 +310,13 @@ void GameUpdateAndRender(Game_Memory* Memory, uint32* ImageContent ,Game_Input* 
         State->GreenOffset += 1;
     }
 
+    RenderSplendidGradient(OBuffer, ImageContent, State->BlueOffset, State->GreenOffset);
+    
     // Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height, OBuffer );
    
     // The flickering bug is due to thes Swapbuffer inside the app
     // loop
+/*
     // Draw pixel here    
     glBegin(GL_TRIANGLES);
     // real32 a =;
@@ -288,16 +326,15 @@ void GameUpdateAndRender(Game_Memory* Memory, uint32* ImageContent ,Game_Input* 
 
     real32 p = 0.9f;
     //printf("Draw something here\n");
-    RenderSplendidGradient(OBuffer, ImageContent, State->BlueOffset, State->GreenOffset);
+     //glBitmap(
+          //Dimens.Width * 0.9,
+          //Dimens.Height * 0.9,
+          //Dimens.Width * 0.1,
+          //Dimens.Height * 0.1,
+         //0,0,
+          //(GLubyte *)FileName
+              //);
 
-     glBitmap(
-          Dimens.Width * 0.9,
-          Dimens.Height * 0.9,
-          Dimens.Width * 0.1,
-          Dimens.Height * 0.1,
-          0,0,
-          (GLubyte *)FileName
-              );
 
     //Upper triangle
     glTexCoord2f(0.0f, 1.0f);
@@ -318,10 +355,13 @@ void GameUpdateAndRender(Game_Memory* Memory, uint32* ImageContent ,Game_Input* 
     glTexCoord2f(1.0f, 0.0f);
     glVertex2f(p, -p);
 
+    RenderSplendidGradient(OBuffer, ImageContent, State->BlueOffset, State->GreenOffset);
+
 if(glGetError() != GL_NO_ERROR){
     printf("OpenGL Error: %d\n", glGetError());
 };
-    glEnd();    
+    glEnd();
+    */
     // Display on the screen
     SwapBuffers(DeviceContext);
     // Release unused DC    

@@ -60,7 +60,7 @@ struct Win32_OffScreen_Buffer{
     BITMAPINFO Bitmapinfo;
     HBITMAP BitmapHandle;
 
-    void* BitmapMemory = nullptr;
+    void* BitmapMemory;
     int BitmapWidth;
     int BitmapHeight;
     int Pitch;
