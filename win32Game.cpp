@@ -94,8 +94,8 @@ void DEBUGFreeFileMemory(void* memory){
     VirtualFree(memory, 0, MEM_RELEASE);
 }
 
-uint32* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
-     uint32* result = 0;
+BMP_content* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
+    BMP_content* result = new BMP_content();
      ReadResult = DEBUGReadFileWhole(filename);
      if(ReadResult->Size != 0){
 
@@ -103,24 +103,27 @@ uint32* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
          //Why plus ???
 
          uint32* pixels = (uint32* )((uint8 *)ReadResult->Content + HeadResult->bfOffBits);
-
-         //result = pixels;
-
+         result->ImageContent = pixels;
+         result->Width = HeadResult->Width;
+         result->Height = HeadResult->Height;
          uint32* SourceDest = pixels;
+
+         
+         
+/*
          //Why Height is inside the width loop
-         for(uint32 Y = 0; Y < HeadResult->Width; Y++){
-             for(uint32 X = 0; X < HeadResult->Height; X++){
+         for(uint32 Y = 0; Y < HeadResult->Width; ++Y){
+             for(uint32 X = 0; X < HeadResult->Height; ++X){
          //for (int32 Y{0}; Y < 1320; Y++) {
              //for(int32 X{0}; X < 1952; X++) {
-                 //How to reverse byte order from AA BB GG RR
-                 //                            => RR GG BB AA
-                 //*SourceDest = (*SourceDest >> 8) | (*SourceDest << 24);
-                 *SourceDest = ((*SourceDest >> 24) | ((*SourceDest << 8) >> 16) | ((*SourceDest << 16) >> 8) | (*SourceDest >> 24));
-                 SourceDest++;
+                 //How to reverse byte order from AA RR GG BB (image byte order)
+                 //                            => RR GG BB AA (little endiendness order)
+                 *SourceDest = ((*SourceDest) >> 8) | ((*SourceDest) << 24);
+                 ++SourceDest;
              }
          };
-         result = pixels;
-     }
+*/
+         }
      return result;
 }
 
@@ -141,57 +144,6 @@ win32LoadXInput(void) {
         if (!XinputSetState) {XinputSetState = XinputSetStateStub;}
     } else {
         // TODO: Do a diagnostic
-    }
-}
-
-void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, uint32* ImageContent, int XOffset, int YOffset) {
-    // RR GG BB
-    // Row is a pointer to every line of bitmapMemory
-    // While pitch is data length of everyline of bitmap
-    int32 Width = OBuffer->BitmapWidth;
-    int32 Height = OBuffer->BitmapHeight;    
-    int32 Pitch = OBuffer->Pitch;
-
-    int32 PixelWidth = 1320;
-    int32 PixelHeight = 1950;
-    
-    int32 BlitWidth =  PixelWidth;
-    int32 BlitHeight = PixelHeight;
-
-    if(BlitWidth > Width){
-        BlitWidth = Width;
-    }
-
-    if(BlitHeight > Height){
-        BlitHeight = Height;
-    }
-    
-    // We take memory from BitmapMemory of main Bufer to write on it
-    uint8* Row = (uint8 *)OBuffer->BitmapMemory;
-    uint32* reversedImagePointer = ImageContent;
-    //reversedImagePointer += (BlitHeight * BlitWidth);
-    //reversedImagePointer+= 1320 * 1950;
-//NOTE: For Gradient version
-    for (int32 Y{0}; Y < BlitHeight; Y++) {
-        uint32* Pixel = (uint32 *)Row;
-        for(int32 X{0}; X < BlitWidth; X++) {
-
-//NOTE: Transfer image pixel
-    //for (int32 Y{0}; Y < 1320; Y++) {
-        //uint32* Pixel = (uint32 *)Row;
-        //for(int32 X{0}; X < 1952; X++) {
-
-            //uint8 Blue = ( X + XOffset);
-            //uint8 Green = ( Y + YOffset);
-
-            //NOTE: AA RR GG BB()
-            // Because I limit the size of Pixels so it can not add Green color to its storage
-            //*Pixel++ = (Green << 8|Blue);
-            *Pixel++ = *reversedImagePointer++;
-        }
-        // Instead of manually move row pointer every y axis (by add it to the pitch)
-        // we just need to reuse the Pixel pointer pass it to row where it was already moved
-        Row += OBuffer->Pitch;
     }
 }
 
@@ -269,6 +221,64 @@ void ProcessXinputDigitalButton(DWORD XInputButtonState ,Game_Button_State* OldS
     NewState->HalfTransitionCount = ((OldState->EndedDown == NewState->EndedDown)? 1 : 0);       
 }
 
+
+void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPContent, int XOffset, int YOffset) {
+    // RR GG BB
+    // Row is a pointer to every line of bitmapMemory
+    // While pitch is data length of everyline of bitmap
+    int32 Width = OBuffer->BitmapWidth;
+    int32 Height = OBuffer->BitmapHeight;
+    int32 Pitch = OBuffer->BitmapWidth * OBuffer->BytesPerPixel;
+    
+    int32 BlitWidth =  BMPContent->Width;
+    int32 BlitHeight = BMPContent->Height;
+
+    if(BlitWidth > Width){
+        BlitWidth = Width;
+    }
+
+    if(BlitHeight > Height){
+        BlitHeight = Height;
+    }
+    
+    // We take memory from BitmapMemory of main Bufer to write on it
+    uint8* Row = ((uint8 *)OBuffer->BitmapMemory);
+    //Change the image row order upside down
+    uint8* imageRow = (uint8*)BMPContent->ImageContent;
+    imageRow += (4 * (BlitHeight - 1) * BlitWidth);
+
+    //for (int32 Y{0}; Y < BlitHeight; Y++) {
+        //uint32* Pixel = (uint32 *)Row;
+        //uint32* imagePixel = (uint32* )imageRow;
+        //for(int32 X{0}; X < BlitWidth; X++) {
+
+//NOTE: For Gradient version
+    for (int Y = 0; Y < Height; Y++) {
+        uint32* Pixel = (uint32 *)Row;
+        for(int X = 0; X < Width; X++) {
+
+            //uint8 Blue = ( X + XOffset);
+            //uint8 Green = ( Y + YOffset);
+
+            //NOTE: AA RR GG BB()
+            // Because I limit the size of Pixels so it can not add Green color to its storage
+            //*Pixel++ = (Green << 8|Blue);
+            // NOTE: How to turn pixels order from bottom up to top down
+            // Pixel :
+            // ImagePointer :
+            // Pixel[0] = imagepixel[h x X + Y]
+            // Why Pixel appear in uint8 not uint32
+            *Pixel++ = *imagePixel++;
+        }
+        // Instead of manually move row pointer every y axis (by add it to the pitch)
+        // we just need to reuse the Pixel pointer pass it to row where it was already moved
+        // NOTE: THIS IS WHERE THING STARTED TO GO WRONG
+        imageRow-=(BlitWidth*4);
+        Row+=Pitch;
+    }
+}
+
+
 void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeight, Win32_OffScreen_Buffer* OBuffer ) {
     
     StretchDIBits(
@@ -287,89 +297,7 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
 */
 }
 
-
-void GameUpdateAndRender(Game_Memory* Memory, uint32* ImageContent ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){
-
-    if(!Memory->IsInitialized){
-        State->Hz = 256;
-         State->BlueOffset = 0;
-         State->GreenOffset = 0;
-    }
-    //char* FileName = "structured_color_map.bmp";
-    
-    Game_Controller_Input* Input0 = &Input->Controller[0];
-    
-    if(Input0->IsAnalog){
-    State->Hz = (int)(128.0f*(Input0->EndX));
-    State->BlueOffset = (int)(4.0f*(Input0->EndY));        
-    } else {
-        
-    }
-    
-    if(Input0->Down.EndedDown){
-        State->GreenOffset += 1;
-    }
-
-    RenderSplendidGradient(OBuffer, ImageContent, State->BlueOffset, State->GreenOffset);
-    
-    // Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height, OBuffer );
-   
-    // The flickering bug is due to thes Swapbuffer inside the app
-    // loop
-/*
-    // Draw pixel here    
-    glBegin(GL_TRIANGLES);
-    // real32 a =;
-    // real32 b =;
-    // real32 proj[]={        
-    // }
-
-    real32 p = 0.9f;
-    //printf("Draw something here\n");
-     //glBitmap(
-          //Dimens.Width * 0.9,
-          //Dimens.Height * 0.9,
-          //Dimens.Width * 0.1,
-          //Dimens.Height * 0.1,
-         //0,0,
-          //(GLubyte *)FileName
-              //);
-
-
-    //Upper triangle
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex2f(-p, p);
-    // glColor3f(1.0f, 0.0f, 0.0f);
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex2f(-p, -p);
-    // glColor3f(0.0f, 1.0f, 0.0f);
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex2f(p, -p);
-    // glColor3f(0.0f, 0.0f, 1.0f);
-    // Below triangle
-    // glColor3f(p, p, p);
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex2f(-p, p);
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex2f(p, p);
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex2f(p, -p);
-
-    RenderSplendidGradient(OBuffer, ImageContent, State->BlueOffset, State->GreenOffset);
-
-if(glGetError() != GL_NO_ERROR){
-    printf("OpenGL Error: %d\n", glGetError());
-};
-    glEnd();
-    */
-    // Display on the screen
-    SwapBuffers(DeviceContext);
-    // Release unused DC    
-    GameOutPutSound(SoundBuffer, State->Hz);
-}
-
-
-void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageContent){
+bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageContent){
     // first device context gotten from current window
     // printf("Start to init OpenGL\n");
     HDC windowDC = GetDC(window);
@@ -458,12 +386,97 @@ void InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
         } else {
             // TODO: Diagnostic
             printf("Failed to init OpenGl\n");            
+            return false;
         };   
     } else {
         printf("Failed to init OpenGl\n");
+        return false;
     }
     ReleaseDC(window, windowDC);
+    return true;
 }
+
+
+void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){
+
+    if(!Memory->IsInitialized){
+        State->Hz = 256;
+         State->BlueOffset = 0;
+         State->GreenOffset = 0;
+    }
+    char* FileName = "structured_color_map.bmp";
+    
+    Game_Controller_Input* Input0 = &Input->Controller[0];
+    
+    if(Input0->IsAnalog){
+    State->Hz = (int)(128.0f*(Input0->EndX));
+    State->BlueOffset = (int)(4.0f*(Input0->EndY));        
+    } else {
+        
+    }
+    
+    if(Input0->Down.EndedDown){
+        State->GreenOffset += 1;
+    }
+
+
+
+    // The flickering bug is due to thes Swapbuffer inside the app
+    // loop
+    // Draw pixel here    
+    glBegin(GL_TRIANGLES);
+    // real32 a =;
+    // real32 b =;
+    // real32 proj[]={        
+    // }
+
+    real32 p = 0.9f;
+    //printf("Draw something here\n");
+     glBitmap(
+          Dimens.Width * 0.9,
+          Dimens.Height * 0.9,
+          Dimens.Width * 0.1,
+          Dimens.Height * 0.1,
+         0,0,
+          (GLubyte *)FileName
+              );
+
+    //Upper triangle
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex2f(-p, p);
+    // glColor3f(1.0f, 0.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex2f(-p, -p);
+    // glColor3f(0.0f, 1.0f, 0.0f);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex2f(p, -p);
+    // glColor3f(0.0f, 0.0f, 1.0f);
+    // Below triangle
+    // glColor3f(p, p, p);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex2f(-p, p);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex2f(p, p);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex2f(p, -p);
+
+    RenderSplendidGradient(OBuffer, BMPContent, State->BlueOffset, State->GreenOffset);
+    Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height, OBuffer);
+    // Display on the screen
+    //SwapBuffers(DeviceContext);    
+
+if(glGetError() != GL_NO_ERROR){
+    printf("OpenGL Error: %d\n", glGetError());
+};
+    glEnd();
+
+    //RenderSplendidGradient(OBuffer, ImageContent, State->BlueOffset, State->GreenOffset);
+    // Display on the screen
+    SwapBuffers(DeviceContext);
+    // Release unused DC    
+    GameOutPutSound(SoundBuffer, State->Hz);
+}
+
 
 void OpenConsole() {
     AllocConsole();                             // Allocate a new console

@@ -425,9 +425,10 @@ LRESULT CALLBACK MainWindowCallBack(
              }else {
                  Operation = WHITENESS;
              }
-            
-             Win32DisplayBufferWindow(DeviceContext,Dimens.Width, Dimens.Height, &BackBuffer);
-            EndPaint(Window, &Paint);
+
+             Win32DisplayBufferWindow( DeviceContext ,Dimens.Width, Dimens.Height, &BackBuffer);
+
+             EndPaint(Window, &Paint);
             OutputDebugStringA("WM_PAINT\n");
         }
         break;
@@ -558,11 +559,13 @@ int CALLBACK WinMain
             game_memory.TransientStorage = ((uint8*)game_memory.PermanentStorage + game_memory.PermanentStorageSize);
             //======================================================
             debug_read_file_result result;
+            BMP_content* BMPContent;
             if(game_memory.TransientStorage && game_memory.PermanentStorage){
                 //printf("About to read image\n");
                 // NOTE: ???? Why when I change to different bmp image it crashed
                 //byte order: AA BB GG RR bottom up  
-                uint32* imageContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
+
+             BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
                 //NOTE: we create a second buffer last for 2 second with
                 //NOTE: Don't call _alloc in the app loop it cause bug (it doesn't clean up entirely but just barely in the function)
              win32_Sound_OutPut SoundOutPut = {};
@@ -603,8 +606,9 @@ int CALLBACK WinMain
             Game_Sound_OutPut SoundBuffer = {};
             Win32_OffScreen_Buffer ScreenBuffer = {};
 
-//Why InitOpenGl only work in the app loop
-                
+            //Why InitOpenGl only work in the app loop
+
+            //Pass BackBuffer data
             ScreenBuffer.BitmapMemory = BackBuffer.BitmapMemory;
             ScreenBuffer.BitmapWidth = BackBuffer.BitmapWidth;
             ScreenBuffer.BitmapHeight = BackBuffer.BitmapHeight;
@@ -757,13 +761,17 @@ int CALLBACK WinMain
                 }                                                    
                                                 
                 //=====================================================================
-                DeviceContext = GetDC(Window);                                    
                  //WHY????
                  //Update here                
                 //printf("Just before Game update and render\n");
 
-                InitOpenGL(Window, &ScreenBuffer, imageContent);
-                GameUpdateAndRender(&game_memory, imageContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
+                if(!InitOpenGL(Window, &ScreenBuffer, nullptr)){
+                    InitOpenGL(Window, &ScreenBuffer, nullptr);
+                };
+                
+                DeviceContext = GetDC(Window);
+                GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
+                ReleaseDC(Window, DeviceContext);
                 //NOTE: Check whether OpenGL work or not
                  //Define the boundary of what we want to rende
                 
@@ -802,8 +810,6 @@ int CALLBACK WinMain
                 MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per register 
                 MULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register  
 */
-                    ReleaseDC(Window, DeviceContext);
-
                 Game_Input* Temp = NewInput;
                 NewInput = OldInput;  //???? still don't understand
                 OldInput = Temp;
