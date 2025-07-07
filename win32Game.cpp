@@ -26,8 +26,6 @@
 */ 
 #include "win32Game.h"
 
-
-
 internal debug_read_file_result* DEBUGReadFileWhole(char* filename){
 
     debug_read_file_result* result = nullptr;
@@ -228,25 +226,28 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPCon
     // While pitch is data length of everyline of bitmap
     int32 BlitWidth =  BMPContent->Width;
     int32 BlitHeight = BMPContent->Height;
+    int32 ImagePitch = 4 * BlitWidth;    
 
     int32 Width =  OBuffer->BitmapWidth;
     int32 Height = OBuffer->BitmapHeight;
-    int32 ImagePitch = 4 * BlitWidth;
-    
-    if(BlitWidth > Width){
-        BlitWidth = Width;
-    }
 
-    if(BlitHeight > Height){
-        BlitHeight = Height;
-    }
+    //BUG right here
+    //if(BlitWidth > Width){
+        //BlitWidth = Width;
+    //}
+
+
+    //if(BlitHeight > Height){
+        //BlitHeight = Height;
+    //}
     
     // We take memory from BitmapMemory of main Bufer to write on it
     uint8* Row = ((uint8 *)OBuffer->BitmapMemory);
     //Change the image row order upside down
     uint8* imageRow = (uint8*)BMPContent->ImageContent;
-    imageRow += 4 * (BlitHeight - 1) * BlitWidth;
-    
+// ???? What todo if the image is bigger than the 
+    imageRow += 4 * ((BlitHeight) * BlitWidth);
+
     for (int32 Y{0}; Y < BlitHeight; Y++) {
         uint32* Pixel = (uint32 *)Row;
         uint32* imagePixel = (uint32* )imageRow;
@@ -274,10 +275,10 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPCon
         // we just need to reuse the Pixel pointer pass it to row where it was already moved
 
         // NOTE: This order is for passing to OpenGL
-        //imageRow+=ImagePitch;
+        imageRow+=ImagePitch;
 
         // And this is for passing directly to the window (RIGHT)
-        imageRow-=ImagePitch;
+        //imageRow-=ImagePitch;
         Row+=OBuffer->Pitch;
         //NOTE: This incidentally produce right pixel order
     }
@@ -432,11 +433,11 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
     // loop
 
     // Display on the screen
-    RenderSplendidGradient(OBuffer, BMPContent, 0, 0);
-    Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height, OBuffer);
-    SwapBuffers(DeviceContext);
+    //RenderSplendidGradient(OBuffer, BMPContent, 0, 0);
+    //Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height, OBuffer);
+    //SwapBuffers(DeviceContext);
 
-/*
+
     // OPENGL parts ======================================================
     glBegin(GL_TRIANGLES);
     // real32 a =;
@@ -444,7 +445,7 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
     // real32 proj[]={        
     // }
 
-    real32 p = 0.9f;
+    real32 p = 1.0f;
     //char* FileName = "structured_color_map.bmp";
     //glBitmap(
           //Dimens.Width * 0.9,
@@ -473,6 +474,7 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
     glVertex2f(p, p);
     glTexCoord2f(1.0f, 0.0f);
     glVertex2f(p, -p);
+
     // Display on the screen
     RenderSplendidGradient(OBuffer, BMPContent, State->BlueOffset, State->GreenOffset);
 
@@ -482,9 +484,9 @@ if(glGetError() != GL_NO_ERROR){
 
     glEnd();
 // ==================================================================
-*/
+
     // Display on the screen
-    //SwapBuffers(DeviceContext);
+    SwapBuffers(DeviceContext);
     GameOutPutSound(SoundBuffer, State->Hz);
 }
 

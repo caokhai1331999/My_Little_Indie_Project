@@ -16,11 +16,13 @@
   NOTE: Services that the platform layer provide to the game layer
  */
 
+#include <Windows.h>
+#include <xinput.h>
+#include <GL/gl.h>
+
 #include <stdio.h>
 #include <cmath>
 #include <iostream>
-#include <Windows.h>
-#include <GL/gl.h>
 
 using namespace std;
 

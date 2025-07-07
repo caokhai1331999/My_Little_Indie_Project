@@ -6,16 +6,8 @@
    $Creator: Cao Khai(Casey disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
-
-#include <DSound.h> 
-#include <combaseapi.h>
-#include <endpointvolume.h>
-#include <strmif.h>
-#include <initguid.h>
-#include <mmdeviceapi.h>
-#include <audioclient.h>
-#include <xinput.h>
 #include "handmade.h"
+#include "SoundMaker.h"
 
 // NOTE: This is all about calling the function in the Xinput.h without the noticing from the compiler
 #define X_INPUT_GET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex,XINPUT_STATE *pState)
@@ -67,22 +59,6 @@ struct Win32_OffScreen_Buffer{
     const int BytesPerPixel = 4;
 };
 
-struct win32_Sound_OutPut{
-    int SamplePerSecond;
-    int BytesPerSample;
-    // Hert(hz) is cycles per second
-    int32 SecondBufferSize;
-    uint32 RunningSampleIndex;
-    real32 tsine;
-    int hz;
-    int LatencySampleCount;
-    int WavePeriod;
-    int SquareWaveCount;
-    int ToneVolume;
-    // Sample per cycle is SquareWave Period    
-}SoundOutPut;
-
-
 struct BMP_content{
     int32 Width;
     int32 Height;
@@ -94,7 +70,6 @@ global_variable HWND Window;
 global_variable RECT ClientRect;
 global_variable HDC DeviceContext;
 // global_variable int  XOffset{0}, YOffset{0};
-global_variable LPDIRECTSOUNDBUFFER GlobalSecondBuffer;
 global_variable Win32_OffScreen_Buffer BackBuffer = {};
 
 global_variable Game_State State = {};
@@ -117,7 +92,7 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPCon
 
 void Win32DisplayBufferWindow (HDC DeviceContext, int WindowWidth, int WindowHeight, Win32_OffScreen_Buffer* OBuffer);
 
-void GameOutputSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz);
+//void GameOutputSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz);
 
 void GameUpdateAndRender(Game_Memory* Memory = nullptr, BMP_content* BMPContent = nullptr ,Game_Input* Input = nullptr, Game_State* State = nullptr ,Win32_OffScreen_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr, HDC DeviceContext = NULL);
 
