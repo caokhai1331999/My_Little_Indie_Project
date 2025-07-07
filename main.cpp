@@ -309,7 +309,7 @@ LRESULT CALLBACK MainWindowCallBack(
              //of the new window and update a new proper DIB for that
              //DIB is a table where store BIT color infor
             Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
-             //Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height,  &Buffer);
+            //Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height,  &BackBuffer);
             OutputDebugStringA("WM_SIZE\n");
         }break;
         
@@ -363,12 +363,13 @@ LRESULT CALLBACK MainWindowCallBack(
             if (WasDown != IsDown) {
 
                 if(vkCode == VK_UP) {
-                    State.BlueOffset += 10;
+                    State.BlueOffset+= 10;
+                    printf("YOffset is %d\n", State.BlueOffset);
                 }
 
                 else if(vkCode == VK_DOWN) {
-                    //YOffset += 10;
-                    State.GreenOffset += 10;
+                    State.GreenOffset+= 10;
+                    printf("YOffset is %d\n", State.GreenOffset);
                 }
 
                 else if(vkCode == VK_LEFT) {
@@ -427,7 +428,6 @@ LRESULT CALLBACK MainWindowCallBack(
              }
 
              Win32DisplayBufferWindow( DeviceContext ,Dimens.Width, Dimens.Height, &BackBuffer);
-
              EndPaint(Window, &Paint);
             OutputDebugStringA("WM_PAINT\n");
         }
@@ -510,6 +510,7 @@ int CALLBACK WinMain
     int64 PerfCountFrequency = (int64)(PerfCountFrequencyResult.QuadPart);                
     win32LoadXInput();
     WNDCLASSA WindowClass = {};
+    //WindowClass.style = CS_HREDRAW|CS_VREDRAW;
     WindowClass.lpfnWndProc = MainWindowCallBack;
     WindowClass.hInstance = Instance;
     WindowClass.lpszClassName = "First Game Window Class";
@@ -564,8 +565,7 @@ int CALLBACK WinMain
                 //printf("About to read image\n");
                 // NOTE: ???? Why when I change to different bmp image it crashed
                 //byte order: AA BB GG RR bottom up  
-
-             BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
+                BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
                 //NOTE: we create a second buffer last for 2 second with
                 //NOTE: Don't call _alloc in the app loop it cause bug (it doesn't clean up entirely but just barely in the function)
              win32_Sound_OutPut SoundOutPut = {};
@@ -597,12 +597,6 @@ int CALLBACK WinMain
 
             LastCycleCounts = __rdtsc();
             int MaxControllerCount = XUSER_MAX_COUNT;
-/*
-             Init here
-             NOTE: Why InitOpenGL only work while in window loop
-             May be this is related to Window and DC that hasn't been
-             initialized yet
-*/
             Game_Sound_OutPut SoundBuffer = {};
             Win32_OffScreen_Buffer ScreenBuffer = {};
 
@@ -613,7 +607,16 @@ int CALLBACK WinMain
             ScreenBuffer.BitmapWidth = BackBuffer.BitmapWidth;
             ScreenBuffer.BitmapHeight = BackBuffer.BitmapHeight;
             ScreenBuffer.Pitch = BackBuffer.Pitch;
-
+            ScreenBuffer.Bitmapinfo = BackBuffer.Bitmapinfo;
+            ScreenBuffer.BitmapHandle = BackBuffer.BitmapHandle;
+            
+/*
+             Init here
+             NOTE: Why InitOpenGL only work while in window loop
+             May be this is related to Window and DC that hasn't been
+             initialized yet
+*/            
+            //OpenGLInited = InitOpenGL(Window, &ScreenBuffer, nullptr);
             while(GlobalRunning) {
                 MSG Message;
                 //NOTE: This is where receiving the message to change
@@ -765,13 +768,12 @@ int CALLBACK WinMain
                  //Update here                
                 //printf("Just before Game update and render\n");
 
-                if(!InitOpenGL(Window, &ScreenBuffer, nullptr)){
-                    InitOpenGL(Window, &ScreenBuffer, nullptr);
-                };
                 
+                //InitOpenGL(Window, &ScreenBuffer, nullptr);                
                 DeviceContext = GetDC(Window);
+//Why the &ScreenBuffer data doesn't show on the direct screen
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
-                ReleaseDC(Window, DeviceContext);
+
                 //NOTE: Check whether OpenGL work or not
                  //Define the boundary of what we want to rende
                 
@@ -813,6 +815,7 @@ int CALLBACK WinMain
                 Game_Input* Temp = NewInput;
                 NewInput = OldInput;  //???? still don't understand
                 OldInput = Temp;
+                ReleaseDC(Window, DeviceContext);
             }            
             }                
         }
