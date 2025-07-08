@@ -8,14 +8,14 @@
    ======================================================================== */
 
 #include "handmade.h"
-#include <initguid.h>
+
 #include <combaseapi.h>
 #include <strmif.h>
 #include <DSound.h> 
 #include <mmdeviceapi.h>
 #include <audioclient.h>
-#include <uuids.h>
 #include <endpointvolume.h>
+#include <uuids.h>
 
 // =====================================================================
 // NOTE: 
@@ -51,12 +51,13 @@ struct win32_Sound_OutPut{
     // Sample per cycle is SquareWave Period    
 }SoundOutPut;
 
+global_variable LPDIRECTSOUNDBUFFER GlobalSecondBuffer;
+
 void Win32FillSoundBuffer(win32_Sound_OutPut* SoundOutPut, DWORD ByteToLock, DWORD ByteToWrite, Game_Sound_OutPut* SoundSourceBuffer);
 void Win32ClearSoundBuffer(win32_Sound_OutPut* SoundOutPut);
 void win32InitDSound(HWND window, int32 SamplePerSecond, int32 SecondBufferSize);
 void win32InitCoreAudioSound(HWND window, int32 SamplePerSecond, int32 SecondBufferSize);
 
-global_variable LPDIRECTSOUNDBUFFER GlobalSecondBuffer;
 
 #define SOUNDMAKER_H
 #endif

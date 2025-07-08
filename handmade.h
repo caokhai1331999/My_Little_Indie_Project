@@ -15,7 +15,6 @@
 /*
   NOTE: Services that the platform layer provide to the game layer
  */
-
 #include <Windows.h>
 #include <xinput.h>
 #include <GL/gl.h>

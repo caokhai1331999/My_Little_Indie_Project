@@ -6,8 +6,8 @@
    $Creator: Cao Khai(Casey disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
-#include "handmade.h"
 #include "SoundMaker.h"
+#include "handmade.h"
 
 // NOTE: This is all about calling the function in the Xinput.h without the noticing from the compiler
 #define X_INPUT_GET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex,XINPUT_STATE *pState)

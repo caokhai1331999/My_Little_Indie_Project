@@ -7,9 +7,9 @@ del *.pdb > NUL 2> NUL
 
 set DIRECTIVES_FLAG=/D:DEBUG=1 /D:INTERNAL=1
 set COMPILE_FLAG=/FC /Zi 
-set LIB_=user32.lib gdi32.lib strmiids.lib opengl32.lib uuid.lib
+set LIB_= strmiids.lib uuid.lib user32.lib gdi32.lib opengl32.lib
 set INCLUDE_=..\*.h
-set FILES=..\main.cpp ..\handmade.cpp ..\SoundMaker.cpp ..\win32Game.cpp
+set FILES=..\main.cpp ..\handmade.cpp ..\SoundMaker.cpp ..\win32Game.cpp ..\GUIDs.cpp
 
 rem Mmdevapi.dll Audioses.dll
 rem remember to add these to use address sanitizer /EHsc /fsanitize=address

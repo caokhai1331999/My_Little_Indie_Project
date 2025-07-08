@@ -1,12 +1,20 @@
+
 /* ========================================================================
    $File: $
    $Date: $
    $Revision: $
-   $Creator: Cao Khai(Casey Muratori's disciple) $
+   $Creator: Cao Khai(Casey's disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
+/*#include <combaseapi.h>
+#include <strmif.h>
+#include <DSound.h> 
+#include <mmdeviceapi.h>
+#include <audioclient.h>
+#include <endpointvolume.h>
+#include <uuids.h>
+*/
 #include "SoundMaker.h"
-
 // ============================================================================
 //NOTE: DONE Practice using coreaudio and multimedia api instead of directsound
 //Now it's time to write real wave
@@ -27,6 +35,8 @@
 
         const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
         const IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
+        //const IID IID_IAudioClient = __uuidof()
+        
         IMMDeviceEnumerator* pEnumerator = nullptr;
 
  // Initialize COM library
@@ -34,10 +44,10 @@
         if (CoCreateInstance && (SUCCEEDED(CoCreateInstance(CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL, IID_IMMDeviceEnumerator, (void**)pEnumerator)))) {
             //NOTE: pEnumerator is a pointer to the IMMDeviceEnumerator
             //NOTE: Get the IMMDeviceCollection api through IMMDeviceEnumerator::
-            IMMDeviceCollection *ppDevicesl = nullptr;
+            IMMDeviceCollection *ppDevicesl;
             if (SUCCEEDED(pEnumerator->EnumAudioEndpoints(eAll, DEVICE_STATE_ACTIVE, &ppDevicesl)))
             {   
-                IMMDevice *ppDevice = nullptr;
+                IMMDevice *ppDevice;
 //NOTE: Get the IMMDevice by calling GetDevice
                 if(SUCCEEDED(ppDevicesl->Item(0, &ppDevice))) {
                     //NOTE: Activate the IMMDevice
@@ -62,7 +72,7 @@
                         } else {
                             //TODO: Do a diagnoses
                         }
-                        IAudioClient* ppInterface2;
+                        IAudioClient* ppInterface2 = nullptr;
                          //If I wasn't wrong the interface stand for buffer
                         //NOTE: Then may be get buffer size
                         if(SUCCEEDED(ppDevice->Activate( IID_IAudioClient, CLSCTX_ALL, NULL, (void**)ppInterface2))) {
