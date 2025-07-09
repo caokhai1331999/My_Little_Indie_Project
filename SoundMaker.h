@@ -8,14 +8,19 @@
    ======================================================================== */
 
 #include "handmade.h"
+#include <initguid.h>
+#include <audioclient.h>
 
 #include <combaseapi.h>
 #include <strmif.h>
 #include <DSound.h> 
 #include <mmdeviceapi.h>
-#include <audioclient.h>
-#include <endpointvolume.h>
 #include <uuids.h>
+#include <endpointvolume.h>
+
+
+DEFINE_GUID(IID_IAudioClient,
+0x1CB9AD4C, 0xDBFA, 0x4c32, 0xB1, 0x78, 0xC2, 0xF5, 0x9F, 0x64, 0x11, 0x6A);
 
 // =====================================================================
 // NOTE: 
@@ -35,6 +40,7 @@ typedef CO_CREATE_INSTANCE (Co_Create_Instance);
 typedef ENUM_AUDIO_ENDPOINTS (Enum_Audio_Endpoints);
 // ===================================================================
 
+LPDIRECTSOUNDBUFFER GlobalSecondBuffer;
 
 struct win32_Sound_OutPut{
     int SamplePerSecond;
@@ -50,8 +56,6 @@ struct win32_Sound_OutPut{
     int ToneVolume;
     // Sample per cycle is SquareWave Period    
 }SoundOutPut;
-
-global_variable LPDIRECTSOUNDBUFFER GlobalSecondBuffer;
 
 void Win32FillSoundBuffer(win32_Sound_OutPut* SoundOutPut, DWORD ByteToLock, DWORD ByteToWrite, Game_Sound_OutPut* SoundSourceBuffer);
 void Win32ClearSoundBuffer(win32_Sound_OutPut* SoundOutPut);

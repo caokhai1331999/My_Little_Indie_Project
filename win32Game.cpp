@@ -237,9 +237,9 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPCon
     //}
 
 
-    //if(BlitHeight > Height){
-        //BlitHeight = Height;
-    //}
+    if(BlitHeight > Height){
+        BlitHeight = Height;
+    }
     
     // We take memory from BitmapMemory of main Bufer to write on it
     uint8* Row = ((uint8 *)OBuffer->BitmapMemory);
@@ -487,7 +487,8 @@ if(glGetError() != GL_NO_ERROR){
 
     // Display on the screen
     SwapBuffers(DeviceContext);
-    GameOutPutSound(SoundBuffer, State->Hz);
+    // The glitching sound driven me nearly crazy so I decided to turn it off
+    //GameOutPutSound(SoundBuffer, State->Hz);
 }
 
 

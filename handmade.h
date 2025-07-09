@@ -10,11 +10,11 @@
 /*
   TODO: Services that the platform layer apply to the game
  */
-
-    
 /*
+
   NOTE: Services that the platform layer provide to the game layer
- */
+
+*/
 #include <Windows.h>
 #include <xinput.h>
 #include <GL/gl.h>

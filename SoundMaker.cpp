@@ -6,15 +6,9 @@
    $Creator: Cao Khai(Casey's disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
-/*#include <combaseapi.h>
-#include <strmif.h>
-#include <DSound.h> 
-#include <mmdeviceapi.h>
-#include <audioclient.h>
-#include <endpointvolume.h>
-#include <uuids.h>
-*/
+
 #include "SoundMaker.h"
+
 // ============================================================================
 //NOTE: DONE Practice using coreaudio and multimedia api instead of directsound
 //Now it's time to write real wave

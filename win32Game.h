@@ -6,7 +6,6 @@
    $Creator: Cao Khai(Casey disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
-#include "SoundMaker.h"
 #include "handmade.h"
 
 // NOTE: This is all about calling the function in the Xinput.h without the noticing from the compiler
