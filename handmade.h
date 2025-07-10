@@ -59,7 +59,39 @@ typedef uint32_t uint32;
 typedef float real32;
 typedef double real64;
 
+// NOTE: This is all about calling the function in the Xinput.h without the noticing from the compiler
+#define X_INPUT_GET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex,XINPUT_STATE *pState)
+typedef X_INPUT_GET_STATE(x_input_get_state);
+// NOTE: The second line will be expand out to be like this :
+// typedef x_input_get_state(DWORD dwUserIndex,XINPUT_STATE *pState)
+// This is to turn on the compiler strict type checking
+// And to DECLARE A FUNCTION SIGNATURE AS A TYPE
+// for example: x_input_get_state _XinputgetState()
+X_INPUT_GET_STATE(XinputGetStateStub) {
+    return (ERROR_DEVICE_NOT_CONNECTED);
+// NOTE: But the rules of C does not allow this(x_input_get_state _XinputGetStateStub() {//do something;})
+}
+// so we use this for function pointer
+global_variable x_input_get_state* XinputGetState_  = XinputGetStateStub;
+// So finally we have a pointer name XinputGetState point to the function
+// XinputGetStateStub(DWORD ....) which basically X_INPUT_GET_STATE() function
+#define XinputGetState XinputGetState_
+
+// This one is to replace the XinputGetState which already been called in Xinput.h
+// with the XinputGetState                                                 
+// ==================================================================
+#define X_INPUT_SET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex,XINPUT_VIBRATION *pVibration)
+typedef X_INPUT_SET_STATE(x_input_set_state);
+X_INPUT_SET_STATE(XinputSetStateStub) {
+    return (ERROR_DEVICE_NOT_CONNECTED);
+
+}
+global_variable x_input_set_state* XinputSetState_  = XinputSetStateStub;
+#define XinputSetState XinputSetState_
+// ==================================================================
+
 typedef struct debug_read_file_result{
+
     uint32 Size;
     void* Content;
 }debug_read_file_result;
@@ -102,16 +134,6 @@ typedef DEBUG_READ_WHOLE_FILE(debug_read_whole_file);
 typedef DEBUG_WRITE_WHOLE_FILE(debug_write_whole_file);
 #define DEBUG_FREE_FILE_MEMORY(name) void name(void* memory);
 typedef  DEBUG_FREE_FILE_MEMORY(debug_free_file_memory);
-
-//struct Game_OffScreen_Buffer{  
-     //BITMAPINFO Bitmapinfo;
-     //HBITMAP BitmapHandle;
-    //void* BitmapMemory;
-    //int BitmapWidth;
-    //int BitmapHeight;
-    //int Pitch;
-    //const int BytesPerPixel = 4;
-//};
 
 struct Game_Sound_OutPut{  
     int16 SamplePerSecond;
@@ -167,6 +189,12 @@ struct Game_Memory{
     void* TransientStorage;
 };
 
+struct BMP_content{
+    int32 Width;
+    int32 Height;
+    uint32* ImageContent;
+};
+
 struct Game_State{
     int BlueOffset = 0;
     int GreenOffset = 0;
@@ -174,14 +202,20 @@ struct Game_State{
 };
 
 // TODO: Allow the sample offset here for more robust platform options
-
-internal void GameOutputSound(Game_Sound_OutPut* SecondSoundBuffer, int Hz);
-// internal void RenderSplendidGradient(Game_OffScreen_Buffer* OBuffer, int XOffset, int YOffset);
-
 uint32 safetruncateUint64(uint64 value);
 real32 saferatioN(real32 numerator, real32 divisor);
 real32 saferatio0(real32 numerator, real32 divisor);
 real32 saferatio1(real32 numerator, real32 divisor);
+
+void* PlatformLoadFile(char* FileName);
+debug_read_file_result* DEBUGReadFileWhole(char* filename);
+BMP_content* DEBUGReadBMP(char* filename, debug_read_file_result* result);
+bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory);
+void DEBUGFreeFileMemory(void* memory);
+
+void win32LoadXInput(void);
+void ProcessXinputDigitalButton(DWORD XInputButtonState ,Game_Button_State* OldState ,DWORD ButtonBit, Game_Button_State* NewState);
+void ProcessInput(int maxControllerCount, Game_Input* OldInput, Game_Input* NewInput);
 
 #define HANDMADE_H
 #endif

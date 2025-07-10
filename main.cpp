@@ -287,38 +287,23 @@ int CALLBACK WinMain
                 // NOTE: ???? Why when I change to different bmp image it crashed
                 //byte order: AA BB GG RR bottom up  
                 BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
-                //NOTE: we create a second buffer last for 2 second with
-                //NOTE: Don't call _alloc in the app loop it cause bug (it doesn't clean up entirely but just barely in the function)
-             win32_Sound_OutPut SoundOutPut = {};
-             SoundOutPut.SamplePerSecond = 48000;
-             SoundOutPut.RunningSampleIndex = 0;
-             SoundOutPut.tsine = 0.0f;
-             SoundOutPut.hz = 128;
-             SoundOutPut.WavePeriod = SoundOutPut.SamplePerSecond/SoundOutPut.hz;
-             SoundOutPut.LatencySampleCount = SoundOutPut.SamplePerSecond / 15;
-             SoundOutPut.SquareWaveCount = 0;
-             SoundOutPut.ToneVolume = 3500;
-             SoundOutPut.BytesPerSample = sizeof(int16)*2;
-             //Hert(hz) is cycles per second
-             SoundOutPut.SecondBufferSize = 2*SoundOutPut.BytesPerSample*SoundOutPut.SamplePerSecond;
-            
-             int16* SSamples = (int16* )VirtualAlloc(0 , SoundOutPut.SecondBufferSize ,MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
-            
-             win32InitDSound(Window, SoundOutPut.SamplePerSecond, SoundOutPut.SecondBufferSize);
-             Win32ClearSoundBuffer(&SoundOutPut);
-             OutputDebugStringA("Sound is playing");
 
-             LARGE_INTEGER LastCounter;
-             QueryPerformanceCounter(&LastCounter);
-             uint64 LastCycleCounts;
+                
+                LARGE_INTEGER LastCounter;
+                QueryPerformanceCounter(&LastCounter);
+                uint64 LastCycleCounts;
             
             Game_Input Input[2] = {};
             Game_Input* OldInput = &Input[0];
             Game_Input* NewInput = &Input[1];
 
             LastCycleCounts = __rdtsc();
-            int MaxControllerCount = XUSER_MAX_COUNT;
+
+            win32_Sound_OutPut SoundOutPut = {};
             Game_Sound_OutPut SoundBuffer = {};
+            InitSoundBuffer(&Window, &SoundOutPut);
+            int16* SSamples = (int16* )VirtualAlloc(0 , SoundOutPut.SecondBufferSize ,MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+
             Win32_OffScreen_Buffer ScreenBuffer = {};
 
             //Why InitOpenGl only work in the app loop
@@ -331,6 +316,7 @@ int CALLBACK WinMain
             ScreenBuffer.Bitmapinfo = BackBuffer.Bitmapinfo;
             ScreenBuffer.BitmapHandle = BackBuffer.BitmapHandle;
             
+            int MaxControllerCount = XUSER_MAX_COUNT;
 /*
              Init here
              NOTE: Why InitOpenGL only work while in window loop
@@ -350,147 +336,22 @@ int CALLBACK WinMain
                     TranslateMessage(&Message);
                 }
 
+             // Console Input part
                 if( MaxControllerCount > ArrayCount(Input->Controller)) {
                     MaxControllerCount = ArrayCount(Input->Controller);   
                 }
                 
-                //NOTE: The update window function must afoot outside the getting
-                // message block and inside the running block
-                for(DWORD ControllerIndex{0}; ControllerIndex < MaxControllerCount;
-                    ControllerIndex++)
-                {
-                    XINPUT_STATE ControllerState;
-                    
-                    if(XinputGetState(ControllerIndex, &ControllerState) == ERROR_SUCCESS) {
-                        //NOTE: The controller is plugged in
-                        Game_Controller_Input* Old_Controller = &OldInput->Controller[ControllerIndex];
-                        Game_Controller_Input* New_Controller = &NewInput->Controller[ControllerIndex];
-                        
-                        XINPUT_GAMEPAD* Pad = &ControllerState.Gamepad;
-
-                        bool32 Up =  (Pad->wButtons & XINPUT_GAMEPAD_DPAD_UP);
-                        bool32 Down =  (Pad->wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
-                        bool32 Left =  (Pad->wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
-                        bool32 Right =  (Pad->wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
-
-                        New_Controller->IsAnalog = true;
-                        New_Controller->StartX = Old_Controller->EndX;
-                        New_Controller->StartY = Old_Controller->EndY;
-
-                        //TODO: Mix/Max macros
-                        real32 X;
-
-                        if (Pad->sThumbLX < 0){
-                            X = (real32)Pad->sThumbLX/ -32768.0f;
-                        } else {
-                            X = (real32)Pad->sThumbLX/ 32768.0f;                            
-                        }
-
-                        real32 Y;
-                        if (Pad->sThumbLY < 0){
-                            Y = (real32)Pad->sThumbLY/ -32768.0f;
-                        } else {
-                            Y = (real32)Pad->sThumbLY/ 32768.0f;                            
-                        }
-                        
-                        New_Controller->MinY = New_Controller->MaxY = New_Controller->EndY = Y;
-                        
-                        ProcessXinputDigitalButton(Pad->wButtons ,&Old_Controller-> Down ,XINPUT_GAMEPAD_A, &New_Controller-> Down);
-                        ProcessXinputDigitalButton(Pad->wButtons ,&Old_Controller-> Right ,XINPUT_GAMEPAD_B, &New_Controller-> Right);
-                        ProcessXinputDigitalButton(Pad->wButtons ,&Old_Controller-> Left ,XINPUT_GAMEPAD_X, &New_Controller-> Left);
-                        ProcessXinputDigitalButton(Pad->wButtons ,&Old_Controller-> Up ,XINPUT_GAMEPAD_Y, &New_Controller-> Up);
-                        ProcessXinputDigitalButton(Pad->wButtons ,&Old_Controller-> LeftShoulder ,XINPUT_GAMEPAD_LEFT_SHOULDER, &New_Controller-> LeftShoulder);
-                        ProcessXinputDigitalButton(Pad->wButtons ,&Old_Controller-> Right ,XINPUT_GAMEPAD_RIGHT_SHOULDER, &New_Controller-> RightShoulder);
-
-                        
-                        int16 StickX = Pad->sThumbLX;
-                        int16 StickY = Pad->sThumbLY;
-                        
-                        bool32 B = (Pad->wButtons &XINPUT_GAMEPAD_B);
-                        bool32 A = (Pad->wButtons &XINPUT_GAMEPAD_A);
-
-                    } else {
-                        //NOTE: The controller is not available
-                    };
-                        
-                    
-                }
-                XINPUT_VIBRATION Vibration;
-                Vibration.wLeftMotorSpeed = 350;
-                Vibration.wRightMotorSpeed = 350;
-                XinputSetState(0, &Vibration);
-
-                // ================================================================
-                //NOTE: The writting cursor create data and the play one will pick
-/*               everyone of them and send to sound card to make sound .
-                 One write one read just like a chase between a cat and a mouse.
-                 Once you hit play 'cursor position right now you have to stop
-                 the writting somewhere otherwise the newly date will overwrite
-                 whatever the play cursor want to read
-*/
+                ProcessInput(MaxControllerCount, OldInput, NewInput);
                 
-                //NOTE: We need to constantly ask the where we are in sound chase
-                //and fill properly in the regions
-                DWORD PlayCursor;
-                DWORD WriteCursor;
-                DWORD ByteToLock;
-                DWORD ByteToWrite;
-                DWORD TargetCursor;
-                bool32 SoundIsValid = false ;
-
-                //Constantly write sound===============================
-                if(SUCCEEDED(GlobalSecondBuffer->GetCurrentPosition(&PlayCursor,            &WriteCursor))) {
-                    
-                    ByteToLock = (SoundOutPut.RunningSampleIndex* SoundOutPut.BytesPerSample)% SoundOutPut.SecondBufferSize;
-                     //% for the secondBufferSize is the move to wrap around the buffer
-                    TargetCursor = ((PlayCursor + (SoundOutPut.LatencySampleCount * SoundOutPut.BytesPerSample)) % SoundOutPut.SecondBufferSize);
-
-/*
-                    //TODO: Collapse these two loops
-                     The bugs is we didn't catch up the play cursor yet
-                    //TODO: Change this to using a lower latency offset from the
-                     playcursor when we actually start having sound effect
-*/                    
-
-                    if(ByteToLock > TargetCursor){
-                         
-                        ByteToWrite = (SoundOutPut.SecondBufferSize - ByteToLock);  //Region 1
-                        ByteToWrite += TargetCursor;
-               //Region 2
-                    } else {
-                         //when the requested size fit in buffer when there only region 1 is active
-                         //In this case,one situation is that The ByteToWrite is 0 and wait for the next turn of the loop                        
-                        ByteToWrite = TargetCursor - ByteToLock;  //Region 1
-                    }                    
-                    SoundIsValid  = true; 
-                }                
-
-
-                SoundBuffer.SamplePerSecond = SoundOutPut.SamplePerSecond;
-                SoundBuffer.SampleCounts = ByteToWrite/SoundOutPut.BytesPerSample;
-                SoundBuffer.Samples = SSamples;                
-                
-                //NOTE: this function throw this memory on the stack and I know
-                 //it will go away when it function is done
-                GlobalSecondBuffer->Play( 0, 0, DSBPLAY_LOOPING);
-
-                //NOTE: Don't know why compiler couldn't find this function
-                 //implementation after a little remove of few arguments
-                
-                 //TODO: This function just being called once
-                if (SoundIsValid){
-                    //TODO: Devle more about why I had to mod SecondBufferSize
-                     //to Byte based on index to create bytetolock
-                    Win32FillSoundBuffer(&SoundOutPut, ByteToLock, ByteToWrite, &SoundBuffer);
-                }                                                    
-                                                
+             // ================================================================
+            // NOTE: Sounding Part
+                WriteSoundToBuffer(&SoundBuffer, &SoundOutPut, SSamples);
                 //=====================================================================
                  //WHY????
                  //Update here                
-                //printf("Just before Game update and render\n");
+                //printf("Just before Game update and render\n");                
 
-                
-                InitOpenGL(Window, &ScreenBuffer, nullptr);                
+                //InitOpenGL(Window, &ScreenBuffer, nullptr);                
                 DeviceContext = GetDC(Window);
 //Why the &ScreenBuffer data doesn't show on the direct screen
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
