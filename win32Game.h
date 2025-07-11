@@ -16,6 +16,11 @@ struct win32Dimension{
     int Width{1280};
 }Dimens;
 
+struct OpenGLData{
+    unsigned int VAOs;
+    unsigned int VBO;
+}
+
 struct Win32_OffScreen_Buffer{  
     BITMAPINFO Bitmapinfo;
     HBITMAP BitmapHandle;
@@ -24,6 +29,8 @@ struct Win32_OffScreen_Buffer{
     int BitmapWidth;
     int BitmapHeight;
     int Pitch;
+
+    OpenGLData OData;
     const int BytesPerPixel = 4;
 };
 
