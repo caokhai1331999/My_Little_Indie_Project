@@ -136,7 +136,6 @@ void ProcessInput(int maxControllerCount, Game_Input* OldInput, Game_Input* NewI
 };
 
 internal debug_read_file_result* DEBUGReadFileWhole(char* filename){
-
     debug_read_file_result* result = nullptr;
     result = (debug_read_file_result*)malloc(sizeof(struct debug_read_file_result));
     HANDLE FileHandle = CreateFileA( filename, GENERIC_READ, 0,  NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -203,7 +202,7 @@ void DEBUGFreeFileMemory(void* memory){
 
 BMP_content* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
     BMP_content* result = new BMP_content();
-     ReadResult = DEBUGReadFileWhole(filename);
+    ReadResult = DEBUGReadFileWhole(filename);
      if(ReadResult->Size != 0){
 
          BITMAP_HEADER *HeadResult = (BITMAP_HEADER*)ReadResult->Content;

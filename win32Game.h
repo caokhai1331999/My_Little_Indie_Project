@@ -19,7 +19,7 @@ struct win32Dimension{
 struct OpenGLData{
     unsigned int VAOs;
     unsigned int VBO;
-}
+};
 
 struct Win32_OffScreen_Buffer{  
     BITMAPINFO Bitmapinfo;

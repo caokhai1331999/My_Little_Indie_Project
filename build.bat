@@ -10,7 +10,7 @@ set COMPILE_FLAG=/FC /Zi
 set LIB_= strmiids.lib uuid.lib user32.lib gdi32.lib opengl32.lib
 set INCLUDE_=..\*.h
 set GLFW_INCLUDE_DIR="C:\Users\klove\Downloads\External_Libraries\glfw\glfw-3.4.bin.WIN64\include"
-set FILES=..\main.cpp ..\handmade.cpp ..\win32Game.cpp ..\SoundMaker.cpp
+set FILES=..\main.cpp ..\handmade.cpp ..\shader.cpp ..\win32Game.cpp ..\SoundMaker.cpp
 
 rem ..\SoundMaker.cpp  ..\GUIDs.cpp
 rem Mmdevapi.dll Audioses.dll /VERBOSE:LIB 
