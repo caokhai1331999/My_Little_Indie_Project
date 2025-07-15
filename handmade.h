@@ -15,9 +15,18 @@
   NOTE: Services that the platform layer provide to the game layer
 
 */
-#include <Windows.h>
-#include <xinput.h>
-#include <GL/gl.h>
+
+#include "Windows.h"
+#include "xinput.h"
+
+//#include "GL/gl.h"
+
+
+#if !defined
+#define GLAD_LIB
+#include <glad/glad.h>
+#include <glad/glad.c>//must be place
+#endif
 
 #include <stdio.h>
 #include <cmath>

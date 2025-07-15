@@ -5,14 +5,40 @@
    $Creator: Cao Khai(Casey Muratori's disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
+
 #include "shader.h"
 
 // NOTE: Load shader code from source file to empty shader object
 // then compile it , next attach it to empty program finally link
 // that small program and delete the shader
+void *GetAnyGLFuncAddress(const char *name)
+{
+  void *p = (void *)wglGetProcAddress(name);
+  if(p == 0 ||
+    (p == (void*)0x1) || (p == (void*)0x2) || (p == (void*)0x3) ||
+    (p == (void*)-1) )
+  {
+    HMODULE module = LoadLibraryA("opengl32.dll");
+    p = (void *)GetProcAddress(module, name);
+  }
+
+  return p;
+}
+
 void loadShader(Shader* shader, char* path){
     //Create File handle to current file for reading
     char* Error;
+
+    // I will try manually load these function
+    //GetAnyGLFuncAddress("glCreateShader");
+    //GetAnyGLFuncAddress("glShaderSource");
+    //GetAnyGLFuncAddress("glCreateProgram");
+    //GetAnyGLFuncAddress("glAttachShader");
+    //GetAnyGLFuncAddress("glLinkProgram");
+    //GetAnyGLFuncAddress("glUseProgram");
+    //GetAnyGLFuncAddress("glGetUniformLocation");
+    //GetAnyGLFuncAddress("glUniform");
+
     shader->shader_file = CreateFileA(
                                      "basic_shader.vs",
                                      GENERIC_READ,
@@ -32,24 +58,20 @@ void loadShader(Shader* shader, char* path){
 
             //First Create an empty shader object by glCreateShader 
             shader->shaderID = glCreateShader(GL_VERTEX_SHADER);
-
             // Then Sourcing it with glShaderSource
             // Seemed like glShaderSource doesn't relate to file content
             // It just need path
             // 2nd arg is number of shader in source, 4th is an array of string length
-            glShaderSource(shader->shaderID, 1, (GLchar*)(shader->path), NULL);
+            glShaderSource(shader->shaderID, 1, &(shader->SourcePath), NULL);
             //Next compile this shader with glCompileShader
-            if(glCompileShader(shader->shaderID)){
-                //Attach it(glAttachShader) with the already created(glCreateProgram) empty program
-                unsigned int ProgramID = glCreateProgram();
-                glAttachShader(ProgramID, shader->shaderID);
-                glLinkProgram(ProgramID);
-                //Finally delete already attached shader
-                glDeleteShader();                            
-            }
-            else {
-                //Show error
-            }
+            glCompileShader(shader->shaderID);
+            //Attach it(glAttachShader) with the already created(glCreateProgram) empty program
+            unsigned int ProgramID = glCreateProgram();
+            glAttachShader(ProgramID, shader->shaderID);
+            glLinkProgram(ProgramID);
+            //Finally delete already attached shader
+            glDeleteShader(shader->shaderID);                            
+
         } else {
             Error = loadCurrentErr();
             printf("error : %s\n", Error);
@@ -94,35 +116,35 @@ void use(Shader* shader){
 
 // Set Int, bool,
 void setBool(Shader* shader, const char* name, const bool value){
-    glUniform1i(glGetUniformLocation(shader->shaderID,(GLchar* ) name), (int)value);
+    glUniform1i(glGetUniformLocation(shader->shaderID, name), (int)value);
 };
 
-void setInt(Shader* shader, const  int value){
-    glUniform1i(glGetUniformLocation(shader->shaderID,(GLchar* ) name), value);
+void setInt(Shader* shader, const char* name, const  int value){
+    glUniform1i(glGetUniformLocation(shader->shaderID, name), value);
 };
 
 //Vector 2nd argument is number of vector
 void setVec2(Shader* shader, const char* name, const  glm::vec2 &value){
-    glUniform2fv(glGetUniformLocation(shader->shaderID,(GLchar* ) name), 1, &value[0])
+    glUniform2fv(glGetUniformLocation(shader->shaderID, name), 1, &value[0]);
 }
 
 void setVec2(Shader* shader, const char* name, float x, float y){
     glm::vec2 value = glm::vec2(x, y);
-    glUniform2f(glGetUniformLocation(shader->shaderID,(GLchar* ) name), x, y)
+    glUniform2f(glGetUniformLocation(shader->shaderID, name), x, y);
 }
 
 void setVec3(Shader* shader, const char* name, const glm::vec3 &value){
-    glUniform3fv(glGetUniformLocation(shader->shaderID,(GLchar* ) name), 1 &value[0]);
+    glUniform3fv(glGetUniformLocation(shader->shaderID, name), 1, &value[0]);
 }
 void setVec3(Shader* shader, const char* name, float x, float y, float z){
-    glUniform3f(glGetUniformLocation(shader->shaderID,(GLchar* ) name), x, y, z);
+    glUniform3f(glGetUniformLocation(shader->shaderID, name), x, y, z);
 }
 
 // Set Matrix, 3rd is GL_Boolean transpose
-void setMat3(Shader* shader, const glm::mat3& value){
-    glUniformMatrix3(glGetUniformLocation(shader->shaderID,(GLchar* ) name), 1, GL_FALSE, &value[0]);
+void setMat3(Shader* shader, const char* name, const glm::mat3 &value){
+    glUniformMatrix3fv(glGetUniformLocation(shader->shaderID, name), 1, GL_FALSE, &value[0][0]);
 };
 
-void setMat4(Shader* shader, const glm::mat4& value){
-    glUniformMatrix3(glGetUniformLocation(shader->shaderID,(GLchar* ) name), 1, GL_FALSE, &value[0]);
+void setMat4(Shader* shader, const char* name, const glm::mat4 &value){
+    glUniformMatrix4fv(glGetUniformLocation(shader->shaderID, name), 1, GL_FALSE, &value[0][0]);
 };

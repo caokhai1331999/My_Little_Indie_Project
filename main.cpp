@@ -6,6 +6,7 @@
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
   ================================================================================*/
 #include "win32Game.h"
+#include "Shader.h"
 #include "SoundMaker.h"
 
 LRESULT CALLBACK MainWindowCallBack(
@@ -286,6 +287,16 @@ int CALLBACK WinMain
                 //printf("About to read image\n");
                 // NOTE: ???? Why when I change to different bmp image it crashed
                 //byte order: AA BB GG RR bottom up  
+                if (!gladLoadGLLoader((GLADloadproc)GetProcAddress))
+                {
+                    std::cout << "Failed to initialize GLAD" << std::endl;
+                }
+
+                if (!gladLoadGLLoader((GLADloadproc)wglGetProcAddress))
+                {
+                    std::cout << "Failed to initialize GLAD" << std::endl;
+                }
+
                 BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
 
                 

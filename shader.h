@@ -28,6 +28,8 @@ struct Shader{
     char* SourcePath;
 };
 
+void *GetAnyGLFuncAddress(const char *name);
+
 void loadShader(Shader* shader,char* path);
 char* loadCurrentErr();
 void checkCompileError(GLuint shader, char* type);
@@ -40,14 +42,15 @@ void setVec3(Shader* shader, const char* name, glm::vec3 &value);
 void setVec3(Shader* shader, const char* name, float x, float y, float z);
 
 void setBool(Shader* shader, const char* name, bool value);
-void setInt(Shader* shader, int value);
+void setInt(Shader* shader, const char* name, int value);
 
 
 // Set Matrix
-void setMat3(Shader* shader, glm::mat3& value);
-void setMat4(Shader* shader, glm::mat4& value);
+void setMat3(Shader* shader, const char* name, glm::mat3 &value);
+void setMat4(Shader* shader, const char* name, glm::mat4 &value);
 
 // Use the shader
 void use(Shader* shader);
+
 #define SHADER_H
 #endif

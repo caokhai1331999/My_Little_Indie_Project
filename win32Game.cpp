@@ -261,10 +261,10 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
             glBindBuffer(GL_ARRAY_BUFFER, OBuffer->OData.VBO);
             glBufferData(GL_ARRAY_BUFFER, sizeof(CubeVerticles), &CubeVerticles, GL_STATIC_DRAW);
 
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, (void*)0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 0, (void*)0);
             glEnableVertexAttribArray(0);
 
-            glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, (void*)(6*sizeof(float)));
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 0, (void*)(6*sizeof(float)));
             glEnableVertexAttribArray(2);
 
             // NOTE: To here we done assigned CubeVerticles data to VAOs and VBO
@@ -280,7 +280,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
             //last argument This is where point to the image data
             // Why this doesn't work
             glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
 
             //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, imageContent);
 
@@ -345,9 +345,9 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
     // loop
 
     // Display on the screen
-    RenderSplendidGradient(OBuffer, BMPContent, 0, 0);
-    Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height, OBuffer);
-    SwapBuffers(DeviceContext);
+    //RenderSplendidGradient(OBuffer, BMPContent, 0, 0);
+    //Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height, OBuffer);
+    //SwapBuffers(DeviceContext);
 
 
     // OPENGL parts ======================================================
@@ -356,8 +356,8 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
     // real32 b =;
     // real32 proj[]={        
     // }
-
     real32 p = 1.0f;
+
     //char* FileName = "structured_color_map.bmp";
     //glBitmap(
           //Dimens.Width * 0.9,
@@ -397,7 +397,7 @@ if(glGetError() != GL_NO_ERROR){
 
     glEnd();
 // ==================================================================
-*/ 
+
     // Display on the screen
     SwapBuffers(DeviceContext);
     // The glitching sound driven me nearly crazy so I decided to turn it off
