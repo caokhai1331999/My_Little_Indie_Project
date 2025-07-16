@@ -15,12 +15,7 @@
   NOTE: Services that the platform layer provide to the game layer
 
 */
-
 #include "Windows.h"
-#include "xinput.h"
-
-//#include "GL/gl.h"
-
 
 #if !defined
 #define GLAD_LIB
@@ -28,6 +23,9 @@
 #include <glad/glad.c>//must be place
 #endif
 
+#include "xinput.h"
+
+#include "GL/gl.h"
 #include <stdio.h>
 #include <cmath>
 #include <iostream>
@@ -93,7 +91,6 @@ global_variable x_input_get_state* XinputGetState_  = XinputGetStateStub;
 typedef X_INPUT_SET_STATE(x_input_set_state);
 X_INPUT_SET_STATE(XinputSetStateStub) {
     return (ERROR_DEVICE_NOT_CONNECTED);
-
 }
 global_variable x_input_set_state* XinputSetState_  = XinputSetStateStub;
 #define XinputSetState XinputSetState_

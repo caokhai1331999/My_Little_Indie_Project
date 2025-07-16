@@ -7,7 +7,7 @@ del *.pdb > NUL 2> NUL
 
 set DIRECTIVES_FLAG=/D:DEBUG=1 /D:INTERNAL=1
 set COMPILE_FLAG=/FC /Zi /EHsc
-set LIB_= strmiids.lib uuid.lib user32.lib gdi32.lib opengl32.lib
+set LIB_= strmiids.lib uuid.lib Kernel32.lib user32.lib gdi32.lib opengl32.lib
 set INCLUDE_=..\*.h
 set GLFW_INCLUDE_DIR="C:\Users\klove\Downloads\External_Libraries\glfw\glfw-3.4.bin.WIN64\include"
 set FILES=..\main.cpp ..\handmade.cpp ..\shader.cpp ..\win32Game.cpp ..\SoundMaker.cpp

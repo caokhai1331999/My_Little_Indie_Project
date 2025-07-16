@@ -29,6 +29,7 @@ struct Shader{
 };
 
 void *GetAnyGLFuncAddress(const char *name);
+#define loadFunc(name) (name*)GetAnyGLFuncAddress(name)
 
 void loadShader(Shader* shader,char* path);
 char* loadCurrentErr();

@@ -19,7 +19,13 @@ void *GetAnyGLFuncAddress(const char *name)
     (p == (void*)-1) )
   {
     HMODULE module = LoadLibraryA("opengl32.dll");
-    p = (void *)GetProcAddress(module, name);
+    if(module!=NULL){
+        p = (void *)GetProcAddress(module, name);
+    } else {
+        printf("Couldn't load OpenGl library: %s\n", loadCurrentErr());
+    }
+  } else {
+      printf("Can find function with given name\n"); \
   }
 
   return p;
@@ -28,17 +34,6 @@ void *GetAnyGLFuncAddress(const char *name)
 void loadShader(Shader* shader, char* path){
     //Create File handle to current file for reading
     char* Error;
-
-    // I will try manually load these function
-    //GetAnyGLFuncAddress("glCreateShader");
-    //GetAnyGLFuncAddress("glShaderSource");
-    //GetAnyGLFuncAddress("glCreateProgram");
-    //GetAnyGLFuncAddress("glAttachShader");
-    //GetAnyGLFuncAddress("glLinkProgram");
-    //GetAnyGLFuncAddress("glUseProgram");
-    //GetAnyGLFuncAddress("glGetUniformLocation");
-    //GetAnyGLFuncAddress("glUniform");
-
     shader->shader_file = CreateFileA(
                                      "basic_shader.vs",
                                      GENERIC_READ,
