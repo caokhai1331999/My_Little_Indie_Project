@@ -176,6 +176,8 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
     GLuint textureHandle = 0;
     GLuint textureHandle_1 = 0;
 
+    
+    
     DescribePixelFormat(
         windowDC,
         suggestedPixelFormatIndex,
@@ -320,7 +322,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
 
 void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){
 
-    if(!Memory->IsInitialized){
+    if(!Memory->IsInitalized){
         State->Hz = 256;
          State->BlueOffset = 0;
          State->GreenOffset = 0;

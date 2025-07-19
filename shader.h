@@ -45,7 +45,6 @@ void setVec3(Shader* shader, const char* name, float x, float y, float z);
 void setBool(Shader* shader, const char* name, bool value);
 void setInt(Shader* shader, const char* name, int value);
 
-
 // Set Matrix
 void setMat3(Shader* shader, const char* name, glm::mat3 &value);
 void setMat4(Shader* shader, const char* name, glm::mat4 &value);

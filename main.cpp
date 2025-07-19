@@ -298,7 +298,7 @@ int CALLBACK WinMain
                 //{
                     //std::cout << "Failed to initialize GLAD" << std::endl;
                 //}
-
+                InitOpenGL(Window, &BackBuffer, nullptr);
                 BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
 
                 
@@ -364,9 +364,10 @@ int CALLBACK WinMain
                  //Update here                
                 //printf("Just before Game update and render\n");                
 
-                //InitOpenGL(Window, &ScreenBuffer, nullptr);                
+                InitOpenGL(Window, &ScreenBuffer, nullptr);                
                 DeviceContext = GetDC(Window);
 //Why the &ScreenBuffer data doesn't show on the direct screen
+                
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
 
                 //NOTE: Check whether OpenGL work or not

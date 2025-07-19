@@ -17,15 +17,16 @@
 */
 #include "Windows.h"
 
+/*
 #if !defined
 #define GLAD_LIB
 #include <glad/glad.h>
-#include <glad/glad.c>//must be place
+#include <glad/glad.c>must be place
 #endif
-
+*/
 #include "xinput.h"
-
-#include "GL/gl.h"
+#include "gl_extensions.h"
+//#include "GL/gl.h"
 #include <stdio.h>
 #include <cmath>
 #include <iostream>

@@ -49,6 +49,12 @@ void loadShader(Shader* shader, char* path){
             shader->file_size.QuadPart = safetruncateUint64(shader->file_size.QuadPart);
         }
 
+        //void* gglCreateShader = GetAnyGLFuncAddress("glCreateShader");
+        //void* gglCompileShader = GetAnyGLFuncAddress("glCompileShader");
+        //void* gglCreateProgram = GetAnyGLFuncAddress("glCreateProgram");
+        //void* gglAttachShader = GetAnyGLFuncAddress("glCreateShader");
+        //void* gglLinkProgram = GetAnyGLFuncAddress("glLinkProgram");
+
         if((ReadFile(shader->shader_file, shader->SourcePath, shader->file_size.QuadPart, &ByteRead, NULL)) && (shader->file_size.QuadPart == ByteRead)){
 
             //First Create an empty shader object by glCreateShader 
