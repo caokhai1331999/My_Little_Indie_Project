@@ -8,24 +8,28 @@
    ======================================================================== */
 
 /*
+
   TODO: Services that the platform layer apply to the game
- */
+
+*/
+
 /*
 
   NOTE: Services that the platform layer provide to the game layer
 
 */
-#include "Windows.h"
+#include <Windows.h>
 
-/*
 #if !defined
 #define GLAD_LIB
-#include <glad/glad.h>
-#include <glad/glad.c>must be place
+#include "glad.h"
+//#include <glad/glad.c>//must be place
 #endif
-*/
+
+#include <wingdi.h>
+
 #include "xinput.h"
-#include "gl_extensions.h"
+//#include "gl_extensions.h"
 //#include "GL/gl.h"
 #include <stdio.h>
 #include <cmath>

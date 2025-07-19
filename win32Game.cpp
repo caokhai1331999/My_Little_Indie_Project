@@ -196,8 +196,14 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
             // Bind it
             // and set some parameter
         if(wglMakeCurrent(windowDC, openglRC)){
-            // printf("Succeed to init OpenGl\n");
-            
+             printf("Succeed to init OpenGl\n");
+                            
+             if(!gladLoadGL()){
+                 printf("Could n't initialized GLAD\n");
+             } else {
+                 printf("GLAD load successfully\n");                    
+             }
+
             float CubeVerticles[] = {
                 // CW
                 // positions          // normals           // texture coords
@@ -322,7 +328,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
 
 void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){
 
-    if(!Memory->IsInitalized){
+    if(!Memory->IsInitialized){
         State->Hz = 256;
          State->BlueOffset = 0;
          State->GreenOffset = 0;

@@ -6,8 +6,8 @@
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
   ================================================================================*/
 
-#include "win32Game.h"
 #include "Shader.h"
+#include "win32Game.h"
 #include "SoundMaker.h"
 
 LRESULT CALLBACK MainWindowCallBack(
@@ -299,6 +299,7 @@ int CALLBACK WinMain
                     //std::cout << "Failed to initialize GLAD" << std::endl;
                 //}
                 InitOpenGL(Window, &BackBuffer, nullptr);
+                
                 BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
 
                 

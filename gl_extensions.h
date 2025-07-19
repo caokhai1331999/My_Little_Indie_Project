@@ -8,9 +8,10 @@
    ======================================================================== */
 
 #include <GL/gl.h>
+/*
 #include <GL/glext.h>
 #define GL_GLEXT_PROTOTYPES
-
+*/
 // You must define missing constants yourself if not using GLEW/GLAD:
 #define GL_VERTEX_SHADER   0x8B31
 #define GL_FRAGMENT_SHADER 0x8B30

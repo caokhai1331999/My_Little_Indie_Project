@@ -108,7 +108,6 @@ char* loadCurrentErr(){
 }
 
 void checkCompileError(GLuint shader, char* type){
-    
 }
 
 void use(Shader* shader){
