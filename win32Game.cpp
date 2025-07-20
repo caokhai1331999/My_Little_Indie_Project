@@ -198,12 +198,13 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
         if(wglMakeCurrent(windowDC, openglRC)){
              printf("Succeed to init OpenGl\n");
                             
-             if(!gladLoadGL()){
+             if(!gladLoadGL((GLADloadfunc)wglGetProcAddress)){
                  printf("Could n't initialized GLAD\n");
              } else {
                  printf("GLAD load successfully\n");                    
              }
 
+             
             float CubeVerticles[] = {
                 // CW
                 // positions          // normals           // texture coords

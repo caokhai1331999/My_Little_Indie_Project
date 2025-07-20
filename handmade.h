@@ -22,14 +22,12 @@
 
 #if !defined
 #define GLAD_LIB
-#include "glad.h"
-//#include <glad/glad.c>//must be place
+#include <glad/gl.h>
 #endif
 
 #include <wingdi.h>
 
 #include "xinput.h"
-//#include "gl_extensions.h"
 //#include "GL/gl.h"
 #include <stdio.h>
 #include <cmath>
