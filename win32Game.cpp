@@ -176,8 +176,6 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
     GLuint textureHandle = 0;
     GLuint textureHandle_1 = 0;
 
-    
-    
     DescribePixelFormat(
         windowDC,
         suggestedPixelFormatIndex,
@@ -204,6 +202,15 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
                  printf("GLAD load successfully\n");                    
              }
 
+             float trianglesVerticles [] = {
+                //FRONT FACE
+               -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+                0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+                0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+                0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+               -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+               -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f                
+             };
              
             float CubeVerticles[] = {
                 // CW
@@ -295,22 +302,15 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+            //NOTE: The commented part is one that is deprecated when using the
+            // new version of OPENGL
+            //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
             glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
-
-            glMatrixMode(GL_TEXTURE);
-            glLoadIdentity();
-    
-            glMatrixMode(GL_MODELVIEW);
-            glLoadIdentity();
-
-            glMatrixMode(GL_PROJECTION);
-            glLoadIdentity();    
 
             glEnable(GL_TEXTURE_2D);
         } else {
@@ -360,7 +360,7 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
 
 
     // OPENGL parts ======================================================
-    glBegin(GL_TRIANGLES);
+    //glBegin(GL_TRIANGLES);
     // real32 a =;
     // real32 b =;
     // real32 proj[]={        
@@ -376,7 +376,8 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
          //0,0,
           //(GLubyte *)FileName
               //);
-
+/*
+// NOTE: Old and Deprecated function
     //Upper triangle
     glTexCoord2f(0.0f, 1.0f);
     glVertex2f(-p, p);
@@ -395,7 +396,11 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
     glVertex2f(p, p);
     glTexCoord2f(1.0f, 0.0f);
     glVertex2f(p, -p);
-    
+*/
+
+    //
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
     // Display on the screen
     RenderSplendidGradient(OBuffer, BMPContent, State->BlueOffset, State->GreenOffset);
     
@@ -404,7 +409,7 @@ if(glGetError() != GL_NO_ERROR){
     printf("OpenGL Error: %d\n", glGetError());
 };
 
-    glEnd();
+    //glEnd();
 // ==================================================================
 
     // Display on the screen

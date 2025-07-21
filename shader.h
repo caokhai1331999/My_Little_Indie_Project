@@ -30,21 +30,7 @@ struct Shader{
 
 void *GetAnyGLFuncAddress(const char *name);
 #define loadFunc(name) (name*)GetAnyGLFuncAddress(name)
-//
-//#define GL_VERTEX_SHADER   0x8B31
-//#define GL_FRAGMENT_SHADER 0x8B30
-//#define GL_COMPILE_STATUS  0x8B81
-//#define GL_LINK_STATUS     0x8B82
-//
-//extern PROC glCreateShader = (PROC)GetAnyGLFuncAddress("glCreateShader");
-//extern PROC glShaderSource = (PROC)GetAnyGLFuncAddress("glShaderSource");
-//extern PROC glUseProgram = (PROC)GetAnyGLFuncAddress("glUseProgram");
-//extern PROC glCompileShader = (PROC)GetAnyGLFuncAddress("glCompileShader");
-//extern PROC glCreateProgram = (PROC)GetAnyGLFuncAddress("glCreateProgram");
-//extern PROC glAttachShader = (PROC)GetAnyGLFuncAddress("glCreateShader");
-//extern PROC glLinkProgram = (PROC)GetAnyGLFuncAddress("glLinkProgram");
-//
-// Too much function address call it make his file looked messy
+
 void loadShader(Shader* shader,char* path);
 char* loadCurrentErr();
 void checkCompileError(GLuint shader, char* type);
