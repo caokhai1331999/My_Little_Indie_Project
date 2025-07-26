@@ -194,14 +194,20 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
             // Bind it
             // and set some parameter
         if(wglMakeCurrent(windowDC, openglRC)){
-             printf("Succeed to init OpenGl\n");
-                            
+            void* ptr = (void*)wglGetProcAddress("glCreateShader");
+
+            if (ptr == NULL) {
+                printf("wglGetProcAddress failed: glCreateShader is NULL\n");
+            } else {
+                printf("wglGetProcAddress worked: glCreateShader = %p\n", ptr);
+            }
+
              if(!gladLoadGL((GLADloadfunc)wglGetProcAddress)){
-                 printf("Could n't initialized GLAD\n");
+                 printf("Could n't initialized GLAD first try\n");
              } else {
                  printf("GLAD load successfully\n");                    
              }
-
+                          
              float trianglesVerticles [] = {
                 //FRONT FACE
                -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
@@ -271,6 +277,8 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
                 5.0f, -0.5f, -5.0f,  2.0f, 2.0f			        
             };
 
+            OBuffer->OData = {};
+            
             glGenBuffers(1, &OBuffer->OData.VBO);
             glGenVertexArrays(1, &OBuffer->OData.VAOs);
 
