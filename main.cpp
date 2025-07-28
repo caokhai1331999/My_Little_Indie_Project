@@ -263,7 +263,7 @@ int CALLBACK WinMain
             int refreshRate = GetDeviceCaps(devicecontext, VREFRESH);
             ReleaseDC(Window, devicecontext);
             if(refreshRate > 1){
-                printf("Refresh rate is : %dHz", refreshRate);
+                printf("Refresh rate is : %dHz\n", refreshRate);
             };
 
 #if INTERNAL

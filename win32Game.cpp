@@ -156,6 +156,10 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
     // printf("Start to init OpenGL\n");
     HDC windowDC = GetDC(window);
     HGLRC openglRC = wglCreateContext(windowDC);
+
+    // NOTE: Failed right at the beginning
+    bool success = false;
+    success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
     
     // Then create rendersplendidgradienting context of opengl from it
     // Create the pixel format features
@@ -165,6 +169,8 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
     desiredPixelFormat.iPixelType = PFD_TYPE_RGBA;
     desiredPixelFormat.cColorBits = 24;
     desiredPixelFormat.cAlphaBits = 8;
+    desiredPixelFormat.cDepthBits = 24;
+    desiredPixelFormat.cStencilBits = 8;
     desiredPixelFormat.dwFlags = PFD_SUPPORT_OPENGL|PFD_DRAW_TO_WINDOW|PFD_DOUBLEBUFFER;
 
     // Assign to an index
@@ -188,27 +194,66 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
              &suggestedPixelFormat)
          )
     {
-         // Then init it
+
+            // Then init it
             // Time to create texture
             // Create texture
             // Bind it
-            // and set some parameter
+            // and set some parameter                
         if(wglMakeCurrent(windowDC, openglRC)){
-            void* ptr = (void*)wglGetProcAddress("glCreateShader");
 
-            if (ptr == NULL) {
-                printf("wglGetProcAddress failed: glCreateShader is NULL\n");
-            } else {
-                printf("wglGetProcAddress worked: glCreateShader = %p\n", ptr);
+            // NOTE: Failed right at the beginning
+            success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
+
+            if(success)
+            {
+                printf("GLAD load successfully\n");                    
+            }
+            else
+            {
+//
+                //GLenum err = glGetError();
+                //if (err != GL_NO_ERROR) {
+                    //printf("OpenGL Error: 0x%X\n", err);
+                //}
+//
+                DWORD ErrorContent = GetLastError();
+                LPVOID ErrorMsgBuffer;
+                if (FormatMessage(
+                        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+                        FORMAT_MESSAGE_FROM_SYSTEM |
+                        FORMAT_MESSAGE_IGNORE_INSERTS,
+                        NULL,
+                        ErrorContent,
+                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                        (LPTSTR) &ErrorMsgBuffer,
+                        0, NULL) == 0){
+                    printf("Failed to format message\n");
+                } else
+
+                {
+                    printf("Could n't initialized GLAD first try, Error: %s\n", (char* )ErrorMsgBuffer);                                        
+
+                }                
+
+                    success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
+                    if(!gladLoadGL((GLADloadfunc)wglGetProcAddress))
+                    {
+                        MessageBox(0, "glad fail", "gladLoadGL()", 0);
+                    }
+//
+                    //void* ptrr = (void*)wglGetProcAddress("glCreateShader");
+                    //const GLubyte* version = glGetString(GL_VERSION);                 
+                    //printf("GL version: %p\n", version);
+                    //if (ptrr == NULL) {
+                        //printf("wglGetProcAddress failed: glCreateShader is NULL\n");
+                    //} else {
+                        //printf("wglGetProcAddress worked: glCreateShader = %p\n", ptrr);
+                    //}
+//
             }
 
-             if(!gladLoadGL((GLADloadfunc)wglGetProcAddress)){
-                 printf("Could n't initialized GLAD first try\n");
-             } else {
-                 printf("GLAD load successfully\n");                    
-             }
-                          
-             float trianglesVerticles [] = {
+            float trianglesVerticles [] = {
                 //FRONT FACE
                -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
                 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
