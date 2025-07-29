@@ -156,10 +156,6 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
     // printf("Start to init OpenGL\n");
     HDC windowDC = GetDC(window);
     HGLRC openglRC = wglCreateContext(windowDC);
-
-    // NOTE: Failed right at the beginning
-    bool success = false;
-    success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
     
     // Then create rendersplendidgradienting context of opengl from it
     // Create the pixel format features
@@ -167,7 +163,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
     desiredPixelFormat.nSize = sizeof(desiredPixelFormat);
     desiredPixelFormat.nVersion =  1;
     desiredPixelFormat.iPixelType = PFD_TYPE_RGBA;
-    desiredPixelFormat.cColorBits = 24;
+    desiredPixelFormat.cColorBits = 32;
     desiredPixelFormat.cAlphaBits = 8;
     desiredPixelFormat.cDepthBits = 24;
     desiredPixelFormat.cStencilBits = 8;
@@ -200,10 +196,14 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
             // Create texture
             // Bind it
             // and set some parameter                
+
+        // NOTE: Failed right at the beginning
+        bool success = false;
+
         if(wglMakeCurrent(windowDC, openglRC)){
 
             // NOTE: Failed right at the beginning
-            success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
+            success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
 
             if(success)
             {
