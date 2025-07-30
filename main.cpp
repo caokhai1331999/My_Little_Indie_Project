@@ -6,8 +6,8 @@
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
   ================================================================================*/
 
-#include "Shader.h"
 #include "win32Game.h"
+#include "Shader.h"
 #include "SoundMaker.h"
 
 LRESULT CALLBACK MainWindowCallBack(

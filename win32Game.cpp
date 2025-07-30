@@ -155,41 +155,41 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
     // first device context gotten from current window
     // printf("Start to init OpenGL\n");
     HDC windowDC = GetDC(window);
-    HGLRC openglRC = wglCreateContext(windowDC);
-    
-    // Then create rendersplendidgradienting context of opengl from it
-    // Create the pixel format features
-    PIXELFORMATDESCRIPTOR desiredPixelFormat = {};
-    desiredPixelFormat.nSize = sizeof(desiredPixelFormat);
-    desiredPixelFormat.nVersion =  1;
-    desiredPixelFormat.iPixelType = PFD_TYPE_RGBA;
-    desiredPixelFormat.cColorBits = 32;
-    desiredPixelFormat.cAlphaBits = 8;
-    desiredPixelFormat.cDepthBits = 24;
-    desiredPixelFormat.cStencilBits = 8;
-    desiredPixelFormat.dwFlags = PFD_SUPPORT_OPENGL|PFD_DRAW_TO_WINDOW|PFD_DOUBLEBUFFER;
+    // Failed to load wglCreateContext function
+    HGLRC openglRC;
+        // Then create rendersplendidgradienting context of opengl from it
+        // Create the pixel format features
+        PIXELFORMATDESCRIPTOR desiredPixelFormat = {};
+        desiredPixelFormat.nSize = sizeof(desiredPixelFormat);
+        desiredPixelFormat.nVersion =  1;
+        desiredPixelFormat.iPixelType = PFD_TYPE_RGBA;
+        desiredPixelFormat.cColorBits = 32;
+        desiredPixelFormat.cAlphaBits = 8;
+        desiredPixelFormat.cDepthBits = 24;
+        desiredPixelFormat.cStencilBits = 8;
+        desiredPixelFormat.dwFlags = PFD_SUPPORT_OPENGL|PFD_DRAW_TO_WINDOW|PFD_DOUBLEBUFFER;
 
-    // Assign to an index
-    int suggestedPixelFormatIndex = ChoosePixelFormat(windowDC, &desiredPixelFormat);
+        // Assign to an index
+        int suggestedPixelFormatIndex = ChoosePixelFormat(windowDC, &desiredPixelFormat);
 
-    // Create a format from that index
-    PIXELFORMATDESCRIPTOR suggestedPixelFormat;
-    bool32 initTexture = false;
-    GLuint textureHandle = 0;
-    GLuint textureHandle_1 = 0;
+        // Create a format from that index
+        PIXELFORMATDESCRIPTOR suggestedPixelFormat;
+        bool32 initTexture = false;
+        GLuint textureHandle = 0;
+        GLuint textureHandle_1 = 0;
 
-    DescribePixelFormat(
-        windowDC,
-        suggestedPixelFormatIndex,
-        sizeof(suggestedPixelFormat),
-        &suggestedPixelFormat);
+        DescribePixelFormat(
+            windowDC,
+            suggestedPixelFormatIndex,
+            sizeof(suggestedPixelFormat),
+            &suggestedPixelFormat);
 
-    if ( SetPixelFormat(
-             windowDC,
-             suggestedPixelFormatIndex,
-             &suggestedPixelFormat)
-         )
-    {
+        if ( SetPixelFormat(
+                 windowDC,
+                 suggestedPixelFormatIndex,
+                 &suggestedPixelFormat)
+             )
+        {
 
             // Then init it
             // Time to create texture
@@ -197,184 +197,173 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
             // Bind it
             // and set some parameter                
 
-        // NOTE: Failed right at the beginning
-        bool success = false;
-
-        if(wglMakeCurrent(windowDC, openglRC)){
-
             // NOTE: Failed right at the beginning
-            success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
+            bool success = false;
+            openglRC = wglCreateContext(windowDC);
 
-            if(success)
-            {
-                printf("GLAD load successfully\n");                    
-            }
-            else
-            {
-//
-                //GLenum err = glGetError();
-                //if (err != GL_NO_ERROR) {
-                    //printf("OpenGL Error: 0x%X\n", err);
-                //}
-//
-                DWORD ErrorContent = GetLastError();
-                LPVOID ErrorMsgBuffer;
-                if (FormatMessage(
-                        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-                        FORMAT_MESSAGE_FROM_SYSTEM |
-                        FORMAT_MESSAGE_IGNORE_INSERTS,
-                        NULL,
-                        ErrorContent,
-                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                        (LPTSTR) &ErrorMsgBuffer,
-                        0, NULL) == 0){
-                    printf("Failed to format message\n");
-                } else
+            if(wglMakeCurrent(windowDC, openglRC)){
 
+                // NOTE: Failed right at the beginning
+                success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
+
+                if(success)
                 {
-                    printf("Could n't initialized GLAD first try, Error: %s\n", (char* )ErrorMsgBuffer);                                        
+                    //OpenConsole();
+                    //printf("GLAD load successfully\n");                    
 
-                }                
-
-                    success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
-                    if(!gladLoadGL((GLADloadfunc)wglGetProcAddress))
-                    {
-                        MessageBox(0, "glad fail", "gladLoadGL()", 0);
-                    }
-//
-                    //void* ptrr = (void*)wglGetProcAddress("glCreateShader");
-                    //const GLubyte* version = glGetString(GL_VERSION);                 
-                    //printf("GL version: %p\n", version);
-                    //if (ptrr == NULL) {
-                        //printf("wglGetProcAddress failed: glCreateShader is NULL\n");
-                    //} else {
-                        //printf("wglGetProcAddress worked: glCreateShader = %p\n", ptrr);
-                    //}
-//
-            }
-
-            float trianglesVerticles [] = {
-                //FRONT FACE
-               -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-                0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-                0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-                0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-               -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-               -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f                
-             };
+                    const GLubyte* ver = glGetString(GL_VERSION);
+                    if (ver)
+                        printf("OpenGL version: %s\n", ver);
+                    else
+                        printf("glGetString(GL_VERSION) returned NULL\n");
+                    
+                float trianglesVerticles [] = {
+                    //FRONT FACE
+                    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+                    0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+                    0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+                    0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+                    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+                    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f                
+                };
              
-            float CubeVerticles[] = {
-                // CW
-                // positions          // normals           // texture coords
-                //BACK FACE
-               -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,// one stride  
-                0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-                0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-                0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-               -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,     
-               -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-                //FRONT FACE
-               -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-                0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-                0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-                0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-               -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-               -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
-                // LEFT FACE
-               -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-               -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-               -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-               -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-               -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-               -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-                // RIGHT FACE
-                0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-                0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-                0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-                0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-                0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-                0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-                // BOTTOM FACE
-               -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-                0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-                0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-                0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-               -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-               -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-                // TOP FACE
-               -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-                0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-                0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-                0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-               -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,    
-               -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-            };
+                float CubeVerticles[] = {
+                    // CW
+                    // positions          // normals           // texture coords
+                    //BACK FACE
+                    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,// one stride  
+                    0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+                    0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+                    0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+                    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,     
+                    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+                    //FRONT FACE
+                    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+                    0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+                    0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+                    0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+                    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+                    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+                    // LEFT FACE
+                    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+                    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+                    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+                    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+                    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+                    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+                    // RIGHT FACE
+                    0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+                    0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+                    0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+                    0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+                    0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+                    0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+                    // BOTTOM FACE
+                    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+                    0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+                    0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+                    0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+                    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+                    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+                    // TOP FACE
+                    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+                    0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+                    0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+                    0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+                    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,    
+                    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+                };
             
-            float PlaneVerticles[] = {
-                // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
-                //       x,  y,    z
-               -0.5f, -0.5f,  5.0f,  2.0f, 0.0f, // Each verticle
-                5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
-               -0.5f, -0.5f, -5.0f,  0.0f, 2.0f,
+                float PlaneVerticles[] = {
+                    // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
+                    //       x,  y,    z
+                    -0.5f, -0.5f,  5.0f,  2.0f, 0.0f, // Each verticle
+                    5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
+                    -0.5f, -0.5f, -5.0f,  0.0f, 2.0f,
 
-                5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-               -0.5f, -0.5f, -5.0f,  0.0f, 2.0f,
-                5.0f, -0.5f, -5.0f,  2.0f, 2.0f			        
-            };
+                    5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+                    -0.5f, -0.5f, -5.0f,  0.0f, 2.0f,
+                    5.0f, -0.5f, -5.0f,  2.0f, 2.0f			        
+                };
 
-            OBuffer->OData = {};
+                OBuffer->OData = {};
             
-            glGenBuffers(1, &OBuffer->OData.VBO);
-            glGenVertexArrays(1, &OBuffer->OData.VAOs);
+                glGenBuffers(1, &OBuffer->OData.VBO);
+                glGenVertexArrays(1, &OBuffer->OData.VAOs);
 
-            glBindBuffer(GL_ARRAY_BUFFER, OBuffer->OData.VBO);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(CubeVerticles), &CubeVerticles, GL_STATIC_DRAW);
+                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->OData.VBO);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(CubeVerticles), &CubeVerticles, GL_STATIC_DRAW);
 
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 0, (void*)0);
-            glEnableVertexAttribArray(0);
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 0, (void*)0);
+                glEnableVertexAttribArray(0);
 
-            glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 0, (void*)(6*sizeof(float)));
-            glEnableVertexAttribArray(2);
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 0, (void*)(6*sizeof(float)));
+                glEnableVertexAttribArray(2);
 
-            // NOTE: To here we done assigned CubeVerticles data to VAOs and VBO
-            // We will call bindbuffer/vertexArray whenever before glDrawArray
+                // NOTE: To here we done assigned CubeVerticles data to VAOs and VBO
+                // We will call bindbuffer/vertexArray whenever before glDrawArray
             
-            //printf("Succeed create OpenGL Context\n");
-            glGenTextures(1, &textureHandle);
-            glBindTexture(GL_TEXTURE_2D, textureHandle);
+                //printf("Succeed create OpenGL Context\n");
+                glGenTextures(1, &textureHandle);
+                glBindTexture(GL_TEXTURE_2D, textureHandle);
 
-            glGenTextures(1, &textureHandle_1);
-            glBindTexture(GL_TEXTURE_2D, textureHandle_1);
+                glGenTextures(1, &textureHandle_1);
+                glBindTexture(GL_TEXTURE_2D, textureHandle_1);
 
-            //last argument This is where point to the image data
-            // Why this doesn't work
-            glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
+                //last argument This is where point to the image data
+                // Why this doesn't work
+                glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
 
-            //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, imageContent);
+                //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, imageContent);
 
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-            //NOTE: The commented part is one that is deprecated when using the
-            // new version of OPENGL
-            //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+                //NOTE: The commented part is one that is deprecated when using the
+                // new version of OPENGL
+                //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-            glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
+                glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT);
 
-            glEnable(GL_TEXTURE_2D);
+                glEnable(GL_TEXTURE_2D);
+                }
+                else
+                {
+
+                    DWORD ErrorContent = GetLastError();
+                    LPVOID ErrorMsgBuffer;
+                    if (FormatMessage(
+                            FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+                            FORMAT_MESSAGE_FROM_SYSTEM |
+                            FORMAT_MESSAGE_IGNORE_INSERTS,
+                            NULL,
+                            ErrorContent,
+                            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                            (LPTSTR) &ErrorMsgBuffer,
+                            0, NULL) == 0){
+                        printf("Failed to format message\n");
+                    } else
+
+                    {
+                        printf("Could n't initialized GLAD first try, Error: %s\n", (char* )ErrorMsgBuffer);                                        
+
+                    }                
+                }
+
+            } else {
+                // TODO: Diagnostic
+                printf("Failed to init OpenGl\n");            
+                return false;
+            };   
         } else {
-            // TODO: Diagnostic
-            printf("Failed to init OpenGl\n");            
+            printf("Failed to init OpenGl\n");
             return false;
-        };   
-    } else {
-        printf("Failed to init OpenGl\n");
-        return false;
-    }
+        }        
+
     ReleaseDC(window, windowDC);
     return true;
 }
