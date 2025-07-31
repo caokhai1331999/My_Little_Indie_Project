@@ -50,8 +50,10 @@ void loadShader(Shader* shader, char* name){
             shader->file_size.QuadPart = safetruncateUint64(shader->file_size.QuadPart);
         }
 
-        if((ReadFile(shader->shader_file, shader->SourceCode, shader->file_size.QuadPart, &ByteRead, NULL)) && (shader->file_size.QuadPart == ByteRead)){
+        if((ReadFile(shader->shader_file, shader->SourceCode, shader->file_size.QuadPart, &ByteRead, NULL))){
 
+            printf("Load file: %s successfully, File size is %d\n", name, ByteRead);
+            
             //First Create an empty shader object by glCreateShader 
             shader->shaderID = glCreateShader(GL_VERTEX_SHADER);
             // Then Sourcing it with glShaderSource
@@ -71,6 +73,7 @@ void loadShader(Shader* shader, char* name){
 
         } else {
             Error = loadCurrentErr();
+            DWORD err = GetLastError();
             printf("error : %s\n", Error);
         }
 
@@ -94,8 +97,9 @@ char* loadCurrentErr(){
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
             (LPTSTR) &lpMsgBuf,
             0, NULL) == 0) {
+
         errorContent = (char*)lpMsgBuf;
-        ExitProcess(dw);
+        //ExitProcess(dw);
     }
         
     LocalFree(lpMsgBuf);

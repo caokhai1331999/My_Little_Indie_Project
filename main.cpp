@@ -303,8 +303,8 @@ int CALLBACK WinMain
                 Shader vshader;
                 Shader fshader;
 
-                loadShader(&vshader, "shader.vs");
                 loadShader(&fshader, "shader.fs");
+                loadShader(&vshader, "shader.vs");
                 
                 BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
 

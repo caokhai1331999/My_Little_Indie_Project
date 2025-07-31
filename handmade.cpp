@@ -232,3 +232,4 @@ BMP_content* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
          }
      return result;
 }
+
