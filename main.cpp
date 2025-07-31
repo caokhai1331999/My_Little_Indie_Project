@@ -300,8 +300,8 @@ int CALLBACK WinMain
                 //}
                 InitOpenGL(Window, &BackBuffer, nullptr);
 
-                Shader vshader = {};
-                Shader fshader = {};
+                Shader vshader;
+                Shader fshader;
 
                 loadShader(&vshader, "shader.vs");
                 loadShader(&fshader, "shader.fs");
@@ -375,6 +375,12 @@ int CALLBACK WinMain
                 DeviceContext = GetDC(Window);
                 use(&vshader);
                 use(&fshader);                
+
+                // Attach VAO
+                // use shader
+                glBindVertexArray(0);
+                // Ah got it. Texture data pass directly to shader
+                glDrawArrays(GL_TRIANGLES, 0, 3);
                 //Why the &ScreenBuffer data doesn't show on the direct screen
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
 

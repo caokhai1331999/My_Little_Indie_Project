@@ -30,12 +30,13 @@ void *GetAnyGLFuncAddress(const char *name)
 
   return p;
 }
+// =============== let aside this alone touch it when it's time================
 
-void loadShader(Shader* shader, char* path){
+void loadShader(Shader* shader, char* name){
     //Create File handle to current file for reading
     char* Error;
     shader->shader_file = CreateFileA(
-                                     "basic_shader.vs",
+                                     name,
                                      GENERIC_READ,
                                      0,0,
                                      OPEN_EXISTING,
@@ -49,13 +50,7 @@ void loadShader(Shader* shader, char* path){
             shader->file_size.QuadPart = safetruncateUint64(shader->file_size.QuadPart);
         }
 
-        //void* gglCreateShader = GetAnyGLFuncAddress("glCreateShader");
-        //void* gglCompileShader = GetAnyGLFuncAddress("glCompileShader");
-        //void* gglCreateProgram = GetAnyGLFuncAddress("glCreateProgram");
-        //void* gglAttachShader = GetAnyGLFuncAddress("glCreateShader");
-        //void* gglLinkProgram = GetAnyGLFuncAddress("glLinkProgram");
-
-        if((ReadFile(shader->shader_file, shader->SourcePath, shader->file_size.QuadPart, &ByteRead, NULL)) && (shader->file_size.QuadPart == ByteRead)){
+        if((ReadFile(shader->shader_file, shader->SourceCode, shader->file_size.QuadPart, &ByteRead, NULL)) && (shader->file_size.QuadPart == ByteRead)){
 
             //First Create an empty shader object by glCreateShader 
             shader->shaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -63,7 +58,8 @@ void loadShader(Shader* shader, char* path){
             // Seemed like glShaderSource doesn't relate to file content
             // It just need path
             // 2nd arg is number of shader in source, 4th is an array of string length
-            glShaderSource(shader->shaderID, 1, &(shader->SourcePath), NULL);
+            const char* CodeContent = (char* )shader->SourceCode;
+            glShaderSource(shader->shaderID, 1, &CodeContent, NULL);
             //Next compile this shader with glCompileShader
             glCompileShader(shader->shaderID);
             //Attach it(glAttachShader) with the already created(glCreateProgram) empty program
@@ -103,7 +99,7 @@ char* loadCurrentErr(){
     }
         
     LocalFree(lpMsgBuf);
-    ExitProcess(dw);
+    //ExitProcess(dw);
     return errorContent;
 }
 

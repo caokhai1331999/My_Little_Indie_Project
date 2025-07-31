@@ -155,10 +155,9 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
     // first device context gotten from current window
     // printf("Start to init OpenGL\n");
     HDC windowDC = GetDC(window);
-    // Failed to load wglCreateContext function
     HGLRC openglRC;
-        // Then create rendersplendidgradienting context of opengl from it
         // Create the pixel format features
+       // Then describe it
         PIXELFORMATDESCRIPTOR desiredPixelFormat = {};
         desiredPixelFormat.nSize = sizeof(desiredPixelFormat);
         desiredPixelFormat.nVersion =  1;
@@ -184,6 +183,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
             sizeof(suggestedPixelFormat),
             &suggestedPixelFormat);
 
+        // Then set pixel format
         if ( SetPixelFormat(
                  windowDC,
                  suggestedPixelFormatIndex,
@@ -199,6 +199,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
 
             // NOTE: Failed right at the beginning
             bool success = false;
+// Next create OPENGL context
             openglRC = wglCreateContext(windowDC);
 
             if(wglMakeCurrent(windowDC, openglRC)){
@@ -211,11 +212,11 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
                     //OpenConsole();
                     //printf("GLAD load successfully\n");                    
 
-                    const GLubyte* ver = glGetString(GL_VERSION);
-                    if (ver)
-                        printf("OpenGL version: %s\n", ver);
-                    else
-                        printf("glGetString(GL_VERSION) returned NULL\n");
+                    //const GLubyte* ver = glGetString(GL_VERSION);
+                    //if (ver)
+                        //printf("OpenGL version: %s\n", ver);
+                    //else
+                        //printf("glGetString(GL_VERSION) returned NULL\n");
                     
                 float trianglesVerticles [] = {
                     //FRONT FACE
@@ -441,7 +442,6 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
 */
 
     //
-    glDrawArrays(GL_TRIANGLES, 0, 3);
 
     // Display on the screen
     RenderSplendidGradient(OBuffer, BMPContent, State->BlueOffset, State->GreenOffset);

@@ -25,13 +25,13 @@ struct Shader{
     LARGE_INTEGER file_size;
     unsigned int shaderID;
     void* SourceCode;
-    char* SourcePath;
+    void* SourcePath;
 };
 
 void *GetAnyGLFuncAddress(const char *name);
 #define loadFunc(name) (name*)GetAnyGLFuncAddress(name)
 
-void loadShader(Shader* shader,char* path);
+void loadShader(Shader* shader,char* name);
 char* loadCurrentErr();
 void checkCompileError(GLuint shader, char* type);
 
