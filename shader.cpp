@@ -71,6 +71,8 @@ void loadShader(Shader* shader, char* name){
             //Finally delete already attached shader
             glDeleteShader(shader->shaderID);                            
 
+            DEBUGFreeFileMemory(shader->SourceCode);
+            CloseHandle(shader->shader_file);
         } else {
             Error = loadCurrentErr();
             DWORD err = GetLastError();

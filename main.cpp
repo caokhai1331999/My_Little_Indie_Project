@@ -392,7 +392,7 @@ int CALLBACK WinMain
 
                 uint64 EndCycleCounts;
                 EndCycleCounts = __rdtsc();
-
+ 
                   //__rdtsc() is an intrinsict (the one which looked like a function call
                  //but it actually a hint to the compiler to a specific dissembly language intstruction)
 
