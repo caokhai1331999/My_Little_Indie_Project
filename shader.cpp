@@ -50,35 +50,40 @@ void loadShader(Shader* shader, char* name){
             shader->file_size.QuadPart = safetruncateUint64(shader->file_size.QuadPart);
         }
 
-        if((ReadFile(shader->shader_file, shader->SourceCode, shader->file_size.QuadPart, &ByteRead, NULL))){
+        shader->SourceCode = VirtualAlloc(0, shader->file_size.QuadPart, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
 
-            printf("Load file: %s successfully, File size is %d\n", name, ByteRead);
+        if(shader->SourceCode){
+
+            if((ReadFile(shader->shader_file, shader->SourceCode, shader->file_size.QuadPart, &ByteRead, NULL))){
+
+                printf("Load file: %s successfully, File size is %d\n", name, ByteRead);
             
-            //First Create an empty shader object by glCreateShader 
-            shader->shaderID = glCreateShader(GL_VERTEX_SHADER);
-            // Then Sourcing it with glShaderSource
-            // Seemed like glShaderSource doesn't relate to file content
-            // It just need path
-            // 2nd arg is number of shader in source, 4th is an array of string length
-            const char* CodeContent = (char* )shader->SourceCode;
-            glShaderSource(shader->shaderID, 1, &CodeContent, NULL);
-            //Next compile this shader with glCompileShader
-            glCompileShader(shader->shaderID);
-            //Attach it(glAttachShader) with the already created(glCreateProgram) empty program
-            unsigned int ProgramID = glCreateProgram();
-            glAttachShader(ProgramID, shader->shaderID);
-            glLinkProgram(ProgramID);
-            //Finally delete already attached shader
-            glDeleteShader(shader->shaderID);                            
+                //First Create an empty shader object by glCreateShader 
+                shader->shaderID = glCreateShader(GL_VERTEX_SHADER);
 
-            DEBUGFreeFileMemory(shader->SourceCode);
-            CloseHandle(shader->shader_file);
-        } else {
-            Error = loadCurrentErr();
-            DWORD err = GetLastError();
-            printf("error : %s\n", Error);
+                // Then Sourcing it with glShaderSource
+                // Seemed like glShaderSource doesn't relate to file content
+                // It just need path
+                // 2nd arg is number of shader in source, 4th is an array of string length
+                const char* CodeContent = (char* )shader->SourceCode;
+                glShaderSource(shader->shaderID, 1, &CodeContent, NULL);
+                //Next compile this shader with glCompileShader
+                glCompileShader(shader->shaderID);
+                //Attach it(glAttachShader) with the already created(glCreateProgram) empty program
+                unsigned int ProgramID = glCreateProgram();
+                glAttachShader(ProgramID, shader->shaderID);
+                glLinkProgram(ProgramID);
+                //Finally delete already attached shader
+                glDeleteShader(shader->shaderID);                            
+
+                DEBUGFreeFileMemory(shader->SourceCode);
+                CloseHandle(shader->shader_file);
+            } else {
+                Error = loadCurrentErr();
+                DWORD err = GetLastError();
+                printf("error : %s\n", Error);
+            }            
         }
-
     } else {
         Error = loadCurrentErr();
         printf("error : %s\n", Error);        
