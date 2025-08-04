@@ -335,6 +335,7 @@ int CALLBACK WinMain
             ScreenBuffer.Pitch = BackBuffer.Pitch;
             ScreenBuffer.Bitmapinfo = BackBuffer.Bitmapinfo;
             ScreenBuffer.BitmapHandle = BackBuffer.BitmapHandle;
+            ScreenBuffer.glData = BackBuffer.glData;
             
             int MaxControllerCount = XUSER_MAX_COUNT;
 /*
@@ -370,20 +371,21 @@ int CALLBACK WinMain
                  //WHY????
                  //Update here                
                 //printf("Just before Game update and render\n");                
-
-                InitOpenGL(Window, &ScreenBuffer, nullptr);                
                 DeviceContext = GetDC(Window);
-                use(&vshader);
-                use(&fshader);                
-
                 // Attach VAO
                 // use shader
                 glBindVertexArray(0);
                 // Ah got it. Texture data pass directly to shader
-                glDrawArrays(GL_TRIANGLES, 0, 3);
+                use(&vshader);
+                use(&fshader);
                 //Why the &ScreenBuffer data doesn't show on the direct screen
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
 
+                //NOTE: I did this the wrong way
+                //glBindTexture(GL_TEXTURE_2D, 1);
+                //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+                SwapBuffers(DeviceContext);
                 //NOTE: Check whether OpenGL work or not
                  //Define the boundary of what we want to rende
                 
@@ -425,6 +427,7 @@ int CALLBACK WinMain
                 Game_Input* Temp = NewInput;
                 NewInput = OldInput;  //???? still don't understand
                 OldInput = Temp;
+                wglDeleteContext(BackBuffer.glData.openglRC);
                 ReleaseDC(Window, DeviceContext);
             }            
             }                

@@ -155,7 +155,6 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
     // first device context gotten from current window
     // printf("Start to init OpenGL\n");
     HDC windowDC = GetDC(window);
-    HGLRC openglRC;
         // Create the pixel format features
        // Then describe it
         PIXELFORMATDESCRIPTOR desiredPixelFormat = {};
@@ -174,9 +173,6 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
         // Create a format from that index
         PIXELFORMATDESCRIPTOR suggestedPixelFormat;
         bool32 initTexture = false;
-        GLuint textureHandle = 0;
-        GLuint textureHandle_1 = 0;
-
         DescribePixelFormat(
             windowDC,
             suggestedPixelFormatIndex,
@@ -200,9 +196,8 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
             // NOTE: Failed right at the beginning
             bool success = false;
 // Next create OPENGL context
-            openglRC = wglCreateContext(windowDC);
-
-            if(wglMakeCurrent(windowDC, openglRC)){
+            OBuffer->glData.openglRC = wglCreateContext(windowDC);
+            if(wglMakeCurrent(windowDC, OBuffer->glData.openglRC)){
 
                 // NOTE: Failed right at the beginning
                 success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
@@ -287,12 +282,12 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
                     5.0f, -0.5f, -5.0f,  2.0f, 2.0f			        
                 };
 
-                OBuffer->OData = {};
+                OBuffer->glData = {};
             
-                glGenBuffers(1, &OBuffer->OData.VBO);
-                glGenVertexArrays(1, &OBuffer->OData.VAOs);
+                glGenBuffers(1, &OBuffer->glData.VBO);
+                glGenVertexArrays(1, &OBuffer->glData.VAOs);
 
-                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->OData.VBO);
+                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.VBO);
                 glBufferData(GL_ARRAY_BUFFER, sizeof(CubeVerticles), &CubeVerticles, GL_STATIC_DRAW);
 
                 glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 0, (void*)0);
@@ -305,17 +300,14 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
                 // We will call bindbuffer/vertexArray whenever before glDrawArray
             
                 //printf("Succeed create OpenGL Context\n");
-                glGenTextures(1, &textureHandle);
-                glBindTexture(GL_TEXTURE_2D, textureHandle);
-
-                glGenTextures(1, &textureHandle_1);
-                glBindTexture(GL_TEXTURE_2D, textureHandle_1);
+                glGenTextures(1, &OBuffer->glData.textureHandle);
+                glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle);
 
                 //last argument This is where point to the image data
                 // Why this doesn't work
                 glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
+                glGenerateMipmap(GL_TEXTURE_2D);
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
-
                 //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, imageContent);
 
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -399,63 +391,17 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
     // Display on the screen
     //RenderSplendidGradient(OBuffer, BMPContent, 0, 0);
     //Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height, OBuffer);
-    //SwapBuffers(DeviceContext);
-
-
-    // OPENGL parts ======================================================
-    //glBegin(GL_TRIANGLES);
-    // real32 a =;
-    // real32 b =;
-    // real32 proj[]={        
-    // }
-    real32 p = 1.0f;
-
-    //char* FileName = "structured_color_map.bmp";
-    //glBitmap(
-          //Dimens.Width * 0.9,
-          //Dimens.Height * 0.9,
-          //Dimens.Width * 0.1,
-          //Dimens.Height * 0.1,
-         //0,0,
-          //(GLubyte *)FileName
-              //);
-/*
-// NOTE: Old and Deprecated function
-    //Upper triangle
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex2f(-p, p);
-    // glColor3f(1.0f, 0.0f, 0.0f);
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex2f(-p, -p);
-    // glColor3f(0.0f, 1.0f, 0.0f);
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex2f(p, -p);
-    // glColor3f(0.0f, 0.0f, 1.0f);
-    // Below triangle
-    // glColor3f(p, p, p);
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex2f(-p, p);
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex2f(p, p);
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex2f(p, -p);
-*/
-
-    //
-
+    //SwapBuffers(DeviceContext);    
     // Display on the screen
+
     RenderSplendidGradient(OBuffer, BMPContent, State->BlueOffset, State->GreenOffset);
-    
-    
-if(glGetError() != GL_NO_ERROR){
-    printf("OpenGL Error: %d\n", glGetError());
-};
 
-    //glEnd();
-// ==================================================================
+    
+//if(glGetError() != GL_NO_ERROR){
+    //printf("OpenGL Error: %d\n", glGetError());
+//};
 
     // Display on the screen
-    SwapBuffers(DeviceContext);
     // The glitching sound driven me nearly crazy so I decided to turn it off
     GameOutPutSound(SoundBuffer, State->Hz);
 }
