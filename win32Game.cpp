@@ -215,38 +215,38 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
                     
                 float trianglesVerticles [] = {
                     //FRONT FACE
-                    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-                    0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-                    0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-                    0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-                    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-                    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f                
+                   -0.5f, -0.5f,  0.0f,  0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
+                    0.5f, -0.5f,  0.0f,  0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
+                   -0.5f,  0.5f,  0.0f,  0.0f, 0.0f, 1.0f,   0.0f, 1.0f,                
+                    0.5f,  0.5f,  0.0f,  0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
+                    0.5f, -0.5f,  0.0f,  0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
+                   -0.5f,  0.5f,  0.0f,  0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
                 };
              
                 float CubeVerticles[] = {
                     // CW
                     // positions          // normals           // texture coords
                     //BACK FACE
-                    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,// one stride  
+                   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,// one stride  
                     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
                     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
                     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-                    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,     
-                    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+                   -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,     
+                   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
                     //FRONT FACE
-                    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+                   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
                     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
                     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
                     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-                    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-                    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+                   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+                   -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
                     // LEFT FACE
-                    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-                    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-                    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-                    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-                    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-                    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+                   -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+                   -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+                   -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+                   -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+                   -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+                   -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
                     // RIGHT FACE
                     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
                     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
@@ -255,40 +255,38 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
                     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
                     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
                     // BOTTOM FACE
-                    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+                   -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
                     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
                     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
                     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-                    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-                    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+                   -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+                   -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
                     // TOP FACE
-                    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+                   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
                     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
                     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
                     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-                    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,    
-                    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+                   -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,    
+                   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
                 };
             
                 float PlaneVerticles[] = {
                     // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
-                    //       x,  y,    z
-                    -0.5f, -0.5f,  5.0f,  2.0f, 0.0f, // Each verticle
+                    //        x,     y,           z
+                   -0.5f, -0.5f,  5.0f,  2.0f, 0.0f, // Each verticle
                     5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
-                    -0.5f, -0.5f, -5.0f,  0.0f, 2.0f,
+                   -0.5f, -0.5f, -5.0f,  0.0f, 2.0f,
 
                     5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-                    -0.5f, -0.5f, -5.0f,  0.0f, 2.0f,
+                   -0.5f, -0.5f, -5.0f,  0.0f, 2.0f,
                     5.0f, -0.5f, -5.0f,  2.0f, 2.0f			        
                 };
 
-                OBuffer->glData = {};
-            
                 glGenBuffers(1, &OBuffer->glData.VBO);
                 glGenVertexArrays(1, &OBuffer->glData.VAOs);
 
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.VBO);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(CubeVerticles), &CubeVerticles, GL_STATIC_DRAW);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(trianglesVerticles), &trianglesVerticles, GL_STATIC_DRAW);
 
                 glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 0, (void*)0);
                 glEnableVertexAttribArray(0);
@@ -298,7 +296,12 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
 
                 // NOTE: To here we done assigned CubeVerticles data to VAOs and VBO
                 // We will call bindbuffer/vertexArray whenever before glDrawArray
-            
+                //GLuint FrameBufferName =0;
+                //glGenFramebuffers(1, &FrameBufferName);
+                //glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferName);
+// NOTE: We delve into Buffer drawing later!!!!
+                //===============================================================
+                
                 //printf("Succeed create OpenGL Context\n");
                 glGenTextures(1, &OBuffer->glData.textureHandle);
                 glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle);
@@ -396,10 +399,13 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
 
     RenderSplendidGradient(OBuffer, BMPContent, State->BlueOffset, State->GreenOffset);
 
-    
-//if(glGetError() != GL_NO_ERROR){
-    //printf("OpenGL Error: %d\n", glGetError());
-//};
+    //NOTE: I did this the wrong way
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    SwapBuffers(DeviceContext);
+
+    if(glGetError() != GL_NO_ERROR){
+        printf("OpenGL Error: %d\n", glGetError());
+    };
 
     // Display on the screen
     // The glitching sound driven me nearly crazy so I decided to turn it off

@@ -375,19 +375,14 @@ int CALLBACK WinMain
                 // Attach VAO
                 // use shader
                 glBindVertexArray(0);
-                // Ah got it. Texture data pass directly to shader
+                // Ah got it. Texture data pass directly to shader(NOPE)
+                // We define that through setInt
+                glBindTexture(GL_TEXTURE_2D, 1);
+                setInt(&fshader, "Texture", 1);
                 use(&vshader);
                 use(&fshader);
                 //Why the &ScreenBuffer data doesn't show on the direct screen
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
-
-                //NOTE: I did this the wrong way
-                //glBindTexture(GL_TEXTURE_2D, 1);
-                //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-                SwapBuffers(DeviceContext);
-                //NOTE: Check whether OpenGL work or not
-                 //Define the boundary of what we want to rende
                 
                 LARGE_INTEGER EndCounter;
                 QueryPerformanceCounter(&EndCounter);
