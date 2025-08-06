@@ -374,7 +374,7 @@ int CALLBACK WinMain
                 DeviceContext = GetDC(Window);
                 // Attach VAO
                 // use shader
-                glBindVertexArray(0);
+                glBindVertexArray(BackBuffer.glData.VAOs);
                 // Ah got it. Texture data pass directly to shader(NOPE)
                 // We define that through setInt
                 glBindTexture(GL_TEXTURE_2D, 1);
