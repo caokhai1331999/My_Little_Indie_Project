@@ -375,10 +375,10 @@ int CALLBACK WinMain
                 // Attach VAO
                 // use shader
                 glBindVertexArray(BackBuffer.glData.VAOs);
+                setInt(&fshader, "Texture", 1);
                 // Ah got it. Texture data pass directly to shader(NOPE)
                 // We define that through setInt
                 glBindTexture(GL_TEXTURE_2D, 1);
-                setInt(&fshader, "Texture", 1);
                 use(&vshader);
                 use(&fshader);
                 //Why the &ScreenBuffer data doesn't show on the direct screen

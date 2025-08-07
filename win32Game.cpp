@@ -215,12 +215,12 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
                     
                 float trianglesVerticles [] = {
                     //FRONT FACE
-                   -0.5f, -0.5f,  0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
-                    0.5f, -0.5f,  0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
-                   -0.5f,  0.5f,  0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f,                
-                    0.5f,  0.5f,  0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,
-                    0.5f, -0.5f,  0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
-                   -0.5f,  0.5f,  0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f,
+                   -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+                    0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+                   -0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f,
+                    0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,
+                    0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+                   -0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f
                 };
              
                 float CubeVerticles[] = {
@@ -283,17 +283,18 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
                 };
 
                 glGenBuffers(1, &OBuffer->glData.VBO);
-                glGenVertexArrays(1, &OBuffer->glData.VAOs);
-
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.VBO);
+                glGenVertexArrays(1, &OBuffer->glData.VAOs);
+                glBindVertexArray(OBuffer->glData.VAOs);
+
                 glBufferData(GL_ARRAY_BUFFER, sizeof(trianglesVerticles), &trianglesVerticles, GL_STATIC_DRAW);
 
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 0, (void*)0);
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)0);
                 glEnableVertexAttribArray(0);
 
-                glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 0, (void*)(6*sizeof(float)));
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)(6*sizeof(float)));
                 glEnableVertexAttribArray(2);
-
+                
                 // NOTE: To here we done assigned CubeVerticles data to VAOs and VBO
                 // We will call bindbuffer/vertexArray whenever before glDrawArray
                 //GLuint FrameBufferName =0;
