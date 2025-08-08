@@ -32,7 +32,7 @@ void *GetAnyGLFuncAddress(const char *name)
 }
 // =============== let aside this alone touch it when it's time================
 
-void loadShader(Shader* shader, char* name){
+void loadShader(Shader* shader, char* name, VertexType type){
     //Create File handle to current file for reading
     char* Error;
     shader->shader_file = CreateFileA(
@@ -59,7 +59,12 @@ void loadShader(Shader* shader, char* name){
                 printf("Load file: %s successfully, File size is %d\n", name, ByteRead);
             
                 //First Create an empty shader object by glCreateShader 
-                shader->shaderID = glCreateShader(GL_VERTEX_SHADER);
+                // BUG here
+                if(type == vertex){
+                    shader->shaderID = glCreateShader(GL_VERTEX_SHADER);
+                } else {
+                    shader->shaderID = glCreateShader(GL_FRAGMENT_SHADER);
+                }
 
                 // Then Sourcing it with glShaderSource
                 // Seemed like glShaderSource doesn't relate to file content
@@ -70,12 +75,16 @@ void loadShader(Shader* shader, char* name){
                 //Next compile this shader with glCompileShader
                 glCompileShader(shader->shaderID);
                 //Attach it(glAttachShader) with the already created(glCreateProgram) empty program
-                unsigned int ProgramID = glCreateProgram();
-                glAttachShader(ProgramID, shader->shaderID);
-                glLinkProgram(ProgramID);
                 //Finally delete already attached shader
-                glDeleteShader(shader->shaderID);                            
 
+                checkCompileErrors(shader->shaderID, type?"Vertex":"Fragment");
+                const GLubyte* ver = glGetString(GL_VERSION);
+                if (ver)
+                    printf("OpenGL version: %s\n", ver);
+                else
+                    printf("glGetString(GL_VERSION) returned NULL\n");
+
+                //glDeleteShader(shader->shaderID);
                 DEBUGFreeFileMemory(shader->SourceCode);
                 CloseHandle(shader->shader_file);
             } else {
@@ -114,11 +123,8 @@ char* loadCurrentErr(){
     return errorContent;
 }
 
-void checkCompileError(GLuint shader, char* type){
-}
-
-void use(Shader* shader){
-    glUseProgram(shader->shaderID);
+void use(OpenGLData* glData){
+    glUseProgram(glData->ProgramID);
 }
 
 // Set Int, bool,
@@ -126,7 +132,7 @@ void setBool(Shader* shader, const char* name, const bool value){
     glUniform1i(glGetUniformLocation(shader->shaderID, name), (int)value);
 };
 
-void setInt(Shader* shader, const char* name, const  int value){
+void setInt(Shader* shader, const char* name, const int value){
     glUniform1i(glGetUniformLocation(shader->shaderID, name), value);
 };
 
@@ -179,3 +185,31 @@ void checkCompileErrors(GLuint shader, char* type)
         }
     }
 };
+
+void setupGLprogram(Win32_OffScreen_Buffer* buffer, Shader* vshader, Shader* fshader){
+    if(buffer->glData.ProgramID == 0){
+        buffer->glData.ProgramID = glCreateProgram();
+    }
+    glAttachShader(buffer->glData.ProgramID, vshader->shaderID);
+    glAttachShader(buffer->glData.ProgramID, fshader->shaderID);
+    glLinkProgram(buffer->glData.ProgramID);
+
+    GLint success;
+    GLchar infoLog[1024];
+    char* type = "vertex";
+    glGetProgramiv(vshader->shaderID, GL_LINK_STATUS, &success);
+
+    if (!success)
+    {
+        glGetProgramInfoLog(vshader->shaderID, 1024, NULL, infoLog);
+        printf("ERROR::PROGRAM_LINKING_ERROR of type: %s\n %s", type, infoLog);
+    }
+
+    glGetProgramiv(fshader->shaderID, GL_LINK_STATUS, &success);
+    type = "fragment";
+    if (!success)
+    {
+        glGetProgramInfoLog(fshader->shaderID, 1024, NULL, infoLog);
+        printf("ERROR::PROGRAM_LINKING_ERROR of type: %s\n %s", type, infoLog);
+    }
+}

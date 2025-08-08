@@ -17,8 +17,12 @@
 
 // Then set mat4(Model, projection,etc ...) to the program
 
-#include "handmade.h"
+#include "win32Game.h"
 #include <glm/glm.hpp>
+
+typedef bool VertexType;
+#define vertex (bool)true
+#define fragment (bool)false
 
 struct Shader{
     HANDLE shader_file;
@@ -28,9 +32,8 @@ struct Shader{
     void* SourcePath;
 };
 
-void loadShader(Shader* shader,char* name);
+void loadShader(Shader* shader, char* name, VertexType type);
 char* loadCurrentErr();
-void checkCompileError(GLuint shader, char* type);
 
 // Set Int, bool, float and Vector
 void setVec2(Shader* shader, const char* name, glm::vec2 &value);
@@ -47,7 +50,11 @@ void setMat3(Shader* shader, const char* name, glm::mat3 &value);
 void setMat4(Shader* shader, const char* name, glm::mat4 &value);
 
 // Use the shader
-void use(Shader* shader);
+void use(OpenGLData* glData);
+
+// Attaching shader to program
+void setupGLprogram(Win32_OffScreen_Buffer* buffer, Shader* vshader, Shader* fshader);
+void checkCompileErrors(GLuint shader, char* type);
 
 #define SHADER_H
 #endif

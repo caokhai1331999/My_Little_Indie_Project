@@ -20,6 +20,8 @@ struct OpenGLData{
     unsigned int VAOs;
     unsigned int VBO;
 
+    unsigned int ProgramID;
+    
     HGLRC openglRC;
     GLuint textureHandle;
 };
@@ -54,9 +56,10 @@ void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Heigh
 void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPContent, int XOffset, int YOffset);
 void Win32DisplayBufferWindow (HDC DeviceContext, int WindowWidth, int WindowHeight, Win32_OffScreen_Buffer* OBuffer);
 
-void GameUpdateAndRender(Game_Memory* Memory = nullptr, BMP_content* BMPContent = nullptr ,Game_Input* Input = nullptr, Game_State* State = nullptr ,Win32_OffScreen_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr, HDC DeviceContext = NULL);
+void GameUpdateAndRender(Game_Memory* Memory = nullptr, BMP_content* BMPContent = nullptr ,Game_Input* Input = nullptr, Game_State* State = nullptr ,Win32_OffScreen_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr,HDC DeviceContext = NULL);
 
 void OpenConsole();
 bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageContent);
+
 #define WIN32GAME_H
 #endif

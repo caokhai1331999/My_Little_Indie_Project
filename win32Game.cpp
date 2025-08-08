@@ -103,8 +103,8 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPCon
         //uint32* imagePixel = (uint32* )imageRow;
         //for(int X = 0; X < OBuffer->BitmapWidth; X++) {
 
-            //uint8 Blue = ( X + XOffset);
-            //uint8 Green = ( Y + YOffset);
+            uint8 Blue = ( X + XOffset);
+            uint8 Green = ( Y + YOffset);
 
             //NOTE: AA RR GG BB()
             // Because I limit the size of Pixels so it can not add Green color to its storage
@@ -206,12 +206,6 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
                 {
                     //OpenConsole();
                     //printf("GLAD load successfully\n");                    
-
-                    //const GLubyte* ver = glGetString(GL_VERSION);
-                    //if (ver)
-                        //printf("OpenGL version: %s\n", ver);
-                    //else
-                        //printf("glGetString(GL_VERSION) returned NULL\n");
                     
                 float trianglesVerticles [] = {
                     //FRONT FACE
@@ -293,7 +287,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
                 glEnableVertexAttribArray(0);
                 //  index, size, type, .., stride, pointer
                 glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)(6*sizeof(float)));
-                glEnableVertexAttribArray(2);
+                glEnableVertexAttribArray(1);
                 
                 // NOTE: To here we done assigned CubeVerticles data to VAOs and VBO
                 // We will call bindbuffer/vertexArray whenever before glDrawArray
@@ -305,12 +299,12 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
                 
                 //printf("Succeed create OpenGL Context\n");
                 glGenTextures(1, &OBuffer->glData.textureHandle);
-                glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle);
-
+// OBuffer->glData.textureHandle is the name of the texture
                 //last argument This is where point to the image data
                 // Why this doesn't work
                 glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
                 glGenerateMipmap(GL_TEXTURE_2D);
+
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
                 //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, imageContent);
 
@@ -319,6 +313,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+                glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle);
                 //NOTE: The commented part is one that is deprecated when using the
                 // new version of OPENGL
                 //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -327,6 +322,13 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
                 glClear(GL_COLOR_BUFFER_BIT);
 
                 glEnable(GL_TEXTURE_2D);
+
+                const GLubyte* ver = glGetString(GL_VERSION);
+                if (ver)
+                    printf("OpenGL version: %s\n", ver);
+                else
+                    printf("glGetString(GL_VERSION) returned NULL\n");
+
                 }
                 else
                 {
@@ -398,11 +400,10 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
     //SwapBuffers(DeviceContext);    
     // Display on the screen
 
-    RenderSplendidGradient(OBuffer, BMPContent, State->BlueOffset, State->GreenOffset);
 
     //NOTE: I did this the wrong way
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    SwapBuffers(DeviceContext);
+    SwapBuffers(DeviceContext);    
 
     if(glGetError() != GL_NO_ERROR){
         printf("OpenGL Error: %d\n", glGetError());

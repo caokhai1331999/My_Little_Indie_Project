@@ -131,29 +131,30 @@ LRESULT CALLBACK MainWindowCallBack(
             OutputDebugStringA("WM_DESTROY\n");            
         }break;
         
-        case WM_PAINT:            
-        {
-            PAINTSTRUCT Paint;
-            DeviceContext = BeginPaint(Window, &Paint);
+        //case WM_PAINT:            
+        //{
+            //PAINTSTRUCT Paint;
+            //DeviceContext = GetWindowDC(Window);
+//
+             //int X = Paint.rcPaint.left;
+             //int Y = Paint.rcPaint.top;
+            //
+             //int width = Paint.rcPaint.right - Paint.rcPaint.left;
+             //int height = Paint.rcPaint.bottom - Paint.rcPaint.top;
+             //GetWindowDimension(Window);
+             //local_persist DWORD Operation = WHITENESS;
+//
+             //if (Operation == WHITENESS) {
+                 //Operation = BLACKNESS;
+             //}else {
+                 //Operation = WHITENESS;
+             //}
+//
+             //RenderSplendidGradient(&BackBuffer, NULL, 0, 0);
+             //EndPaint(Window, &Paint);
+            //OutputDebugStringA("WM_PAINT\n");
+        //}
 
-             int X = Paint.rcPaint.left;
-             int Y = Paint.rcPaint.top;
-            
-             int width = Paint.rcPaint.right - Paint.rcPaint.left;
-             int height = Paint.rcPaint.bottom - Paint.rcPaint.top;
-            GetWindowDimension(Window);
-             local_persist DWORD Operation = WHITENESS;
-
-             if (Operation == WHITENESS) {
-                 Operation = BLACKNESS;
-             }else {
-                 Operation = WHITENESS;
-             }
-
-             Win32DisplayBufferWindow( DeviceContext ,Dimens.Width, Dimens.Height, &BackBuffer);
-             EndPaint(Window, &Paint);
-            OutputDebugStringA("WM_PAINT\n");
-        }
         break;
         case WM_LBUTTONDOWN: 
             fDraw = TRUE; 
@@ -287,39 +288,20 @@ int CALLBACK WinMain
             if(game_memory.TransientStorage && game_memory.PermanentStorage){
                 //printf("About to read image\n");
                 // NOTE: ???? Why when I change to different bmp image it crashed
-                //byte order: AA BB GG RR bottom up  
+                //byte order: AA BB GG RR bottom up                  
+                BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
 
-                //if (!gladLoadGLLoader((GLADloadproc)GetProcAddress))
-                //{
-                    //std::cout << "Failed to initialize GLAD" << std::endl;
-                //}
-//
-                //if (!gladLoadGLLoader((GLADloadproc)wglGetProcAddress))
-                //{
-                    //std::cout << "Failed to initialize GLAD" << std::endl;
-                //}
+                //OpenGL part
                 InitOpenGL(Window, &BackBuffer, nullptr);
 
                 Shader vshader;
                 Shader fshader;
 
-                loadShader(&fshader, "shader.fs");
-                loadShader(&vshader, "shader.vs");
+                loadShader(&vshader, "shader.vs", (VertexType)vertex);
+                loadShader(&fshader, "shader.fs", (VertexType)fragment);
 
-                unsigned int* vsource;
-                unsigned int* fsource;
-
-                int sourcelenght = 300;
-                
-                glGetShaderSource(vshader.shaderID, 300, &sourcelenght, fsource);
-                glGetShaderSource(fshader.shaderID, 300, &sourcelenght, vsource);
-
-                printf("vshader source: %s\n", vsource);
-                printf("fshader source: %s\n", fsource);
-                
-                BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
-
-                
+                setupGLprogram(&BackBuffer, &vshader, &fshader);
+                // =============================================
                 LARGE_INTEGER LastCounter;
                 QueryPerformanceCounter(&LastCounter);
                 uint64 LastCycleCounts;
@@ -384,17 +366,24 @@ int CALLBACK WinMain
                 //printf("Just before Game update and render\n");                
                 DeviceContext = GetDC(Window);
                 // Attach VAO
-                // use shader
-                glBindVertexArray(BackBuffer.glData.VAOs);
-                glBindTexture(GL_TEXTURE_2D, BackBuffer.glData.textureHandle);
-                setInt(&fshader, "Texture", BackBuffer.glData.textureHandle);
+                // use shader program
+                use(&ScreenBuffer.glData);
+                setInt(&fshader, "Texture", ScreenBuffer.glData.textureHandle);
+                glBindVertexArray(ScreenBuffer.glData.VAOs);
+
+                if(glGetError() != GL_NO_ERROR){
+                    printf("OpenGL Error: %d\n", glGetError());
+                };
+
+                // Display on the screen
+                // The glitching sound driven me nearly crazy so I decided to turn it off
+                
                 // Ah got it. Texture data pass directly to shader(NOPE)
                 // We define that through setInt
-                use(&vshader);
-                use(&fshader);
                 //Why the &ScreenBuffer data doesn't show on the direct screen
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
-                
+                SwapBuffers(DeviceContext);
+
                 LARGE_INTEGER EndCounter;
                 QueryPerformanceCounter(&EndCounter);
 
