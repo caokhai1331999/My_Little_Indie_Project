@@ -28,9 +28,6 @@ struct Shader{
     void* SourcePath;
 };
 
-void *GetAnyGLFuncAddress(const char *name);
-#define loadFunc(name) (name*)GetAnyGLFuncAddress(name)
-
 void loadShader(Shader* shader,char* name);
 char* loadCurrentErr();
 void checkCompileError(GLuint shader, char* type);

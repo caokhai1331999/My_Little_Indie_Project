@@ -305,6 +305,17 @@ int CALLBACK WinMain
 
                 loadShader(&fshader, "shader.fs");
                 loadShader(&vshader, "shader.vs");
+
+                unsigned int* vsource;
+                unsigned int* fsource;
+
+                int sourcelenght = 300;
+                
+                glGetShaderSource(vshader.shaderID, 300, &sourcelenght, fsource);
+                glGetShaderSource(fshader.shaderID, 300, &sourcelenght, vsource);
+
+                printf("vshader source: %s\n", vsource);
+                printf("fshader source: %s\n", fsource);
                 
                 BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
 
@@ -375,10 +386,10 @@ int CALLBACK WinMain
                 // Attach VAO
                 // use shader
                 glBindVertexArray(BackBuffer.glData.VAOs);
-                setInt(&fshader, "Texture", 1);
+                glBindTexture(GL_TEXTURE_2D, BackBuffer.glData.textureHandle);
+                setInt(&fshader, "Texture", BackBuffer.glData.textureHandle);
                 // Ah got it. Texture data pass directly to shader(NOPE)
                 // We define that through setInt
-                glBindTexture(GL_TEXTURE_2D, 1);
                 use(&vshader);
                 use(&fshader);
                 //Why the &ScreenBuffer data doesn't show on the direct screen

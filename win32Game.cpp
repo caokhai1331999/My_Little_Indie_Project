@@ -291,7 +291,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
 
                 glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)0);
                 glEnableVertexAttribArray(0);
-
+                //  index, size, type, .., stride, pointer
                 glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)(6*sizeof(float)));
                 glEnableVertexAttribArray(2);
                 

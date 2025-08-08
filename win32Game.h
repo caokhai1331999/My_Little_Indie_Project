@@ -21,7 +21,7 @@ struct OpenGLData{
     unsigned int VBO;
 
     HGLRC openglRC;
-    GLuint textureHandle = 0;
+    GLuint textureHandle;
 };
 
 struct Win32_OffScreen_Buffer{  
