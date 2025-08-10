@@ -26,13 +26,14 @@ LRESULT CALLBACK MainWindowCallBack(
             //break;
         case WM_SIZE:
         {
-            DeviceContext = GetDC(Window);
+           DeviceContext = GetDC(Window);
             GetWindowDimension(Window);
             //NOTE: Whenever the window is resized, this function capture the size
              //of the new window and update a new proper DIB for that
              //DIB is a table where store BIT color infor
             Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
             //Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height,  &BackBuffer);
+            ReleaseDC(Window, DeviceContext);
             OutputDebugStringA("WM_SIZE\n");
         }break;
         
@@ -131,38 +132,38 @@ LRESULT CALLBACK MainWindowCallBack(
             OutputDebugStringA("WM_DESTROY\n");            
         }break;
         
-        //case WM_PAINT:            
-        //{
-            //PAINTSTRUCT Paint;
-            //DeviceContext = GetWindowDC(Window);
-//
-             //int X = Paint.rcPaint.left;
-             //int Y = Paint.rcPaint.top;
-            //
-             //int width = Paint.rcPaint.right - Paint.rcPaint.left;
-             //int height = Paint.rcPaint.bottom - Paint.rcPaint.top;
-             //GetWindowDimension(Window);
-             //local_persist DWORD Operation = WHITENESS;
-//
-             //if (Operation == WHITENESS) {
-                 //Operation = BLACKNESS;
-             //}else {
-                 //Operation = WHITENESS;
-             //}
-//
-             //RenderSplendidGradient(&BackBuffer, NULL, 0, 0);
-             //EndPaint(Window, &Paint);
-            //OutputDebugStringA("WM_PAINT\n");
-        //}
+        case WM_PAINT:            
+        {
+            PAINTSTRUCT Paint;
+             DeviceContext = BeginPaint(Window, &Paint);
 
-        break;
-        case WM_LBUTTONDOWN: 
+             int X = Paint.rcPaint.left;
+             int Y = Paint.rcPaint.top;
+            
+             int width = Paint.rcPaint.right - Paint.rcPaint.left;
+             int height = Paint.rcPaint.bottom - Paint.rcPaint.top;
+             GetWindowDimension(Window);
+             local_persist DWORD Operation = WHITENESS;
+
+             if (Operation == WHITENESS) {
+                 Operation = BLACKNESS;
+             }else {
+                 Operation = WHITENESS;
+             }
+             //Win32DisplayBufferWindow(DeviceContext, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, &BackBuffer );
+             EndPaint(Window, &Paint);
+             SwapBuffers(DeviceContext);
+             ReleaseDC(Window, DeviceContext);
+             OutputDebugStringA("WM_PAINT\n");
+        }break;
+
+        case WM_LBUTTONDOWN:{
             fDraw = TRUE; 
             ptPrevious.x = LOWORD(Lparam); 
             ptPrevious.y = HIWORD(Lparam);
-            return 0L; 
-             break;
-        case WM_LBUTTONUP: 
+            return 0L;             
+        } break;
+        case WM_LBUTTONUP:{
             if (fDraw) 
             { 
                 DeviceContext = GetDC(Window); 
@@ -171,9 +172,9 @@ LRESULT CALLBACK MainWindowCallBack(
                 ReleaseDC(Window, DeviceContext); 
             } 
             fDraw = FALSE; 
-            return 0L; 
-             break; 
-        case WM_MOUSEMOVE: 
+            return 0L;             
+        }break; 
+        case WM_MOUSEMOVE:{
             if (fDraw) 
             { 
                 DeviceContext = GetDC(Window); 
@@ -182,8 +183,8 @@ LRESULT CALLBACK MainWindowCallBack(
                 ptPrevious.y = HIWORD(Lparam)); 
                 ReleaseDC(Window, DeviceContext); 
             }
-            return 0L; 
-             break;            
+            return 0L;             
+        }break;            
         default:
         {
             OutputDebugStringA("DEFAULT\n");
@@ -260,9 +261,9 @@ int CALLBACK WinMain
         if(Window) {
             GlobalRunning = true; 
 
-            HDC devicecontext = GetDC(Window);
-            int refreshRate = GetDeviceCaps(devicecontext, VREFRESH);
-            ReleaseDC(Window, devicecontext);
+            HDC DeviceContext = GetDC(Window);
+            int refreshRate = GetDeviceCaps(DeviceContext, VREFRESH);
+            ReleaseDC(Window, DeviceContext);
             if(refreshRate > 1){
                 printf("Refresh rate is : %dHz\n", refreshRate);
             };
@@ -292,6 +293,7 @@ int CALLBACK WinMain
                 BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
 
                 //OpenGL part
+                Win32_OffScreen_Buffer ScreenBuffer = {};
                 InitOpenGL(Window, &BackBuffer, nullptr);
 
                 Shader vshader;
@@ -300,7 +302,8 @@ int CALLBACK WinMain
                 loadShader(&vshader, "shader.vs", (VertexType)vertex);
                 loadShader(&fshader, "shader.fs", (VertexType)fragment);
 
-                setupGLprogram(&BackBuffer, &vshader, &fshader);
+                setupGLprogram(&ScreenBuffer, &vshader, &fshader);
+                RenderSplendidGradient(&BackBuffer, BMPContent, 0, 0);
                 // =============================================
                 LARGE_INTEGER LastCounter;
                 QueryPerformanceCounter(&LastCounter);
@@ -317,7 +320,6 @@ int CALLBACK WinMain
             InitSoundBuffer(&Window, &SoundOutPut);
             int16* SSamples = (int16* )VirtualAlloc(0 , SoundOutPut.SecondBufferSize ,MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
 
-            Win32_OffScreen_Buffer ScreenBuffer = {};
 
             //Why InitOpenGl only work in the app loop
 
@@ -364,9 +366,9 @@ int CALLBACK WinMain
                  //WHY????
                  //Update here                
                 //printf("Just before Game update and render\n");                
-                DeviceContext = GetDC(Window);
                 // Attach VAO
                 // use shader program
+                DeviceContext = GetDC(Window);
                 use(&ScreenBuffer.glData);
                 setInt(&fshader, "Texture", ScreenBuffer.glData.textureHandle);
                 glBindVertexArray(ScreenBuffer.glData.VAOs);
@@ -382,7 +384,6 @@ int CALLBACK WinMain
                 // We define that through setInt
                 //Why the &ScreenBuffer data doesn't show on the direct screen
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
-                SwapBuffers(DeviceContext);
 
                 LARGE_INTEGER EndCounter;
                 QueryPerformanceCounter(&EndCounter);
@@ -422,9 +423,8 @@ int CALLBACK WinMain
                 Game_Input* Temp = NewInput;
                 NewInput = OldInput;  //???? still don't understand
                 OldInput = Temp;
-                wglDeleteContext(BackBuffer.glData.openglRC);
                 ReleaseDC(Window, DeviceContext);
-            }            
+            }
             }                
         }
         else{
@@ -449,6 +449,7 @@ int CALLBACK WinMain
         char buffer[256] = {};
         FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, buffer, sizeof(buffer), NULL);
         printf("%s\n", buffer);
-    }   
-        return (0);
+    }
+    wglDeleteContext(BackBuffer.glData.openglRC);
+    return (0);
 }

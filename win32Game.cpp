@@ -368,7 +368,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
 }
 
 
-void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContext){
+void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContextt){
 
     if(!Memory->IsInitialized){
         State->Hz = 256;
@@ -395,15 +395,14 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
     // loop
 
     // Display on the screen
-    //RenderSplendidGradient(OBuffer, BMPContent, 0, 0);
     //Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height, OBuffer);
-    //SwapBuffers(DeviceContext);    
+    //SwapBuffers(DeviceContextt);    
     // Display on the screen
 
-
     //NOTE: I did this the wrong way
+    RenderSplendidGradient(OBuffer, BMPContent, 0, 0);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    SwapBuffers(DeviceContext);    
+    SwapBuffers(DeviceContextt);    
 
     if(glGetError() != GL_NO_ERROR){
         printf("OpenGL Error: %d\n", glGetError());
