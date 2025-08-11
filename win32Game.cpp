@@ -401,8 +401,8 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
 
     //NOTE: I did this the wrong way
     RenderSplendidGradient(OBuffer, BMPContent, 0, 0);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    SwapBuffers(DeviceContextt);    
+    //glDrawArrays(GL_TRIANGLES, 0, 6);
+    //SwapBuffers(DeviceContextt);    
 
     if(glGetError() != GL_NO_ERROR){
         printf("OpenGL Error: %d\n", glGetError());
@@ -411,6 +411,19 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
     // Display on the screen
     // The glitching sound driven me nearly crazy so I decided to turn it off
     GameOutPutSound(SoundBuffer, State->Hz);
+}
+
+void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_OffScreen_Buffer* ScreenBuffer){
+    
+    //Pass BackBuffer data
+    ScreenBuffer->BitmapMemory = BackBuffer->BitmapMemory;
+    ScreenBuffer->BitmapWidth = BackBuffer->BitmapWidth;
+    ScreenBuffer->BitmapHeight = BackBuffer->BitmapHeight;
+    ScreenBuffer->Pitch = BackBuffer->Pitch;
+    ScreenBuffer->Bitmapinfo = BackBuffer->Bitmapinfo;
+    ScreenBuffer->BitmapHandle = BackBuffer->BitmapHandle;
+    ScreenBuffer->glData = BackBuffer->glData;
+    
 }
 
 // void LoadTileMap(){

@@ -35,6 +35,8 @@ struct Win32_OffScreen_Buffer{
     int BitmapHeight;
     int Pitch;
 
+    bool transferNeed;
+    
     OpenGLData glData;
     const int BytesPerPixel = 4;
 };
@@ -60,6 +62,8 @@ void GameUpdateAndRender(Game_Memory* Memory = nullptr, BMP_content* BMPContent 
 
 void OpenConsole();
 bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageContent);
+
+void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_OffScreen_Buffer* ScreenBuffer);
 
 #define WIN32GAME_H
 #endif

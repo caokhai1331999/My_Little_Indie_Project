@@ -26,14 +26,16 @@ LRESULT CALLBACK MainWindowCallBack(
             //break;
         case WM_SIZE:
         {
-           DeviceContext = GetDC(Window);
-            GetWindowDimension(Window);
+// What is DeviceContext for in this case??
+           GetWindowDimension(Window);
             //NOTE: Whenever the window is resized, this function capture the size
              //of the new window and update a new proper DIB for that
              //DIB is a table where store BIT color infor
             Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
-            //Win32DisplayBufferWindow(DeviceContext, Dimens.Width, Dimens.Height,  &BackBuffer);
-            ReleaseDC(Window, DeviceContext);
+            if(!BackBuffer.transferNeed){
+                BackBuffer.transferNeed = true;
+            }
+
             OutputDebugStringA("WM_SIZE\n");
         }break;
         
@@ -57,7 +59,9 @@ LRESULT CALLBACK MainWindowCallBack(
             }
 
             if(vkCode == VK_ESCAPE){
-                GlobalRunning = false;
+                if(GlobalRunning){
+                    GlobalRunning = false;
+                }
             }
             
         }break;
@@ -134,25 +138,39 @@ LRESULT CALLBACK MainWindowCallBack(
         
         case WM_PAINT:            
         {
-            PAINTSTRUCT Paint;
-             DeviceContext = BeginPaint(Window, &Paint);
+             //PAINTSTRUCT Paint;
+             //DeviceContext = BeginPaint(Window, &Paint);
+//
+             //int X = Paint.rcPaint.left;
+             //int Y = Paint.rcPaint.top;
+            //
+             //int width = Paint.rcPaint.right - Paint.rcPaint.left;
+             //int height = Paint.rcPaint.bottom - Paint.rcPaint.top;
+//
+             //local_persist DWORD Operation = WHITENESS;
+//
+             //if (Operation == WHITENESS) {
+                 //Operation = BLACKNESS;
+             //}else {
+                 //Operation = WHITENESS;
+             //}
+             //EndPaint(Window, &Paint);
 
-             int X = Paint.rcPaint.left;
-             int Y = Paint.rcPaint.top;
+             BeginPaint(Window, NULL);
             
-             int width = Paint.rcPaint.right - Paint.rcPaint.left;
-             int height = Paint.rcPaint.bottom - Paint.rcPaint.top;
-             GetWindowDimension(Window);
-             local_persist DWORD Operation = WHITENESS;
-
-             if (Operation == WHITENESS) {
-                 Operation = BLACKNESS;
-             }else {
-                 Operation = WHITENESS;
-             }
-             //Win32DisplayBufferWindow(DeviceContext, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, &BackBuffer );
-             EndPaint(Window, &Paint);
+             DeviceContext = GetDC(Window);
+             glDrawArrays(GL_TRIANGLES, 0, 6);
              SwapBuffers(DeviceContext);
+
+             //if(!BackBuffer.transferNeed){
+                 //BackBuffer.transferNeed = true;
+             //} 
+             
+             if(glGetError() != GL_NO_ERROR){
+                 printf("OpenGL Error: %d\n", glGetError());
+             };
+
+             EndPaint(Window, NULL);
              ReleaseDC(Window, DeviceContext);
              OutputDebugStringA("WM_PAINT\n");
         }break;
@@ -259,7 +277,10 @@ int CALLBACK WinMain
             0);
 
         if(Window) {
-            GlobalRunning = true; 
+
+            if(!GlobalRunning){
+                GlobalRunning = true; 
+            }
 
             HDC DeviceContext = GetDC(Window);
             int refreshRate = GetDeviceCaps(DeviceContext, VREFRESH);
@@ -294,8 +315,12 @@ int CALLBACK WinMain
 
                 //OpenGL part
                 Win32_OffScreen_Buffer ScreenBuffer = {};
-                InitOpenGL(Window, &BackBuffer, nullptr);
 
+
+                RenderSplendidGradient(&BackBuffer, BMPContent, 0, 0);
+
+                
+                InitOpenGL(Window, &BackBuffer, nullptr);
                 Shader vshader;
                 Shader fshader;
 
@@ -303,7 +328,7 @@ int CALLBACK WinMain
                 loadShader(&fshader, "shader.fs", (VertexType)fragment);
 
                 setupGLprogram(&ScreenBuffer, &vshader, &fshader);
-                RenderSplendidGradient(&BackBuffer, BMPContent, 0, 0);
+                copyBufferData(&BackBuffer, &ScreenBuffer);
                 // =============================================
                 LARGE_INTEGER LastCounter;
                 QueryPerformanceCounter(&LastCounter);
@@ -322,15 +347,6 @@ int CALLBACK WinMain
 
 
             //Why InitOpenGl only work in the app loop
-
-            //Pass BackBuffer data
-            ScreenBuffer.BitmapMemory = BackBuffer.BitmapMemory;
-            ScreenBuffer.BitmapWidth = BackBuffer.BitmapWidth;
-            ScreenBuffer.BitmapHeight = BackBuffer.BitmapHeight;
-            ScreenBuffer.Pitch = BackBuffer.Pitch;
-            ScreenBuffer.Bitmapinfo = BackBuffer.Bitmapinfo;
-            ScreenBuffer.BitmapHandle = BackBuffer.BitmapHandle;
-            ScreenBuffer.glData = BackBuffer.glData;
             
             int MaxControllerCount = XUSER_MAX_COUNT;
 /*
@@ -367,8 +383,13 @@ int CALLBACK WinMain
                  //Update here                
                 //printf("Just before Game update and render\n");                
                 // Attach VAO
-                // use shader program
+                if(BackBuffer.transferNeed){
+                    copyBufferData(&BackBuffer, &ScreenBuffer);
+                    BackBuffer.transferNeed = false;
+                }
+
                 DeviceContext = GetDC(Window);
+                // use shader program
                 use(&ScreenBuffer.glData);
                 setInt(&fshader, "Texture", ScreenBuffer.glData.textureHandle);
                 glBindVertexArray(ScreenBuffer.glData.VAOs);
@@ -377,13 +398,13 @@ int CALLBACK WinMain
                     printf("OpenGL Error: %d\n", glGetError());
                 };
 
+                    GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);                
                 // Display on the screen
                 // The glitching sound driven me nearly crazy so I decided to turn it off
                 
                 // Ah got it. Texture data pass directly to shader(NOPE)
                 // We define that through setInt
                 //Why the &ScreenBuffer data doesn't show on the direct screen
-                GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);
 
                 LARGE_INTEGER EndCounter;
                 QueryPerformanceCounter(&EndCounter);
