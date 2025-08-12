@@ -64,7 +64,7 @@ void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Heigh
 
 }
 
-void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPContent, int XOffset, int YOffset) {
+void RenderSplendidGradient(Win32_Front_Buffer* OBuffer, BMP_content* BMPContent, int XOffset, int YOffset) {
     // RR GG BB
     // Row is a pointer to every line of bitmapMemory
     // While pitch is data length of everyline of bitmap
@@ -72,8 +72,8 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPCon
     int32 BlitHeight = BMPContent->Height;
     int32 ImagePitch = 4 * BlitWidth;    
 
-    int32 Width =  OBuffer->BitmapWidth;
     int32 Height = OBuffer->BitmapHeight;
+    int32 Width =  OBuffer->BitmapWidth;
 
     //BUG right here
     //if(BlitWidth > Width){
@@ -368,7 +368,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
 }
 
 
-void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Input* Input, Game_State* State, Win32_OffScreen_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContextt){
+void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Input* Input, Game_State* State, Win32_Front_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContextt){
 
     if(!Memory->IsInitialized){
         State->Hz = 256;
@@ -413,17 +413,27 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
     GameOutPutSound(SoundBuffer, State->Hz);
 }
 
-void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_OffScreen_Buffer* ScreenBuffer){
+void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer){
+
+    if(ScreenBuffer->BitmapMemory != BackBuffer->BitmapMemory){
+        ScreenBuffer->BitmapMemory = BackBuffer->BitmapMemory;
+    }
+
+    if(ScreenBuffer->glData != &BackBuffer->glData){
+        ScreenBuffer->glData != &BackBuffer->glData;
+    }
+
+    if(ScreenBuffer->Bitmapinfo != &BackBuffer->Bitmapinfo){
+        ScreenBuffer->Bitmapinfo = &BackBuffer->Bitmapinfo;
+    }
+    if(ScreenBuffer->BitmapHandle = &BackBuffer->BitmapHandle){
+        ScreenBuffer->BitmapHandle = &BackBuffer->BitmapHandle;
+    }
     
-    //Pass BackBuffer data
-    ScreenBuffer->BitmapMemory = BackBuffer->BitmapMemory;
     ScreenBuffer->BitmapWidth = BackBuffer->BitmapWidth;
     ScreenBuffer->BitmapHeight = BackBuffer->BitmapHeight;
     ScreenBuffer->Pitch = BackBuffer->Pitch;
-    ScreenBuffer->Bitmapinfo = BackBuffer->Bitmapinfo;
-    ScreenBuffer->BitmapHandle = BackBuffer->BitmapHandle;
-    ScreenBuffer->glData = BackBuffer->glData;
-    
+
 }
 
 // void LoadTileMap(){

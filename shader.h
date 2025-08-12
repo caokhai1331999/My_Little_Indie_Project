@@ -53,7 +53,7 @@ void setMat4(Shader* shader, const char* name, glm::mat4 &value);
 void use(OpenGLData* glData);
 
 // Attaching shader to program
-void setupGLprogram(Win32_OffScreen_Buffer* buffer, Shader* vshader, Shader* fshader);
+void setupGLprogram(Win32_Front_Buffer* buffer, Shader* vshader, Shader* fshader);
 void checkCompileErrors(GLuint shader, char* type);
 
 #define SHADER_H

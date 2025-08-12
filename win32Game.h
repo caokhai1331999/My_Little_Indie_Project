@@ -15,7 +15,6 @@ struct win32Dimension{
     int Height{720};
     int Width{1280};
 }Dimens;
-
 struct OpenGLData{
     unsigned int VAOs;
     unsigned int VBO;
@@ -41,6 +40,18 @@ struct Win32_OffScreen_Buffer{
     const int BytesPerPixel = 4;
 };
 
+struct Win32_Front_Buffer{  
+    BITMAPINFO* Bitmapinfo;
+    HBITMAP* BitmapHandle;
+    void* BitmapMemory;
+
+    int BitmapWidth;
+    int BitmapHeight;
+    int Pitch;
+    
+    OpenGLData* glData;
+};
+
 global_variable bool  GlobalRunning;
 global_variable HWND Window;
 global_variable RECT ClientRect;
@@ -55,15 +66,15 @@ const global_variable int Width = 1280;
 void GetWindowDimension(HWND Window);
 void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Height);
 
-void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPContent, int XOffset, int YOffset);
+void RenderSplendidGradient(Win32_Front_Buffer* OBuffer, BMP_content* BMPContent, int XOffset, int YOffset);
 void Win32DisplayBufferWindow (HDC DeviceContext, int WindowWidth, int WindowHeight, Win32_OffScreen_Buffer* OBuffer);
 
-void GameUpdateAndRender(Game_Memory* Memory = nullptr, BMP_content* BMPContent = nullptr ,Game_Input* Input = nullptr, Game_State* State = nullptr ,Win32_OffScreen_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr, HDC DeviceContextt = NULL);
+void GameUpdateAndRender(Game_Memory* Memory = nullptr, BMP_content* BMPContent = nullptr ,Game_Input* Input = nullptr, Game_State* State = nullptr ,Win32_Front_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr, HDC DeviceContextt = NULL);
 
 void OpenConsole();
 bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageContent);
 
-void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_OffScreen_Buffer* ScreenBuffer);
+void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
 
 #define WIN32GAME_H
 #endif

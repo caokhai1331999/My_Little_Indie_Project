@@ -157,8 +157,10 @@ LRESULT CALLBACK MainWindowCallBack(
              //EndPaint(Window, &Paint);
 
              BeginPaint(Window, NULL);
-            
+            // Start to save bit drawing data to the current HDC
              DeviceContext = GetDC(Window);
+             glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
+             glClear(GL_COLOR_BUFFER_BIT);
              glDrawArrays(GL_TRIANGLES, 0, 6);
              SwapBuffers(DeviceContext);
 
@@ -170,8 +172,9 @@ LRESULT CALLBACK MainWindowCallBack(
                  printf("OpenGL Error: %d\n", glGetError());
              };
 
-             EndPaint(Window, NULL);
              ReleaseDC(Window, DeviceContext);
+             EndPaint(Window, NULL);
+
              OutputDebugStringA("WM_PAINT\n");
         }break;
 
@@ -314,21 +317,24 @@ int CALLBACK WinMain
                 BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
 
                 //OpenGL part
-                Win32_OffScreen_Buffer ScreenBuffer = {};
+                Win32_Front_Buffer ScreenBuffer = {};
 
-
-                RenderSplendidGradient(&BackBuffer, BMPContent, 0, 0);
-
-                
+// Cause the ScreenData will be deleted out of the loop so
+                // We have to assign address of memory and glData to
+    
+                //Pass BackBuffer data
+                ScreenBuffer.BitmapMemory = BackBuffer.BitmapMemory;
+                // Why After we pass this data the 2 trian disappear
+                ScreenBuffer.glData = &BackBuffer.glData;
                 InitOpenGL(Window, &BackBuffer, nullptr);
+
                 Shader vshader;
                 Shader fshader;
 
                 loadShader(&vshader, "shader.vs", (VertexType)vertex);
                 loadShader(&fshader, "shader.fs", (VertexType)fragment);
-
                 setupGLprogram(&ScreenBuffer, &vshader, &fshader);
-                copyBufferData(&BackBuffer, &ScreenBuffer);
+
                 // =============================================
                 LARGE_INTEGER LastCounter;
                 QueryPerformanceCounter(&LastCounter);
@@ -383,6 +389,7 @@ int CALLBACK WinMain
                  //Update here                
                 //printf("Just before Game update and render\n");                
                 // Attach VAO
+
                 if(BackBuffer.transferNeed){
                     copyBufferData(&BackBuffer, &ScreenBuffer);
                     BackBuffer.transferNeed = false;
@@ -390,15 +397,15 @@ int CALLBACK WinMain
 
                 DeviceContext = GetDC(Window);
                 // use shader program
-                use(&ScreenBuffer.glData);
-                setInt(&fshader, "Texture", ScreenBuffer.glData.textureHandle);
-                glBindVertexArray(ScreenBuffer.glData.VAOs);
+                use(ScreenBuffer.glData);
+                setInt(&fshader, "Texture", ScreenBuffer.glData->textureHandle);
+                glBindVertexArray(ScreenBuffer.glData->VAOs);
+                GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, DeviceContext);                
 
                 if(glGetError() != GL_NO_ERROR){
                     printf("OpenGL Error: %d\n", glGetError());
                 };
 
-                    GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer, &SoundBuffer, DeviceContext);                
                 // Display on the screen
                 // The glitching sound driven me nearly crazy so I decided to turn it off
                 

@@ -186,13 +186,13 @@ void checkCompileErrors(GLuint shader, char* type)
     }
 };
 
-void setupGLprogram(Win32_OffScreen_Buffer* buffer, Shader* vshader, Shader* fshader){
-    if(buffer->glData.ProgramID == 0){
-        buffer->glData.ProgramID = glCreateProgram();
+void setupGLprogram(Win32_Front_Buffer* buffer, Shader* vshader, Shader* fshader){
+    if(buffer->glData->ProgramID == 0){
+        buffer->glData->ProgramID = glCreateProgram();
     }
-    glAttachShader(buffer->glData.ProgramID, vshader->shaderID);
-    glAttachShader(buffer->glData.ProgramID, fshader->shaderID);
-    glLinkProgram(buffer->glData.ProgramID);
+    glAttachShader(buffer->glData->ProgramID, vshader->shaderID);
+    glAttachShader(buffer->glData->ProgramID, fshader->shaderID);
+    glLinkProgram(buffer->glData->ProgramID);
 
     GLint success;
     GLchar infoLog[1024];
