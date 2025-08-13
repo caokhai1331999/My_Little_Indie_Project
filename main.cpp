@@ -31,8 +31,9 @@ LRESULT CALLBACK MainWindowCallBack(
             //NOTE: Whenever the window is resized, this function capture the size
              //of the new window and update a new proper DIB for that
              //DIB is a table where store BIT color infor
-            Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
-            if(!BackBuffer.transferNeed){
+           
+           Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
+           if(!BackBuffer.transferNeed){
                 BackBuffer.transferNeed = true;
             }
 
@@ -162,11 +163,9 @@ LRESULT CALLBACK MainWindowCallBack(
              glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
              glClear(GL_COLOR_BUFFER_BIT);
              glDrawArrays(GL_TRIANGLES, 0, 6);
-             SwapBuffers(DeviceContext);
 
-             //if(!BackBuffer.transferNeed){
-                 //BackBuffer.transferNeed = true;
-             //} 
+             //glDrawElements(GL_TRIANGLES, 2, GL_UNSIGNED_BYTE, &BackBuffer.glData.VAOs);
+             SwapBuffers(DeviceContext);
              
              if(glGetError() != GL_NO_ERROR){
                  printf("OpenGL Error: %d\n", glGetError());
@@ -309,32 +308,30 @@ int CALLBACK WinMain
             game_memory.TransientStorage = ((uint8*)game_memory.PermanentStorage + game_memory.PermanentStorageSize);
             //======================================================
             debug_read_file_result result;
-            BMP_content* BMPContent;
             if(game_memory.TransientStorage && game_memory.PermanentStorage){
                 //printf("About to read image\n");
                 // NOTE: ???? Why when I change to different bmp image it crashed
                 //byte order: AA BB GG RR bottom up                  
                 BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
-
                 //OpenGL part
                 Win32_Front_Buffer ScreenBuffer = {};
+                RenderSplendidGradient(&BackBuffer, BMPContent, 0, 0);
 
 // Cause the ScreenData will be deleted out of the loop so
                 // We have to assign address of memory and glData to
-    
-                //Pass BackBuffer data
-                ScreenBuffer.BitmapMemory = BackBuffer.BitmapMemory;
-                // Why After we pass this data the 2 trian disappear
-                ScreenBuffer.glData = &BackBuffer.glData;
-                InitOpenGL(Window, &BackBuffer, nullptr);
-
+                InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
                 Shader vshader;
                 Shader fshader;
 
                 loadShader(&vshader, "shader.vs", (VertexType)vertex);
                 loadShader(&fshader, "shader.fs", (VertexType)fragment);
+
+                copyBufferData(&BackBuffer, &ScreenBuffer);
                 setupGLprogram(&ScreenBuffer, &vshader, &fshader);
 
+                glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
+                setInt(&fshader, "Texture", BackBuffer.glData.textureHandle[0]);
+                printf("texture id:%d\n", BackBuffer.glData.textureHandle[0]);
                 // =============================================
                 LARGE_INTEGER LastCounter;
                 QueryPerformanceCounter(&LastCounter);
@@ -395,16 +392,17 @@ int CALLBACK WinMain
                     BackBuffer.transferNeed = false;
                 }
 
-                DeviceContext = GetDC(Window);
+                //DeviceContext = GetDC(Window);
                 // use shader program
-                use(ScreenBuffer.glData);
-                setInt(&fshader, "Texture", ScreenBuffer.glData->textureHandle);
-                glBindVertexArray(ScreenBuffer.glData->VAOs);
-                GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, DeviceContext);                
+                printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
+                use(&ScreenBuffer.glData);
+                glBindVertexArray(ScreenBuffer.glData.VAOs);
+                GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
 
-                if(glGetError() != GL_NO_ERROR){
-                    printf("OpenGL Error: %d\n", glGetError());
-                };
+
+                //if(glGetError() != GL_NO_ERROR){
+                    //printf("OpenGL Error: %d\n", glGetError());
+                //};
 
                 // Display on the screen
                 // The glitching sound driven me nearly crazy so I decided to turn it off

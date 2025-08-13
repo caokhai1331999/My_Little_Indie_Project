@@ -27,7 +27,6 @@
 
 #include <Windows.h>
 #include <xinput.h>
-//#include <GL/gl.h>
 #include <stdio.h>
 #include <cmath>
 #include <iostream>

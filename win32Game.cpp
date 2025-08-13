@@ -64,7 +64,8 @@ void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Heigh
 
 }
 
-void RenderSplendidGradient(Win32_Front_Buffer* OBuffer, BMP_content* BMPContent, int XOffset, int YOffset) {
+//void RenderSplendidGradient(Win32_Front_Buffer* OBuffer, BMP_content* BMPContent, int XOffset, int YOffset) {
+void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPContent, int XOffset, int YOffset) {
     // RR GG BB
     // Row is a pointer to every line of bitmapMemory
     // While pitch is data length of everyline of bitmap
@@ -103,8 +104,8 @@ void RenderSplendidGradient(Win32_Front_Buffer* OBuffer, BMP_content* BMPContent
         //uint32* imagePixel = (uint32* )imageRow;
         //for(int X = 0; X < OBuffer->BitmapWidth; X++) {
 
-            uint8 Blue = ( X + XOffset);
-            uint8 Green = ( Y + YOffset);
+            //uint8 Blue = ( X + XOffset);
+            //uint8 Green = ( Y + YOffset);
 
             //NOTE: AA RR GG BB()
             // Because I limit the size of Pixels so it can not add Green color to its storage
@@ -151,7 +152,7 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
 */
 }
 
-bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageContent){
+bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, BMP_content* bmpContent){
     // first device context gotten from current window
     // printf("Start to init OpenGL\n");
     HDC windowDC = GetDC(window);
@@ -291,36 +292,43 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageConte
                 
                 // NOTE: To here we done assigned CubeVerticles data to VAOs and VBO
                 // We will call bindbuffer/vertexArray whenever before glDrawArray
-                //GLuint FrameBufferName =0;
-                //glGenFramebuffers(1, &FrameBufferName);
-                //glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferName);
 // NOTE: We delve into Buffer drawing later!!!!
                 //===============================================================
                 
                 //printf("Succeed create OpenGL Context\n");
-                glGenTextures(1, &OBuffer->glData.textureHandle);
+                OBuffer->glData.textureHandle = new unsigned int();
+                glGenTextures(1, OBuffer->glData.textureHandle);
 // OBuffer->glData.textureHandle is the name of the texture
                 //last argument This is where point to the image data
                 // Why this doesn't work
                 glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
                 glGenerateMipmap(GL_TEXTURE_2D);
+                
+                if(FBuffer->BitmapMemory != NULL){
+                    printf("We have Image content but somehow it wasn't shown on screen\n");                    
+                } else {
+                    printf("Image content is NULL\n");
+                }
 
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
-                //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, imageContent);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth/2, OBuffer->BitmapHeight/2, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
 
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-                glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle);
+                glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle[0]);
+                if(OBuffer->glData.textureHandle!=NULL){
+                    printf("Texture name is: %d\n", OBuffer->glData.textureHandle[0]);
+                } else {
+                    printf("Some How texture is NULL???\n");
+                }
                 //NOTE: The commented part is one that is deprecated when using the
                 // new version of OPENGL
                 //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
                 glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT);
-
                 glEnable(GL_TEXTURE_2D);
 
                 const GLubyte* ver = glGetString(GL_VERSION);
@@ -400,13 +408,13 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
     // Display on the screen
 
     //NOTE: I did this the wrong way
-    RenderSplendidGradient(OBuffer, BMPContent, 0, 0);
+    //RenderSplendidGradient(OBuffer, BMPContent, 0, 0);
     //glDrawArrays(GL_TRIANGLES, 0, 6);
     //SwapBuffers(DeviceContextt);    
 
-    if(glGetError() != GL_NO_ERROR){
-        printf("OpenGL Error: %d\n", glGetError());
-    };
+    //if(glGetError() != GL_NO_ERROR){
+        //printf("OpenGL Error: %d\n", glGetError());
+    //};
 
     // Display on the screen
     // The glitching sound driven me nearly crazy so I decided to turn it off
@@ -414,26 +422,19 @@ void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Inpu
 }
 
 void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer){
-
-    if(ScreenBuffer->BitmapMemory != BackBuffer->BitmapMemory){
-        ScreenBuffer->BitmapMemory = BackBuffer->BitmapMemory;
-    }
-
-    if(ScreenBuffer->glData != &BackBuffer->glData){
-        ScreenBuffer->glData != &BackBuffer->glData;
-    }
-
-    if(ScreenBuffer->Bitmapinfo != &BackBuffer->Bitmapinfo){
-        ScreenBuffer->Bitmapinfo = &BackBuffer->Bitmapinfo;
-    }
-    if(ScreenBuffer->BitmapHandle = &BackBuffer->BitmapHandle){
-        ScreenBuffer->BitmapHandle = &BackBuffer->BitmapHandle;
-    }
     
-    ScreenBuffer->BitmapWidth = BackBuffer->BitmapWidth;
-    ScreenBuffer->BitmapHeight = BackBuffer->BitmapHeight;
-    ScreenBuffer->Pitch = BackBuffer->Pitch;
+    ScreenBuffer->BitmapWidth = ScreenBuffer->BitmapWidth!=BackBuffer->BitmapWidth?BackBuffer->BitmapWidth:printf("W didn't change\n");
+    ScreenBuffer->BitmapHeight = ScreenBuffer->BitmapHeight!=BackBuffer->BitmapHeight?BackBuffer->BitmapHeight:printf("H didn't change\n");
+    ScreenBuffer->Pitch = ScreenBuffer->Pitch!=BackBuffer->Pitch?BackBuffer->Pitch:printf("Pitch didn't change\n");
 
+        ScreenBuffer->glData = BackBuffer->glData;
+        //ScreenBuffer->Bitmapinfo = BackBuffer->Bitmapinfo;
+//
+        //if(ScreenBuffer->BitmapHandle != BackBuffer->BitmapHandle && BackBuffer->BitmapHandle != NULL){
+        //ScreenBuffer->BitmapHandle = BackBuffer->BitmapHandle;
+    //}
+
+        ScreenBuffer->BitmapMemory = BackBuffer->BitmapMemory;
 }
 
 // void LoadTileMap(){

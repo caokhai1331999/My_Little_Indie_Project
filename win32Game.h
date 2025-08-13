@@ -15,6 +15,7 @@ struct win32Dimension{
     int Height{720};
     int Width{1280};
 }Dimens;
+
 struct OpenGLData{
     unsigned int VAOs;
     unsigned int VBO;
@@ -22,7 +23,7 @@ struct OpenGLData{
     unsigned int ProgramID;
     
     HGLRC openglRC;
-    GLuint textureHandle;
+    unsigned int* textureHandle;
 };
 
 struct Win32_OffScreen_Buffer{  
@@ -34,22 +35,21 @@ struct Win32_OffScreen_Buffer{
     int BitmapHeight;
     int Pitch;
 
-    bool transferNeed;
-    
+    bool transferNeed;    
     OpenGLData glData;
     const int BytesPerPixel = 4;
 };
 
 struct Win32_Front_Buffer{  
-    BITMAPINFO* Bitmapinfo;
-    HBITMAP* BitmapHandle;
+    //BITMAPINFO Bitmapinfo;
+    //HBITMAP BitmapHandle;
     void* BitmapMemory;
 
     int BitmapWidth;
     int BitmapHeight;
     int Pitch;
     
-    OpenGLData* glData;
+    OpenGLData glData;
 };
 
 global_variable bool  GlobalRunning;
@@ -59,20 +59,21 @@ global_variable HDC DeviceContext;
 // global_variable int  XOffset{0}, YOffset{0};
 global_variable Win32_OffScreen_Buffer BackBuffer = {};
 global_variable Game_State State = {};
-
+global_variable BMP_content* BMPContent;
 const global_variable int Height = 720;
 const global_variable int Width = 1280;
 
 void GetWindowDimension(HWND Window);
 void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Height);
 
-void RenderSplendidGradient(Win32_Front_Buffer* OBuffer, BMP_content* BMPContent, int XOffset, int YOffset);
+//void RenderSplendidGradient(Win32_Front_Buffer* OBuffer, BMP_content* BMPContent, int XOffset, int YOffset);
+void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPContent, int XOffset, int YOffset);
 void Win32DisplayBufferWindow (HDC DeviceContext, int WindowWidth, int WindowHeight, Win32_OffScreen_Buffer* OBuffer);
 
 void GameUpdateAndRender(Game_Memory* Memory = nullptr, BMP_content* BMPContent = nullptr ,Game_Input* Input = nullptr, Game_State* State = nullptr ,Win32_Front_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr, HDC DeviceContextt = NULL);
 
 void OpenConsole();
-bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, uint32* imageContent);
+bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, BMP_content* bmpContent);
 
 void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
 

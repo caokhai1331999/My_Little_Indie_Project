@@ -187,13 +187,18 @@ void checkCompileErrors(GLuint shader, char* type)
 };
 
 void setupGLprogram(Win32_Front_Buffer* buffer, Shader* vshader, Shader* fshader){
-    if(buffer->glData->ProgramID == 0){
-        buffer->glData->ProgramID = glCreateProgram();
+    if(buffer->glData.ProgramID == 0){
+        buffer->glData.ProgramID = glCreateProgram();
     }
-    glAttachShader(buffer->glData->ProgramID, vshader->shaderID);
-    glAttachShader(buffer->glData->ProgramID, fshader->shaderID);
-    glLinkProgram(buffer->glData->ProgramID);
 
+    glAttachShader(buffer->glData.ProgramID, vshader->shaderID);
+    glAttachShader(buffer->glData.ProgramID, fshader->shaderID);
+    glLinkProgram(buffer->glData.ProgramID);
+
+    if(glGetError() != GL_NO_ERROR){
+    printf("OpenGL Error: %d\n", glGetError());
+    };
+    
     GLint success;
     GLchar infoLog[1024];
     char* type = "vertex";
@@ -212,4 +217,7 @@ void setupGLprogram(Win32_Front_Buffer* buffer, Shader* vshader, Shader* fshader
         glGetProgramInfoLog(fshader->shaderID, 1024, NULL, infoLog);
         printf("ERROR::PROGRAM_LINKING_ERROR of type: %s\n %s", type, infoLog);
     }
+
+    printf("Succeed using program ID:%d, vshader:%d, fshader:%d\n", buffer->glData.ProgramID, vshader->shaderID, fshader->shaderID);
+
 }
