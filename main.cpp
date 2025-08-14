@@ -327,11 +327,13 @@ int CALLBACK WinMain
                 loadShader(&fshader, "shader.fs", (VertexType)fragment);
 
                 copyBufferData(&BackBuffer, &ScreenBuffer);
+                ScreenBuffer.glData = BackBuffer.glData;
                 setupGLprogram(&ScreenBuffer, &vshader, &fshader);
 
+                useProgram(ScreenBuffer.glData.ProgramID);
                 glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
-                setInt(&fshader, "Texture", BackBuffer.glData.textureHandle[0]);
-                printf("texture id:%d\n", BackBuffer.glData.textureHandle[0]);
+                setInt(ScreenBuffer.glData.ProgramID, "texture1", ScreenBuffer.glData.textureHandle[0]);
+                printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
                 // =============================================
                 LARGE_INTEGER LastCounter;
                 QueryPerformanceCounter(&LastCounter);
@@ -394,8 +396,8 @@ int CALLBACK WinMain
 
                 //DeviceContext = GetDC(Window);
                 // use shader program
-                printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
-                use(&ScreenBuffer.glData);
+                //printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
+
                 glBindVertexArray(ScreenBuffer.glData.VAOs);
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
 

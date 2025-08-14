@@ -36,21 +36,21 @@ void loadShader(Shader* shader, char* name, VertexType type);
 char* loadCurrentErr();
 
 // Set Int, bool, float and Vector
-void setVec2(Shader* shader, const char* name, glm::vec2 &value);
-void setVec2(Shader* shader, const char* name, float x, float y);
+void setVec2(GLuint programID, const char* name, glm::vec2 &value);
+void setVec2(GLuint programID, const char* name, float x, float y);
 
-void setVec3(Shader* shader, const char* name, glm::vec3 &value);
-void setVec3(Shader* shader, const char* name, float x, float y, float z);
+void setVec3(GLuint programID, const char* name, glm::vec3 &value);
+void setVec3(GLuint programID, const char* name, float x, float y, float z);
 
-void setBool(Shader* shader, const char* name, bool value);
-void setInt(Shader* shader, const char* name, int value);
+void setBool(GLuint programID, const char* name, bool value);
+void setInt(GLuint programID, const char* name, int value);
 
 // Set Matrix
-void setMat3(Shader* shader, const char* name, glm::mat3 &value);
-void setMat4(Shader* shader, const char* name, glm::mat4 &value);
+void setMat3(GLuint programID, const char* name, glm::mat3 &value);
+void setMat4(GLuint programID, const char* name, glm::mat4 &value);
 
 // Use the shader
-void use(OpenGLData* glData);
+void useProgram(GLuint programID);
 
 // Attaching shader to program
 void setupGLprogram(Win32_Front_Buffer* buffer, Shader* vshader, Shader* fshader);

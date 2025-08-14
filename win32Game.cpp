@@ -287,7 +287,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)0);
                 glEnableVertexAttribArray(0);
                 //  index, size, type, .., stride, pointer
-                glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)(6*sizeof(float)));
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)(7*sizeof(float)));
                 glEnableVertexAttribArray(1);
                 
                 // NOTE: To here we done assigned CubeVerticles data to VAOs and VBO
@@ -304,13 +304,13 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
                 glGenerateMipmap(GL_TEXTURE_2D);
                 
-                if(FBuffer->BitmapMemory != NULL){
+                if(OBuffer->BitmapMemory != NULL){
                     printf("We have Image content but somehow it wasn't shown on screen\n");                    
                 } else {
                     printf("Image content is NULL\n");
                 }
 
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth/2, OBuffer->BitmapHeight/2, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
 
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -427,6 +427,7 @@ void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* Scre
     ScreenBuffer->BitmapHeight = ScreenBuffer->BitmapHeight!=BackBuffer->BitmapHeight?BackBuffer->BitmapHeight:printf("H didn't change\n");
     ScreenBuffer->Pitch = ScreenBuffer->Pitch!=BackBuffer->Pitch?BackBuffer->Pitch:printf("Pitch didn't change\n");
 
+    // Why if I don't pass this type of data the app will collapse as the conflict of memory
         ScreenBuffer->glData = BackBuffer->glData;
         //ScreenBuffer->Bitmapinfo = BackBuffer->Bitmapinfo;
 //

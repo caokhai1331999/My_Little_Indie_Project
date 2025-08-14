@@ -123,43 +123,43 @@ char* loadCurrentErr(){
     return errorContent;
 }
 
-void use(OpenGLData* glData){
-    glUseProgram(glData->ProgramID);
+void useProgram(GLuint programID){
+    glUseProgram(programID);
 }
 
 // Set Int, bool,
-void setBool(Shader* shader, const char* name, const bool value){
-    glUniform1i(glGetUniformLocation(shader->shaderID, name), (int)value);
+void setBool(GLuint programID, const char* name, const bool value){
+    glUniform1i(glGetUniformLocation(programID, name), (int)value);
 };
 
-void setInt(Shader* shader, const char* name, const int value){
-    glUniform1i(glGetUniformLocation(shader->shaderID, name), value);
+void setInt(GLuint programID, const char* name, const int value){
+    glUniform1i(glGetUniformLocation(programID, name), value);
 };
 
 //Vector 2nd argument is number of vector
-void setVec2(Shader* shader, const char* name, const  glm::vec2 &value){
-    glUniform2fv(glGetUniformLocation(shader->shaderID, name), 1, &value[0]);
+void setVec2(GLuint programID, const char* name, const  glm::vec2 &value){
+    glUniform2fv(glGetUniformLocation(programID, name), 1, &value[0]);
 }
 
-void setVec2(Shader* shader, const char* name, float x, float y){
+void setVec2(GLuint programID, const char* name, float x, float y){
     glm::vec2 value = glm::vec2(x, y);
-    glUniform2f(glGetUniformLocation(shader->shaderID, name), x, y);
+    glUniform2f(glGetUniformLocation(programID, name), x, y);
 }
 
-void setVec3(Shader* shader, const char* name, const glm::vec3 &value){
-    glUniform3fv(glGetUniformLocation(shader->shaderID, name), 1, &value[0]);
+void setVec3(GLuint programID, const char* name, const glm::vec3 &value){
+    glUniform3fv(glGetUniformLocation(programID, name), 1, &value[0]);
 }
-void setVec3(Shader* shader, const char* name, float x, float y, float z){
-    glUniform3f(glGetUniformLocation(shader->shaderID, name), x, y, z);
+void setVec3(GLuint programID, const char* name, float x, float y, float z){
+    glUniform3f(glGetUniformLocation(programID, name), x, y, z);
 }
 
 // Set Matrix, 3rd is GL_Boolean transpose
-void setMat3(Shader* shader, const char* name, const glm::mat3 &value){
-    glUniformMatrix3fv(glGetUniformLocation(shader->shaderID, name), 1, GL_FALSE, &value[0][0]);
+void setMat3(GLuint programID, const char* name, const glm::mat3 &value){
+    glUniformMatrix3fv(glGetUniformLocation(programID, name), 1, GL_FALSE, &value[0][0]);
 };
 
-void setMat4(Shader* shader, const char* name, const glm::mat4 &value){
-    glUniformMatrix4fv(glGetUniformLocation(shader->shaderID, name), 1, GL_FALSE, &value[0][0]);
+void setMat4(GLuint programID, const char* name, const glm::mat4 &value){
+    glUniformMatrix4fv(glGetUniformLocation(programID, name), 1, GL_FALSE, &value[0][0]);
 };
 
 void checkCompileErrors(GLuint shader, char* type)
@@ -187,37 +187,18 @@ void checkCompileErrors(GLuint shader, char* type)
 };
 
 void setupGLprogram(Win32_Front_Buffer* buffer, Shader* vshader, Shader* fshader){
-    if(buffer->glData.ProgramID == 0){
-        buffer->glData.ProgramID = glCreateProgram();
-    }
+    buffer->glData.ProgramID = glCreateProgram();
 
     glAttachShader(buffer->glData.ProgramID, vshader->shaderID);
     glAttachShader(buffer->glData.ProgramID, fshader->shaderID);
     glLinkProgram(buffer->glData.ProgramID);
 
+    checkCompileErrors(buffer->glData.ProgramID, "PROGRAM");
+    
     if(glGetError() != GL_NO_ERROR){
     printf("OpenGL Error: %d\n", glGetError());
     };
-    
-    GLint success;
-    GLchar infoLog[1024];
-    char* type = "vertex";
-    glGetProgramiv(vshader->shaderID, GL_LINK_STATUS, &success);
 
-    if (!success)
-    {
-        glGetProgramInfoLog(vshader->shaderID, 1024, NULL, infoLog);
-        printf("ERROR::PROGRAM_LINKING_ERROR of type: %s\n %s", type, infoLog);
-    }
-
-    glGetProgramiv(fshader->shaderID, GL_LINK_STATUS, &success);
-    type = "fragment";
-    if (!success)
-    {
-        glGetProgramInfoLog(fshader->shaderID, 1024, NULL, infoLog);
-        printf("ERROR::PROGRAM_LINKING_ERROR of type: %s\n %s", type, infoLog);
-    }
-
-    printf("Succeed using program ID:%d, vshader:%d, fshader:%d\n", buffer->glData.ProgramID, vshader->shaderID, fshader->shaderID);
-
+    glDeleteShader(vshader->shaderID);
+    glDeleteShader(fshader->shaderID);
 }
