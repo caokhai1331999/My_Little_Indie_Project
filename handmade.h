@@ -200,6 +200,7 @@ struct BMP_content{
     int32 Width;
     int32 Height;
     uint32* ImageContent;
+    void* XImageContent;
 };
 
 struct Game_State{

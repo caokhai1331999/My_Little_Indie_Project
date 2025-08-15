@@ -214,11 +214,13 @@ BMP_content* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
          result->Width = HeadResult->Width;
          result->Height = HeadResult->Height;
 
+         
+         
          uint32* SourceDest = pixels;
 //NOTE: For OpenGL this original arranging order work but not for passing directly to window graphic
          
-/*         
-
+         
+/*
          //Why Height is inside the width loop
          for(uint32 Y = 0; Y < HeadResult->Width; ++Y){
              for(uint32 X = 0; X < HeadResult->Height; ++X){

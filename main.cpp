@@ -31,12 +31,10 @@ LRESULT CALLBACK MainWindowCallBack(
             //NOTE: Whenever the window is resized, this function capture the size
              //of the new window and update a new proper DIB for that
              //DIB is a table where store BIT color infor
-           
            Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
            if(!BackBuffer.transferNeed){
                 BackBuffer.transferNeed = true;
             }
-
             OutputDebugStringA("WM_SIZE\n");
         }break;
         
@@ -159,19 +157,11 @@ LRESULT CALLBACK MainWindowCallBack(
 
              BeginPaint(Window, NULL);
             // Start to save bit drawing data to the current HDC
-             DeviceContext = GetDC(Window);
-             glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
-             glClear(GL_COLOR_BUFFER_BIT);
-             glDrawArrays(GL_TRIANGLES, 0, 6);
-
-             //glDrawElements(GL_TRIANGLES, 2, GL_UNSIGNED_BYTE, &BackBuffer.glData.VAOs);
-             SwapBuffers(DeviceContext);
-             
-             if(glGetError() != GL_NO_ERROR){
-                 printf("OpenGL Error: %d\n", glGetError());
-             };
-
-             ReleaseDC(Window, DeviceContext);
+             HDC tempDC = GetDC(Window);
+             RenderSplendidGradient(&BackBuffer, BMPContent, 0, 0);
+             Win32DisplayBufferWindow(tempDC, Dimens.Width, Dimens.Height, &BackBuffer);
+             SwapBuffers(tempDC);
+             ReleaseDC(Window, tempDC);
              EndPaint(Window, NULL);
 
              OutputDebugStringA("WM_PAINT\n");
@@ -328,11 +318,18 @@ int CALLBACK WinMain
 
                 copyBufferData(&BackBuffer, &ScreenBuffer);
                 ScreenBuffer.glData = BackBuffer.glData;
-                setupGLprogram(&ScreenBuffer, &vshader, &fshader);
 
-                useProgram(ScreenBuffer.glData.ProgramID);
+                ScreenBuffer.glData.ProgramID = setupGLprogram(&vshader, &fshader);
+
+                if(glIsProgram(ScreenBuffer.glData.ProgramID)){
+                    useProgram(ScreenBuffer.glData.ProgramID);
+                } else {
+                    printf("NO program object created before\n");
+                }
+                
                 glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
-                setInt(ScreenBuffer.glData.ProgramID, "texture1", ScreenBuffer.glData.textureHandle[0]);
+                //setInt(ScreenBuffer.glData.ProgramID, "texture1", ScreenBuffer.glData.textureHandle[0]);
+                glUniform1i(glGetUniformLocation(ScreenBuffer.glData.ProgramID, "texture1"), ScreenBuffer.glData.textureHandle[0]);
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
                 // =============================================
                 LARGE_INTEGER LastCounter;
@@ -397,10 +394,20 @@ int CALLBACK WinMain
                 //DeviceContext = GetDC(Window);
                 // use shader program
                 //printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
-
-                glBindVertexArray(ScreenBuffer.glData.VAOs);
+                DeviceContext = GetDC(Window);
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
+                glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+                //glDrawElements(GL_TRIANGLES, 2, GL_UNSIGNED_BYTE, &BackBuffer.glData.VAOs);
+             
+                if(glGetError() != GL_NO_ERROR){
+                    printf("OpenGL Error: %d\n", glGetError());
+                };
 
+                //ReleaseDC(Window, DeviceContext);
+                glBindVertexArray(ScreenBuffer.glData.VAOs);
+                glDrawArrays(GL_TRIANGLES, 0, 6);
+                SwapBuffers(DeviceContext);
 
                 //if(glGetError() != GL_NO_ERROR){
                     //printf("OpenGL Error: %d\n", glGetError());

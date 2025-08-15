@@ -71,16 +71,17 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPCon
     // While pitch is data length of everyline of bitmap
     int32 BlitWidth =  BMPContent->Width;
     int32 BlitHeight = BMPContent->Height;
+    int32 WidthOffset = 0;
     int32 ImagePitch = 4 * BlitWidth;    
 
     int32 Height = OBuffer->BitmapHeight;
     int32 Width =  OBuffer->BitmapWidth;
 
     //BUG right here
-    //if(BlitWidth > Width){
-        //BlitWidth = Width;
-    //}
-
+    if(BlitWidth > Width){
+        WidthOffset = BlitWidth - Width;
+        BlitWidth = Width;
+    }
 
     if(BlitHeight > Height){
         BlitHeight = Height;
@@ -114,6 +115,7 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPCon
             // Pixel :
             // ImagePointer :
             // Why Pixel appear in uint8 not uint32
+
             *Pixel++ = *imagePixel++;
         }
         // Instead of manually move row pointer every y axis (by add it to the pitch)
@@ -298,18 +300,19 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 //printf("Succeed create OpenGL Context\n");
                 OBuffer->glData.textureHandle = new unsigned int();
                 glGenTextures(1, OBuffer->glData.textureHandle);
+                glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle[0]);
 // OBuffer->glData.textureHandle is the name of the texture
                 //last argument This is where point to the image data
                 // Why this doesn't work
                 glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
-                glGenerateMipmap(GL_TEXTURE_2D);
                 
                 if(OBuffer->BitmapMemory != NULL){
                     printf("We have Image content but somehow it wasn't shown on screen\n");                    
                 } else {
+                    RenderSplendidGradient(OBuffer, BMPContent, 0, 0);                    
                     printf("Image content is NULL\n");
                 }
-
+// NOTE: Focus on this
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
 
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -317,7 +320,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-                glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle[0]);
+                glGenerateMipmap(GL_TEXTURE_2D);
                 if(OBuffer->glData.textureHandle!=NULL){
                     printf("Texture name is: %d\n", OBuffer->glData.textureHandle[0]);
                 } else {

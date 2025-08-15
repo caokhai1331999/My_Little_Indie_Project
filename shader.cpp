@@ -1,4 +1,4 @@
-/* ========================================================================
+ /* ========================================================================
    $File: $
    $Date: $
    $Revision: $
@@ -166,39 +166,50 @@ void checkCompileErrors(GLuint shader, char* type)
 {
     GLint success;
     GLchar infoLog[1024];
+    int infoLength;
     if (type != "PROGRAM")
     {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-        if (!success)
+        glGetProgramiv(shader, GL_INFO_LOG_LENGTH, &infoLength);
+        if (!success )
         {
-            glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+            glGetShaderInfoLog(shader, infoLength, NULL, infoLog);
             printf("ERROR::SHADER_COMPILATION_ERROR of type: %s\n %s", type, infoLog);
         }
     }
     else
     {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
-        if (!success)
+        glGetProgramiv(shader, GL_INFO_LOG_LENGTH, &infoLength);        
+        if (!success|| (infoLength > 0))
         {
-            glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+            glGetProgramInfoLog(shader, infoLength, NULL, infoLog);
             printf("ERROR::PROGRAM_LINKING_ERROR of type: %s\n %s", type, infoLog);
         }
     }
 };
 
-void setupGLprogram(Win32_Front_Buffer* buffer, Shader* vshader, Shader* fshader){
-    buffer->glData.ProgramID = glCreateProgram();
+GLuint setupGLprogram(Shader* vshader, Shader* fshader){
+    //buffer->glData.ProgramID = glCreateProgram();
+    unsigned int tempProgramID = glCreateProgram();
 
-    glAttachShader(buffer->glData.ProgramID, vshader->shaderID);
-    glAttachShader(buffer->glData.ProgramID, fshader->shaderID);
-    glLinkProgram(buffer->glData.ProgramID);
+    glAttachShader(tempProgramID, vshader->shaderID);
+    glAttachShader(tempProgramID, fshader->shaderID);
+    glLinkProgram(tempProgramID);
 
-    checkCompileErrors(buffer->glData.ProgramID, "PROGRAM");
+    checkCompileErrors(vshader->shaderID, "VERTEX");
+    checkCompileErrors(fshader->shaderID, "FRAGMENT");
+    checkCompileErrors(tempProgramID, "PROGRAM");
     
     if(glGetError() != GL_NO_ERROR){
     printf("OpenGL Error: %d\n", glGetError());
     };
 
+    glDetachShader(tempProgramID, vshader->shaderID); 
+    glDetachShader(tempProgramID, fshader->shaderID); 
+
     glDeleteShader(vshader->shaderID);
     glDeleteShader(fshader->shaderID);
+
+    return tempProgramID;
 }
