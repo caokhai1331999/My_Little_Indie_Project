@@ -200,8 +200,8 @@ void DEBUGFreeFileMemory(void* memory){
     VirtualFree(memory, 0, MEM_RELEASE);
 }
 
-BMP_content* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
-    BMP_content* result = new BMP_content();
+imagee_content* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
+    imagee_content* result = new imagee_content();
     ReadResult = DEBUGReadFileWhole(filename);
      if(ReadResult->Size != 0){
 

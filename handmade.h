@@ -196,11 +196,10 @@ struct Game_Memory{
     void* TransientStorage;
 };
 
-struct BMP_content{
+struct imagee_content{
     int32 Width;
     int32 Height;
     uint32* ImageContent;
-    void* XImageContent;
 };
 
 struct Game_State{
@@ -217,7 +216,8 @@ real32 saferatio1(real32 numerator, real32 divisor);
 
 void* PlatformLoadFile(char* FileName);
 debug_read_file_result* DEBUGReadFileWhole(char* filename);
-BMP_content* DEBUGReadBMP(char* filename, debug_read_file_result* result);
+imagee_content* DEBUGReadBMP(char* filename, debug_read_file_result* result);
+//BMP_content* DEBUGReadJPG(char* filename, debug_read_file_result* result);
 bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory);
 void DEBUGFreeFileMemory(void* memory);
 

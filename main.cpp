@@ -34,8 +34,8 @@ LRESULT CALLBACK MainWindowCallBack(
            Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
            if(!BackBuffer.transferNeed){
                 BackBuffer.transferNeed = true;
-            }
-            OutputDebugStringA("WM_SIZE\n");
+            }           
+           OutputDebugStringA("WM_SIZE\n");
         }break;
         
         case WM_CLOSE:
@@ -137,32 +137,23 @@ LRESULT CALLBACK MainWindowCallBack(
         
         case WM_PAINT:            
         {
-             //PAINTSTRUCT Paint;
-             //DeviceContext = BeginPaint(Window, &Paint);
-//
-             //int X = Paint.rcPaint.left;
-             //int Y = Paint.rcPaint.top;
-            //
-             //int width = Paint.rcPaint.right - Paint.rcPaint.left;
-             //int height = Paint.rcPaint.bottom - Paint.rcPaint.top;
-//
-             //local_persist DWORD Operation = WHITENESS;
-//
-             //if (Operation == WHITENESS) {
-                 //Operation = BLACKNESS;
-             //}else {
-                 //Operation = WHITENESS;
-             //}
-             //EndPaint(Window, &Paint);
-
+ 
              BeginPaint(Window, NULL);
-            // Start to save bit drawing data to the current HDC
              HDC tempDC = GetDC(Window);
-             RenderSplendidGradient(&BackBuffer, BMPContent, 0, 0);
+             // Start to save bit drawing data to the current HDC
+             RenderSplendidGradient(&BackBuffer, NULL, BMPContent, 0, 0, 4);
              Win32DisplayBufferWindow(tempDC, Dimens.Width, Dimens.Height, &BackBuffer);
-             SwapBuffers(tempDC);
-             ReleaseDC(Window, tempDC);
-             EndPaint(Window, NULL);
+
+                if(glGetError() != GL_NO_ERROR){
+                    printf("OpenGL Error: %d\n", glGetError());
+                };
+
+                //glBindVertexArray(BackBuffer.glData.VAOs);
+                //glDrawArrays(GL_TRIANGLES, 0, 6);
+                SwapBuffers(tempDC);
+            
+                EndPaint(Window, NULL);
+                ReleaseDC(Window, tempDC);
 
              OutputDebugStringA("WM_PAINT\n");
         }break;
@@ -298,18 +289,20 @@ int CALLBACK WinMain
             game_memory.TransientStorage = ((uint8*)game_memory.PermanentStorage + game_memory.PermanentStorageSize);
             //======================================================
             debug_read_file_result result;
+            debug_read_file_result result2;
             if(game_memory.TransientStorage && game_memory.PermanentStorage){
                 //printf("About to read image\n");
                 // NOTE: ???? Why when I change to different bmp image it crashed
                 //byte order: AA BB GG RR bottom up                  
                 BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
+                JPGContent = DEBUGReadJPG("Harry and Accomplices.jpg", &result2);
                 //OpenGL part
                 Win32_Front_Buffer ScreenBuffer = {};
-                RenderSplendidGradient(&BackBuffer, BMPContent, 0, 0);
+                RenderSplendidGradient(&BackBuffer, NULL, BMPContent, 0, 0, 4);
 
 // Cause the ScreenData will be deleted out of the loop so
                 // We have to assign address of memory and glData to
-                InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
+                InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
                 Shader vshader;
                 Shader fshader;
 
@@ -328,8 +321,8 @@ int CALLBACK WinMain
                 }
                 
                 glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
-                //setInt(ScreenBuffer.glData.ProgramID, "texture1", ScreenBuffer.glData.textureHandle[0]);
-                glUniform1i(glGetUniformLocation(ScreenBuffer.glData.ProgramID, "texture1"), ScreenBuffer.glData.textureHandle[0]);
+                setInt(ScreenBuffer.glData.ProgramID, "texture1_", ScreenBuffer.glData.textureHandle[0]);
+                //glUniform1i(glGetUniformLocation(ScreenBuffer.glData.ProgramID, "texture1"), ScreenBuffer.glData.textureHandle[0]);
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
                 // =============================================
                 LARGE_INTEGER LastCounter;
@@ -387,24 +380,23 @@ int CALLBACK WinMain
                 // Attach VAO
 
                 if(BackBuffer.transferNeed){
-                    copyBufferData(&BackBuffer, &ScreenBuffer);
-                    BackBuffer.transferNeed = false;
+                    int count = 0;
+                    while (count < 20){
+                        count++;
+                    };
+                    if (count > 19){
+                        copyBufferData(&BackBuffer, &ScreenBuffer);
+                        BackBuffer.transferNeed = false;                        
+                    };
                 }
 
-                //DeviceContext = GetDC(Window);
+                DeviceContext = GetDC(Window);
                 // use shader program
                 //printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
-                DeviceContext = GetDC(Window);
+                //DeviceContext = GetDC(Window);
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
-                glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
-                glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-                //glDrawElements(GL_TRIANGLES, 2, GL_UNSIGNED_BYTE, &BackBuffer.glData.VAOs);
-             
-                if(glGetError() != GL_NO_ERROR){
-                    printf("OpenGL Error: %d\n", glGetError());
-                };
-
-                //ReleaseDC(Window, DeviceContext);
+                glClearColor(1.0f, 1.0f, 0.75f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT);             
                 glBindVertexArray(ScreenBuffer.glData.VAOs);
                 glDrawArrays(GL_TRIANGLES, 0, 6);
                 SwapBuffers(DeviceContext);

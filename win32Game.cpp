@@ -47,7 +47,8 @@ void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Heigh
     // NOTE: The BitmapWidth change every time we resize the window
     OBuffer->BitmapWidth = Width;
     OBuffer->BitmapHeight = Height;
-    OBuffer->Pitch = OBuffer->BytesPerPixel * OBuffer->BitmapWidth;
+    //OBuffer->Pitch = OBuffer->BytesPerPixel * OBuffer->BitmapWidth;
+    OBuffer->Pitch = 4 * OBuffer->BitmapWidth;
     
     int BitMapMemorySize;
 
@@ -64,8 +65,8 @@ void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Heigh
 
 }
 
-//void RenderSplendidGradient(Win32_Front_Buffer* OBuffer, BMP_content* BMPContent, int XOffset, int YOffset) {
-void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPContent, int XOffset, int YOffset) {
+//void RenderSplendidGradient(Win32_Front_Buffer* OBuffer, imagee_content* BMPContent, int XOffset, int YOffset) {
+void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* BMPContent, int XOffset, int YOffset, int ByteCount) {
     // RR GG BB
     // Row is a pointer to every line of bitmapMemory
     // While pitch is data length of everyline of bitmap
@@ -74,9 +75,17 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPCon
     int32 WidthOffset = 0;
     int32 ImagePitch = 4 * BlitWidth;    
 
-    int32 Height = OBuffer->BitmapHeight;
-    int32 Width =  OBuffer->BitmapWidth;
+    int32 Height;
+    int32 Width;
 
+    if (OBuffer!=NULL){
+        Height = OBuffer->BitmapHeight;
+        Width =  OBuffer->BitmapWidth;
+    } else {
+        Height = FBuffer->BitmapHeight;
+        Width =  FBuffer->BitmapWidth;        
+    }
+    
     //BUG right here
     if(BlitWidth > Width){
         WidthOffset = BlitWidth - Width;
@@ -88,11 +97,16 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPCon
     }
     
     // We take memory from BitmapMemory of main Bufer to write on it
-    uint8* Row = ((uint8 *)OBuffer->BitmapMemory);
+    uint8* Row;
+    if (OBuffer!=NULL){
+        Row = ((uint8 *)OBuffer->BitmapMemory);
+    } else {
+        Row = ((uint8 *)FBuffer->BitmapMemory);
+    }
     //Change the image row order upside down
     uint8* imageRow = (uint8*)BMPContent->ImageContent;
 // ???? What todo if the image is bigger than the 
-    imageRow += 4 * ((BlitHeight) * BlitWidth);
+    imageRow += 4 * ((BlitHeight - 1) * BlitWidth);
 
     for (int32 Y{0}; Y < BlitHeight; Y++) {
         uint32* Pixel = (uint32 *)Row;
@@ -126,9 +140,13 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, BMP_content* BMPCon
 
         // And this is for passing directly to the window (RIGHT)
         imageRow-=ImagePitch;
-        Row+=OBuffer->Pitch;
+        if(OBuffer != NULL){
+            Row+=OBuffer->Pitch;
+        } else {
+            Row+=FBuffer->Pitch;            
+        }
         //NOTE: This incidentally produce right pixel order
-    }
+    }        
 }
 
 
@@ -154,7 +172,7 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
 */
 }
 
-bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, BMP_content* bmpContent){
+bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* bmpContent){
     // first device context gotten from current window
     // printf("Start to init OpenGL\n");
     HDC windowDC = GetDC(window);
@@ -213,10 +231,10 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 float trianglesVerticles [] = {
                     //FRONT FACE
                    -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
-                    0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
-                   -0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f,
+                    0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,
+                   -0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
                     0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,
-                    0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+                    0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
                    -0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f
                 };
              
@@ -224,59 +242,59 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                     // CW
                     // positions          // normals           // texture coords
                     //BACK FACE
-                   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,// one stride  
-                    0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-                    0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-                    0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-                   -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,     
-                   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+                   -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,// one stride  
+                    1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+                    1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+                    1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+                   -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,     
+                   -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
                     //FRONT FACE
-                   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-                    0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-                    0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-                    0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-                   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-                   -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+                   -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+                    1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+                    1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+                    1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+                   -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+                   -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
                     // LEFT FACE
-                   -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-                   -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-                   -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-                   -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-                   -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-                   -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+                   -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+                   -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+                   -1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+                   -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+                   -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+                   -1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
                     // RIGHT FACE
-                    0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-                    0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-                    0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-                    0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-                    0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-                    0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+                    1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+                    1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+                    1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+                    1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+                    1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+                    1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
                     // BOTTOM FACE
-                   -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-                    0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-                    0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-                    0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-                   -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-                   -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+                   -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+                    1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+                    1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+                    1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+                   -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+                   -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
                     // TOP FACE
-                   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-                    0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-                    0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-                    0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-                   -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,    
-                   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+                   -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+                    1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+                    1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+                    1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+                   -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,    
+                   -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
                 };
             
                 float PlaneVerticles[] = {
                     // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
                     //        x,     y,           z
-                   -0.5f, -0.5f,  5.0f,  2.0f, 0.0f, // Each verticle
-                    5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
-                   -0.5f, -0.5f, -5.0f,  0.0f, 2.0f,
+                   -1.0f, -1.0f,  5.0f,  2.0f, 0.0f, // Each verticle
+                    5.0f, -1.0f,  5.0f,  0.0f, 0.0f,
+                   -1.0f, -1.0f, -5.0f,  0.0f, 2.0f,
 
-                    5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-                   -0.5f, -0.5f, -5.0f,  0.0f, 2.0f,
-                    5.0f, -0.5f, -5.0f,  2.0f, 2.0f			        
+                    5.0f, -1.0f,  5.0f,  2.0f, 0.0f,
+                   -1.0f, -1.0f, -5.0f,  0.0f, 2.0f,
+                    5.0f, -1.0f, -5.0f,  2.0f, 2.0f			        
                 };
 
                 glGenBuffers(1, &OBuffer->glData.VBO);
@@ -289,8 +307,8 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)0);
                 glEnableVertexAttribArray(0);
                 //  index, size, type, .., stride, pointer
-                glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)(7*sizeof(float)));
-                glEnableVertexAttribArray(1);
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)(6*sizeof(float)));
+                glEnableVertexAttribArray(2);
                 
                 // NOTE: To here we done assigned CubeVerticles data to VAOs and VBO
                 // We will call bindbuffer/vertexArray whenever before glDrawArray
@@ -309,18 +327,30 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 if(OBuffer->BitmapMemory != NULL){
                     printf("We have Image content but somehow it wasn't shown on screen\n");                    
                 } else {
-                    RenderSplendidGradient(OBuffer, BMPContent, 0, 0);                    
+                    RenderSplendidGradient(OBuffer, NULL, BMPContent, 0, 0, 3);                    
                     printf("Image content is NULL\n");
                 }
 // NOTE: Focus on this
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
 
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
+ 
+                glPixelStorei(GL_UNPACK_ROW_LENGTH, OBuffer->Pitch / 4);
+                //
+                glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle[0]);
+                glGenerateMipmap(GL_TEXTURE_2D);
+                
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-                glGenerateMipmap(GL_TEXTURE_2D);
+
+                GLenum err = glGetError();
+
+                if (err != GL_NO_ERROR) {
+                    printf("OpenGL Error after glTexImage2D: %x\n", err);
+                }
+
                 if(OBuffer->glData.textureHandle!=NULL){
                     printf("Texture name is: %d\n", OBuffer->glData.textureHandle[0]);
                 } else {
@@ -330,9 +360,11 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 // new version of OPENGL
                 //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-                glClearColor(1.0f, 0.5f, 0.75f, 1.0f);
+                glClearColor(1.0f, 1.0f, 0.75f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT);
-                glEnable(GL_TEXTURE_2D);
+
+                // Deprecated
+                //glEnable(GL_TEXTURE_2D);
 
                 const GLubyte* ver = glGetString(GL_VERSION);
                 if (ver)
@@ -379,7 +411,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
 }
 
 
-void GameUpdateAndRender(Game_Memory* Memory, BMP_content* BMPContent ,Game_Input* Input, Game_State* State, Win32_Front_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContextt){
+void GameUpdateAndRender(Game_Memory* Memory, imagee_content* BMPContent ,Game_Input* Input, Game_State* State, Win32_Front_Buffer* OBuffer,  Game_Sound_OutPut* SoundBuffer, HDC DeviceContextt){
 
     if(!Memory->IsInitialized){
         State->Hz = 256;
