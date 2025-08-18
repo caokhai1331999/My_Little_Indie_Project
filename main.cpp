@@ -295,14 +295,15 @@ int CALLBACK WinMain
                 // NOTE: ???? Why when I change to different bmp image it crashed
                 //byte order: AA BB GG RR bottom up                  
                 BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
-                JPGContent = DEBUGReadJPG("Harry and Accomplices.jpg", &result2);
+                //JPGContent = DEBUGReadJPG("Harry and Accomplices.jpg", &result2);
                 //OpenGL part
                 Win32_Front_Buffer ScreenBuffer = {};
                 RenderSplendidGradient(&BackBuffer, NULL, BMPContent, 0, 0, 4);
 
 // Cause the ScreenData will be deleted out of the loop so
                 // We have to assign address of memory and glData to
-                InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
+                //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
+                InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
                 Shader vshader;
                 Shader fshader;
 
@@ -319,10 +320,10 @@ int CALLBACK WinMain
                 } else {
                     printf("NO program object created before\n");
                 }
-                
-                glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
-                setInt(ScreenBuffer.glData.ProgramID, "texture1_", ScreenBuffer.glData.textureHandle[0]);
-                //glUniform1i(glGetUniformLocation(ScreenBuffer.glData.ProgramID, "texture1"), ScreenBuffer.glData.textureHandle[0]);
+
+                //????
+                setInt(ScreenBuffer.glData.ProgramID, "texture1 ", ScreenBuffer.glData.textureHandle[0]);
+
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
                 // =============================================
                 LARGE_INTEGER LastCounter;

@@ -31,6 +31,8 @@ struct Win32_OffScreen_Buffer{
     HBITMAP BitmapHandle;
 
     void* BitmapMemory;
+    void* BitmapMemoryForDirectBlit;
+
     int BitmapWidth;
     int BitmapHeight;
     int Pitch;
@@ -44,6 +46,7 @@ struct Win32_Front_Buffer{
     //BITMAPINFO Bitmapinfo;
     //HBITMAP BitmapHandle;
     void* BitmapMemory;
+    void* BitmapMemoryForDirectBlit;
 
     int BitmapWidth;
     int BitmapHeight;

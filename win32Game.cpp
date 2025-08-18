@@ -44,6 +44,10 @@ void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Heigh
     if(OBuffer->BitmapMemory) {
         VirtualFree(OBuffer->BitmapMemory, 0, MEM_RELEASE);
     }
+
+    if(OBuffer->BitmapMemoryForDirectBlit) {
+        VirtualFree(OBuffer->BitmapMemoryForDirectBlit, 0, MEM_RELEASE);
+    }
     // NOTE: The BitmapWidth change every time we resize the window
     OBuffer->BitmapWidth = Width;
     OBuffer->BitmapHeight = Height;
@@ -61,7 +65,9 @@ void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Heigh
         
              
     BitMapMemorySize = OBuffer->BytesPerPixel*(OBuffer->BitmapWidth*OBuffer->BitmapHeight);
+
     OBuffer->BitmapMemory = VirtualAlloc(0 ,BitMapMemorySize ,MEM_COMMIT, PAGE_READWRITE);
+    OBuffer->BitmapMemoryForDirectBlit = VirtualAlloc(0 ,BitMapMemorySize ,MEM_COMMIT, PAGE_READWRITE);
 
 }
 
@@ -98,19 +104,36 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
     
     // We take memory from BitmapMemory of main Bufer to write on it
     uint8* Row;
+    uint8* DirectRow;
+
     if (OBuffer!=NULL){
         Row = ((uint8 *)OBuffer->BitmapMemory);
     } else {
         Row = ((uint8 *)FBuffer->BitmapMemory);
     }
+
+    if (OBuffer!=NULL){
+        if(OBuffer->BitmapMemoryForDirectBlit != NULL){
+            DirectRow = ((uint8 *)OBuffer->BitmapMemoryForDirectBlit);
+        } else {
+            printf("Bitmap Memory for direct blit is empty\n");
+        }
+    } else {
+        DirectRow = ((uint8 *)FBuffer->BitmapMemoryForDirectBlit);
+    }
     //Change the image row order upside down
     uint8* imageRow = (uint8*)BMPContent->ImageContent;
+    uint8* imageRowForDirectBlit = (uint8*)BMPContent->ImageContent;
 // ???? What todo if the image is bigger than the 
-    imageRow += 4 * ((BlitHeight - 1) * BlitWidth);
+    imageRowForDirectBlit += 4*((Height - 1) * Width);
 
     for (int32 Y{0}; Y < BlitHeight; Y++) {
         uint32* Pixel = (uint32 *)Row;
+        uint32* DirectPixel = (uint32 *)DirectRow;
+        
         uint32* imagePixel = (uint32* )imageRow;
+        uint32* imagePixelForDirect = (uint32* )imageRowForDirectBlit;
+
         for(int32 X{0}; X < BlitWidth; X++) {
 
 //NOTE: For Gradient version
@@ -131,19 +154,27 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
             // Why Pixel appear in uint8 not uint32
 
             *Pixel++ = *imagePixel++;
+            *DirectPixel++ = *imagePixelForDirect++;
         }
         // Instead of manually move row pointer every y axis (by add it to the pitch)
         // we just need to reuse the Pixel pointer pass it to row where it was already moved
 
         // NOTE: This order is for passing to OpenGL
-        //imageRow+=ImagePitch;
+        imageRow+=ImagePitch;
 
         // And this is for passing directly to the window (RIGHT)
-        imageRow-=ImagePitch;
+        imageRowForDirectBlit-=ImagePitch;
+//For GL
         if(OBuffer != NULL){
             Row+=OBuffer->Pitch;
         } else {
             Row+=FBuffer->Pitch;            
+        }
+// For direct blit
+        if(OBuffer != NULL){
+            DirectRow+=OBuffer->Pitch;
+        } else {
+            DirectRow+=FBuffer->Pitch;            
         }
         //NOTE: This incidentally produce right pixel order
     }        
@@ -159,12 +190,12 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
         0,0,OBuffer->BitmapWidth, OBuffer->BitmapHeight, // Source rectangle
         0,0,WindowWidth, WindowHeight,                 // Destination Rectangle
         // const VOID* lpBits,
-        OBuffer->BitmapMemory,
+        OBuffer->BitmapMemoryForDirectBlit,
         &OBuffer->Bitmapinfo,
         DIB_RGB_COLORS,
         SRCCOPY);    
 
-    //printf("Number of scanned line is: %d\n", ScannedLine);
+    OBuffer->BitmapMemoryForDirectBlit!=NULL?printf("Memory for direct blit was not NULL but screen still being black\n"):printf("Memory Pool is empty\n");
     
 /*
      Why Flickering???
@@ -231,10 +262,10 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 float trianglesVerticles [] = {
                     //FRONT FACE
                    -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
-                    0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,
-                   -0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+                    0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+                   -0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f,
                     0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,
-                    0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+                    0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
                    -0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f
                 };
              
@@ -332,17 +363,17 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 }
 // NOTE: Focus on this
 
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
  
-                glPixelStorei(GL_UNPACK_ROW_LENGTH, OBuffer->Pitch / 4);
+                //glPixelStorei(GL_UNPACK_ROW_LENGTH, OBuffer->Pitch / 4);
                 //
                 glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle[0]);
                 glGenerateMipmap(GL_TEXTURE_2D);
                 
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
 
                 GLenum err = glGetError();
@@ -364,7 +395,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 glClear(GL_COLOR_BUFFER_BIT);
 
                 // Deprecated
-                //glEnable(GL_TEXTURE_2D);
+                glEnable(GL_TEXTURE_2D);
 
                 const GLubyte* ver = glGetString(GL_VERSION);
                 if (ver)
