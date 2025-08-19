@@ -7,7 +7,7 @@
   ================================================================================*/
 
 #include "win32Game.h"
-#include "Shader.h"
+#include "shader.h"
 #include "SoundMaker.h"
 
 LRESULT CALLBACK MainWindowCallBack(
@@ -35,6 +35,7 @@ LRESULT CALLBACK MainWindowCallBack(
            if(!BackBuffer.transferNeed){
                 BackBuffer.transferNeed = true;
             }           
+           //glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
            OutputDebugStringA("WM_SIZE\n");
         }break;
         
@@ -322,7 +323,21 @@ int CALLBACK WinMain
                 }
 
                 //????
-                setInt(ScreenBuffer.glData.ProgramID, "texture1 ", ScreenBuffer.glData.textureHandle[0]);
+
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, 0);
+
+                glm::mat4 View = glm::mat4(1.0f);
+                View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
+                glm::mat4 Model = glm::mat4(1.0f);
+                float fov = 45.0f;
+                Model = glm::translate(Model, glm::vec3(0.0f, 0.0f, 0.0f));
+                glm::mat4 Projection = glm::perspective(glm::radians(fov), (float)Dimens.Width / (float)Dimens.Height, 0.1f, 100.0f);
+
+                useProgram(ScreenBuffer.glData.ProgramID);
+                setInt(ScreenBuffer.glData.ProgramID, "texture1", ScreenBuffer.glData.textureHandle[0]);
+                setMat4(ScreenBuffer.glData.ProgramID, "view ", View);
+                setMat4(ScreenBuffer.glData.ProgramID, "projection ", Projection);
 
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
                 // =============================================
@@ -330,29 +345,29 @@ int CALLBACK WinMain
                 QueryPerformanceCounter(&LastCounter);
                 uint64 LastCycleCounts;
             
-            Game_Input Input[2] = {};
-            Game_Input* OldInput = &Input[0];
-            Game_Input* NewInput = &Input[1];
+                Game_Input Input[2] = {};
+                Game_Input* OldInput = &Input[0];
+                Game_Input* NewInput = &Input[1];
 
-            LastCycleCounts = __rdtsc();
+                LastCycleCounts = __rdtsc();
 
-            win32_Sound_OutPut SoundOutPut = {};
-            Game_Sound_OutPut SoundBuffer = {};
-            InitSoundBuffer(&Window, &SoundOutPut);
-            int16* SSamples = (int16* )VirtualAlloc(0 , SoundOutPut.SecondBufferSize ,MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+                win32_Sound_OutPut SoundOutPut = {};
+                Game_Sound_OutPut SoundBuffer = {};
+                InitSoundBuffer(&Window, &SoundOutPut);
+                int16* SSamples = (int16* )VirtualAlloc(0 , SoundOutPut.SecondBufferSize ,MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
 
 
-            //Why InitOpenGl only work in the app loop
+                //Why InitOpenGl only work in the app loop
             
-            int MaxControllerCount = XUSER_MAX_COUNT;
+                int MaxControllerCount = XUSER_MAX_COUNT;
 /*
-             Init here
-             NOTE: Why InitOpenGL only work while in window loop
-             May be this is related to Window and DC that hasn't been
-             initialized yet
+  Init here
+  NOTE: Why InitOpenGL only work while in window loop
+  May be this is related to Window and DC that hasn't been
+  initialized yet
 */            
-            //OpenGLInited = InitOpenGL(Window, &ScreenBuffer, nullptr);
-            while(GlobalRunning) {
+
+                while(GlobalRunning) {
                 MSG Message;
                 //NOTE: This is where receiving the message to change
                 // for any change in window
@@ -364,7 +379,6 @@ int CALLBACK WinMain
                     TranslateMessage(&Message);
                 }
 
-             // Console Input part
                 if( MaxControllerCount > ArrayCount(Input->Controller)) {
                     MaxControllerCount = ArrayCount(Input->Controller);   
                 }
@@ -388,6 +402,7 @@ int CALLBACK WinMain
                     if (count > 19){
                         copyBufferData(&BackBuffer, &ScreenBuffer);
                         BackBuffer.transferNeed = false;                        
+                        glViewport(0, 0, ScreenBuffer.BitmapWidth, ScreenBuffer.BitmapHeight);
                     };
                 }
 
@@ -395,16 +410,23 @@ int CALLBACK WinMain
                 // use shader program
                 //printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
                 //DeviceContext = GetDC(Window);
-                GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
-                glClearColor(1.0f, 1.0f, 0.75f, 1.0f);
-                glClear(GL_COLOR_BUFFER_BIT);             
-                glBindVertexArray(ScreenBuffer.glData.VAOs);
-                glDrawArrays(GL_TRIANGLES, 0, 6);
-                SwapBuffers(DeviceContext);
+                glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);             
 
-                //if(glGetError() != GL_NO_ERROR){
-                    //printf("OpenGL Error: %d\n", glGetError());
-                //};
+                GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
+
+
+                //glm::vec3 Position = glm::vec3(0.0f, 0.0f, 0.0f);
+                //glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
+                //glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+                // camera/view transformation
+                //glm::mat4 View = glm::lookAt(Position, Position + Front, Up);
+                useProgram(ScreenBuffer.glData.ProgramID);                
+                Model = glm::rotate(Model, glm::radians(fov), glm::vec3(1.0f, 0.0f, 0.5f));
+                setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
+                glBindVertexArray(ScreenBuffer.glData.VAOs);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+                SwapBuffers(DeviceContext);
 
                 // Display on the screen
                 // The glitching sound driven me nearly crazy so I decided to turn it off

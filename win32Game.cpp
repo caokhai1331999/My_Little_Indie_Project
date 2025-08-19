@@ -258,62 +258,59 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 {
                     //OpenConsole();
                     //printf("GLAD load successfully\n");                    
-                    
-                float trianglesVerticles [] = {
+                    //
+                //float trianglesVerticles [] = {
                     //FRONT FACE
-                   -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
-                    0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
-                   -0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f,
-                    0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,
-                    0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
-                   -0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f
-                };
-             
-                float CubeVerticles[] = {
-                    // CW
-                    // positions          // normals           // texture coords
-                    //BACK FACE
-                   -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,// one stride  
-                    1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-                    1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-                    1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-                   -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,     
-                   -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-                    //FRONT FACE
-                   -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-                    1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-                    1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-                    1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-                   -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-                   -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
-                    // LEFT FACE
-                   -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-                   -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-                   -1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-                   -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-                   -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-                   -1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-                    // RIGHT FACE
-                    1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-                    1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-                    1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-                    1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-                    1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-                    1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-                    // BOTTOM FACE
-                   -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-                    1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-                    1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-                    1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-                   -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-                   -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-                    // TOP FACE
-                   -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-                    1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-                    1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-                    1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-                   -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,    
-                   -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+                   //-0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+                    //0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+                   //-0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f,
+                    //0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,
+                    //0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+                   //-0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f
+                //};
+             //
+                float Vertices[] = {
+                   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+                    0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+                    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+                   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+                   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+                    0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+                    0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+                   -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+                   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+                   -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                   -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                   -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+                    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                    0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                    0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                    0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+                   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                    0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+                    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+                    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+                   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+                   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+                    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                   -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+                   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
                 };
             
                 float PlaneVerticles[] = {
@@ -333,12 +330,19 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 glGenVertexArrays(1, &OBuffer->glData.VAOs);
                 glBindVertexArray(OBuffer->glData.VAOs);
 
-                glBufferData(GL_ARRAY_BUFFER, sizeof(trianglesVerticles), &trianglesVerticles, GL_STATIC_DRAW);
+                //glBufferData(GL_ARRAY_BUFFER, sizeof(trianglesVerticles), &trianglesVerticles, GL_STATIC_DRAW);
 
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)0);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), &Vertices, GL_STATIC_DRAW);
+
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 5*sizeof(float), (void*)0);
                 glEnableVertexAttribArray(0);
+
+                //glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)(3*sizeof(float)));
+//
+                //glEnableVertexAttribArray(1);
+
                 //  index, size, type, .., stride, pointer
-                glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)(6*sizeof(float)));
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 5*sizeof(float), (void*)(3*sizeof(float)));
                 glEnableVertexAttribArray(2);
                 
                 // NOTE: To here we done assigned CubeVerticles data to VAOs and VBO
@@ -370,11 +374,12 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle[0]);
                 glGenerateMipmap(GL_TEXTURE_2D);
                 
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   //Wrapping
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
+   //Filter
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
                 GLenum err = glGetError();
 
@@ -391,11 +396,13 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 // new version of OPENGL
                 //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-                glClearColor(1.0f, 1.0f, 0.75f, 1.0f);
-                glClear(GL_COLOR_BUFFER_BIT);
-
                 // Deprecated
                 glEnable(GL_TEXTURE_2D);
+                glEnable(GL_DEPTH_TEST);
+
+
+                glClearColor(1.0f, 1.0f, 0.75f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
                 const GLubyte* ver = glGetString(GL_VERSION);
                 if (ver)

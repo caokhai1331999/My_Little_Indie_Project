@@ -16,9 +16,14 @@
 // the program
 
 // Then set mat4(Model, projection,etc ...) to the program
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "win32Game.h"
-#include <glm/glm.hpp>
+#include <stdio.h>
+
+using namespace std;
 
 typedef bool VertexType;
 #define vertex (bool)true
@@ -36,18 +41,18 @@ void loadShader(Shader* shader, char* name, VertexType type);
 char* loadCurrentErr();
 
 // Set Int, bool, float and Vector
-void setVec2(GLuint programID, const char* name, glm::vec2 &value);
+void setVec2(GLuint programID, const char* name, const glm::vec2 &value);
 void setVec2(GLuint programID, const char* name, float x, float y);
 
-void setVec3(GLuint programID, const char* name, glm::vec3 &value);
-void setVec3(GLuint programID, const char* name, float x, float y, float z);
+void setVec3(GLuint programID, const char* name, const glm::vec3 &value);
+void setVec3(GLuint programID, const char* name,  float x, float y, float z);
 
-void setBool(GLuint programID, const char* name, bool value);
-void setInt(GLuint programID, const char* name, int value);
+void setBool(GLuint programID, const char* name, const bool value);
+void setInt(GLuint programID, const char* name, const int value);
 
 // Set Matrix
-void setMat3(GLuint programID, const char* name, glm::mat3 &value);
-void setMat4(GLuint programID, const char* name, glm::mat4 &value);
+void setMat3(GLuint programID, const char* name, const glm::mat3 &value);
+void setMat4(GLuint programID, const char* name, const glm::mat4 &value);
 
 // Use the shader
 void useProgram(GLuint programID);

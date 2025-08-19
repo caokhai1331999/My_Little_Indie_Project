@@ -137,7 +137,7 @@ void setInt(GLuint programID, const char* name, const int value){
 };
 
 //Vector 2nd argument is number of vector
-void setVec2(GLuint programID, const char* name, const  glm::vec2 &value){
+void setVec2(GLuint programID, const char* name, const glm::vec2 &value){
     glUniform2fv(glGetUniformLocation(programID, name), 1, &value[0]);
 }
 
@@ -176,6 +176,7 @@ void checkCompileErrors(GLuint shader, char* type)
             glGetShaderInfoLog(shader, infoLength, NULL, infoLog);
             printf("ERROR::SHADER_COMPILATION_ERROR of type: %s\n %s", type, infoLog);
         }
+        std::cout<<infoLog<<std::endl;
     }
     else
     {
@@ -185,6 +186,7 @@ void checkCompileErrors(GLuint shader, char* type)
         {
             glGetProgramInfoLog(shader, infoLength, NULL, infoLog);
             printf("ERROR::PROGRAM_LINKING_ERROR of type: %s\n %s", type, infoLog);
+            std::cout<<infoLog<<std::endl;
         }
     }
 };
