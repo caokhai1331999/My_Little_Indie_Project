@@ -312,7 +312,6 @@ int CALLBACK WinMain
                 loadShader(&fshader, "shader.fs", (VertexType)fragment);
 
                 copyBufferData(&BackBuffer, &ScreenBuffer);
-                ScreenBuffer.glData = BackBuffer.glData;
 
                 ScreenBuffer.glData.ProgramID = setupGLprogram(&vshader, &fshader);
 
@@ -331,15 +330,22 @@ int CALLBACK WinMain
                 View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
                 glm::mat4 Model = glm::mat4(1.0f);
                 float fov = 45.0f;
+
                 Model = glm::translate(Model, glm::vec3(0.0f, 0.0f, 0.0f));
                 glm::mat4 Projection = glm::perspective(glm::radians(fov), (float)Dimens.Width / (float)Dimens.Height, 0.1f, 100.0f);
 
                 useProgram(ScreenBuffer.glData.ProgramID);
-                setInt(ScreenBuffer.glData.ProgramID, "texture1", ScreenBuffer.glData.textureHandle[0]);
-                setMat4(ScreenBuffer.glData.ProgramID, "view ", View);
-                setMat4(ScreenBuffer.glData.ProgramID, "projection ", Projection);
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
+                char* name = "texture1";
+                setInt(ScreenBuffer.glData.ProgramID, name, ScreenBuffer.glData.textureHandle[0]);
+                name = "view";
+                setMat4(ScreenBuffer.glData.ProgramID, name, View);
+                name = "projection";
+                setMat4(ScreenBuffer.glData.ProgramID, name, Projection);
 
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
+                printf("vertex array :%d\n", ScreenBuffer.glData.VAOs);
                 // =============================================
                 LARGE_INTEGER LastCounter;
                 QueryPerformanceCounter(&LastCounter);
@@ -423,7 +429,8 @@ int CALLBACK WinMain
                 //glm::mat4 View = glm::lookAt(Position, Position + Front, Up);
                 useProgram(ScreenBuffer.glData.ProgramID);                
                 Model = glm::rotate(Model, glm::radians(fov), glm::vec3(1.0f, 0.0f, 0.5f));
-                setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
+                name = "model";
+                setMat4(ScreenBuffer.glData.ProgramID, name, Model);
                 glBindVertexArray(ScreenBuffer.glData.VAOs);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
                 SwapBuffers(DeviceContext);

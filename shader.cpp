@@ -158,25 +158,28 @@ void setMat3(GLuint programID, const char* name, const glm::mat3 &value){
     glUniformMatrix3fv(glGetUniformLocation(programID, name), 1, GL_FALSE, &value[0][0]);
 };
 
-void setMat4(GLuint programID, const char* name, const glm::mat4 &value){
+ void setMat4(GLuint programID, const char* name, const glm::mat4 &value){
     glUniformMatrix4fv(glGetUniformLocation(programID, name), 1, GL_FALSE, &value[0][0]);
 };
 
 void checkCompileErrors(GLuint shader, char* type)
 {
     GLint success;
-    GLchar infoLog[1024];
     int infoLength;
+    GLchar* infoLog;
     if (type != "PROGRAM")
     {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         glGetProgramiv(shader, GL_INFO_LOG_LENGTH, &infoLength);
+        if(infoLog != NULL){
+            free(infoLog);
+        }
+        infoLog = (GLchar*)malloc(infoLength);
         if (!success )
         {
             glGetShaderInfoLog(shader, infoLength, NULL, infoLog);
             printf("ERROR::SHADER_COMPILATION_ERROR of type: %s\n %s", type, infoLog);
         }
-        std::cout<<infoLog<<std::endl;
     }
     else
     {
@@ -184,9 +187,12 @@ void checkCompileErrors(GLuint shader, char* type)
         glGetProgramiv(shader, GL_INFO_LOG_LENGTH, &infoLength);        
         if (!success|| (infoLength > 0))
         {
+            if(infoLog != NULL){
+                free(infoLog);
+            }
+            infoLog = (GLchar*)malloc(infoLength);
             glGetProgramInfoLog(shader, infoLength, NULL, infoLog);
             printf("ERROR::PROGRAM_LINKING_ERROR of type: %s\n %s", type, infoLog);
-            std::cout<<infoLog<<std::endl;
         }
     }
 };
@@ -204,7 +210,8 @@ GLuint setupGLprogram(Shader* vshader, Shader* fshader){
     checkCompileErrors(tempProgramID, "PROGRAM");
     
     if(glGetError() != GL_NO_ERROR){
-    printf("OpenGL Error: %d\n", glGetError());
+    //printf("OpenGL Error: %d\n", glGetError());
+        cout<<"OpenGL Error: "<< glGetError()<<endl;
     };
 
     glDetachShader(tempProgramID, vshader->shaderID); 

@@ -125,16 +125,19 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
     uint8* imageRow = (uint8*)BMPContent->ImageContent;
     uint8* imageRowForDirectBlit = (uint8*)BMPContent->ImageContent;
 // ???? What todo if the image is bigger than the 
-    imageRowForDirectBlit += 4*((Height - 1) * Width);
+    imageRowForDirectBlit += 4*((BlitHeight - 1) * BlitWidth);
 
-    for (int32 Y{0}; Y < BlitHeight; Y++) {
+    for (int32 Y{0}; Y < Height; Y++) {
         uint32* Pixel = (uint32 *)Row;
         uint32* DirectPixel = (uint32 *)DirectRow;
         
         uint32* imagePixel = (uint32* )imageRow;
+        if(Y == BlitHeight){
+            imageRowForDirectBlit += 4*((BlitHeight - 1) * BlitWidth);            
+        }
         uint32* imagePixelForDirect = (uint32* )imageRowForDirectBlit;
 
-        for(int32 X{0}; X < BlitWidth; X++) {
+        for(int32 X{0}; X < Width; X++) {
 
 //NOTE: For Gradient version
     //for (int Y = 0; Y < OBuffer->BitmapHeight; Y++) {
@@ -154,7 +157,11 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
             // Why Pixel appear in uint8 not uint32
 
             *Pixel++ = *imagePixel++;
-            *DirectPixel++ = *imagePixelForDirect++;
+            if(X >= BlitWidth){
+                *DirectPixel++ = 0xffffffff;
+            } else {
+                *DirectPixel++ = *imagePixelForDirect++;
+            }
         }
         // Instead of manually move row pointer every y axis (by add it to the pitch)
         // we just need to reuse the Pixel pointer pass it to row where it was already moved
@@ -195,7 +202,7 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
         DIB_RGB_COLORS,
         SRCCOPY);    
 
-    OBuffer->BitmapMemoryForDirectBlit!=NULL?printf("Memory for direct blit was not NULL but screen still being black\n"):printf("Memory Pool is empty\n");
+    //OBuffer->BitmapMemoryForDirectBlit!=NULL?printf("Memory for direct blit was not NULL but screen still being black\n"):printf("Memory Pool is empty\n");
     
 /*
      Why Flickering???
@@ -351,20 +358,22 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 //===============================================================
                 
                 //printf("Succeed create OpenGL Context\n");
-                OBuffer->glData.textureHandle = new unsigned int();
-                glGenTextures(1, OBuffer->glData.textureHandle);
+                //OBuffer->glData.textureHandle = (unsigned int*)malloc(sizeof(unsigned int));
+                unsigned int tempTextureHandle;
+                glGenTextures(1, &tempTextureHandle);
+                OBuffer->glData.textureHandle = &tempTextureHandle;
                 glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle[0]);
 // OBuffer->glData.textureHandle is the name of the texture
                 //last argument This is where point to the image data
                 // Why this doesn't work
                 glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
                 
-                if(OBuffer->BitmapMemory != NULL){
-                    printf("We have Image content but somehow it wasn't shown on screen\n");                    
-                } else {
-                    RenderSplendidGradient(OBuffer, NULL, BMPContent, 0, 0, 3);                    
-                    printf("Image content is NULL\n");
-                }
+                //if(OBuffer->BitmapMemory != NULL){
+                    //printf("We have Image content but somehow it wasn't shown on screen\n");                    
+                //} else {
+                    //RenderSplendidGradient(OBuffer, NULL, BMPContent, 0, 0, 3);                    
+                    //printf("Image content is NULL\n");
+                //}
 // NOTE: Focus on this
 
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
@@ -501,7 +510,25 @@ void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* Scre
     ScreenBuffer->Pitch = ScreenBuffer->Pitch!=BackBuffer->Pitch?BackBuffer->Pitch:printf("Pitch didn't change\n");
 
     // Why if I don't pass this type of data the app will collapse as the conflict of memory
-        ScreenBuffer->glData = BackBuffer->glData;
+    if( ScreenBuffer->glData.VAOs != BackBuffer->glData.VAOs){
+        ScreenBuffer->glData.VAOs = BackBuffer->glData.VAOs;
+    }
+
+    if(ScreenBuffer->glData.VBO != BackBuffer->glData.VBO){
+        ScreenBuffer->glData.VBO = BackBuffer->glData.VBO;
+    }
+
+    if(ScreenBuffer->glData.ProgramID != BackBuffer->glData.ProgramID){
+        ScreenBuffer->glData.ProgramID = BackBuffer->glData.ProgramID;
+    }
+
+    if(ScreenBuffer->glData.VAOs != BackBuffer->glData.VAOs){
+        ScreenBuffer->glData.VAOs = BackBuffer->glData.VAOs;
+    }
+
+    if(ScreenBuffer->glData.textureHandle != BackBuffer->glData.textureHandle){
+        ScreenBuffer->glData.textureHandle = BackBuffer->glData.textureHandle; 
+    }
         //ScreenBuffer->Bitmapinfo = BackBuffer->Bitmapinfo;
 //
         //if(ScreenBuffer->BitmapHandle != BackBuffer->BitmapHandle && BackBuffer->BitmapHandle != NULL){
