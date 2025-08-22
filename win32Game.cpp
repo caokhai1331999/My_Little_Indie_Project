@@ -277,6 +277,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 //};
              //
                 float Vertices[] = {
+
                    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
                     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
                     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -349,8 +350,8 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 //glEnableVertexAttribArray(1);
 
                 //  index, size, type, .., stride, pointer
-                glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, 5*sizeof(float), (void*)(3*sizeof(float)));
-                glEnableVertexAttribArray(2);
+                glVertexAttribPointer(1, 2, GL_FLOAT, GL_TRUE, 5*sizeof(float), (void*)(3*sizeof(float)));
+                glEnableVertexAttribArray(1);
                 
                 // NOTE: To here we done assigned CubeVerticles data to VAOs and VBO
                 // We will call bindbuffer/vertexArray whenever before glDrawArray

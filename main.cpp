@@ -305,6 +305,7 @@ int CALLBACK WinMain
                 // We have to assign address of memory and glData to
                 //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
                 InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
+
                 Shader vshader;
                 Shader fshader;
 
@@ -312,8 +313,10 @@ int CALLBACK WinMain
                 loadShader(&fshader, "shader.fs", (VertexType)fragment);
 
                 copyBufferData(&BackBuffer, &ScreenBuffer);
-
                 ScreenBuffer.glData.ProgramID = setupGLprogram(&vshader, &fshader);
+
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, 0);
 
                 if(glIsProgram(ScreenBuffer.glData.ProgramID)){
                     useProgram(ScreenBuffer.glData.ProgramID);
@@ -322,29 +325,23 @@ int CALLBACK WinMain
                 }
 
                 //????
-
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, 0);
-
                 glm::mat4 View = glm::mat4(1.0f);
                 View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
                 glm::mat4 Model = glm::mat4(1.0f);
                 float fov = 45.0f;
 
                 Model = glm::translate(Model, glm::vec3(0.0f, 0.0f, 0.0f));
+
                 glm::mat4 Projection = glm::perspective(glm::radians(fov), (float)Dimens.Width / (float)Dimens.Height, 0.1f, 100.0f);
 
-                useProgram(ScreenBuffer.glData.ProgramID);
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
-                char* name = "texture1";
-                setInt(ScreenBuffer.glData.ProgramID, name, ScreenBuffer.glData.textureHandle[0]);
-                name = "view";
+                char* name = "texture1 ";
+                setInt(ScreenBuffer.glData.ProgramID, name, BackBuffer.glData.textureHandle[0]);
+                name = "view ";
                 setMat4(ScreenBuffer.glData.ProgramID, name, View);
-                name = "projection";
+                name = "projection ";
                 setMat4(ScreenBuffer.glData.ProgramID, name, Projection);
 
-                printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
+                printf("texture id:%d\n", BackBuffer.glData.textureHandle[0]);
                 printf("vertex array :%d\n", ScreenBuffer.glData.VAOs);
                 // =============================================
                 LARGE_INTEGER LastCounter;
@@ -418,6 +415,9 @@ int CALLBACK WinMain
                 //DeviceContext = GetDC(Window);
                 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);             
 
+                useProgram(ScreenBuffer.glData.ProgramID);
+                glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
+
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
 
 
@@ -427,12 +427,12 @@ int CALLBACK WinMain
 
                 // camera/view transformation
                 //glm::mat4 View = glm::lookAt(Position, Position + Front, Up);
-                useProgram(ScreenBuffer.glData.ProgramID);                
                 Model = glm::rotate(Model, glm::radians(fov), glm::vec3(1.0f, 0.0f, 0.5f));
-                name = "model";
+                name = "model ";
                 setMat4(ScreenBuffer.glData.ProgramID, name, Model);
                 glBindVertexArray(ScreenBuffer.glData.VAOs);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
+
                 SwapBuffers(DeviceContext);
 
                 // Display on the screen
