@@ -299,12 +299,13 @@ int CALLBACK WinMain
                 //JPGContent = DEBUGReadJPG("Harry and Accomplices.jpg", &result2);
                 //OpenGL part
                 Win32_Front_Buffer ScreenBuffer = {};
-                RenderSplendidGradient(&BackBuffer, NULL, BMPContent, 0, 0, 4);
 
 // Cause the ScreenData will be deleted out of the loop so
                 // We have to assign address of memory and glData to
                 //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
                 InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
+                RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
+                copyBufferData(&BackBuffer, &ScreenBuffer);
 
                 Shader vshader;
                 Shader fshader;
@@ -312,12 +313,13 @@ int CALLBACK WinMain
                 loadShader(&vshader, "shader.vs", (VertexType)vertex);
                 loadShader(&fshader, "shader.fs", (VertexType)fragment);
 
-                copyBufferData(&BackBuffer, &ScreenBuffer);
                 ScreenBuffer.glData.ProgramID = setupGLprogram(&vshader, &fshader);
 
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, 0);
+                copyBufferData(&BackBuffer, &ScreenBuffer);
+                //glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
 
+                printf("Program ID: %d\n", ScreenBuffer.glData.ProgramID);
                 if(glIsProgram(ScreenBuffer.glData.ProgramID)){
                     useProgram(ScreenBuffer.glData.ProgramID);
                 } else {
@@ -335,13 +337,14 @@ int CALLBACK WinMain
                 glm::mat4 Projection = glm::perspective(glm::radians(fov), (float)Dimens.Width / (float)Dimens.Height, 0.1f, 100.0f);
 
                 char* name = "texture1 ";
-                setInt(ScreenBuffer.glData.ProgramID, name, BackBuffer.glData.textureHandle[0]);
+                //setInt(ScreenBuffer.glData.ProgramID, name, BackBuffer.glData.textureHandle);
+                setInt(ScreenBuffer.glData.ProgramID, name, 0);
                 name = "view ";
                 setMat4(ScreenBuffer.glData.ProgramID, name, View);
                 name = "projection ";
                 setMat4(ScreenBuffer.glData.ProgramID, name, Projection);
 
-                printf("texture id:%d\n", BackBuffer.glData.textureHandle[0]);
+                printf("texture id:%d\n", BackBuffer.glData.textureHandle);
                 printf("vertex array :%d\n", ScreenBuffer.glData.VAOs);
                 // =============================================
                 LARGE_INTEGER LastCounter;
@@ -405,6 +408,7 @@ int CALLBACK WinMain
                     if (count > 19){
                         copyBufferData(&BackBuffer, &ScreenBuffer);
                         BackBuffer.transferNeed = false;                        
+                        displayBufferData(&BackBuffer, &ScreenBuffer);
                         glViewport(0, 0, ScreenBuffer.BitmapWidth, ScreenBuffer.BitmapHeight);
                     };
                 }
@@ -415,8 +419,16 @@ int CALLBACK WinMain
                 //DeviceContext = GetDC(Window);
                 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);             
 
-                useProgram(ScreenBuffer.glData.ProgramID);
-                glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
+                //printf("Program ID:%d \n", ScreenBuffer.glData.ProgramID);
+                if(glIsProgram(0)){
+                    useProgram(0);
+                }
+                //else {
+                    //printf("NO program object created before\n");
+                //}
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, 0);
+                //printf("Texture ID: %d\n", ScreenBuffer.glData.textureHandle[0]);
 
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
 
@@ -432,7 +444,6 @@ int CALLBACK WinMain
                 setMat4(ScreenBuffer.glData.ProgramID, name, Model);
                 glBindVertexArray(ScreenBuffer.glData.VAOs);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
-
                 SwapBuffers(DeviceContext);
 
                 // Display on the screen
@@ -458,6 +469,7 @@ int CALLBACK WinMain
                  D : Data
                 
 */                
+ 
                 uint64 CyclesElapsed = EndCycleCounts - LastCycleCounts;
                 //NOTE: It based on the var type to decide what kind of the substraction to do
                 real32 ElapsedCounter = (real32)((real32)(EndCounter.QuadPart) - (real32)(LastCounter.QuadPart));

@@ -23,7 +23,7 @@ struct OpenGLData{
     unsigned int ProgramID;
     
     HGLRC openglRC;
-    GLuint* textureHandle;
+    unsigned int textureHandle;
 };
 
 struct Win32_OffScreen_Buffer{  
@@ -79,6 +79,6 @@ void OpenConsole();
 bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* bmpContent);
 
 void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
-
+void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
 #define WIN32GAME_H
 #endif

@@ -360,10 +360,12 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 
                 //printf("Succeed create OpenGL Context\n");
                 //OBuffer->glData.textureHandle = (unsigned int*)malloc(sizeof(unsigned int));
-                unsigned int tempTextureHandle;
-                glGenTextures(1, &tempTextureHandle);
-                OBuffer->glData.textureHandle = &tempTextureHandle;
-                glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle[0]);
+
+                // NOTE: Found it: The temptexture is local to this fx so its
+                // data and address turn to null after the fx called
+
+                glGenTextures(1, &OBuffer->glData.textureHandle);
+                glBindTexture(GL_TEXTURE_2D, 0);
 // OBuffer->glData.textureHandle is the name of the texture
                 //last argument This is where point to the image data
                 // Why this doesn't work
@@ -381,7 +383,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
  
                 //glPixelStorei(GL_UNPACK_ROW_LENGTH, OBuffer->Pitch / 4);
                 //
-                glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle[0]);
+                glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle);
                 glGenerateMipmap(GL_TEXTURE_2D);
                 
    //Wrapping
@@ -398,7 +400,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 }
 
                 if(OBuffer->glData.textureHandle!=NULL){
-                    printf("Texture name is: %d\n", OBuffer->glData.textureHandle[0]);
+                    printf("Texture name is: %d\n", OBuffer->glData.textureHandle);
                 } else {
                     printf("Some How texture is NULL???\n");
                 }
@@ -537,6 +539,15 @@ void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* Scre
     //}
 
         ScreenBuffer->BitmapMemory = BackBuffer->BitmapMemory;
+}
+
+void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* FrontBuffer){
+    printf("=====================================\n");
+    printf("              |  BackBuffer | FrontBuffer\n");
+    printf("VAOS          |  %d        |  %d\n", BackBuffer->glData.VAOs, FrontBuffer->glData.VAOs);
+    printf("TextureID     |%d| %d\n", BackBuffer->glData.textureHandle, FrontBuffer->glData.textureHandle);
+    printf("Memory Address|0x%x|0x%x\n", BackBuffer->BitmapMemory, FrontBuffer->BitmapMemory);
+    printf("=====================================\n");
 }
 
 // void LoadTileMap(){
