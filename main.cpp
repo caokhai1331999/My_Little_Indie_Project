@@ -191,6 +191,7 @@ LRESULT CALLBACK MainWindowCallBack(
         {
             OutputDebugStringA("DEFAULT\n");
             result = DefWindowProcA(Window, Message, Wparam, Lparam);
+            //glDebugMessageCallback(MessageCallback, 0);
         }break;
     }
     //return 0L;         
@@ -319,10 +320,13 @@ int CALLBACK WinMain
                 copyBufferData(&BackBuffer, &ScreenBuffer);
                 //glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
 
-                printf("Program ID: %d\n", ScreenBuffer.glData.ProgramID);
                 if(glIsProgram(ScreenBuffer.glData.ProgramID)){
                     useProgram(ScreenBuffer.glData.ProgramID);
+                    printf("Program ID: %d\n", ScreenBuffer.glData.ProgramID);
                 } else {
+                    checkCompileErrors(vshader.shaderID, "Vertex");
+                    checkCompileErrors(fshader.shaderID, "Fragment");
+                    checkCompileErrors(ScreenBuffer.glData.ProgramID, "Program");                    
                     printf("NO program object created before\n");
                 }
 
@@ -347,6 +351,10 @@ int CALLBACK WinMain
                 name = "projection ";
                 setMat4(ScreenBuffer.glData.ProgramID, name, Projection);
 
+                // GL 4.3+
+                //glEnable(GL_DEBUG_OUTPUT);
+                //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+                
                 printf("texture id:%d\n", BackBuffer.glData.textureHandle);
                 printf("vertex array :%d\n", ScreenBuffer.glData.VAOs);
                 // =============================================
@@ -423,18 +431,15 @@ int CALLBACK WinMain
                 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);             
 
                 //printf("Program ID:%d \n", ScreenBuffer.glData.ProgramID);
-                if(glIsProgram(0)){
-                    useProgram(0);
-                }
+
                 //else {
                     //printf("NO program object created before\n");
                 //}
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, 1);
+
+                //glActiveTexture(GL_TEXTURE0);
+                //glBindTexture(GL_TEXTURE_2D, 1);
                 //printf("Texture ID: %d\n", ScreenBuffer.glData.textureHandle[0]);
-
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
-
 
                 //glm::vec3 Position = glm::vec3(0.0f, 0.0f, 0.0f);
                 //glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -443,15 +448,14 @@ int CALLBACK WinMain
                 // camera/view transformation
                 //glm::mat4 View = glm::lookAt(Position, Position + Front, Up);
                 Model = glm::rotate(Model, glm::radians(fov), glm::vec3(1.0f, 0.0f, 0.5f));
-                name = "model";
+                name = "model ";
                 setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
                 glBindVertexArray(ScreenBuffer.glData.VAOs);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
                 SwapBuffers(DeviceContext);
 
                 // Display on the screen
-                // The glitching sound driven me nearly crazy so I decided to turn it off
-                
+                // The glitching sound driven me nearly crazy so I decided to turn it off                
                 // Ah got it. Texture data pass directly to shader(NOPE)
                 // We define that through setInt
                 //Why the &ScreenBuffer data doesn't show on the direct screen
