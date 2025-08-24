@@ -23,7 +23,7 @@ struct OpenGLData{
     unsigned int ProgramID;
     
     HGLRC openglRC;
-    unsigned int textureHandle;
+    unsigned int textureHandle = 0;
 };
 
 struct Win32_OffScreen_Buffer{  

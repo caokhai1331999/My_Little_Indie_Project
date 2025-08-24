@@ -160,7 +160,8 @@ void setMat3(GLuint programID, const char* name, const glm::mat3 &value){
 
  void setMat4(GLuint programID, const char* name, const glm::mat4 &value){
     glUniformMatrix4fv(glGetUniformLocation(programID, name), 1, GL_FALSE, &value[0][0]);
-};
+    //printf("pointer to matrix is: 0x%hx\n",&value[0][0]);
+ };
 
 void checkCompileErrors(GLuint shader, char* type)
 {

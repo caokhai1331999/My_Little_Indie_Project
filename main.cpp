@@ -5,7 +5,7 @@
    $Creator: Cao Khai(Casey Muratori's disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
   ================================================================================*/
-
+#include <glm/gtx/string_cast.hpp>
 #include "win32Game.h"
 #include "shader.h"
 #include "SoundMaker.h"
@@ -22,21 +22,21 @@ LRESULT CALLBACK MainWindowCallBack(
     POINT ptPrevious = {};
     switch(Message) {
         //case WM_CREATE:
-            //printf("On Window creating stage\n");
-            //break;
+        //printf("On Window creating stage\n");
+        //break;
         case WM_SIZE:
         {
 // What is DeviceContext for in this case??
-           GetWindowDimension(Window);
+            GetWindowDimension(Window);
             //NOTE: Whenever the window is resized, this function capture the size
-             //of the new window and update a new proper DIB for that
-             //DIB is a table where store BIT color infor
-           Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
-           if(!BackBuffer.transferNeed){
+            //of the new window and update a new proper DIB for that
+            //DIB is a table where store BIT color infor
+            Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
+            if(!BackBuffer.transferNeed){
                 BackBuffer.transferNeed = true;
             }           
-           //glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
-           OutputDebugStringA("WM_SIZE\n");
+            //glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
+            OutputDebugStringA("WM_SIZE\n");
         }break;
         
         case WM_CLOSE:
@@ -101,7 +101,7 @@ LRESULT CALLBACK MainWindowCallBack(
                 }
 
                 else if(vkCode == VK_LEFT) {
-                     //XOffset -= 10;
+                    //XOffset -= 10;
                     OutputDebugStringA("Left Button :");
                     //if(WasDown) {                    
                     //    OutputDebugStringA(" Was Down");
@@ -121,14 +121,14 @@ LRESULT CALLBACK MainWindowCallBack(
                     } else {
                         SoundOutPut.hz = 128;                        
                     }
-                     char Output[256];
-                     sprintf(Output, "TAB button hitted, Current Hert is: %d\n", SoundOutPut.hz);
+                    char Output[256];
+                    sprintf(Output, "TAB button hitted, Current Hert is: %d\n", SoundOutPut.hz);
                     SoundOutPut.WavePeriod = SoundOutPut.SamplePerSecond/SoundOutPut.hz;
                     
                     OutputDebugStringA("TAB button hitted");                  
                 }
             }                
-            }break;
+        }break;
         case WM_DESTROY:
         {
             GlobalRunning = false;
@@ -139,24 +139,24 @@ LRESULT CALLBACK MainWindowCallBack(
         case WM_PAINT:            
         {
  
-             BeginPaint(Window, NULL);
-             HDC tempDC = GetDC(Window);
-             // Start to save bit drawing data to the current HDC
-             RenderSplendidGradient(&BackBuffer, NULL, BMPContent, 0, 0, 4);
-             Win32DisplayBufferWindow(tempDC, Dimens.Width, Dimens.Height, &BackBuffer);
+            BeginPaint(Window, NULL);
+            HDC tempDC = GetDC(Window);
+            // Start to save bit drawing data to the current HDC
+            RenderSplendidGradient(&BackBuffer, NULL, BMPContent, 0, 0, 4);
+            Win32DisplayBufferWindow(tempDC, Dimens.Width, Dimens.Height, &BackBuffer);
 
-                if(glGetError() != GL_NO_ERROR){
-                    printf("OpenGL Error: %d\n", glGetError());
-                };
+            if(glGetError() != GL_NO_ERROR){
+                printf("OpenGL Error: %d\n", glGetError());
+            };
 
-                //glBindVertexArray(BackBuffer.glData.VAOs);
-                //glDrawArrays(GL_TRIANGLES, 0, 6);
-                SwapBuffers(tempDC);
+            //glBindVertexArray(BackBuffer.glData.VAOs);
+            //glDrawArrays(GL_TRIANGLES, 0, 6);
+            SwapBuffers(tempDC);
             
-                EndPaint(Window, NULL);
-                ReleaseDC(Window, tempDC);
+            EndPaint(Window, NULL);
+            ReleaseDC(Window, tempDC);
 
-             OutputDebugStringA("WM_PAINT\n");
+            OutputDebugStringA("WM_PAINT\n");
         }break;
 
         case WM_LBUTTONDOWN:{
@@ -182,7 +182,7 @@ LRESULT CALLBACK MainWindowCallBack(
                 DeviceContext = GetDC(Window); 
                 MoveToEx(DeviceContext, ptPrevious.x, ptPrevious.y, NULL); 
                 LineTo(DeviceContext, ptPrevious.x = LOWORD(Lparam), 
-                ptPrevious.y = HIWORD(Lparam)); 
+                       ptPrevious.y = HIWORD(Lparam)); 
                 ReleaseDC(Window, DeviceContext); 
             }
             return 0L;             
@@ -193,7 +193,7 @@ LRESULT CALLBACK MainWindowCallBack(
             result = DefWindowProcA(Window, Message, Wparam, Lparam);
         }break;
     }
-     //return 0L;         
+    //return 0L;         
     return result;
 }
 
@@ -205,14 +205,14 @@ void ErrorExit()
     DWORD dw = GetLastError(); 
 
     if (FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-        FORMAT_MESSAGE_FROM_SYSTEM |
-        FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
-        dw,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPTSTR) &lpMsgBuf,
-        0, NULL) == 0) {
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+            FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            dw,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR) &lpMsgBuf,
+            0, NULL) == 0) {
         MessageBox(NULL, TEXT("FormatMessage failed"), TEXT("Error"), MB_OK);
         ExitProcess(dw);
     }
@@ -274,9 +274,9 @@ int CALLBACK WinMain
             };
 
 #if INTERNAL
-                LPVOID BaseAddress = megabytes(5);
+            LPVOID BaseAddress = megabytes(5);
 #else
-                LPVOID BaseAddress = 0;
+            LPVOID BaseAddress = 0;
 #endif
 
             //=======================================================
@@ -335,12 +335,15 @@ int CALLBACK WinMain
                 Model = glm::translate(Model, glm::vec3(0.0f, 0.0f, 0.0f));
 
                 glm::mat4 Projection = glm::perspective(glm::radians(fov), (float)Dimens.Width / (float)Dimens.Height, 0.1f, 100.0f);
-
+                //printf("Part of Projection matrix:%f %f %f\n", Projection[0][1], Projection[1][1], Projection[2][1]);
+                std::cout<<glm::to_string(Projection)<<std::endl;
                 char* name = "texture1 ";
                 //setInt(ScreenBuffer.glData.ProgramID, name, BackBuffer.glData.textureHandle);
-                setInt(ScreenBuffer.glData.ProgramID, name, 0);
+                setInt(ScreenBuffer.glData.ProgramID, name, BackBuffer.glData.textureHandle);
+
                 name = "view ";
                 setMat4(ScreenBuffer.glData.ProgramID, name, View);
+
                 name = "projection ";
                 setMat4(ScreenBuffer.glData.ProgramID, name, Projection);
 
@@ -427,7 +430,7 @@ int CALLBACK WinMain
                     //printf("NO program object created before\n");
                 //}
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, 0);
+                glBindTexture(GL_TEXTURE_2D, 1);
                 //printf("Texture ID: %d\n", ScreenBuffer.glData.textureHandle[0]);
 
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
@@ -440,8 +443,8 @@ int CALLBACK WinMain
                 // camera/view transformation
                 //glm::mat4 View = glm::lookAt(Position, Position + Front, Up);
                 Model = glm::rotate(Model, glm::radians(fov), glm::vec3(1.0f, 0.0f, 0.5f));
-                name = "model ";
-                setMat4(ScreenBuffer.glData.ProgramID, name, Model);
+                name = "model";
+                setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
                 glBindVertexArray(ScreenBuffer.glData.VAOs);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
                 SwapBuffers(DeviceContext);

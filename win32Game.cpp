@@ -277,7 +277,6 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 //};
              //
                 float Vertices[] = {
-
                    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
                     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
                     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -334,15 +333,17 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 };
 
                 glGenBuffers(1, &OBuffer->glData.VBO);
-                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.VBO);
                 glGenVertexArrays(1, &OBuffer->glData.VAOs);
-                glBindVertexArray(OBuffer->glData.VAOs);
 
+                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.VBO);
                 //glBufferData(GL_ARRAY_BUFFER, sizeof(trianglesVerticles), &trianglesVerticles, GL_STATIC_DRAW);
 
                 glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), &Vertices, GL_STATIC_DRAW);
 
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 5*sizeof(float), (void*)0);
+                printf("Size of Vertices:%d\n", sizeof(Vertices));
+
+                glBindVertexArray(OBuffer->glData.VAOs);
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)0);
                 glEnableVertexAttribArray(0);
 
                 //glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)(3*sizeof(float)));
@@ -350,8 +351,8 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 //glEnableVertexAttribArray(1);
 
                 //  index, size, type, .., stride, pointer
-                glVertexAttribPointer(1, 2, GL_FLOAT, GL_TRUE, 5*sizeof(float), (void*)(3*sizeof(float)));
-                glEnableVertexAttribArray(1);
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(3*sizeof(float)));
+                glEnableVertexAttribArray(2);
                 
                 // NOTE: To here we done assigned CubeVerticles data to VAOs and VBO
                 // We will call bindbuffer/vertexArray whenever before glDrawArray
@@ -409,7 +410,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
                 // Deprecated
-                glEnable(GL_TEXTURE_2D);
+                //glEnable(GL_TEXTURE_2D);
                 glEnable(GL_DEPTH_TEST);
 
 
