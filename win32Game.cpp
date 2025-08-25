@@ -412,7 +412,10 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 // Deprecated
                 //glEnable(GL_TEXTURE_2D);
                 glEnable(GL_DEPTH_TEST);
-
+                // GL 4.3+
+                glEnable(GL_DEBUG_OUTPUT);
+                glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+                
                 glClearColor(1.0f, 1.0f, 0.75f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -513,23 +516,23 @@ void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* Scre
     ScreenBuffer->Pitch = ScreenBuffer->Pitch!=BackBuffer->Pitch?BackBuffer->Pitch:printf("Pitch didn't change\n");
 
     // Why if I don't pass this type of data the app will collapse as the conflict of memory
-    if( ScreenBuffer->glData.VAOs != BackBuffer->glData.VAOs){
+    if( ScreenBuffer->glData.VAOs != BackBuffer->glData.VAOs && BackBuffer->glData.VAOs!=NULL){
         ScreenBuffer->glData.VAOs = BackBuffer->glData.VAOs;
     }
 
-    if(ScreenBuffer->glData.VBO != BackBuffer->glData.VBO){
+    if(ScreenBuffer->glData.VBO != BackBuffer->glData.VBO && BackBuffer->glData.VBO!=NULL){
         ScreenBuffer->glData.VBO = BackBuffer->glData.VBO;
     }
 
-    if(ScreenBuffer->glData.ProgramID != BackBuffer->glData.ProgramID){
+    if(ScreenBuffer->glData.ProgramID != BackBuffer->glData.ProgramID && BackBuffer->glData.ProgramID!=NULL){
         ScreenBuffer->glData.ProgramID = BackBuffer->glData.ProgramID;
     }
 
-    if(ScreenBuffer->glData.VAOs != BackBuffer->glData.VAOs){
+    if(ScreenBuffer->glData.VAOs != BackBuffer->glData.VAOs && BackBuffer->glData.VAOs!=NULL){
         ScreenBuffer->glData.VAOs = BackBuffer->glData.VAOs;
     }
 
-    if(ScreenBuffer->glData.textureHandle != BackBuffer->glData.textureHandle){
+    if(ScreenBuffer->glData.textureHandle != BackBuffer->glData.textureHandle && BackBuffer->glData.textureHandle!=NULL){
         ScreenBuffer->glData.textureHandle = BackBuffer->glData.textureHandle; 
     }
         //ScreenBuffer->Bitmapinfo = BackBuffer->Bitmapinfo;
@@ -537,15 +540,17 @@ void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* Scre
         //if(ScreenBuffer->BitmapHandle != BackBuffer->BitmapHandle && BackBuffer->BitmapHandle != NULL){
         //ScreenBuffer->BitmapHandle = BackBuffer->BitmapHandle;
     //}
-
+    if(ScreenBuffer->BitmapMemory != BackBuffer->BitmapMemory && BackBuffer->BitmapMemory!=NULL){
         ScreenBuffer->BitmapMemory = BackBuffer->BitmapMemory;
+    }
 }
 
 void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* FrontBuffer){
     printf("=====================================\n");
     printf("              |  BackBuffer | FrontBuffer\n");
-    printf("VAOS          |  %d        |  %d\n", BackBuffer->glData.VAOs, FrontBuffer->glData.VAOs);
-    printf("TextureID     |%d| %d\n", BackBuffer->glData.textureHandle, FrontBuffer->glData.textureHandle);
+    printf("VAOS          |  %d         | %d\n", BackBuffer->glData.VAOs, FrontBuffer->glData.VAOs);
+    printf("TextureID     |  %d         | %d\n", BackBuffer->glData.textureHandle, FrontBuffer->glData.textureHandle);
+    printf("ProgramID     |  %d         | %d\n", BackBuffer->glData.ProgramID, FrontBuffer->glData.ProgramID);
     printf("Memory Address|0x%x|0x%x\n", BackBuffer->BitmapMemory, FrontBuffer->BitmapMemory);
     printf("=====================================\n");
 }

@@ -151,8 +151,7 @@ LRESULT CALLBACK MainWindowCallBack(
 
             //glBindVertexArray(BackBuffer.glData.VAOs);
             //glDrawArrays(GL_TRIANGLES, 0, 6);
-            SwapBuffers(tempDC);
-            
+            SwapBuffers(tempDC);            
             EndPaint(Window, NULL);
             ReleaseDC(Window, tempDC);
 
@@ -191,7 +190,6 @@ LRESULT CALLBACK MainWindowCallBack(
         {
             OutputDebugStringA("DEFAULT\n");
             result = DefWindowProcA(Window, Message, Wparam, Lparam);
-            //glDebugMessageCallback(MessageCallback, 0);
         }break;
     }
     //return 0L;         
@@ -306,29 +304,27 @@ int CALLBACK WinMain
                 //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
                 InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
                 RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
-                copyBufferData(&BackBuffer, &ScreenBuffer);
-
                 Shader vshader;
                 Shader fshader;
 
                 loadShader(&vshader, "shader.vs", (VertexType)vertex);
                 loadShader(&fshader, "shader.fs", (VertexType)fragment);
-
-                ScreenBuffer.glData.ProgramID = setupGLprogram(&vshader, &fshader);
-
-                glActiveTexture(GL_TEXTURE0);
+                BackBuffer.glData.ProgramID = setupGLprogram(&vshader, &fshader);                
                 copyBufferData(&BackBuffer, &ScreenBuffer);
-                //glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
 
                 if(glIsProgram(ScreenBuffer.glData.ProgramID)){
                     useProgram(ScreenBuffer.glData.ProgramID);
                     printf("Program ID: %d\n", ScreenBuffer.glData.ProgramID);
                 } else {
+                    glDebugMessageCallback(MessageCallback, 0);
                     checkCompileErrors(vshader.shaderID, "Vertex");
                     checkCompileErrors(fshader.shaderID, "Fragment");
                     checkCompileErrors(ScreenBuffer.glData.ProgramID, "Program");                    
                     printf("NO program object created before\n");
                 }
+
+                glActiveTexture(GL_TEXTURE0);
+                //glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
 
                 //????
                 glm::mat4 View = glm::mat4(1.0f);
@@ -342,8 +338,8 @@ int CALLBACK WinMain
                 //printf("Part of Projection matrix:%f %f %f\n", Projection[0][1], Projection[1][1], Projection[2][1]);
                 std::cout<<glm::to_string(Projection)<<std::endl;
                 char* name = "texture1 ";
-                //setInt(ScreenBuffer.glData.ProgramID, name, BackBuffer.glData.textureHandle);
-                setInt(ScreenBuffer.glData.ProgramID, name, BackBuffer.glData.textureHandle);
+
+                setInt(ScreenBuffer.glData.ProgramID, name, ScreenBuffer.glData.textureHandle);
 
                 name = "view ";
                 setMat4(ScreenBuffer.glData.ProgramID, name, View);
@@ -351,12 +347,10 @@ int CALLBACK WinMain
                 name = "projection ";
                 setMat4(ScreenBuffer.glData.ProgramID, name, Projection);
 
-                // GL 4.3+
-                //glEnable(GL_DEBUG_OUTPUT);
-                //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
                 
-                printf("texture id:%d\n", BackBuffer.glData.textureHandle);
+                printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
                 printf("vertex array :%d\n", ScreenBuffer.glData.VAOs);
+
                 // =============================================
                 LARGE_INTEGER LastCounter;
                 QueryPerformanceCounter(&LastCounter);
@@ -429,16 +423,14 @@ int CALLBACK WinMain
                 //printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
                 //DeviceContext = GetDC(Window);
                 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);             
-
                 //printf("Program ID:%d \n", ScreenBuffer.glData.ProgramID);
-
                 //else {
                     //printf("NO program object created before\n");
                 //}
-
                 //glActiveTexture(GL_TEXTURE0);
                 //glBindTexture(GL_TEXTURE_2D, 1);
                 //printf("Texture ID: %d\n", ScreenBuffer.glData.textureHandle[0]);
+
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
 
                 //glm::vec3 Position = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -448,10 +440,11 @@ int CALLBACK WinMain
                 // camera/view transformation
                 //glm::mat4 View = glm::lookAt(Position, Position + Front, Up);
                 Model = glm::rotate(Model, glm::radians(fov), glm::vec3(1.0f, 0.0f, 0.5f));
-                name = "model ";
-                setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
+                name = "model";
+                setMat4(ScreenBuffer.glData.ProgramID, name, Model);
                 glBindVertexArray(ScreenBuffer.glData.VAOs);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
+
                 SwapBuffers(DeviceContext);
 
                 // Display on the screen
