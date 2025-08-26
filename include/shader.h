@@ -22,6 +22,8 @@
 
 #include "win32Game.h"
 #include <stdio.h>
+#include <string>
+#include <cstring>
 
 using namespace std;
 
@@ -48,11 +50,11 @@ void setVec3(GLuint programID, const char* name, const glm::vec3 &value);
 void setVec3(GLuint programID, const char* name,  float x, float y, float z);
 
 void setBool(GLuint programID, const char* name, const bool value);
-void setInt(GLuint programID, const char* name, const int value);
+void setInt(GLuint programID, const std::string name, const int value);
 
 // Set Matrix
 void setMat3(GLuint programID, const char* name, const glm::mat3 &value);
-void setMat4(GLuint programID, const char* name, const glm::mat4 &value);
+void setMat4(GLuint programID, const std::string name, const glm::mat4 &value);
 
 // Use the shader
 void useProgram(GLuint programID);

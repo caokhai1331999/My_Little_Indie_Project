@@ -40,10 +40,6 @@ void GetWindowDimension(HWND Window) {
 }
 
 void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Height) {
-    
-    if(OBuffer->BitmapMemory) {
-        VirtualFree(OBuffer->BitmapMemory, 0, MEM_RELEASE);
-    }
 
     if(OBuffer->BitmapMemoryForDirectBlit) {
         VirtualFree(OBuffer->BitmapMemoryForDirectBlit, 0, MEM_RELEASE);
@@ -54,20 +50,23 @@ void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Heigh
     //OBuffer->Pitch = OBuffer->BytesPerPixel * OBuffer->BitmapWidth;
     OBuffer->Pitch = 4 * OBuffer->BitmapWidth;
     
-    int BitMapMemorySize;
-
     OBuffer->Bitmapinfo.bmiHeader.biSize = sizeof(OBuffer->Bitmapinfo.bmiHeader);
     OBuffer->Bitmapinfo.bmiHeader.biWidth = OBuffer->BitmapWidth;
     OBuffer->Bitmapinfo.bmiHeader.biHeight = -OBuffer->BitmapHeight;
     OBuffer->Bitmapinfo.bmiHeader.biPlanes = 1;
     OBuffer->Bitmapinfo.bmiHeader.biBitCount = 32;
     OBuffer->Bitmapinfo.bmiHeader.biCompression = BI_RGB;
-        
-             
-    BitMapMemorySize = OBuffer->BytesPerPixel*(OBuffer->BitmapWidth*OBuffer->BitmapHeight);
+                     
+    OBuffer->BitmapMemorySize = OBuffer->BytesPerPixel*(OBuffer->BitmapWidth*OBuffer->BitmapHeight);
 
-    OBuffer->BitmapMemory = VirtualAlloc(0 ,BitMapMemorySize ,MEM_COMMIT, PAGE_READWRITE);
-    OBuffer->BitmapMemoryForDirectBlit = VirtualAlloc(0 ,BitMapMemorySize ,MEM_COMMIT, PAGE_READWRITE);
+    if(!OBuffer->GLImageRendered){
+        if(OBuffer->BitmapMemory) {
+            VirtualFree(OBuffer->BitmapMemory, 0, MEM_RELEASE);
+        }
+        OBuffer->BitmapMemory = VirtualAlloc(0 ,OBuffer->BitmapMemorySize ,MEM_COMMIT, PAGE_READWRITE);
+    }
+
+    OBuffer->BitmapMemoryForDirectBlit = VirtualAlloc(0 ,OBuffer->BitmapMemorySize ,MEM_COMMIT, PAGE_READWRITE);
 
 }
 
@@ -128,10 +127,7 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
     imageRowForDirectBlit += 4*((BlitHeight - 1) * BlitWidth);
 
     for (int32 Y{0}; Y < Height; Y++) {
-        uint32* Pixel = (uint32 *)Row;
-        uint32* DirectPixel = (uint32 *)DirectRow;
-        
-        uint32* imagePixel = (uint32* )imageRow;
+        uint32* DirectPixel = (uint32 *)DirectRow;        
         if(Y == BlitHeight){
             imageRowForDirectBlit += 4*((BlitHeight - 1) * BlitWidth);            
         }
@@ -155,8 +151,6 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
             // Pixel :
             // ImagePointer :
             // Why Pixel appear in uint8 not uint32
-
-            *Pixel++ = *imagePixel++;
             if(X >= BlitWidth){
                 *DirectPixel++ = 0xffffffff;
             } else {
@@ -165,18 +159,8 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
         }
         // Instead of manually move row pointer every y axis (by add it to the pitch)
         // we just need to reuse the Pixel pointer pass it to row where it was already moved
-
-        // NOTE: This order is for passing to OpenGL
-        imageRow+=ImagePitch;
-
         // And this is for passing directly to the window (RIGHT)
         imageRowForDirectBlit-=ImagePitch;
-//For GL
-        if(OBuffer != NULL){
-            Row+=OBuffer->Pitch;
-        } else {
-            Row+=FBuffer->Pitch;            
-        }
 // For direct blit
         if(OBuffer != NULL){
             DirectRow+=OBuffer->Pitch;
@@ -184,7 +168,28 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
             DirectRow+=FBuffer->Pitch;            
         }
         //NOTE: This incidentally produce right pixel order
-    }        
+    }
+
+    if(!OBuffer->GLImageRendered){    
+    for (int32 Y{0}; Y < Height; Y++) {
+        uint32* Pixel = (uint32 *)Row;
+        uint32* imagePixel = (uint32* )imageRow;
+        for(int32 X{0}; X < Width; X++) {
+            *Pixel++ = *imagePixel++;
+        }
+        // NOTE: This order is for passing to OpenGL
+        imageRow+=ImagePitch;
+//For GL
+        if(OBuffer != NULL){
+            Row+=OBuffer->Pitch;
+        } else {
+            Row+=FBuffer->Pitch;            
+        }
+        //NOTE: This incidentally produce right pixel order
+        OBuffer->GLImageRendered = true;
+    }
+    }
+
 }
 
 
@@ -366,7 +371,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 // data and address turn to null after the fx called
 
                 glGenTextures(1, &OBuffer->glData.textureHandle);
-                glBindTexture(GL_TEXTURE_2D, 0);
+                glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle );
 // OBuffer->glData.textureHandle is the name of the texture
                 //last argument This is where point to the image data
                 // Why this doesn't work
@@ -516,42 +521,49 @@ void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* Scre
     ScreenBuffer->Pitch = ScreenBuffer->Pitch!=BackBuffer->Pitch?BackBuffer->Pitch:printf("Pitch didn't change\n");
 
     // Why if I don't pass this type of data the app will collapse as the conflict of memory
-    if( ScreenBuffer->glData.VAOs != BackBuffer->glData.VAOs && BackBuffer->glData.VAOs!=NULL){
-        ScreenBuffer->glData.VAOs = BackBuffer->glData.VAOs;
+    if(!ScreenBuffer->GLDataPassed){
+        if( ScreenBuffer->glData.VAOs != BackBuffer->glData.VAOs && BackBuffer->glData.VAOs!=NULL){
+            ScreenBuffer->glData.VAOs = BackBuffer->glData.VAOs;
+        }
+
+        if(ScreenBuffer->glData.VBO != BackBuffer->glData.VBO && BackBuffer->glData.VBO!=NULL){
+            ScreenBuffer->glData.VBO = BackBuffer->glData.VBO;
+        }
+
+        if(ScreenBuffer->glData.ProgramID != BackBuffer->glData.ProgramID && BackBuffer->glData.ProgramID!=NULL){
+            ScreenBuffer->glData.ProgramID = BackBuffer->glData.ProgramID;
+        }
+
+        if(ScreenBuffer->glData.VAOs != BackBuffer->glData.VAOs && BackBuffer->glData.VAOs!=NULL){
+            ScreenBuffer->glData.VAOs = BackBuffer->glData.VAOs;
+        }
+
+        if(ScreenBuffer->glData.textureHandle != BackBuffer->glData.textureHandle && BackBuffer->glData.textureHandle!=NULL){
+            ScreenBuffer->glData.textureHandle = BackBuffer->glData.textureHandle; 
+        }
+
+        if(ScreenBuffer->BitmapMemory != BackBuffer->BitmapMemory && BackBuffer->BitmapMemory!=NULL){
+            ScreenBuffer->BitmapMemory = BackBuffer->BitmapMemory;
+        }
+
+        ScreenBuffer->GLDataPassed = true;
     }
 
-    if(ScreenBuffer->glData.VBO != BackBuffer->glData.VBO && BackBuffer->glData.VBO!=NULL){
-        ScreenBuffer->glData.VBO = BackBuffer->glData.VBO;
-    }
-
-    if(ScreenBuffer->glData.ProgramID != BackBuffer->glData.ProgramID && BackBuffer->glData.ProgramID!=NULL){
-        ScreenBuffer->glData.ProgramID = BackBuffer->glData.ProgramID;
-    }
-
-    if(ScreenBuffer->glData.VAOs != BackBuffer->glData.VAOs && BackBuffer->glData.VAOs!=NULL){
-        ScreenBuffer->glData.VAOs = BackBuffer->glData.VAOs;
-    }
-
-    if(ScreenBuffer->glData.textureHandle != BackBuffer->glData.textureHandle && BackBuffer->glData.textureHandle!=NULL){
-        ScreenBuffer->glData.textureHandle = BackBuffer->glData.textureHandle; 
-    }
         //ScreenBuffer->Bitmapinfo = BackBuffer->Bitmapinfo;
 //
         //if(ScreenBuffer->BitmapHandle != BackBuffer->BitmapHandle && BackBuffer->BitmapHandle != NULL){
         //ScreenBuffer->BitmapHandle = BackBuffer->BitmapHandle;
     //}
-    if(ScreenBuffer->BitmapMemory != BackBuffer->BitmapMemory && BackBuffer->BitmapMemory!=NULL){
-        ScreenBuffer->BitmapMemory = BackBuffer->BitmapMemory;
-    }
 }
 
 void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* FrontBuffer){
     printf("=====================================\n");
-    printf("              |  BackBuffer | FrontBuffer\n");
-    printf("VAOS          |  %d         | %d\n", BackBuffer->glData.VAOs, FrontBuffer->glData.VAOs);
-    printf("TextureID     |  %d         | %d\n", BackBuffer->glData.textureHandle, FrontBuffer->glData.textureHandle);
-    printf("ProgramID     |  %d         | %d\n", BackBuffer->glData.ProgramID, FrontBuffer->glData.ProgramID);
-    printf("Memory Address|0x%x|0x%x\n", BackBuffer->BitmapMemory, FrontBuffer->BitmapMemory);
+    printf("                 |  BackBuffer | FrontBuffer\n");
+    printf("VAOS             |  %d         | %d\n", BackBuffer->glData.VAOs, FrontBuffer->glData.VAOs);
+    printf("TextureID        |  %d         | %d\n", BackBuffer->glData.textureHandle, FrontBuffer->glData.textureHandle);
+    printf("ProgramID        |  %d         | %d\n", BackBuffer->glData.ProgramID, FrontBuffer->glData.ProgramID);
+    printf("Memory Address   |0x%x |0x%x \n", BackBuffer->BitmapMemory, FrontBuffer->BitmapMemory);
+    printf("DirectMem Address|0x%x size:%d |       \n", BackBuffer->BitmapMemoryForDirectBlit, BackBuffer->BitmapMemorySize);
     printf("=====================================\n");
 }
 

@@ -36,8 +36,10 @@ struct Win32_OffScreen_Buffer{
     int BitmapWidth;
     int BitmapHeight;
     int Pitch;
-
+    int BitmapMemorySize;
+    
     bool transferNeed;    
+    bool GLImageRendered = false;
     OpenGLData glData;
     const int BytesPerPixel = 4;
 };
@@ -51,7 +53,8 @@ struct Win32_Front_Buffer{
     int BitmapWidth;
     int BitmapHeight;
     int Pitch;
-    
+
+    bool GLDataPassed = false;
     OpenGLData glData;
 };
 

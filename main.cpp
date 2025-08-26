@@ -304,13 +304,14 @@ int CALLBACK WinMain
                 //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
                 InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
                 RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
+
                 Shader vshader;
                 Shader fshader;
 
                 loadShader(&vshader, "shader.vs", (VertexType)vertex);
                 loadShader(&fshader, "shader.fs", (VertexType)fragment);
-                BackBuffer.glData.ProgramID = setupGLprogram(&vshader, &fshader);                
                 copyBufferData(&BackBuffer, &ScreenBuffer);
+                ScreenBuffer.glData.ProgramID = setupGLprogram(&vshader, &fshader);                
 
                 if(glIsProgram(ScreenBuffer.glData.ProgramID)){
                     useProgram(ScreenBuffer.glData.ProgramID);
@@ -319,7 +320,7 @@ int CALLBACK WinMain
                     glDebugMessageCallback(MessageCallback, 0);
                     checkCompileErrors(vshader.shaderID, "Vertex");
                     checkCompileErrors(fshader.shaderID, "Fragment");
-                    checkCompileErrors(ScreenBuffer.glData.ProgramID, "Program");                    
+                    checkCompileErrors(ScreenBuffer.glData.ProgramID, "Program");
                     printf("NO program object created before\n");
                 }
 
@@ -328,24 +329,21 @@ int CALLBACK WinMain
 
                 //????
                 glm::mat4 View = glm::mat4(1.0f);
-                View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
                 glm::mat4 Model = glm::mat4(1.0f);
+                glm::mat4 Projection = glm::mat4(1.0f);
+
+                View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
+                std::cout<<"View matrix: "<<glm::to_string(View)<<std::endl;
                 float fov = 45.0f;
-
                 Model = glm::translate(Model, glm::vec3(0.0f, 0.0f, 0.0f));
-
-                glm::mat4 Projection = glm::perspective(glm::radians(fov), (float)Dimens.Width / (float)Dimens.Height, 0.1f, 100.0f);
+                std::cout<<glm::to_string(Model)<<std::endl;
+                Projection = glm::perspective(glm::radians(fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
                 //printf("Part of Projection matrix:%f %f %f\n", Projection[0][1], Projection[1][1], Projection[2][1]);
-                std::cout<<glm::to_string(Projection)<<std::endl;
-                char* name = "texture1 ";
+                std::cout<<"Perspective matrix: "<<glm::to_string(Projection)<<std::endl;
 
-                setInt(ScreenBuffer.glData.ProgramID, name, ScreenBuffer.glData.textureHandle);
-
-                name = "view ";
-                setMat4(ScreenBuffer.glData.ProgramID, name, View);
-
-                name = "projection ";
-                setMat4(ScreenBuffer.glData.ProgramID, name, Projection);
+                setInt(ScreenBuffer.glData.ProgramID, "texture1", ScreenBuffer.glData.textureHandle);
+                setMat4(ScreenBuffer.glData.ProgramID, "view", View);
+                setMat4(ScreenBuffer.glData.ProgramID, "projection", Projection);
 
                 
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
@@ -414,7 +412,7 @@ int CALLBACK WinMain
                         copyBufferData(&BackBuffer, &ScreenBuffer);
                         BackBuffer.transferNeed = false;                        
                         displayBufferData(&BackBuffer, &ScreenBuffer);
-                        glViewport(0, 0, ScreenBuffer.BitmapWidth, ScreenBuffer.BitmapHeight);
+                        glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
                     };
                 }
 
@@ -439,9 +437,8 @@ int CALLBACK WinMain
 
                 // camera/view transformation
                 //glm::mat4 View = glm::lookAt(Position, Position + Front, Up);
-                Model = glm::rotate(Model, glm::radians(fov), glm::vec3(1.0f, 0.0f, 0.5f));
-                name = "model";
-                setMat4(ScreenBuffer.glData.ProgramID, name, Model);
+                //Model = glm::rotate(Model, glm::radians(fov)*0.5f, glm::vec3(1.0f, 0.0f, 0.5f));
+                setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
                 glBindVertexArray(ScreenBuffer.glData.VAOs);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -495,6 +492,8 @@ int CALLBACK WinMain
                 ReleaseDC(Window, DeviceContext);
             }
             }                
+            glDeleteVertexArrays(1, &BackBuffer.glData.VAOs);
+            glDeleteBuffers(1, &BackBuffer.glData.VBO);
         }
         else{
             //TODO: Logging

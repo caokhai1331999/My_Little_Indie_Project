@@ -132,8 +132,8 @@ void setBool(GLuint programID, const char* name, const bool value){
     glUniform1i(glGetUniformLocation(programID, name), (int)value);
 };
 
-void setInt(GLuint programID, const char* name, const int value){
-    glUniform1i(glGetUniformLocation(programID, name), value);
+void setInt(GLuint programID, const std::string name, const int value){
+    glUniform1i(glGetUniformLocation(programID, name.c_str()), value);
 };
 
 //Vector 2nd argument is number of vector
@@ -158,8 +158,8 @@ void setMat3(GLuint programID, const char* name, const glm::mat3 &value){
     glUniformMatrix3fv(glGetUniformLocation(programID, name), 1, GL_FALSE, &value[0][0]);
 };
 
- void setMat4(GLuint programID, const char* name, const glm::mat4 &value){
-    glUniformMatrix4fv(glGetUniformLocation(programID, name), 1, GL_FALSE, &value[0][0]);
+void setMat4(GLuint programID, const std::string name, const glm::mat4 &value){
+    glUniformMatrix4fv(glGetUniformLocation(programID, name.c_str()), 1, GL_FALSE, &value[0][0]);
     //printf("pointer to matrix is: 0x%hx\n",&value[0][0]);
  };
 
