@@ -328,11 +328,16 @@ int CALLBACK WinMain
                 //glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
 
                 //????
-                glm::mat4 View = glm::mat4(1.0f);
+                //glm::mat4 View = glm::mat4(1.0f);
                 glm::mat4 Model = glm::mat4(1.0f);
                 glm::mat4 Projection = glm::mat4(1.0f);
 
-                View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
+                //View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
+                glm::vec3 Position = glm::vec3(4.0f, 3.0f, 3.0f);
+                glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
+                glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+                glm::mat4 View = glm::lookAt(Position, glm::vec3(0,0,0), Up);
                 std::cout<<"View matrix: "<<glm::to_string(View)<<std::endl;
                 float fov = 45.0f;
                 Model = glm::translate(Model, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -342,6 +347,7 @@ int CALLBACK WinMain
                 std::cout<<"Perspective matrix: "<<glm::to_string(Projection)<<std::endl;
 
                 setInt(ScreenBuffer.glData.ProgramID, "texture1", ScreenBuffer.glData.textureHandle);
+
                 setMat4(ScreenBuffer.glData.ProgramID, "view", View);
                 setMat4(ScreenBuffer.glData.ProgramID, "projection", Projection);
 
@@ -431,12 +437,7 @@ int CALLBACK WinMain
 
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
 
-                //glm::vec3 Position = glm::vec3(0.0f, 0.0f, 0.0f);
-                //glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
-                //glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
-
                 // camera/view transformation
-                //glm::mat4 View = glm::lookAt(Position, Position + Front, Up);
                 //Model = glm::rotate(Model, glm::radians(fov)*0.5f, glm::vec3(1.0f, 0.0f, 0.5f));
                 setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
                 glBindVertexArray(ScreenBuffer.glData.VAOs);

@@ -18,7 +18,9 @@ struct win32Dimension{
 
 struct OpenGLData{
     unsigned int VAOs;
+    unsigned int ColorVAOs;
     unsigned int VBO;
+    unsigned int ColorVBO;
 
     unsigned int ProgramID;
     

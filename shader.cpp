@@ -163,7 +163,7 @@ void setMat4(GLuint programID, const std::string name, const glm::mat4 &value){
     //printf("pointer to matrix is: 0x%hx\n",&value[0][0]);
  };
 
-void checkCompileErrors(GLuint shader, char* type)
+void checkCompileErrors(GLuint shader, const char* type)
 {
     GLint success;
     int infoLength;
@@ -180,6 +180,7 @@ void checkCompileErrors(GLuint shader, char* type)
         {
             glGetShaderInfoLog(shader, infoLength, NULL, infoLog);
             printf("ERROR::SHADER_COMPILATION_ERROR of type: %s\n %s", type, infoLog);
+            //std::cout<<infoLog<<std::endl;
         }
     }
     else
@@ -192,7 +193,7 @@ void checkCompileErrors(GLuint shader, char* type)
                 free(infoLog);
             }
             infoLog = (GLchar*)malloc(infoLength);
-            glGetProgramInfoLog(shader, infoLength, NULL, infoLog);
+            glGetProgramInfoLog(shader, 512, NULL, infoLog);
             printf("ERROR::PROGRAM_LINKING_ERROR of type: %s\n %s", type, infoLog);
         }
     }

@@ -61,7 +61,7 @@ void useProgram(GLuint programID);
 
 // Attaching shader to program
 GLuint setupGLprogram(Shader* vshader, Shader* fshader);
-void checkCompileErrors(GLuint shader, char* type);
+void checkCompileErrors(GLuint shader, const char* type);
 
 #define SHADER_H
 #endif
