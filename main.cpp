@@ -310,8 +310,8 @@ int CALLBACK WinMain
 
                 loadShader(&vshader, "shader.vs", (VertexType)vertex);
                 loadShader(&fshader, "shader.fs", (VertexType)fragment);
-                copyBufferData(&BackBuffer, &ScreenBuffer);
                 ScreenBuffer.glData.ProgramID = setupGLprogram(&vshader, &fshader);                
+                copyBufferData(&BackBuffer, &ScreenBuffer);
 
                 if(glIsProgram(ScreenBuffer.glData.ProgramID)){
                     useProgram(ScreenBuffer.glData.ProgramID);
@@ -382,6 +382,7 @@ int CALLBACK WinMain
   initialized yet
 */            
 
+                real32 count = 0.0f;
                 while(GlobalRunning) {
                 MSG Message;
                 //NOTE: This is where receiving the message to change
@@ -483,6 +484,13 @@ int CALLBACK WinMain
  #endif                
                 LastCounter = EndCounter;
                 LastCycleCounts = EndCycleCounts;
+
+                if(ElapsedCounter - count >= 17.0f){
+                    Model = glm::rotate(Model, glm::radians(20.0f), glm::vec3(0.4f, 0.0f, 0.5f));
+                    setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
+                    count = ElapsedCounter;
+                }
+
 /*
                 MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per register 
                 MULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register  

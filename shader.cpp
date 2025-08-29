@@ -134,6 +134,12 @@ void setBool(GLuint programID, const char* name, const bool value){
 
 void setInt(GLuint programID, const std::string name, const int value){
     glUniform1i(glGetUniformLocation(programID, name.c_str()), value);
+    if(name.c_str()==""){
+        printf("name content is NULL\n");
+    }
+    if(&value == 0x00){
+        printf("value content is NULL\n");        
+    }
 };
 
 //Vector 2nd argument is number of vector
