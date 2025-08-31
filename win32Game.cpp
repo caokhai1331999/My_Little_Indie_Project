@@ -441,11 +441,11 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 glGenerateMipmap(GL_TEXTURE_2D);
                 
    //Wrapping
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
    //Filter
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
                 GLenum err = glGetError();
 
@@ -571,39 +571,12 @@ void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* Scre
 
     // Why if I don't pass this type of data the app will collapse as the conflict of memory
     if(!ScreenBuffer->GLDataPassed){
-        if( ScreenBuffer->glData.VAOs != BackBuffer->glData.VAOs && BackBuffer->glData.VAOs!=NULL){
-            ScreenBuffer->glData.VAOs = BackBuffer->glData.VAOs;
-        }
-
-        if(ScreenBuffer->glData.VBO != BackBuffer->glData.VBO && BackBuffer->glData.VBO!=NULL){
-            ScreenBuffer->glData.VBO = BackBuffer->glData.VBO;
-        }
-
-        if(ScreenBuffer->glData.ColorVBO != BackBuffer->glData.ColorVBO && BackBuffer->glData.ColorVBO!=NULL){
-            ScreenBuffer->glData.ColorVBO = BackBuffer->glData.ColorVBO;
-        }
-
-        if(ScreenBuffer->glData.ProgramID != BackBuffer->glData.ProgramID && BackBuffer->glData.ProgramID!=NULL){
-            ScreenBuffer->glData.ProgramID = BackBuffer->glData.ProgramID;
-        }
-
-        if(ScreenBuffer->glData.VAOs != BackBuffer->glData.VAOs && BackBuffer->glData.VAOs!=NULL){
-            ScreenBuffer->glData.VAOs = BackBuffer->glData.VAOs;
-        }
-
-        if(ScreenBuffer->glData.ColorVAOs != BackBuffer->glData.ColorVAOs && BackBuffer->glData.ColorVAOs!=NULL){
-            ScreenBuffer->glData.ColorVAOs = BackBuffer->glData.ColorVAOs;
-        }
-
-        if(ScreenBuffer->glData.textureHandle != BackBuffer->glData.textureHandle && BackBuffer->glData.textureHandle!=NULL){
-            ScreenBuffer->glData.textureHandle = BackBuffer->glData.textureHandle; 
-        }
-
-        if(ScreenBuffer->BitmapMemory != BackBuffer->BitmapMemory && BackBuffer->BitmapMemory!=NULL){
-            ScreenBuffer->BitmapMemory = BackBuffer->BitmapMemory;
-        }
-
+        PassGLData(&BackBuffer->glData, &ScreenBuffer->glData);
         ScreenBuffer->GLDataPassed = true;
+    }
+
+    if(ScreenBuffer->BitmapMemory != BackBuffer->BitmapMemory && BackBuffer->BitmapMemory!=NULL){
+        ScreenBuffer->BitmapMemory = BackBuffer->BitmapMemory;
     }
 
         //ScreenBuffer->Bitmapinfo = BackBuffer->Bitmapinfo;
@@ -641,4 +614,36 @@ void APIENTRY MessageCallback(GLenum source,
               << " type = 0x" << std::hex << type
               << ", severity = 0x" << severity
               << ", message = " << message << std::endl;
+}
+
+void PassGLData(OpenGLData* BackData, OpenGLData* FrontData)
+{
+        if( FrontData->VAOs != BackData->VAOs && BackData->VAOs!=NULL){
+            FrontData->VAOs = BackData->VAOs;
+        }
+
+        if(FrontData->VBO != BackData->VBO && BackData->VBO!=NULL){
+            FrontData->VBO = BackData->VBO;
+        }
+
+        if(FrontData->ColorVBO != BackData->ColorVBO && BackData->ColorVBO!=NULL){
+            FrontData->ColorVBO = BackData->ColorVBO;
+        }
+
+        if(FrontData->ProgramID != BackData->ProgramID && BackData->ProgramID!=NULL){
+            FrontData->ProgramID = BackData->ProgramID;
+        }
+
+        if(FrontData->VAOs != BackData->VAOs && BackData->VAOs!=NULL){
+            FrontData->VAOs = BackData->VAOs;
+        }
+
+        if(FrontData->ColorVAOs != BackData->ColorVAOs && BackData->ColorVAOs!=NULL){
+            FrontData->ColorVAOs = BackData->ColorVAOs;
+        }
+
+        if(FrontData->textureHandle != BackData->textureHandle && BackData->textureHandle!=NULL){
+            FrontData->textureHandle = BackData->textureHandle; 
+        }
+    
 }

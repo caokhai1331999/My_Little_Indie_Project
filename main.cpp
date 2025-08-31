@@ -297,13 +297,12 @@ int CALLBACK WinMain
                 BMPContent = DEBUGReadBMP("Harry and Accomplices_rescaled.bmp", &result);
                 //JPGContent = DEBUGReadJPG("Harry and Accomplices.jpg", &result2);
                 //OpenGL part
-                Win32_Front_Buffer ScreenBuffer = {};
-
+                Win32_Front_Buffer ScreenBuffer = Win32_Front_Buffer(BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, &BackBuffer.glData, BackBuffer.BitmapMemory);
 // Cause the ScreenData will be deleted out of the loop so
                 // We have to assign address of memory and glData to
                 //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
-                InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
                 RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
+                InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
 
                 Shader vshader;
                 Shader fshader;
@@ -312,20 +311,6 @@ int CALLBACK WinMain
                 loadShader(&fshader, "shader.fs", (VertexType)fragment);
                 ScreenBuffer.glData.ProgramID = setupGLprogram(&vshader, &fshader);                
                 copyBufferData(&BackBuffer, &ScreenBuffer);
-
-                if(glIsProgram(ScreenBuffer.glData.ProgramID)){
-                    useProgram(ScreenBuffer.glData.ProgramID);
-                    printf("Program ID: %d\n", ScreenBuffer.glData.ProgramID);
-                } else {
-                    glDebugMessageCallback(MessageCallback, 0);
-                    checkCompileErrors(vshader.shaderID, "Vertex");
-                    checkCompileErrors(fshader.shaderID, "Fragment");
-                    checkCompileErrors(ScreenBuffer.glData.ProgramID, "Program");
-                    printf("NO program object created before\n");
-                }
-
-                glActiveTexture(GL_TEXTURE0);
-                //glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
 
                 //????
                 //glm::mat4 View = glm::mat4(1.0f);
@@ -346,11 +331,25 @@ int CALLBACK WinMain
                 //printf("Part of Projection matrix:%f %f %f\n", Projection[0][1], Projection[1][1], Projection[2][1]);
                 std::cout<<"Perspective matrix: "<<glm::to_string(Projection)<<std::endl;
 
-                setInt(ScreenBuffer.glData.ProgramID, "texture1", ScreenBuffer.glData.textureHandle);
+                
+                if(glIsProgram(ScreenBuffer.glData.ProgramID)){
+                    useProgram(ScreenBuffer.glData.ProgramID);
+                    printf("Program ID: %d\n", ScreenBuffer.glData.ProgramID);
+                } else {
+                    glDebugMessageCallback(MessageCallback, 0);
+                    checkCompileErrors(vshader.shaderID, "Vertex");
+                    checkCompileErrors(fshader.shaderID, "Fragment");
+                    checkCompileErrors(ScreenBuffer.glData.ProgramID, "Program");
+                    printf("NO program object created before\n");
+                }
+
+                glActiveTexture(GL_TEXTURE0);
+                //glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
+
+                setInt(ScreenBuffer.glData.ProgramID, "ttexture1", ScreenBuffer.glData.textureHandle);
 
                 setMat4(ScreenBuffer.glData.ProgramID, "view", View);
                 setMat4(ScreenBuffer.glData.ProgramID, "projection", Projection);
-
                 
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
                 printf("vertex array :%d\n", ScreenBuffer.glData.VAOs);
@@ -359,7 +358,7 @@ int CALLBACK WinMain
                 LARGE_INTEGER LastCounter;
                 QueryPerformanceCounter(&LastCounter);
                 uint64 LastCycleCounts;
-            
+
                 Game_Input Input[2] = {};
                 Game_Input* OldInput = &Input[0];
                 Game_Input* NewInput = &Input[1];
@@ -371,7 +370,6 @@ int CALLBACK WinMain
                 InitSoundBuffer(&Window, &SoundOutPut);
                 int16* SSamples = (int16* )VirtualAlloc(0 , SoundOutPut.SecondBufferSize ,MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
 
-
                 //Why InitOpenGl only work in the app loop
             
                 int MaxControllerCount = XUSER_MAX_COUNT;
@@ -381,8 +379,7 @@ int CALLBACK WinMain
   May be this is related to Window and DC that hasn't been
   initialized yet
 */            
-
-                real32 count = 0.0f;
+                WaitTimeCounter = 0.0f;
                 while(GlobalRunning) {
                 MSG Message;
                 //NOTE: This is where receiving the message to change
@@ -409,7 +406,6 @@ int CALLBACK WinMain
                  //Update here                
                 //printf("Just before Game update and render\n");                
                 // Attach VAO
-
                 if(BackBuffer.transferNeed){
                     int count = 0;
                     while (count < 20){
@@ -435,12 +431,9 @@ int CALLBACK WinMain
                 //glActiveTexture(GL_TEXTURE0);
                 //glBindTexture(GL_TEXTURE_2D, 1);
                 //printf("Texture ID: %d\n", ScreenBuffer.glData.textureHandle[0]);
-
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
-
                 // camera/view transformation
                 //Model = glm::rotate(Model, glm::radians(fov)*0.5f, glm::vec3(1.0f, 0.0f, 0.5f));
-                setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
                 glBindVertexArray(ScreenBuffer.glData.VAOs);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -453,8 +446,10 @@ int CALLBACK WinMain
                 //Why the &ScreenBuffer data doesn't show on the direct screen
 
                 LARGE_INTEGER EndCounter;
+                //In 1us(1/1000000)
                 QueryPerformanceCounter(&EndCounter);
 
+                // Frame(cycles)
                 uint64 EndCycleCounts;
                 EndCycleCounts = __rdtsc();
  
@@ -468,29 +463,39 @@ int CALLBACK WinMain
                  D : Data
                 
 */                
- 
+
+                // Number of ticks/frame
                 uint64 CyclesElapsed = EndCycleCounts - LastCycleCounts;
                 //NOTE: It based on the var type to decide what kind of the substraction to do
+
+                // Time elapsed of one cycle/frame in 1/000000 s
                 real32 ElapsedCounter = (real32)((real32)(EndCounter.QuadPart) - (real32)(LastCounter.QuadPart));
                 real32 McPerFrame = (real32)((real32)CyclesElapsed/(1000.f * 1000.f));
-                real32 MsPerFrame = (real32)((1000 * (real32)ElapsedCounter) / (real32)PerfCountFrequency);
+                // Time elapsed of one cycle/frame in second
+                //real32 MsPerFrame = (real32)((1000 * (real32)ElapsedCounter) / (real32)PerfCountFrequency);
+                real32 MsPerFrame = (real32)((1000  * (real32)ElapsedCounter) / (real32)CyclesElapsed);
                 real32 FPS = (real32)((real32)PerfCountFrequency/(real32)ElapsedCounter);
- #if 0                
+
+#if 0                
                 char Buffer[256];
                 //NOTE: The '%' is to decide the format of the next thing to print
                  for example: %d is the 32 bit integer
                 sprintf(Buffer, "%f Miliseconds/Frame, %f FPS, %f Mc/f \n ", MsPerFrame, FPS, MsPerFrame);
                 OutputDebugStringA(Buffer);
  #endif                
-                LastCounter = EndCounter;
-                LastCycleCounts = EndCycleCounts;
-
-                if(ElapsedCounter - count >= 17.0f){
+                
+                if(WaitTimeCounter >= 1.67f){
                     Model = glm::rotate(Model, glm::radians(20.0f), glm::vec3(0.4f, 0.0f, 0.5f));
                     setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
-                    count = ElapsedCounter;
+                    // Wait to 17 milli s perframe for model to rotate
+                    WaitTimeCounter = 0.0f;
+                } else {
+                    WaitTimeCounter += MsPerFrame;
+                    //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
                 }
-
+                
+                LastCounter = EndCounter;
+                LastCycleCounts = EndCycleCounts;
 /*
                 MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per register 
                 MULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register  

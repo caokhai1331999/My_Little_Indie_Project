@@ -45,7 +45,7 @@ struct Win32_OffScreen_Buffer{
     OpenGLData glData;
     const int BytesPerPixel = 4;
 };
-
+void PassGLData(OpenGLData* BackData, OpenGLData* FrontData);
 struct Win32_Front_Buffer{  
     //BITMAPINFO Bitmapinfo;
     //HBITMAP BitmapHandle;
@@ -58,6 +58,10 @@ struct Win32_Front_Buffer{
 
     bool GLDataPassed = false;
     OpenGLData glData;
+    Win32_Front_Buffer(int PassedWidth, int PassedHeight, OpenGLData* PassedglData, void* PassedMem):BitmapWidth(PassedWidth), BitmapHeight(PassedHeight), BitmapMemory(PassedMem)
+    {
+        PassGLData(PassedglData, &glData);
+    }
 };
 
 global_variable bool  GlobalRunning;
@@ -68,6 +72,8 @@ global_variable HDC DeviceContext;
 global_variable Win32_OffScreen_Buffer BackBuffer = {};
 global_variable Game_State State = {};
 global_variable imagee_content* BMPContent;
+global_variable real32 WaitTimeCounter = 0.0f;
+
 const global_variable int Height = 720;
 const global_variable int Width = 1280;
 
@@ -92,5 +98,6 @@ void APIENTRY MessageCallback(GLenum source,
                               GLsizei length,
                               const GLchar* message,
                               const void* userParam);
+
 #define WIN32GAME_H
 #endif
