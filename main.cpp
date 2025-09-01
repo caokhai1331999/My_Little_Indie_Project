@@ -9,6 +9,8 @@
 #include "win32Game.h"
 #include "shader.h"
 #include "SoundMaker.h"
+#include <ctime>
+#include <cstdlib>
 
 LRESULT CALLBACK MainWindowCallBack(
     HWND Window,
@@ -301,6 +303,7 @@ int CALLBACK WinMain
 // Cause the ScreenData will be deleted out of the loop so
                 // We have to assign address of memory and glData to
                 //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
+                std::srand(std::time(NULL));
                 RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
                 InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
 
@@ -343,9 +346,6 @@ int CALLBACK WinMain
                     printf("NO program object created before\n");
                 }
 
-                glActiveTexture(GL_TEXTURE0);
-                //glBindTexture(GL_TEXTURE_2D, ScreenBuffer.glData.textureHandle[0]);
-
                 setInt(ScreenBuffer.glData.ProgramID, "ttexture1", ScreenBuffer.glData.textureHandle);
 
                 setMat4(ScreenBuffer.glData.ProgramID, "view", View);
@@ -380,6 +380,7 @@ int CALLBACK WinMain
   initialized yet
 */            
                 WaitTimeCounter = 0.0f;
+                float ChangeAxisCounter = 0.0f;
                 while(GlobalRunning) {
                 MSG Message;
                 //NOTE: This is where receiving the message to change
@@ -408,14 +409,14 @@ int CALLBACK WinMain
                 // Attach VAO
                 if(BackBuffer.transferNeed){
                     int count = 0;
-                    while (count < 20){
+                    while (count < 6){
                         count++;
                     };
-                    if (count > 19){
+                    if (count >= 5){
                         copyBufferData(&BackBuffer, &ScreenBuffer);
                         BackBuffer.transferNeed = false;                        
                         displayBufferData(&BackBuffer, &ScreenBuffer);
-                        glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
+                        glViewport(0, 0, ScreenBuffer.BitmapWidth, ScreenBuffer.BitmapHeight);
                     };
                 }
 
@@ -483,9 +484,15 @@ int CALLBACK WinMain
                 sprintf(Buffer, "%f Miliseconds/Frame, %f FPS, %f Mc/f \n ", MsPerFrame, FPS, MsPerFrame);
                 OutputDebugStringA(Buffer);
  #endif                
-                
-                if(WaitTimeCounter >= 1.67f){
-                    Model = glm::rotate(Model, glm::radians(20.0f), glm::vec3(0.4f, 0.0f, 0.5f));
+                glm::vec3 randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2));
+                if(WaitTimeCounter >= 16.67f){
+                    if(ChangeAxisCounter >= 1000.0f){
+                        ChangeAxisCounter = 0.0f;
+                        randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2));
+                    } else {
+                        ChangeAxisCounter += WaitTimeCounter;
+                    }
+                    Model = glm::rotate(Model, glm::radians(20.0f), randomRotateAxis);
                     setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
                     // Wait to 17 milli s perframe for model to rotate
                     WaitTimeCounter = 0.0f;

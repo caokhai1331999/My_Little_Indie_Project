@@ -172,19 +172,19 @@ void setMat4(GLuint programID, const std::string name, const glm::mat4 &value){
 void checkCompileErrors(GLuint shader, const char* type)
 {
     GLint success;
-    int infoLength;
-    GLchar* infoLog;
+    int infoLength = 0;
+    GLchar infoLog;
     if (type != "PROGRAM")
     {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         glGetProgramiv(shader, GL_INFO_LOG_LENGTH, &infoLength);
-        if(infoLog != NULL){
-            free(infoLog);
-        }
-        infoLog = (GLchar*)malloc(infoLength);
+        //if(infoLog != nullptr){
+            //free(infoLog);
+        //}
+            //infoLog = (GLchar*)malloc(infoLength);
         if (!success )
         {
-            glGetShaderInfoLog(shader, infoLength, NULL, infoLog);
+            glGetShaderInfoLog(shader, infoLength, NULL, &infoLog);
             printf("ERROR::SHADER_COMPILATION_ERROR of type: %s\n %s", type, infoLog);
             //std::cout<<infoLog<<std::endl;
         }
@@ -195,11 +195,11 @@ void checkCompileErrors(GLuint shader, const char* type)
         glGetProgramiv(shader, GL_INFO_LOG_LENGTH, &infoLength);        
         if (!success|| (infoLength > 0))
         {
-            if(infoLog != NULL){
-                free(infoLog);
-            }
-            infoLog = (GLchar*)malloc(infoLength);
-            glGetProgramInfoLog(shader, 512, NULL, infoLog);
+            //if(infoLog != nullptr){
+                //free(infoLog);
+            //}
+            //infoLog = (GLchar*)malloc(infoLength);
+            glGetProgramInfoLog(shader, 512, NULL, &infoLog);
             printf("ERROR::PROGRAM_LINKING_ERROR of type: %s\n %s", type, infoLog);
         }
     }

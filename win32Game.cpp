@@ -423,7 +423,13 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
 // OBuffer->glData.textureHandle is the name of the texture
                 //last argument This is where point to the image data
                 // Why this doesn't work
-                glViewport(0, 0, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
+                if(FBuffer->BitmapHeight != OBuffer->BitmapHeight){
+                    FBuffer->BitmapHeight != OBuffer->BitmapHeight;
+                }
+                if(FBuffer->BitmapWidth != OBuffer->BitmapWidth){
+                    FBuffer->BitmapWidth != OBuffer->BitmapWidth;
+                }
+                glViewport(0, 0, FBuffer->BitmapWidth, FBuffer->BitmapHeight);
                 
                 //if(OBuffer->BitmapMemory != NULL){
                     //printf("We have Image content but somehow it wasn't shown on screen\n");                    
@@ -618,32 +624,39 @@ void APIENTRY MessageCallback(GLenum source,
 
 void PassGLData(OpenGLData* BackData, OpenGLData* FrontData)
 {
-        if( FrontData->VAOs != BackData->VAOs && BackData->VAOs!=NULL){
+    if( FrontData->VAOs != BackData->VAOs && !isNull(&BackData->VAOs)){
             FrontData->VAOs = BackData->VAOs;
         }
 
-        if(FrontData->VBO != BackData->VBO && BackData->VBO!=NULL){
+        if(FrontData->VBO != BackData->VBO && !isNull(&BackData->VBO)){
             FrontData->VBO = BackData->VBO;
         }
 
-        if(FrontData->ColorVBO != BackData->ColorVBO && BackData->ColorVBO!=NULL){
+        if(FrontData->ColorVBO != BackData->ColorVBO && !isNull(&BackData->ColorVBO)){
             FrontData->ColorVBO = BackData->ColorVBO;
         }
 
-        if(FrontData->ProgramID != BackData->ProgramID && BackData->ProgramID!=NULL){
-            FrontData->ProgramID = BackData->ProgramID;
-        }
+        //if(FrontData->ProgramID != BackData->ProgramID && !isNull(&BackData->ProgramID)){
+            //FrontData->ProgramID = BackData->ProgramID;
+        //}
 
-        if(FrontData->VAOs != BackData->VAOs && BackData->VAOs!=NULL){
+        if(FrontData->VAOs != BackData->VAOs && !isNull(&BackData->VAOs)){
             FrontData->VAOs = BackData->VAOs;
         }
 
-        if(FrontData->ColorVAOs != BackData->ColorVAOs && BackData->ColorVAOs!=NULL){
+        if(FrontData->ColorVAOs != BackData->ColorVAOs && !isNull(&BackData->ColorVAOs)){
             FrontData->ColorVAOs = BackData->ColorVAOs;
         }
 
-        if(FrontData->textureHandle != BackData->textureHandle && BackData->textureHandle!=NULL){
+        if(FrontData->textureHandle != BackData->textureHandle && !isNull(&BackData->textureHandle)){
             FrontData->textureHandle = BackData->textureHandle; 
         }
     
+}
+
+bool isNull(unsigned int* member){
+    if(member == 0x00){
+        return true;
+    }
+    return false;
 }

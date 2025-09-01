@@ -45,6 +45,7 @@ struct Win32_OffScreen_Buffer{
     OpenGLData glData;
     const int BytesPerPixel = 4;
 };
+bool isNull(GLuint* member = nullptr);
 void PassGLData(OpenGLData* BackData, OpenGLData* FrontData);
 struct Win32_Front_Buffer{  
     //BITMAPINFO Bitmapinfo;
@@ -60,8 +61,13 @@ struct Win32_Front_Buffer{
     OpenGLData glData;
     Win32_Front_Buffer(int PassedWidth, int PassedHeight, OpenGLData* PassedglData, void* PassedMem):BitmapWidth(PassedWidth), BitmapHeight(PassedHeight), BitmapMemory(PassedMem)
     {
+        //isNull(&glData.VAOs)?glData.VAOs=0:printf("Front Buffer VAOs is not NUll\n");
+        //isNull(&glData.ColorVAOs)?glData.ColorVAOs=0:printf("Front Buffer ColorVAOs is not NUll\n");
+        //isNull(&glData.VBO)?glData.VBO=0:printf("Front Buffer VBO is not NUll\n");
+        //isNull(&glData.ColorVBO)?glData.ColorVBO=0:printf("Front Buffer ColorVBO is not NUll\n");
         PassGLData(PassedglData, &glData);
     }
+    
 };
 
 global_variable bool  GlobalRunning;
