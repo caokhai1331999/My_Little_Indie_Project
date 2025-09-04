@@ -43,6 +43,9 @@ struct Win32_OffScreen_Buffer{
     bool transferNeed;    
     bool GLImageRendered = false;
     OpenGLData glData;
+
+    Camera camera;
+    
     const int BytesPerPixel = 4;
 };
 bool isNull(GLuint* member = nullptr);

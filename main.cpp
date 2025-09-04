@@ -56,6 +56,7 @@ LRESULT CALLBACK MainWindowCallBack(
                 OutputDebugStringA("Left Button :");
                 if(IsDown) {                    
                     OutputDebugStringA(" Is Down");
+                    
                 }
                 OutputDebugStringA("\n");
             }
@@ -94,24 +95,28 @@ LRESULT CALLBACK MainWindowCallBack(
 
                 if(vkCode == VK_UP) {
                     State.BlueOffset+= 10;
+                    BackBuffer.camera.Position += BackBuffer.camera.Front *BackBuffer.camera.speed;
                     printf("YOffset is %d\n", State.BlueOffset);
                 }
 
                 else if(vkCode == VK_DOWN) {
                     State.GreenOffset+= 10;
+                    BackBuffer.camera.Position -= BackBuffer.camera.Front *BackBuffer.camera.speed;
                     printf("YOffset is %d\n", State.GreenOffset);
                 }
 
                 else if(vkCode == VK_LEFT) {
                     //XOffset -= 10;
                     OutputDebugStringA("Left Button :");
-                    //if(WasDown) {                    
-                    //    OutputDebugStringA(" Was Down");
-                    //}
+                    if(WasDown) {                    
+                        BackBuffer.camera.Position += glm::cross(BackBuffer.camera.Up, BackBuffer.camera.Front)*BackBuffer.camera.speed;
+                        OutputDebugStringA(" Was Down");
+                    }
                     OutputDebugStringA("\n");
                 }
 
                 else if(vkCode == VK_RIGHT) {
+                    BackBuffer.camera.Position -= glm::cross(BackBuffer.camera.Up, BackBuffer.camera.Front)*BackBuffer.camera.speed;
                     //XOffset += 10;                    
                 }
                 
@@ -314,7 +319,6 @@ int CALLBACK WinMain
                 loadShader(&fshader, "shader.fs", (VertexType)fragment);
                 ScreenBuffer.glData.ProgramID = setupGLprogram(&vshader, &fshader);                
                 copyBufferData(&BackBuffer, &ScreenBuffer);
-
                 //????
                 //glm::mat4 View = glm::mat4(1.0f);
                 glm::mat4 Model = glm::mat4(1.0f);
@@ -325,6 +329,8 @@ int CALLBACK WinMain
                 glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
                 glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
 
+                BackBuffer.camera = Camera(Front, Up, Position, glm::vec3(0.0f));
+// This will be replaced by camera.view matrix
                 glm::mat4 View = glm::lookAt(Position, glm::vec3(0,0,0), Up);
                 std::cout<<"View matrix: "<<glm::to_string(View)<<std::endl;
                 float fov = 45.0f;

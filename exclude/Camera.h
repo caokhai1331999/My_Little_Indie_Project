@@ -34,16 +34,34 @@ struct Camera{
     float Roll;// May be this one is unecessary
 
     // Camera attributes
+    glm::vec3 Position;
     glm::vec3 Front;
     glm::vec3 Up;
     glm::vec3 Right;
-    glm::vec3 Position;
+
+    glm::vec3 Pointing;
     glm::vec3 WorldUp;
 
+    glm::mat4 camera = glm::mat4(1.0f);
+    
     // Options
     float zoom;
     float sentivity;
     float speed;
+
+    Camera(glm::vec3 front = glm::vec3(), glm::vec3 up = glm::vec3() glm::vec3 position = glm::vec3(), glm::vec3 pointing = glm::vec3()): Front(front), Up(up), Right(right), Position(position){
+        
+        view = glm::LookAt(
+            Position, //Camera Position
+            Pointing, // Position Where Camere pointing to
+            glm::vec3(0.0f, 1.0f, 0.0f)
+                      // How camera is oriented (Normalized up vector)
+                             );
+
+        zoom = 0.0f;
+        sentivity = 0.0f;
+        speed = 0.5f;
+    }
 };
 
 void UpdateCamera(Camera* camera);
