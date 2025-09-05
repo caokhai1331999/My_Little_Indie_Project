@@ -326,11 +326,16 @@ int CALLBACK WinMain
 
                 //View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
                 glm::vec3 Position = glm::vec3(4.0f, 3.0f, 3.0f);
-                glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
-                glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
+                glm::vec3 Point = glm::vec3(0.0f, 0.0f, 0.0f);
+                glm::vec3 Front = glm::vec3(-1.0f, 0.0f, 0.0f);
+                glm::vec3 Up = glm::vec3(0.0f, 0.0f, 1.0f);
+                glm::vec3 Right = glm::vec3(1.0f, 0.0f, 0.0f);
 
-                BackBuffer.camera = Camera(Front, Up, Position, glm::vec3(0.0f));
-// This will be replaced by camera.view matrix
+                //set camera view here
+                BackBuffer.camera = Camera(Position, Point, Front, Up, Right);
+                std::cout<<"View matrix from camera: "<<glm::to_string(BackBuffer.camera.view)<<std::endl;
+
+                // This will be replaced by camera.view matrix
                 glm::mat4 View = glm::lookAt(Position, glm::vec3(0,0,0), Up);
                 std::cout<<"View matrix: "<<glm::to_string(View)<<std::endl;
                 float fov = 45.0f;
@@ -352,9 +357,8 @@ int CALLBACK WinMain
                     printf("NO program object created before\n");
                 }
 
-                setInt(ScreenBuffer.glData.ProgramID, "ttexture1", ScreenBuffer.glData.textureHandle);
-
-                setMat4(ScreenBuffer.glData.ProgramID, "view", View);
+                setInt(ScreenBuffer.glData.ProgramID, "ttexture1", ScreenBuffer.glData.textureHandle);                
+                setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
                 setMat4(ScreenBuffer.glData.ProgramID, "projection", Projection);
                 
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
@@ -490,11 +494,29 @@ int CALLBACK WinMain
                 sprintf(Buffer, "%f Miliseconds/Frame, %f FPS, %f Mc/f \n ", MsPerFrame, FPS, MsPerFrame);
                 OutputDebugStringA(Buffer);
  #endif                
-                glm::vec3 randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2));
+                glm::vec3 randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2));
+
+                int ChosenAxis = 0;
+
                 if(WaitTimeCounter >= 16.67f){
+                setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
                     if(ChangeAxisCounter >= 1000.0f){
                         ChangeAxisCounter = 0.0f;
-                        randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2));
+                        ChosenAxis = std::rand()*2;
+                        switch(ChosenAxis){
+                            case 0:
+                                randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2), 0, 0);
+                                break;
+                            case 1:
+                                randomRotateAxis = glm::vec3(0, 0.4f*(float)(std::rand()*2), 0);
+                                break;
+                            case 2:
+                                randomRotateAxis = glm::vec3(0, 0, 0.4f*(float)(std::rand()*2));
+                                break;
+                            default:
+                                randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2));
+                                break;
+                        };
                     } else {
                         ChangeAxisCounter += WaitTimeCounter;
                     }

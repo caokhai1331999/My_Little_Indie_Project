@@ -7,7 +7,7 @@
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
 #include "glm/glm.hpp" 
-
+#include <glm/ext/matrix_transform.hpp>
 /*
 
 // Don't know shit about this
@@ -42,21 +42,20 @@ struct Camera{
     glm::vec3 Pointing;
     glm::vec3 WorldUp;
 
-    glm::mat4 camera = glm::mat4(1.0f);
+    glm::mat4 view = glm::mat4(1.0f);
     
     // Options
     float zoom;
     float sentivity;
     float speed;
 
-    Camera(glm::vec3 front = glm::vec3(), glm::vec3 up = glm::vec3() glm::vec3 position = glm::vec3(), glm::vec3 pointing = glm::vec3()): Front(front), Up(up), Right(right), Position(position){
-        
-        view = glm::LookAt(
+    Camera(glm::vec3 position = glm::vec3(0.0f), glm::vec3 pointing = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 front = glm::vec3(0.0f), glm::vec3 up = glm::vec3(0.0f), glm::vec3 right = glm::vec3(0.0f)): Front(front), Up(up), Right(right), Position(position), Pointing(pointing)
+    {
+        view = glm::lookAt(
             Position, //Camera Position
             Pointing, // Position Where Camere pointing to
-            glm::vec3(0.0f, 1.0f, 0.0f)
-                      // How camera is oriented (Normalized up vector)
-                             );
+            Up        // How camera is oriented (Normalized up vector)
+                           );
 
         zoom = 0.0f;
         sentivity = 0.0f;
