@@ -10,8 +10,10 @@ set COMPILE_FLAG=/FC /Zi /EHsc
 set LIB_= strmiids.lib uuid.lib Kernel32.lib user32.lib gdi32.lib Opengl32.lib
 set _include=..\include
 set glad_src=..\src
+rem set PDB_name=
+rem set dll_name=win32.dll
 set GLFW_INCLUDE_DIR="C:\Users\klove\Downloads\External_Libraries\glfw\glfw-3.4.bin.WIN64\include"
-set FILES=..\main.cpp ..\src\gl.c ..\src\wgl.c ..\handmade.cpp ..\shader.cpp ..\win32Game.cpp ..\SoundMaker.cpp
+set FILES=..\main.cpp ..\src\gl.c ..\src\wgl.c ..\handmade.cpp ..\shader.cpp ..\win32Game.cpp ..\SoundMaker.cpp ..\Camera.cpp
 
 rem ..\SoundMaker.cpp  ..\GUIDs.cpp
 rem Mmdevapi.dll Audioses.dll /VERBOSE:LIB 
@@ -20,7 +22,13 @@ rem -fsanitize=address -DEBUG  uuid.lib ..\gl_extensions.cpp
 rem for %%f in (..\*.cpp) do (
 rem     cl /FC /Zi -Fe:"win32Game" %%f -I%INCLUDE_% -link %LIB_% -DEBUG /FORCE:MULTIPLE /IGNORE:4006
 rem  )
-    cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES% -I%_include% -I%glad_src% -link %LIB_% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006
+
+rem Let alone the hot Loading code later
+
+rem cl /LD ..\win32Game.cpp ..\main.cpp %COMPILE_FLAG% %DIRECTIVES_FLAG%  -I%_include% -I%glad_src% -link %LIB_% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /PDB:%PDB_name% %EXPORT_% /DEBUG/OUT:%dll_name%
+
+cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES% -I%_include% -I%glad_src% -link %LIB_% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006
+    
 rem if %ERRORLEVEL% EQU 0 (
 rem    @echo Announce: " compilation succeeded (^ w ^) "
 rem ) else (

@@ -91,7 +91,7 @@ LRESULT CALLBACK MainWindowCallBack(
             // So if it is bit 30 it is down 
             bool WasDown = ((Lparam &(1 << 30)) != 0);
             bool IsDown = ((Lparam &(1 << 31)) == 0);            
-            if (WasDown != IsDown) {
+            //if (WasDown != IsDown) {
 
                 if(vkCode == VK_UP) {
                     State.BlueOffset+= 10;
@@ -109,15 +109,15 @@ LRESULT CALLBACK MainWindowCallBack(
                     //XOffset -= 10;
                     OutputDebugStringA("Left Button :");
                     if(WasDown) {                    
-                        BackBuffer.camera.Position += glm::cross(BackBuffer.camera.Up, BackBuffer.camera.Front)*BackBuffer.camera.speed;
+                        BackBuffer.camera.Position -=  glm::cross(BackBuffer.camera.Front, BackBuffer.camera.Up) * BackBuffer.camera.speed;
                         OutputDebugStringA(" Was Down");
                     }
                     OutputDebugStringA("\n");
                 }
 
                 else if(vkCode == VK_RIGHT) {
-                    BackBuffer.camera.Position -= glm::cross(BackBuffer.camera.Up, BackBuffer.camera.Front)*BackBuffer.camera.speed;
-                    //XOffset += 10;                    
+                    BackBuffer.camera.Position += glm::cross(BackBuffer.camera.Front, BackBuffer.camera.Up) * BackBuffer.camera.speed;
+                        //XOffset += 10;                    
                 }
                 
                 else if(vkCode == VK_TAB) {
@@ -134,7 +134,12 @@ LRESULT CALLBACK MainWindowCallBack(
                     
                     OutputDebugStringA("TAB button hitted");                  
                 }
-            }                
+
+                if (!BackBuffer.camera.moved){
+                    BackBuffer.camera.moved = true;
+                }
+
+            //}                
         }break;
         case WM_DESTROY:
         {
@@ -327,9 +332,11 @@ int CALLBACK WinMain
                 //View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
                 glm::vec3 Position = glm::vec3(4.0f, 3.0f, 3.0f);
                 glm::vec3 Point = glm::vec3(0.0f, 0.0f, 0.0f);
-                glm::vec3 Front = glm::vec3(-1.0f, 0.0f, 0.0f);
-                glm::vec3 Up = glm::vec3(0.0f, 0.0f, 1.0f);
-                glm::vec3 Right = glm::vec3(1.0f, 0.0f, 0.0f);
+
+                glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
+                glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+                glm::vec3 Right = glm::vec3(0.0f, 1.0f, 0.0f);
 
                 //set camera view here
                 BackBuffer.camera = Camera(Position, Point, Front, Up, Right);
@@ -498,8 +505,14 @@ int CALLBACK WinMain
 
                 int ChosenAxis = 0;
 
+                if(BackBuffer.camera.moved){
+                    UpdateCamera(&(BackBuffer.camera));
+                    setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
+                    BackBuffer.camera.moved = false;
+                }
+                
                 if(WaitTimeCounter >= 16.67f){
-                setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
+
                     if(ChangeAxisCounter >= 1000.0f){
                         ChangeAxisCounter = 0.0f;
                         ChosenAxis = std::rand()*2;
