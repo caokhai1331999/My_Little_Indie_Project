@@ -51,15 +51,47 @@ LRESULT CALLBACK MainWindowCallBack(
         {            
             bool IsDown = ((Lparam &(1 << 31)) == 0);
             uint32 vkCode = Wparam;
-            if(vkCode == VK_LEFT) {
-                
-                OutputDebugStringA("Left Button :");
-                if(IsDown) {                    
-                    OutputDebugStringA(" Is Down");
-                    
+
+                if(vkCode == VK_UP) {
+                    State.BlueOffset+= 10;
+                    BackBuffer.camera.Position += BackBuffer.camera.Front *BackBuffer.camera.speed;
+                    printf("YOffset is %d\n", State.BlueOffset);
                 }
-                OutputDebugStringA("\n");
-            }
+
+                else if(vkCode == VK_DOWN) {
+                    State.GreenOffset+= 10;
+                    BackBuffer.camera.Position -= BackBuffer.camera.Front *BackBuffer.camera.speed;
+                    printf("YOffset is %d\n", State.GreenOffset);
+                }
+
+                else if(vkCode == VK_LEFT) {
+                    //XOffset -= 10;
+                    OutputDebugStringA("Left Button :");
+                    //if(WasDown) {                    
+                        BackBuffer.camera.Position -=  glm::cross(BackBuffer.camera.Front, BackBuffer.camera.Up) * BackBuffer.camera.speed;
+                        OutputDebugStringA(" Was Down");
+                    //}
+                    OutputDebugStringA("\n");
+                }
+
+                else if(vkCode == VK_RIGHT) {
+                    BackBuffer.camera.Position += glm::cross(BackBuffer.camera.Front, BackBuffer.camera.Up) * BackBuffer.camera.speed;
+                        //XOffset += 10;                    
+                }
+
+                if (!BackBuffer.camera.moved){
+                    BackBuffer.camera.moved = true;
+                }
+
+            //if(vkCode == VK_LEFT) {
+                //
+                //OutputDebugStringA("Left Button :");
+                //if(IsDown) {                    
+                    //OutputDebugStringA(" Is Down");
+                    //
+                //}
+                //OutputDebugStringA("\n");
+            //}
 
             if(vkCode == VK_ESCAPE){
                 if(GlobalRunning){
@@ -92,35 +124,9 @@ LRESULT CALLBACK MainWindowCallBack(
             bool WasDown = ((Lparam &(1 << 30)) != 0);
             bool IsDown = ((Lparam &(1 << 31)) == 0);            
             //if (WasDown != IsDown) {
-
-                if(vkCode == VK_UP) {
-                    State.BlueOffset+= 10;
-                    BackBuffer.camera.Position += BackBuffer.camera.Front *BackBuffer.camera.speed;
-                    printf("YOffset is %d\n", State.BlueOffset);
-                }
-
-                else if(vkCode == VK_DOWN) {
-                    State.GreenOffset+= 10;
-                    BackBuffer.camera.Position -= BackBuffer.camera.Front *BackBuffer.camera.speed;
-                    printf("YOffset is %d\n", State.GreenOffset);
-                }
-
-                else if(vkCode == VK_LEFT) {
-                    //XOffset -= 10;
-                    OutputDebugStringA("Left Button :");
-                    if(WasDown) {                    
-                        BackBuffer.camera.Position -=  glm::cross(BackBuffer.camera.Front, BackBuffer.camera.Up) * BackBuffer.camera.speed;
-                        OutputDebugStringA(" Was Down");
-                    }
-                    OutputDebugStringA("\n");
-                }
-
-                else if(vkCode == VK_RIGHT) {
-                    BackBuffer.camera.Position += glm::cross(BackBuffer.camera.Front, BackBuffer.camera.Up) * BackBuffer.camera.speed;
-                        //XOffset += 10;                    
-                }
                 
-                else if(vkCode == VK_TAB) {
+            //else
+                if(vkCode == VK_TAB) {
                     if(SoundOutPut.hz == 128){
                         SoundOutPut.hz = 256;
                     } else if (SoundOutPut.hz == 256) {
@@ -133,10 +139,6 @@ LRESULT CALLBACK MainWindowCallBack(
                     SoundOutPut.WavePeriod = SoundOutPut.SamplePerSecond/SoundOutPut.hz;
                     
                     OutputDebugStringA("TAB button hitted");                  
-                }
-
-                if (!BackBuffer.camera.moved){
-                    BackBuffer.camera.moved = true;
                 }
 
             //}                
@@ -328,7 +330,8 @@ int CALLBACK WinMain
                 //glm::mat4 View = glm::mat4(1.0f);
                 glm::mat4 Model = glm::mat4(1.0f);
                 glm::mat4 Model2 = glm::mat4(1.0f);
-                Model2 = glm::translate(Model2, glm::vec3(-2.0f, 0.0f, 0.0f));
+                Model2 = glm::translate(Model2, glm::vec3(-4.0f, 0.0f, 0.0f));
+                std::cout<<"Stand still model 2 matrix is :"<<glm::to_string(Model2)<<std::endl;
                 glm::mat4 Projection = glm::mat4(1.0f);
 
                 //View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
@@ -342,14 +345,14 @@ int CALLBACK WinMain
 
                 //set camera view here
                 BackBuffer.camera = Camera(Position, Point, Front, Up, Right);
-                std::cout<<"View matrix from camera: "<<glm::to_string(BackBuffer.camera.view)<<std::endl;
+                //std::cout<<"View matrix from camera: "<<glm::to_string(BackBuffer.camera.view)<<std::endl;
 
                 // This will be replaced by camera.view matrix
                 glm::mat4 View = glm::lookAt(Position, glm::vec3(0,0,0), Up);
-                std::cout<<"View matrix: "<<glm::to_string(View)<<std::endl;
+                //std::cout<<"View matrix: "<<glm::to_string(View)<<std::endl;
                 float fov = 45.0f;
                 Model = glm::translate(Model, glm::vec3(0.0f, 0.0f, 0.0f));
-                std::cout<<glm::to_string(Model)<<std::endl;
+                std::cout<<"Central rotating model is"<<glm::to_string(Model)<<std::endl;
                 Projection = glm::perspective(glm::radians(fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
                 //printf("Part of Projection matrix:%f %f %f\n", Projection[0][1], Projection[1][1], Projection[2][1]);
                 std::cout<<"Perspective matrix: "<<glm::to_string(Projection)<<std::endl;
@@ -400,6 +403,8 @@ int CALLBACK WinMain
 */            
                 WaitTimeCounter = 0.0f;
                 float ChangeAxisCounter = 0.0f;
+                int64 ViewRotateCount = 0;
+
                 while(GlobalRunning) {
                 MSG Message;
                 //NOTE: This is where receiving the message to change
@@ -455,10 +460,6 @@ int CALLBACK WinMain
                 // camera/view transformation
                 //Model = glm::rotate(Model, glm::radians(fov)*0.5f, glm::vec3(1.0f, 0.0f, 0.5f));
 
-                glBindVertexArray(ScreenBuffer.glData.VAOs);
-                setMat4(ScreenBuffer.glData.ProgramID, "model", Model2);
-                glDrawArrays(GL_TRIANGLES, 0, 36);                
-
 
                 // Display on the screen
                 // The glitching sound driven me nearly crazy so I decided to turn it off                
@@ -508,47 +509,61 @@ int CALLBACK WinMain
 
                 int ChosenAxis = 0;
 
+
+                
                 if(BackBuffer.camera.moved){
                     UpdateCamera(&(BackBuffer.camera));
-                    setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
                     BackBuffer.camera.moved = false;
                 }
-                
-                if(WaitTimeCounter >= 16.67f){
 
-                    if(ChangeAxisCounter >= 1000.0f){
-                        ChangeAxisCounter = 0.0f;
-                        ChosenAxis = std::rand()*2;
-                        switch(ChosenAxis){
-                            case 0:
-                                randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2), 0, 0);
-                                break;
-                            case 1:
-                                randomRotateAxis = glm::vec3(0, 0.4f*(float)(std::rand()*2), 0);
-                                break;
-                            case 2:
-                                randomRotateAxis = glm::vec3(0, 0, 0.4f*(float)(std::rand()*2));
-                                break;
-                            default:
-                                randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2));
-                                break;
-                        };
+                    if(WaitTimeCounter >= 16.67f){
+                ViewRotateCount++;
+                float CamX = sin(ViewRotateCount)*10.0f;
+                float CamZ = cos(ViewRotateCount)*10.0f;
+                BackBuffer.camera.view = glm::lookAt(glm::vec3(CamX, 0.0f, CamZ), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);                
+
+                        if(ChangeAxisCounter >= 1000.0f){
+                            ChangeAxisCounter = 0.0f;
+                            ChosenAxis = std::rand()*2;
+                            switch(ChosenAxis){
+                                case 0:
+                                    randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2), 0, 0);
+                                    break;
+                                case 1:
+                                    randomRotateAxis = glm::vec3(0, 0.4f*(float)(std::rand()*2), 0);
+                                    break;
+                                case 2:
+                                    randomRotateAxis = glm::vec3(0, 0, 0.4f*(float)(std::rand()*2));
+                                    break;
+                                default:
+                                    randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2));
+                                    break;
+                            };
+
+                        } else {
+                            ChangeAxisCounter += WaitTimeCounter;
+                        }
+
+                        Model = glm::rotate(Model, glm::radians(20.0f), randomRotateAxis);
+
+                        // Wait to 17 milli s perframe for model to rotate
+                        WaitTimeCounter = 0.0f;
                     } else {
-                        ChangeAxisCounter += WaitTimeCounter;
+                        WaitTimeCounter += MsPerFrame;
+                        //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
                     }
-                    Model = glm::rotate(Model, glm::radians(20.0f), randomRotateAxis);
-                    // Wait to 17 milli s perframe for model to rotate
-                    WaitTimeCounter = 0.0f;
-                } else {
-                    WaitTimeCounter += MsPerFrame;
-                    printf("WaitTimeCounter: %f\n", WaitTimeCounter);
-                }
                 
                 LastCounter = EndCounter;
                 LastCycleCounts = EndCycleCounts;
+                        
+                glBindVertexArray(ScreenBuffer.glData.VAOs);
+
+                setMat4(ScreenBuffer.glData.ProgramID, "model", Model2);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
 
                 setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
-                glDrawArrays(GL_TRIANGLES, 0, 36);                
+                glDrawArrays(GL_TRIANGLES, 0, 36);
 /*
                 MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per register 
                 MULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register  
