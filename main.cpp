@@ -327,6 +327,8 @@ int CALLBACK WinMain
                 //????
                 //glm::mat4 View = glm::mat4(1.0f);
                 glm::mat4 Model = glm::mat4(1.0f);
+                glm::mat4 Model2 = glm::mat4(1.0f);
+                Model2 = glm::translate(Model2, glm::vec3(-2.0f, 0.0f, 0.0f));
                 glm::mat4 Projection = glm::mat4(1.0f);
 
                 //View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
@@ -452,10 +454,11 @@ int CALLBACK WinMain
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
                 // camera/view transformation
                 //Model = glm::rotate(Model, glm::radians(fov)*0.5f, glm::vec3(1.0f, 0.0f, 0.5f));
-                glBindVertexArray(ScreenBuffer.glData.VAOs);
-                glDrawArrays(GL_TRIANGLES, 0, 36);
 
-                SwapBuffers(DeviceContext);
+                glBindVertexArray(ScreenBuffer.glData.VAOs);
+                setMat4(ScreenBuffer.glData.ProgramID, "model", Model2);
+                glDrawArrays(GL_TRIANGLES, 0, 36);                
+
 
                 // Display on the screen
                 // The glitching sound driven me nearly crazy so I decided to turn it off                
@@ -534,16 +537,18 @@ int CALLBACK WinMain
                         ChangeAxisCounter += WaitTimeCounter;
                     }
                     Model = glm::rotate(Model, glm::radians(20.0f), randomRotateAxis);
-                    setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
                     // Wait to 17 milli s perframe for model to rotate
                     WaitTimeCounter = 0.0f;
                 } else {
                     WaitTimeCounter += MsPerFrame;
-                    //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
+                    printf("WaitTimeCounter: %f\n", WaitTimeCounter);
                 }
                 
                 LastCounter = EndCounter;
                 LastCycleCounts = EndCycleCounts;
+
+                setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
+                glDrawArrays(GL_TRIANGLES, 0, 36);                
 /*
                 MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per register 
                 MULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register  
@@ -551,6 +556,7 @@ int CALLBACK WinMain
                 Game_Input* Temp = NewInput;
                 NewInput = OldInput;  //???? still don't understand
                 OldInput = Temp;
+                SwapBuffers(DeviceContext);
                 ReleaseDC(Window, DeviceContext);
             }
             }                

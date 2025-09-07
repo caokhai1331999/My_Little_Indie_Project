@@ -424,10 +424,10 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 //last argument This is where point to the image data
                 // Why this doesn't work
                 if(FBuffer->BitmapHeight != OBuffer->BitmapHeight){
-                    FBuffer->BitmapHeight != OBuffer->BitmapHeight;
+                    FBuffer->BitmapHeight = OBuffer->BitmapHeight;
                 }
                 if(FBuffer->BitmapWidth != OBuffer->BitmapWidth){
-                    FBuffer->BitmapWidth != OBuffer->BitmapWidth;
+                    FBuffer->BitmapWidth = OBuffer->BitmapWidth;
                 }
                 glViewport(0, 0, FBuffer->BitmapWidth, FBuffer->BitmapHeight);
                 
