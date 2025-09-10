@@ -50,55 +50,70 @@ LRESULT CALLBACK MainWindowCallBack(
         case WM_KEYDOWN:
         {            
             bool IsDown = ((Lparam &(1 << 31)) == 0);
-            uint32 vkCode = Wparam;
+            bool WasDown = ((Lparam &(1 << 30)) != 0);
 
+            uint32 vkCode = Wparam;
+            if(IsDown){
                 if(vkCode == VK_UP) {
                     State.BlueOffset+= 10;
                     BackBuffer.camera.Position += BackBuffer.camera.Front *BackBuffer.camera.speed;
-                    printf("YOffset is %d\n", State.BlueOffset);
+                    printf("Up is HIT\n");
                 }
 
                 else if(vkCode == VK_DOWN) {
                     State.GreenOffset+= 10;
                     BackBuffer.camera.Position -= BackBuffer.camera.Front *BackBuffer.camera.speed;
-                    printf("YOffset is %d\n", State.GreenOffset);
+                    printf("Down is HIT\n");
                 }
 
                 else if(vkCode == VK_LEFT) {
                     //XOffset -= 10;
                     OutputDebugStringA("Left Button :");
                     //if(WasDown) {                    
-                        BackBuffer.camera.Position -=  glm::cross(BackBuffer.camera.Front, BackBuffer.camera.Up) * BackBuffer.camera.speed;
-                        OutputDebugStringA(" Was Down");
+                    BackBuffer.camera.Position -=  glm::normalize(glm::cross(BackBuffer.camera.Front, BackBuffer.camera.Up)) * BackBuffer.camera.speed;
+                    //OutputDebugStringA(" Was Down");
                     //}
-                    OutputDebugStringA("\n");
+                    printf("LEFT is HIT\n");
                 }
 
                 else if(vkCode == VK_RIGHT) {
-                    BackBuffer.camera.Position += glm::cross(BackBuffer.camera.Front, BackBuffer.camera.Up) * BackBuffer.camera.speed;
-                        //XOffset += 10;                    
+                    BackBuffer.camera.Position += glm::normalize(glm::cross(BackBuffer.camera.Front, BackBuffer.camera.Up)) * BackBuffer.camera.speed;
+                    printf("LEFT is HIT\n");
+                    //XOffset += 10;                    
+                }
+
+                else if(vkCode == VK_SPACE) {
+                    BackBuffer.camera.Position += BackBuffer.camera.Up * BackBuffer.camera.speed;
+                    printf("Space is HIT\n");
+                    //XOffset += 10;                    
+                }
+
+                else if(vkCode == VK_SHIFT) {
+                    BackBuffer.camera.Position -= BackBuffer.camera.Up * BackBuffer.camera.speed;
+                    printf("Space is HIT\n");
+                    //XOffset += 10;                    
                 }
 
                 if (!BackBuffer.camera.moved){
                     BackBuffer.camera.moved = true;
                 }
 
-            //if(vkCode == VK_LEFT) {
+                //if(vkCode == VK_LEFT) {
                 //
                 //OutputDebugStringA("Left Button :");
                 //if(IsDown) {                    
-                    //OutputDebugStringA(" Is Down");
-                    //
+                //OutputDebugStringA(" Is Down");
+                //
                 //}
                 //OutputDebugStringA("\n");
-            //}
+                //}
 
-            if(vkCode == VK_ESCAPE){
-                if(GlobalRunning){
-                    GlobalRunning = false;
-                }
+                if(vkCode == VK_ESCAPE){
+                    if(GlobalRunning){
+                        GlobalRunning = false;
+                    }
+                }                
             }
-            
         }break;
 
         case WM_SYSKEYDOWN:
@@ -341,7 +356,7 @@ int CALLBACK WinMain
                 glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
                 glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-                glm::vec3 Right = glm::vec3(0.0f, 1.0f, 0.0f);
+                glm::vec3 Right = glm::normalize(glm::cross(Front, Up));
 
                 //set camera view here
                 BackBuffer.camera = Camera(Position, Point, Front, Up, Right);
@@ -509,50 +524,52 @@ int CALLBACK WinMain
 
                 int ChosenAxis = 0;
 
-
-                
-                if(BackBuffer.camera.moved){
-                    UpdateCamera(&(BackBuffer.camera));
-                    BackBuffer.camera.moved = false;
-                }
-
-                    if(WaitTimeCounter >= 16.67f){
-                ViewRotateCount++;
-                float CamX = sin(ViewRotateCount)*10.0f;
-                float CamZ = cos(ViewRotateCount)*10.0f;
-                BackBuffer.camera.view = glm::lookAt(glm::vec3(CamX, 0.0f, CamZ), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-                setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);                
-
-                        if(ChangeAxisCounter >= 1000.0f){
-                            ChangeAxisCounter = 0.0f;
-                            ChosenAxis = std::rand()*2;
-                            switch(ChosenAxis){
-                                case 0:
-                                    randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2), 0, 0);
-                                    break;
-                                case 1:
-                                    randomRotateAxis = glm::vec3(0, 0.4f*(float)(std::rand()*2), 0);
-                                    break;
-                                case 2:
-                                    randomRotateAxis = glm::vec3(0, 0, 0.4f*(float)(std::rand()*2));
-                                    break;
-                                default:
-                                    randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2));
-                                    break;
-                            };
-
-                        } else {
-                            ChangeAxisCounter += WaitTimeCounter;
-                        }
-
-                        Model = glm::rotate(Model, glm::radians(20.0f), randomRotateAxis);
-
-                        // Wait to 17 milli s perframe for model to rotate
-                        WaitTimeCounter = 0.0f;
-                    } else {
-                        WaitTimeCounter += MsPerFrame;
-                        //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
+                    if(BackBuffer.camera.moved){
+                        UpdateCamera(&(BackBuffer.camera));
+                        setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
+                        BackBuffer.camera.moved = false;
                     }
+                    
+                if(WaitTimeCounter >= 16.67f){
+                    //else {
+                        //ViewRotateCount++;
+                        //float CamX = sin(ViewRotateCount)*10.0f;
+                        //float CamZ = cos(ViewRotateCount)*10.0f;
+                        //BackBuffer.camera.view = glm::lookAt(glm::vec3(CamX, 0.0f, CamZ), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                        //setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
+                    //}
+
+
+                    if(ChangeAxisCounter >= 1000.0f){
+                        ChangeAxisCounter = 0.0f;
+                        ChosenAxis = std::rand()*2;
+                        switch(ChosenAxis){
+                            case 0:
+                                randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2), 0, 0);
+                                break;
+                            case 1:
+                                randomRotateAxis = glm::vec3(0, 0.4f*(float)(std::rand()*2), 0);
+                                break;
+                            case 2:
+                                randomRotateAxis = glm::vec3(0, 0, 0.4f*(float)(std::rand()*2));
+                                break;
+                            default:
+                                randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2));
+                                break;
+                        };
+
+                    } else {
+                        ChangeAxisCounter += WaitTimeCounter;
+                    }
+
+                    Model = glm::rotate(Model, glm::radians(20.0f), randomRotateAxis);
+
+                    // Wait to 17 milli s perframe for model to rotate
+                    WaitTimeCounter = 0.0f;
+                } else {
+                    WaitTimeCounter += MsPerFrame;
+                    //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
+                }
                 
                 LastCounter = EndCounter;
                 LastCycleCounts = EndCycleCounts;
