@@ -90,7 +90,7 @@ LRESULT CALLBACK MainWindowCallBack(
 
                 else if(vkCode == VK_SHIFT) {
                     BackBuffer.camera.Position -= BackBuffer.camera.Up * BackBuffer.camera.speed;
-                    printf("Space is HIT\n");
+                    printf("Shift is HIT\n");
                     //XOffset += 10;                    
                 }
 
@@ -158,6 +158,7 @@ LRESULT CALLBACK MainWindowCallBack(
 
             //}                
         }break;
+        
         case WM_DESTROY:
         {
             GlobalRunning = false;
@@ -214,6 +215,14 @@ LRESULT CALLBACK MainWindowCallBack(
                 ReleaseDC(Window, DeviceContext); 
             }
             return 0L;             
+
+            BackBuffer.camera.mouse.xPos =  GET_X_LPARAM(lParam); 
+            BackBuffer.camera.mouse.yPos = GET_Y_LPARAM(lParam); 
+
+            if(!BackBuffer.camera.mouse.moved){
+                
+            }
+
         }break;            
         default:
         {
@@ -350,16 +359,16 @@ int CALLBACK WinMain
                 glm::mat4 Projection = glm::mat4(1.0f);
 
                 //View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
-                glm::vec3 Position = glm::vec3(4.0f, 3.0f, 3.0f);
                 glm::vec3 Point = glm::vec3(0.0f, 0.0f, 0.0f);
 
+                glm::vec3 Position = glm::vec3(4.0f, 3.0f, 3.0f);
                 glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
                 glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
 
                 glm::vec3 Right = glm::normalize(glm::cross(Front, Up));
 
                 //set camera view here
-                BackBuffer.camera = Camera(Position, Point, Front, Up, Right);
+                BackBuffer.camera = Camera(BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, Position, Point, Front, Up, Right);
                 //std::cout<<"View matrix from camera: "<<glm::to_string(BackBuffer.camera.view)<<std::endl;
 
                 // This will be replaced by camera.view matrix
@@ -525,7 +534,7 @@ int CALLBACK WinMain
                 int ChosenAxis = 0;
 
                     if(BackBuffer.camera.moved){
-                        UpdateCamera(&(BackBuffer.camera));
+                        UpdateCamera(&BackBuffer.camera);
                         setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
                         BackBuffer.camera.moved = false;
                     }
