@@ -78,7 +78,7 @@ LRESULT CALLBACK MainWindowCallBack(
 
                 else if(vkCode == VK_RIGHT) {
                     BackBuffer.camera.Position += glm::normalize(glm::cross(BackBuffer.camera.Front, BackBuffer.camera.Up)) * BackBuffer.camera.speed;
-                    printf("LEFT is HIT\n");
+                    printf("Right is HIT\n");
                     //XOffset += 10;                    
                 }
 
@@ -95,6 +95,8 @@ LRESULT CALLBACK MainWindowCallBack(
                 }
 
                 if (!BackBuffer.camera.moved){
+                    std::cout<<"Camera Position is"<<glm::to_string(BackBuffer.camera.Position)<<std::endl;
+                    std::cout<<"Camera Direction is"<<glm::to_string(BackBuffer.camera.Direction)<<std::endl;
                     BackBuffer.camera.moved = true;
                 }
 
@@ -216,11 +218,11 @@ LRESULT CALLBACK MainWindowCallBack(
             }
             return 0L;             
 
-            BackBuffer.camera.mouse.xPos =  GET_X_LPARAM(lParam); 
-            BackBuffer.camera.mouse.yPos = GET_Y_LPARAM(lParam); 
+            BackBuffer.camera.mouse.xPos =  GET_X_LPARAM(Lparam); 
+            BackBuffer.camera.mouse.yPos = GET_Y_LPARAM(Lparam); 
 
             if(!BackBuffer.camera.mouse.moved){
-                
+                BackBuffer.camera.mouse.moved = true;
             }
 
         }break;            
@@ -359,8 +361,6 @@ int CALLBACK WinMain
                 glm::mat4 Projection = glm::mat4(1.0f);
 
                 //View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
-                glm::vec3 Point = glm::vec3(0.0f, 0.0f, 0.0f);
-
                 glm::vec3 Position = glm::vec3(4.0f, 3.0f, 3.0f);
                 glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
                 glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -368,16 +368,15 @@ int CALLBACK WinMain
                 glm::vec3 Right = glm::normalize(glm::cross(Front, Up));
 
                 //set camera view here
-                BackBuffer.camera = Camera(BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, Position, Point, Front, Up, Right);
+                BackBuffer.camera = Camera(BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, Position, Front, Up, Right);
                 //std::cout<<"View matrix from camera: "<<glm::to_string(BackBuffer.camera.view)<<std::endl;
 
                 // This will be replaced by camera.view matrix
-                glm::mat4 View = glm::lookAt(Position, glm::vec3(0,0,0), Up);
                 //std::cout<<"View matrix: "<<glm::to_string(View)<<std::endl;
-                float fov = 45.0f;
+                BackBuffer.camera.fov = 45.0f;
                 Model = glm::translate(Model, glm::vec3(0.0f, 0.0f, 0.0f));
                 std::cout<<"Central rotating model is"<<glm::to_string(Model)<<std::endl;
-                Projection = glm::perspective(glm::radians(fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
+                Projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
                 //printf("Part of Projection matrix:%f %f %f\n", Projection[0][1], Projection[1][1], Projection[2][1]);
                 std::cout<<"Perspective matrix: "<<glm::to_string(Projection)<<std::endl;
 
@@ -529,17 +528,23 @@ int CALLBACK WinMain
                 sprintf(Buffer, "%f Miliseconds/Frame, %f FPS, %f Mc/f \n ", MsPerFrame, FPS, MsPerFrame);
                 OutputDebugStringA(Buffer);
  #endif                
+
                 glm::vec3 randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2));
+                //BackBuffer.camera.speed = 2.5f * MsPerFrame/1000;
 
                 int ChosenAxis = 0;
 
-                    if(BackBuffer.camera.moved){
-                        UpdateCamera(&BackBuffer.camera);
+                    if(BackBuffer.camera.moved || BackBuffer.camera.mouse.moved){
+                        UpdateCamera(&BackBuffer.camera, MsPerFrame);
                         setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
-                        BackBuffer.camera.moved = false;
+                        if(BackBuffer.camera.moved){
+                            BackBuffer.camera.moved = false;
+                        }
+                        
                     }
-                    
+                
                 if(WaitTimeCounter >= 16.67f){
+
                     //else {
                         //ViewRotateCount++;
                         //float CamX = sin(ViewRotateCount)*10.0f;
@@ -571,7 +576,7 @@ int CALLBACK WinMain
                         ChangeAxisCounter += WaitTimeCounter;
                     }
 
-                    Model = glm::rotate(Model, glm::radians(20.0f), randomRotateAxis);
+                    Model = glm::rotate(Model, glm::radians(10.0f), randomRotateAxis);
 
                     // Wait to 17 milli s perframe for model to rotate
                     WaitTimeCounter = 0.0f;
