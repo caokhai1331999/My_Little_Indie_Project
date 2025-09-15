@@ -7,37 +7,43 @@
    ======================================================================== */
 #include "Camera.h"
 
-void UpdateCamera (Camera* camera, float FrameTime) {
+void UpdateCamera (Camera* camera, float DelayRatio) {
     //Update the camera front based on yaw/bearing (around the y axe), pitch/elevation (around the x axe), roll (around the z axe)
 
     // First take the perspective from above we have the x is sin(yaw) and z is
     // cos(yaw)
     // Then do the similar look on pitch(y and z) we have y equal to sin(pitch)
     // and z is cos(pitch)
-    camera->Direction = camera->Position + camera->Front;
     
     if(camera->mouse.moved){
         camera->mouse.MouseXOffset = camera->mouse.xPos - camera->mouse.LastX;
         // NOTE: Still don't know why the do opposite for Y offset cause of
         // the y axe go down
         camera->mouse.MouseYOffset = camera->mouse.LastY - camera->mouse.yPos;    
+
         camera->mouse.LastX = camera->mouse.xPos;
         camera->mouse.LastY = camera->mouse.yPos;        
             
-        camera->Yaw += camera->mouse.MouseXOffset * SENSITIVITY;
-        camera->Pitch += camera->mouse.MouseYOffset * SENSITIVITY;
+        camera->Yaw += camera->mouse.MouseXOffset * DelayRatio * 0.1f;
+        camera->Pitch += camera->mouse.MouseYOffset * DelayRatio * 0.1f;
 
+        if(camera->Pitch >= 89.0f){
+            camera->Pitch = 89.0f;
+        }
+
+        if(camera->Pitch <= 0.0f){
+            camera->Pitch = 0.0f;
+        }
         //Camera->LastFrameTime = FrameTime; ?? ??
     
-        camera->Direction.x = glm::sin((glm::radians(camera->Yaw)));  
-        camera->Direction.z = glm::cos(glm::radians(camera->Yaw)) * glm::cos(glm::radians(camera->Pitch));
-        camera->Direction.y = glm::sin((glm::radians(camera->Pitch)));  
+        camera->Front.x = glm::sin((glm::radians(camera->Yaw)));  
+        camera->Front.z = glm::cos(glm::radians(camera->Yaw)) * glm::cos(glm::radians(camera->Pitch));
+        camera->Front.y = glm::sin((glm::radians(camera->Pitch)));  
         
         camera->mouse.moved = false;
     }
 
-    //camera->Up = glm::cos();  
-    //camera->Right = glm::cos();  
+    camera->Direction = camera->Position + camera->Front;
     
     camera->view = glm::lookAt(
         camera->Position,  //Camera Position
@@ -45,8 +51,6 @@ void UpdateCamera (Camera* camera, float FrameTime) {
         camera->Direction, //Camera Direction
         camera->Up         //How camera is oriented (Normalized up vector)
                            );
-
-    //camera->view = glm::translate(camera->view, camera->Position);
 };
 
 void Zoom(Camera* camera, float offset){

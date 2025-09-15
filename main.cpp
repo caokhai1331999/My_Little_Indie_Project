@@ -216,19 +216,35 @@ LRESULT CALLBACK MainWindowCallBack(
                        ptPrevious.y = HIWORD(Lparam)); 
                 ReleaseDC(Window, DeviceContext); 
             }
-            return 0L;             
 
             BackBuffer.camera.mouse.xPos =  GET_X_LPARAM(Lparam); 
             BackBuffer.camera.mouse.yPos = GET_Y_LPARAM(Lparam); 
+
+            //printf("Mouse x pos: %d\n", BackBuffer.camera.mouse.xPos);
+            //printf("Mouse y pos: %d\n", BackBuffer.camera.mouse.yPos);
 
             if(!BackBuffer.camera.mouse.moved){
                 BackBuffer.camera.mouse.moved = true;
             }
 
+
+            //return 0L;             
+
         }break;            
         default:
         {
             OutputDebugStringA("DEFAULT\n");
+
+            //BackBuffer.camera.mouse.xPos =  GET_X_LPARAM(Lparam); 
+            //BackBuffer.camera.mouse.yPos = GET_Y_LPARAM(Lparam); 
+//
+            //if(!BackBuffer.camera.mouse.moved){
+                //BackBuffer.camera.mouse.moved = true;
+            //}
+
+            //printf("Mouse x pos: %d\n", BackBuffer.camera.mouse.xPos);
+            //printf("Mouse y pos: %d\n", BackBuffer.camera.mouse.yPos);
+
             result = DefWindowProcA(Window, Message, Wparam, Lparam);
         }break;
     }
@@ -300,7 +316,9 @@ int CALLBACK WinMain
             0);
 
         if(Window) {
-
+            int displayCount = ShowCursor(true);
+            printf("display count: %d\n", displayCount);
+            
             if(!GlobalRunning){
                 GlobalRunning = true; 
             }
@@ -428,6 +446,9 @@ int CALLBACK WinMain
                 float ChangeAxisCounter = 0.0f;
                 int64 ViewRotateCount = 0;
 
+                bool RatioCalculated = false;
+                float DelayedRatio = 0.0f;                
+
                 while(GlobalRunning) {
                 MSG Message;
                 //NOTE: This is where receiving the message to change
@@ -443,8 +464,6 @@ int CALLBACK WinMain
                 if( MaxControllerCount > ArrayCount(Input->Controller)) {
                     MaxControllerCount = ArrayCount(Input->Controller);   
                 }
-                
-                ProcessInput(MaxControllerCount, OldInput, NewInput);
                 
              // ================================================================
             // NOTE: Sounding Part
@@ -529,22 +548,29 @@ int CALLBACK WinMain
                 OutputDebugStringA(Buffer);
  #endif                
 
-                glm::vec3 randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2));
-                //BackBuffer.camera.speed = 2.5f * MsPerFrame/1000;
-
                 int ChosenAxis = 0;
 
-                    if(BackBuffer.camera.moved || BackBuffer.camera.mouse.moved){
-                        UpdateCamera(&BackBuffer.camera, MsPerFrame);
-                        setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
-                        if(BackBuffer.camera.moved){
-                            BackBuffer.camera.moved = false;
-                        }
-                        
-                    }
-                
-                if(WaitTimeCounter >= 16.67f){
+                if(!RatioCalculated){
+                    printf("Ms per frame :%f \n", MsPerFrame);
+                    DelayedRatio = MsPerFrame/16.67f;
+                    printf("Delay Ratio: %f\n", DelayedRatio);
+                    BackBuffer.camera.speed = (2.5f * DelayedRatio);                
+                    printf("camera speed: %f\n", BackBuffer.camera.speed);
+                    RatioCalculated = true;
+                }
 
+                glm::vec3 randomRotateAxis = glm::vec3(0.4f* DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2));
+
+                if(BackBuffer.camera.moved || BackBuffer.camera.mouse.moved){
+                        UpdateCamera(&BackBuffer.camera, DelayedRatio);                    
+                        //if(BackBuffer.camera.moved){
+                            //BackBuffer.camera.moved = false;
+                        //}
+                    }
+
+                setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
+                
+                //if(WaitTimeCounter >= 16.67f){
                     //else {
                         //ViewRotateCount++;
                         //float CamX = sin(ViewRotateCount)*10.0f;
@@ -553,37 +579,36 @@ int CALLBACK WinMain
                         //setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
                     //}
 
-
                     if(ChangeAxisCounter >= 1000.0f){
-                        ChangeAxisCounter = 0.0f;
                         ChosenAxis = std::rand()*2;
                         switch(ChosenAxis){
                             case 0:
-                                randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2), 0, 0);
+                                randomRotateAxis = glm::vec3(0.4f*DelayedRatio*(float)(std::rand()*2), 0, 0);
                                 break;
                             case 1:
-                                randomRotateAxis = glm::vec3(0, 0.4f*(float)(std::rand()*2), 0);
+                                randomRotateAxis = glm::vec3(0, 0.4f*DelayedRatio*(float)(std::rand()*2), 0);
                                 break;
                             case 2:
-                                randomRotateAxis = glm::vec3(0, 0, 0.4f*(float)(std::rand()*2));
+                                randomRotateAxis = glm::vec3(0, 0, 0.4f* DelayedRatio*(float)(std::rand()*2));
                                 break;
                             default:
-                                randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2));
+                                randomRotateAxis = glm::vec3(0.4f*DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2), 0.4f*DelayedRatio*(float)(std::rand()*2));
                                 break;
                         };
+                        ChangeAxisCounter = 0.0f;
 
                     } else {
-                        ChangeAxisCounter += WaitTimeCounter;
+                        ChangeAxisCounter += MsPerFrame;
                     }
 
                     Model = glm::rotate(Model, glm::radians(10.0f), randomRotateAxis);
 
                     // Wait to 17 milli s perframe for model to rotate
-                    WaitTimeCounter = 0.0f;
-                } else {
-                    WaitTimeCounter += MsPerFrame;
+                    //WaitTimeCounter = 0.0f;
+                //} else {
+                    //WaitTimeCounter += MsPerFrame;
                     //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
-                }
+                //}
                 
                 LastCounter = EndCounter;
                 LastCycleCounts = EndCycleCounts;
