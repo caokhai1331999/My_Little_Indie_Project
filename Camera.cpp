@@ -34,23 +34,35 @@ void UpdateCamera (Camera* camera, float DelayRatio) {
         if(camera->Pitch <= 0.0f){
             camera->Pitch = 0.0f;
         }
-        //Camera->LastFrameTime = FrameTime; ?? ??
     
-        camera->Direction.x = glm::sin((glm::radians(camera->Yaw)));  
-        camera->Direction.z = glm::cos(glm::radians(camera->Yaw)) * glm::cos(glm::radians(camera->Pitch));
-        camera->Direction.y = glm::sin((glm::radians(camera->Pitch)));  
-        
+    camera->Direction.x = glm::sin((glm::radians(camera->Yaw)));  
+    camera->Direction.z = glm::cos(glm::radians(camera->Yaw)) * glm::cos(glm::radians(camera->Pitch));
+    camera->Direction.y = glm::sin((glm::radians(camera->Pitch)));  
+
+//Camera->LastFrameTime = FrameTime; ?? ??
         //camera->mouse.moved = false;
     //}
-        camera->Front = glm::normalize(camera->Direction);
+        
+    //if(camera->moved){
+        std::cout<<"Front vec: "<<glm::to_string(camera->Front)<<std::endl;
+        // Cross product between the constant Up Vector which pointing upward in
+        // world space we have camera Right vector
+        camera->Right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera->Direction));
+        camera->Up = glm::normalize(glm::cross(camera->Right, camera->Direction));
+        glm::vec3 center =  camera->Position + camera->Direction;
 
         camera->view = glm::lookAt(
-            camera->Position,  //Camera Position
-            //camera->Position + camera->Front,
-            camera->Position + camera->Front, //Camera Direction
-            camera->Up         //How camera is oriented (Normalized up vector)
+//Camera Position
+            camera->Position,
+//camera->Position + camera->Front,
+            center,
+//Position Where the camera is looking at (formular is AB-> = B - A(we can apply basic number subtraction rule))
+            camera->Up
+//How camera is oriented (Normalized up vector of camera NOT WORLD)
                                    );
-// Why I have to plus Position with Front
+        //camera->moved = false;
+    //}
+
 };
 
 void Zoom(Camera* camera, float offset){
