@@ -56,13 +56,13 @@ LRESULT CALLBACK MainWindowCallBack(
             if(IsDown){
                 if(vkCode == VK_UP) {
                     State.BlueOffset+= 10;
-                    BackBuffer.camera.Position += BackBuffer.camera.Front *BackBuffer.camera.speed;
+                    BackBuffer.camera.Position += BackBuffer.camera.Front * BackBuffer.camera.speed;
                     printf("Up is HIT\n");
                 }
 
                 else if(vkCode == VK_DOWN) {
                     State.GreenOffset+= 10;
-                    BackBuffer.camera.Position -= BackBuffer.camera.Front *BackBuffer.camera.speed;
+                    BackBuffer.camera.Position -= BackBuffer.camera.Front * BackBuffer.camera.speed;
                     printf("Down is HIT\n");
                 }
 
@@ -570,7 +570,7 @@ int CALLBACK WinMain
 
                 setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
                 
-                //if(WaitTimeCounter >= 16.67f){
+                if(WaitTimeCounter >= 16.67f){
                     //else {
                         //ViewRotateCount++;
                         //float CamX = sin(ViewRotateCount)*10.0f;
@@ -583,16 +583,16 @@ int CALLBACK WinMain
                         ChosenAxis = std::rand()*2;
                         switch(ChosenAxis){
                             case 0:
-                                randomRotateAxis = glm::vec3(0.4f*DelayedRatio*(float)(std::rand()*2), 0, 0);
+                                randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2), 0, 0);
                                 break;
                             case 1:
-                                randomRotateAxis = glm::vec3(0, 0.4f*DelayedRatio*(float)(std::rand()*2), 0);
+                                randomRotateAxis = glm::vec3(0, 0.4f*(float)(std::rand()*2), 0);
                                 break;
                             case 2:
-                                randomRotateAxis = glm::vec3(0, 0, 0.4f* DelayedRatio*(float)(std::rand()*2));
+                                randomRotateAxis = glm::vec3(0, 0, 0.4f* (float)(std::rand()*2));
                                 break;
                             default:
-                                randomRotateAxis = glm::vec3(0.4f*DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2), 0.4f*DelayedRatio*(float)(std::rand()*2));
+                                randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2));
                                 break;
                         };
                         ChangeAxisCounter = 0.0f;
@@ -604,11 +604,11 @@ int CALLBACK WinMain
                     Model = glm::rotate(Model, glm::radians(10.0f), randomRotateAxis);
 
                     // Wait to 17 milli s perframe for model to rotate
-                    //WaitTimeCounter = 0.0f;
-                //} else {
-                    //WaitTimeCounter += MsPerFrame;
+                    WaitTimeCounter = 0.0f;
+                } else {
+                    WaitTimeCounter += MsPerFrame;
                     //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
-                //}
+                }
                 
                 LastCounter = EndCounter;
                 LastCycleCounts = EndCycleCounts;
