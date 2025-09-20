@@ -47,7 +47,7 @@ LRESULT CALLBACK MainWindowCallBack(
         }break;
 
         case WM_KEYDOWN:
-        {            
+        {
             bool IsDown = ((Lparam &(1 << 31)) == 0);
             bool WasDown = ((Lparam &(1 << 30)) != 0);
             
@@ -71,7 +71,7 @@ LRESULT CALLBACK MainWindowCallBack(
                     OutputDebugStringA("Left Button :");
                     //if(WasDown) {                    
                     // Not Camera front and up
-                    BackBuffer.camera.Position -=  glm::normalize(glm::cross(BackBuffer.camera.Direction, BackBuffer.camera.Up)) * BackBuffer.camera.speed;
+                        BackBuffer.camera.Position -=  glm::normalize(glm::cross(BackBuffer.camera.Direction, BackBuffer.camera.Up)) * BackBuffer.camera.speed;
                     //OutputDebugStringA(" Was Down");
                     //}
                     printf("LEFT is HIT\n");
@@ -94,7 +94,7 @@ LRESULT CALLBACK MainWindowCallBack(
                     printf("Shift is HIT\n");
                     //XOffset += 10;                    
                 }
-
+                }
 
                 else if(vkCode == VK_BACK) {
                     BackBuffer.camera.Direction = glm::vec3(0.0f) - BackBuffer.camera.Position;
@@ -123,9 +123,32 @@ LRESULT CALLBACK MainWindowCallBack(
                         GlobalRunning = false;
                     }
                 }                
-            }
         }break;
 
+        case WM_LBUTTONDOWN:
+        {
+            uint32 vkCode = Wparam;
+                //if(vkCode == VK_LBUTTON) {
+                    if(!BackBuffer.camera.focusCenter){
+                        BackBuffer.camera.focusCenter = true;
+                    }
+                    printf("Mouse LButton is HIT\n");
+                //}
+                //return 0;
+        }break;
+
+        case WM_LBUTTONUP:
+        {
+            //uint32 vkCode = Wparam;
+            //if(vkCode == VK_LBUTTON) {
+                if(BackBuffer.camera.focusCenter){
+                    BackBuffer.camera.focusCenter = false;
+                }
+                printf("Mouse LButton is released\n");
+            //}
+            //return 0;
+        }break;
+        
         case WM_SYSKEYDOWN:
         {
             uint32 vkCode = Wparam;
@@ -166,7 +189,6 @@ LRESULT CALLBACK MainWindowCallBack(
                     OutputDebugStringA("TAB button hitted");                  
                 }
 
-            //}                
         }break;
         
         case WM_DESTROY:
@@ -198,23 +220,6 @@ LRESULT CALLBACK MainWindowCallBack(
             OutputDebugStringA("WM_PAINT\n");
         }break;
 
-        case WM_LBUTTONDOWN:{
-            fDraw = TRUE; 
-            ptPrevious.x = LOWORD(Lparam); 
-            ptPrevious.y = HIWORD(Lparam);
-            return 0L;             
-        } break;
-        case WM_LBUTTONUP:{
-            if (fDraw) 
-            { 
-                DeviceContext = GetDC(Window); 
-                MoveToEx(DeviceContext, ptPrevious.x, ptPrevious.y, NULL); 
-                LineTo(DeviceContext, LOWORD(Lparam), HIWORD(Lparam)); 
-                ReleaseDC(Window, DeviceContext); 
-            } 
-            fDraw = FALSE; 
-            return 0L;             
-        }break; 
         case WM_MOUSEMOVE:{
             if (fDraw) 
             { 
@@ -226,8 +231,25 @@ LRESULT CALLBACK MainWindowCallBack(
             }
 
             BackBuffer.camera.mouse.xPos =  GET_X_LPARAM(Lparam); 
+
+            if(BackBuffer.camera.mouse.xPos > BackBuffer.BitmapWidth){
+                BackBuffer.camera.mouse.xPos = BackBuffer.BitmapWidth;
+            }
+
+            if(BackBuffer.camera.mouse.xPos < 0){
+                BackBuffer.camera.mouse.xPos = 0;
+            }
+
             BackBuffer.camera.mouse.yPos = GET_Y_LPARAM(Lparam); 
 
+            if(BackBuffer.camera.mouse.yPos > BackBuffer.BitmapHeight){
+                BackBuffer.camera.mouse.yPos = BackBuffer.BitmapHeight;
+            }
+
+            if(BackBuffer.camera.mouse.yPos < 0){
+                BackBuffer.camera.mouse.yPos = 0;
+            }
+            
             //printf("Mouse x pos: %d\n", BackBuffer.camera.mouse.xPos);
             //printf("Mouse y pos: %d\n", BackBuffer.camera.mouse.yPos);
 
@@ -240,17 +262,6 @@ LRESULT CALLBACK MainWindowCallBack(
         default:
         {
             OutputDebugStringA("DEFAULT\n");
-
-            //BackBuffer.camera.mouse.xPos =  GET_X_LPARAM(Lparam); 
-            //BackBuffer.camera.mouse.yPos = GET_Y_LPARAM(Lparam); 
-//
-            //if(!BackBuffer.camera.mouse.moved){
-                //BackBuffer.camera.mouse.moved = true;
-            //}
-
-            //printf("Mouse x pos: %d\n", BackBuffer.camera.mouse.xPos);
-            //printf("Mouse y pos: %d\n", BackBuffer.camera.mouse.yPos);
-
             result = DefWindowProcA(Window, Message, Wparam, Lparam);
         }break;
     }
@@ -458,6 +469,7 @@ int CALLBACK WinMain
 
                 bool RatioCalculated = false;
                 float DelayedRatio = 0.0f;                
+                //Window = SetCapture(Window);
 
                 while(GlobalRunning) {
                 MSG Message;

@@ -44,17 +44,19 @@ void UpdateCamera (Camera* camera, float DelayRatio) {
     //}
         
     //if(camera->moved){
-        std::cout<<"Front vec: "<<glm::to_string(camera->Front)<<std::endl;
         // Cross product between the constant Up Vector which pointing upward in
         // world space we have camera Right vector
         camera->Right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera->Direction));
         camera->Up = glm::normalize(glm::cross(camera->Right, camera->Direction));
-        glm::vec3 center =  camera->Position + camera->Direction;
+
+        glm::vec3 center =  !camera->focusCenter?camera->Position + camera->Direction:glm::vec3(0.0f);
 
         camera->view = glm::lookAt(
 //Camera Position
             camera->Position,
 //camera->Position + camera->Front,
+            //glm::vec3(0.0f),
+            // One above make camera rotate around center
             center,
 //Position Where the camera is looking at (formular is AB-> = B - A(we can apply basic number subtraction rule))
             camera->Up
