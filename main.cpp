@@ -56,7 +56,7 @@ LRESULT CALLBACK MainWindowCallBack(
                 if(vkCode == 'W') {
                     //Actually the front vec is at the back of the camera
                     State.BlueOffset+= 10;
-                    BackBuffer.camera.Position += BackBuffer.camera.Direction * BackBuffer.camera.speed;
+                    BackBuffer.camera.Position +=  BackBuffer.camera.Direction * BackBuffer.camera.speed;
                     printf("Up is HIT\n");
                 }
 
@@ -125,6 +125,46 @@ LRESULT CALLBACK MainWindowCallBack(
                 }                
         }break;
 
+        case WM_MOUSEWHEEL:
+        {
+            float wheelPos = GET_WHEEL_DELTA_WPARAM(Wparam)*0.1f;
+            //printf("Wheel delta: %d\n", (GET_WHEEL_DELTA_WPARAM(Wparam)));
+            BackBuffer.camera.fov += wheelPos * BackBuffer.camera.speed;
+
+            if(BackBuffer.camera.fov < 1.0f){
+                BackBuffer.camera.fov = 1.0f;
+            }
+
+            if(BackBuffer.camera.fov > 45.0f){
+                BackBuffer.camera.fov = 45.0f;
+            }
+            printf("Mouse Wheel is rolling, Wheel: %f, fov: %f\n", wheelPos, BackBuffer.camera.fov);
+
+            if(!BackBuffer.camera.mouse.Wheeled){
+                BackBuffer.camera.mouse.Wheeled = true;
+            }
+
+        }break;
+
+        case WM_MOUSELEAVE:
+        {
+            if(BackBuffer.camera.mouse.LastX != BackBuffer.BitmapWidth/2){
+                BackBuffer.camera.mouse.LastX = BackBuffer.BitmapWidth/2;
+            }
+
+            if(BackBuffer.camera.mouse.LastY != BackBuffer.BitmapHeight/2){
+                BackBuffer.camera.mouse.LastY = BackBuffer.BitmapHeight/2;
+            }
+            
+                //printf("Mouse Pos X: %d, Y: %d\n", BackBuffer.camera.mouse.LastX, BackBuffer.camera.mouse.LastY);
+                if(BackBuffer.camera.mouse.moved){
+                    //std::cout<<"Camera Position is"<<glm::to_string(BackBuffer.camera.Position)<<std::endl;
+                    //std::cout<<"Camera Direction is"<<glm::to_string(BackBuffer.camera.Direction)<<std::endl;
+                    BackBuffer.camera.mouse.moved = false;
+                }
+            
+        }break;
+        
         case WM_LBUTTONDOWN:
         {
             uint32 vkCode = Wparam;
@@ -148,7 +188,55 @@ LRESULT CALLBACK MainWindowCallBack(
             //}
             //return 0;
         }break;
-        
+
+        case WM_MOUSEHOVER:{
+            if(TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent)){
+                printf("Mouse event is being tracked\n");
+            } else {
+                printf("Can not track Mouse event\n");                
+            };
+        }break;
+
+        case WM_MOUSEMOVE:{
+            if (fDraw) 
+            { 
+                DeviceContext = GetDC(Window); 
+                MoveToEx(DeviceContext, ptPrevious.x, ptPrevious.y, NULL); 
+                LineTo(DeviceContext, ptPrevious.x = LOWORD(Lparam), 
+                       ptPrevious.y = HIWORD(Lparam)); 
+                ReleaseDC(Window, DeviceContext); 
+            }
+
+            BackBuffer.camera.mouse.xPos =  GET_X_LPARAM(Lparam); 
+//
+            //if(BackBuffer.camera.mouse.xPos > BackBuffer.BitmapWidth){
+                //BackBuffer.camera.mouse.xPos = BackBuffer.BitmapWidth;
+            //}
+//
+            //if(BackBuffer.camera.mouse.xPos < 0){
+                //BackBuffer.camera.mouse.xPos = 0;
+            //}
+//
+            BackBuffer.camera.mouse.yPos = GET_Y_LPARAM(Lparam); 
+//
+            //if(BackBuffer.camera.mouse.yPos > BackBuffer.BitmapHeight){
+                //BackBuffer.camera.mouse.yPos = BackBuffer.BitmapHeight;
+            //}
+//
+            //if(BackBuffer.camera.mouse.yPos < 0){
+                //BackBuffer.camera.mouse.yPos = 0;
+            //}
+            //
+            //printf("Mouse x pos: %d\n", BackBuffer.camera.mouse.xPos);
+            //printf("Mouse y pos: %d\n", BackBuffer.camera.mouse.yPos);
+
+            if(!BackBuffer.camera.mouse.moved){
+                BackBuffer.camera.mouse.moved = true;
+            }
+            //return 0L;             
+
+        }break;         
+
         case WM_SYSKEYDOWN:
         {
             uint32 vkCode = Wparam;
@@ -219,46 +307,7 @@ LRESULT CALLBACK MainWindowCallBack(
 
             OutputDebugStringA("WM_PAINT\n");
         }break;
-
-        case WM_MOUSEMOVE:{
-            if (fDraw) 
-            { 
-                DeviceContext = GetDC(Window); 
-                MoveToEx(DeviceContext, ptPrevious.x, ptPrevious.y, NULL); 
-                LineTo(DeviceContext, ptPrevious.x = LOWORD(Lparam), 
-                       ptPrevious.y = HIWORD(Lparam)); 
-                ReleaseDC(Window, DeviceContext); 
-            }
-
-            BackBuffer.camera.mouse.xPos =  GET_X_LPARAM(Lparam); 
-
-            if(BackBuffer.camera.mouse.xPos > BackBuffer.BitmapWidth){
-                BackBuffer.camera.mouse.xPos = BackBuffer.BitmapWidth;
-            }
-
-            if(BackBuffer.camera.mouse.xPos < 0){
-                BackBuffer.camera.mouse.xPos = 0;
-            }
-
-            BackBuffer.camera.mouse.yPos = GET_Y_LPARAM(Lparam); 
-
-            if(BackBuffer.camera.mouse.yPos > BackBuffer.BitmapHeight){
-                BackBuffer.camera.mouse.yPos = BackBuffer.BitmapHeight;
-            }
-
-            if(BackBuffer.camera.mouse.yPos < 0){
-                BackBuffer.camera.mouse.yPos = 0;
-            }
-            
-            //printf("Mouse x pos: %d\n", BackBuffer.camera.mouse.xPos);
-            //printf("Mouse y pos: %d\n", BackBuffer.camera.mouse.yPos);
-
-            if(!BackBuffer.camera.mouse.moved){
-                BackBuffer.camera.mouse.moved = true;
-            }
-            //return 0L;             
-
-        }break;            
+           
         default:
         {
             OutputDebugStringA("DEFAULT\n");
@@ -407,6 +456,20 @@ int CALLBACK WinMain
                 //std::cout<<"View matrix from camera: "<<glm::to_string(BackBuffer.camera.view)<<std::endl;
                 BackBuffer.camera = Camera(BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, Position, Front, Right, Up);
 
+                TRACKMOUSEEVENT mouseEventVar = {};
+                mouseEventVar.cbSize = sizeof(TRACKMOUSEEVENT);
+                mouseEventVar.dwFlags = TME_HOVER|TME_LEAVE;
+                mouseEventVar.hwndTrack = Window;
+                mouseEventVar.dwHoverTime = 1000;
+
+                BackBuffer.camera.mouse.mouseEvent = &mouseEventVar;
+
+                //if(BackBuffer.camera.mouse.mouseEvent == NULL){
+                    //printf("Can't initialize mouse Event, hoverTime\n");
+                //} else {
+                    //printf("Succeed initialize mouse Event\n");                    
+                //}
+                
                 // This will be replaced by camera.view matrix
                 std::cout<<"View matrix: "<<glm::to_string(BackBuffer.camera.view)<<std::endl;
                 std::cout<<"Front vec: "<<glm::to_string(BackBuffer.camera.Front)<<std::endl;
@@ -486,8 +549,14 @@ int CALLBACK WinMain
                 if( MaxControllerCount > ArrayCount(Input->Controller)) {
                     MaxControllerCount = ArrayCount(Input->Controller);   
                 }
-                
-             // ================================================================
+                TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent);
+                //if(TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent)){
+                    //printf("Mouse event is being tracked\n");
+                //} else {
+                    //printf("Can not track Mouse event\n");                
+                //};                
+
+                // ================================================================
             // NOTE: Sounding Part
                 WriteSoundToBuffer(&SoundBuffer, &SoundOutPut, SSamples);
                 //=====================================================================
@@ -584,6 +653,12 @@ int CALLBACK WinMain
                 //if(BackBuffer.camera.moved || BackBuffer.camera.mouse.moved){
                         UpdateCamera(&BackBuffer.camera, DelayedRatio);                    
                     //}
+                        if(BackBuffer.camera.mouse.Wheeled)
+                        {
+                            BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
+                            setMat4(ScreenBuffer.glData.ProgramID, "projection", BackBuffer.camera.projection);
+                            BackBuffer.camera.mouse.Wheeled = false;
+                        }
 
                 setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
 

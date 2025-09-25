@@ -15,7 +15,7 @@ void UpdateCamera (Camera* camera, float DelayRatio) {
     // Then do the similar look on pitch(y and z) we have y equal to sin(pitch)
     // and z is cos(pitch)
     
-    //if(camera->mouse.moved){
+    if(camera->mouse.moved){
         camera->mouse.MouseXOffset = camera->mouse.xPos - camera->mouse.LastX;
         // NOTE: Still don't know why we have to do oppositely for Y offset cause of
         // the y axe go down
@@ -27,12 +27,20 @@ void UpdateCamera (Camera* camera, float DelayRatio) {
         camera->Yaw += camera->mouse.MouseXOffset * DelayRatio * SENSITIVITY;
         camera->Pitch += camera->mouse.MouseYOffset * DelayRatio * SENSITIVITY;
 
-        if(camera->Pitch >= 89.0f){
-            camera->Pitch = 89.0f;
+        if(camera->Pitch > 90.0f){
+            camera->Pitch = 90.0f;
         }
 
-        if(camera->Pitch <= 0.0f){
+        if(camera->Pitch < 0.0f){
             camera->Pitch = 0.0f;
+        }
+
+        if(camera->Yaw > 360.0f){
+            camera->Pitch = 360.0f;
+        }
+
+        if(camera->Yaw < 0.0f){
+            camera->Yaw = 0.0f;
         }
     
     camera->Direction.x = glm::sin((glm::radians(camera->Yaw)));  
@@ -40,16 +48,17 @@ void UpdateCamera (Camera* camera, float DelayRatio) {
     camera->Direction.y = glm::sin((glm::radians(camera->Pitch)));  
 
 //Camera->LastFrameTime = FrameTime; ?? ??
-        //camera->mouse.moved = false;
-    //}
+        camera->mouse.moved = false;
+    }
         
     //if(camera->moved){
-        // Cross product between the constant Up Vector which pointing upward in
-        // world space we have camera Right vector
+        // Cross product between the constant Up Vector which pointing upward and
+        // cammera Direction in world space we have camera Right vector
         camera->Right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera->Direction));
         camera->Up = glm::normalize(glm::cross(camera->Right, camera->Direction));
-
-        glm::vec3 center =  !camera->focusCenter?camera->Position + camera->Direction:glm::vec3(0.0f);
+        std::string UpContent = glm::to_string(camera->Up);
+        //printf("%s \n", UpContent.c_str());
+        glm::vec3 LookedPoint =  camera->Position + camera->Direction;
 
         camera->view = glm::lookAt(
 //Camera Position
@@ -57,14 +66,13 @@ void UpdateCamera (Camera* camera, float DelayRatio) {
 //camera->Position + camera->Front,
             //glm::vec3(0.0f),
             // One above make camera rotate around center
-            center,
+            !camera->focusCenter?LookedPoint:glm::vec3(0.0f),
 //Position Where the camera is looking at (formular is AB-> = B - A(we can apply basic number subtraction rule))
             camera->Up
 //How camera is oriented (Normalized up vector of camera NOT WORLD)
                                    );
         //camera->moved = false;
     //}
-
 };
 
 void Zoom(Camera* camera, float offset){

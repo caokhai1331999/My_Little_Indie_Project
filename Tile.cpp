@@ -8,7 +8,7 @@
 #include "Tile.h"
 
 
-void DrawTile(std::string path){
+void DrawTile(std::string path, GLuint ShaderID){
     std::ifstream file(".map");
     std::string content;
     content.resize(fs::file_size("file.txt"));
@@ -20,4 +20,17 @@ void DrawTile(std::string path){
     };
 
     // Draw here
+    debug_read_file_result* MapFile = DEBUGReadFileWhole("");
+    useProgram(ShaderID);
+    int i = 0;
+    for(int y = 0; y < MapHeight; y++){
+        for(int x = 0; x < MapWidth; x++)
+        {
+            // Set each Tile Matrix then Draw
+            //glBindVertexArray()
+            setMat4(MapFile->content[i]);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            i++;
+        }
+    }
 }
