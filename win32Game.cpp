@@ -375,9 +375,10 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                     0.820f,  0.883f,  0.371f,
                     0.982f,  0.099f,  0.879f
                 };
-                
+
                 glGenBuffers(1, &OBuffer->glData.VBO);
                 glGenVertexArrays(1, &OBuffer->glData.VAOs);
+                glGenVertexArrays(1, &OBuffer->glData.PlaneVAOs);
                 //glGenVertexArrays(1, &OBuffer->glData.ColorVAOs);
 
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.VBO);
@@ -406,6 +407,19 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.VBO);
                 glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(3*sizeof(float)));
                 glEnableVertexAttribArray(2);
+
+                glGenBuffers(1, &OBuffer->glData.PlaneVBO);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(PlaneVerticles), &PlaneVerticles, GL_STATIC_DRAW);
+
+                glBindVertexArray(OBuffer->glData.PlaneVAOs);
+
+                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.PlaneVBO);
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)0);
+                glEnableVertexAttribArray(0);
+
+                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.ColorVBO);
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+                glEnableVertexAttribArray(1);
                 
                 // NOTE: To here we done assigned CubeVerticles data to VAOs and VBO
                 // We will call bindbuffer/vertexArray whenever before glDrawArray
