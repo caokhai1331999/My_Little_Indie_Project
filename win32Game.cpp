@@ -325,16 +325,16 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
                 };
             
-                const float PlaneVerticles[] = {
+                static const GLfloat PlaneVerticles[] = {
                     // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
-                    //        x,     y,           z
-                   -1.0f, -1.0f,  5.0f,  2.0f, 0.0f, // Each verticle
-                    5.0f, -1.0f,  5.0f,  0.0f, 0.0f,
-                   -1.0f, -1.0f, -5.0f,  0.0f, 2.0f,
+                  // x,    y,     z
+                   -1.0f, -1.0f,  5.0f,  0.583f, 0.771f, 0.014f,  2.0f, 0.0f, // Each verticle
+                    5.0f, -1.0f,  5.0f,  0.609f, 0.115f, 0.436f,  0.0f, 0.0f,
+                   -1.0f, -1.0f, -5.0f,  0.327f, 0.483f, 0.844f,  0.0f, 2.0f,
 
-                    5.0f, -1.0f,  5.0f,  2.0f, 0.0f,
-                   -1.0f, -1.0f, -5.0f,  0.0f, 2.0f,
-                    5.0f, -1.0f, -5.0f,  2.0f, 2.0f			        
+                    5.0f, -1.0f,  5.0f,  0.822f, 0.569f, 0.201f,  2.0f, 0.0f,
+                   -1.0f, -1.0f, -5.0f,  0.435f, 0.602f, 0.223f,  0.0f, 2.0f,
+                    5.0f, -1.0f, -5.0f,  0.310f, 0.747f, 0.185f,  2.0f, 2.0f			        
                 };
 
                 static const GLfloat g_color_buffer_data[] = {
@@ -376,13 +376,18 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                     0.982f,  0.099f,  0.879f
                 };
 
-                glGenBuffers(1, &OBuffer->glData.VBO);
                 glGenVertexArrays(1, &OBuffer->glData.VAOs);
                 glGenVertexArrays(1, &OBuffer->glData.PlaneVAOs);
-                //glGenVertexArrays(1, &OBuffer->glData.ColorVAOs);
 
+
+                glGenBuffers(1, &OBuffer->glData.VBO);
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.VBO);
                 glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), &Vertices, GL_STATIC_DRAW);
+
+
+                glGenBuffers(1, &OBuffer->glData.PlaneVBO);
+                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.PlaneVBO);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(PlaneVerticles), &PlaneVerticles, GL_STATIC_DRAW);
 
                 glGenBuffers(1, &OBuffer->glData.ColorVBO);
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.ColorVBO);
@@ -390,37 +395,42 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
 
                 //glBufferData(GL_ARRAY_BUFFER, sizeof(trianglesVerticles), &trianglesVerticles, GL_STATIC_DRAW);
                 printf("Size of Vertices:%d\n", sizeof(Vertices));
-                
+
                 glBindVertexArray(OBuffer->glData.VAOs);
+
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.VBO);
+                // CUBE position in NDC
                 glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)0);
                 glEnableVertexAttribArray(0);
 
+                // COLOR Value
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.ColorVBO);
-                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
                 glEnableVertexAttribArray(1);
-                //glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 8*sizeof(float), (void*)(3*sizeof(float)));
-//
-                //glEnableVertexAttribArray(1);
 
                 //  index, size, type, .., stride, pointer
+                // Texture coor
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.VBO);
                 glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(3*sizeof(float)));
                 glEnableVertexAttribArray(2);
 
-                glGenBuffers(1, &OBuffer->glData.PlaneVBO);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(PlaneVerticles), &PlaneVerticles, GL_STATIC_DRAW);
+//========================================================================
 
+// FOR PLANE
                 glBindVertexArray(OBuffer->glData.PlaneVAOs);
-
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.PlaneVBO);
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)0);
+                 //Position
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
                 glEnableVertexAttribArray(0);
 
-                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.ColorVBO);
-                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+                 //COLOR
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
                 glEnableVertexAttribArray(1);
-                
+
+                 //TEXTURE COOR
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));
+                glEnableVertexAttribArray(2);
+                //
                 // NOTE: To here we done assigned CubeVerticles data to VAOs and VBO
                 // We will call bindbuffer/vertexArray whenever before glDrawArray
 // NOTE: We delve into Buffer drawing later!!!!
@@ -610,7 +620,7 @@ void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* F
     printf("=====================================\n");
     printf("                 |  BackBuffer | FrontBuffer\n");
     printf("VAOS             |  %d         | %d\n", BackBuffer->glData.VAOs, FrontBuffer->glData.VAOs);
-    printf("ColorVAOS        |  %d         | %d\n", BackBuffer->glData.ColorVAOs, FrontBuffer->glData.ColorVAOs);
+    printf("PlaneVAOS        |  %d         | %d\n", BackBuffer->glData.PlaneVAOs, FrontBuffer->glData.PlaneVAOs);
     printf("VBO              |  %d         | %d\n", BackBuffer->glData.VBO, FrontBuffer->glData.VBO);
     printf("ColorVBO         |  %d         | %d\n", BackBuffer->glData.ColorVBO, FrontBuffer->glData.ColorVBO);
     printf("TextureID        |  %d         | %d\n", BackBuffer->glData.textureHandle, FrontBuffer->glData.textureHandle);
@@ -658,8 +668,12 @@ void PassGLData(OpenGLData* BackData, OpenGLData* FrontData)
             FrontData->VAOs = BackData->VAOs;
         }
 
-        if(FrontData->ColorVAOs != BackData->ColorVAOs && !isNull(&BackData->ColorVAOs)){
-            FrontData->ColorVAOs = BackData->ColorVAOs;
+        if(FrontData->PlaneVAOs != BackData->PlaneVAOs && !isNull(&BackData->PlaneVAOs)){
+            FrontData->PlaneVAOs = BackData->PlaneVAOs;
+        }
+
+        if(FrontData->PlaneVBO != BackData->PlaneVBO && !isNull(&BackData->PlaneVBO)){
+            FrontData->PlaneVBO = BackData->PlaneVBO;
         }
 
         if(FrontData->textureHandle != BackData->textureHandle && !isNull(&BackData->textureHandle)){

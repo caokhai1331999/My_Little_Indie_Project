@@ -440,12 +440,14 @@ int CALLBACK WinMain
                 //glm::mat4 View = glm::mat4(1.0f);
                 glm::mat4 Model = glm::mat4(1.0f);
                 glm::mat4 Model2 = glm::mat4(1.0f);
-                Model2 = glm::translate(Model2, glm::vec3(-4.0f, 0.0f, 0.0f));
-                std::cout<<"Stand still model 2 matrix is :"<<glm::to_string(Model2)<<std::endl;
+                glm::mat4 Plane = glm::mat4(1.0f);
+
+                Plane = glm::translate(Plane, glm::vec3(0.0f));
+
                 glm::mat4 Projection = glm::mat4(1.0f);
 
                 //View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
-                glm::vec3 Position = glm::vec3(4.0f, 3.0f, 3.0f);
+                glm::vec3 Position = glm::vec3(2.0f, 4.0f, 0.0f);
                 glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
                 glm::vec3 WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -477,8 +479,10 @@ int CALLBACK WinMain
                 std::cout<<"Up vec: "<<glm::to_string(BackBuffer.camera.Up)<<std::endl;
 
                 BackBuffer.camera.fov = 45.0f;
-                Model = glm::translate(Model, glm::vec3(0.0f, 0.0f, 0.0f));
+                Model = glm::translate(Model, glm::vec3(2.0f, -4.0f, 0.0f));
                 std::cout<<"Central rotating model is"<<glm::to_string(Model)<<std::endl;
+                Model2 = glm::translate(Model2, glm::vec3(-4.0f, -4.0f, 0.0f));
+                std::cout<<"Stand still model 2 matrix is :"<<glm::to_string(Model2)<<std::endl;
 
                 BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
                 
@@ -705,14 +709,20 @@ int CALLBACK WinMain
                     //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
                 }
                 
-                    glBindVertexArray(ScreenBuffer.glData.VAOs);
-                    setMat4(ScreenBuffer.glData.ProgramID, "model", Model2);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                    setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);                
+                glBindVertexArray(ScreenBuffer.glData.VAOs);
+                setMat4(ScreenBuffer.glData.ProgramID, "model", Model2);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
 
-                    LastCounter = EndCounter;
-                    LastCycleCounts = EndCycleCounts;
+                setMat4(ScreenBuffer.glData.ProgramID, "model", Model);
+                glDrawArrays(GL_TRIANGLES, 0, 36);                
+                
+                 //Set vectices and color for plane
+                glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
+                setMat4(ScreenBuffer.glData.ProgramID, "model", Plane);
+                glDrawArrays(GL_TRIANGLES, 0, 6);
+
+                LastCounter = EndCounter;
+                LastCycleCounts = EndCycleCounts;
 /*
                 MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per register 
                 MULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register  
