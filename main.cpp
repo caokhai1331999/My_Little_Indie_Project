@@ -55,14 +55,14 @@ LRESULT CALLBACK MainWindowCallBack(
             if(IsDown){
                 if(vkCode == 'W') {
                     //Actually the front vec is at the back of the camera
-                    State.BlueOffset+= 10;
-                    BackBuffer.camera.Position +=  BackBuffer.camera.Direction * BackBuffer.camera.speed;
+                    //State.BlueOffset+= 10;
+                    BackBuffer.camera.Position +=  glm::normalize(BackBuffer.camera.Direction) * BackBuffer.camera.speed;
                     printf("Up is HIT\n");
                 }
 
                 else if(vkCode == 'S') {
                     State.GreenOffset+= 10;
-                    BackBuffer.camera.Position -= BackBuffer.camera.Direction * BackBuffer.camera.speed;
+                    BackBuffer.camera.Position -= glm::normalize(BackBuffer.camera.Direction) * BackBuffer.camera.speed;
                     printf("Down is HIT\n");
                 }
 
@@ -392,6 +392,9 @@ int CALLBACK WinMain
             HDC DeviceContext = GetDC(Window);
             int refreshRate = GetDeviceCaps(DeviceContext, VREFRESH);
             ReleaseDC(Window, DeviceContext);
+
+            MSG message;
+            
             if(refreshRate > 1){
                 printf("Refresh rate is : %dHz\n", refreshRate);
             };
@@ -543,13 +546,14 @@ int CALLBACK WinMain
                 //NOTE: This is where receiving the message to change
                 // for any change in window
                 while(PeekMessageA(&Message, 0, 0, 0, PM_REMOVE)) {
-                    if (Message.message == WM_QUIT) {
-                        GlobalRunning = false;
+                    if(Message.message == WM_QUIT){
+                        if(GlobalRunning){
+                            GlobalRunning = false;
+                        }
                     }
                     DispatchMessage(&Message);
                     TranslateMessage(&Message);
                 }
-
                 if( MaxControllerCount > ArrayCount(Input->Controller)) {
                     MaxControllerCount = ArrayCount(Input->Controller);   
                 }
@@ -694,19 +698,15 @@ int CALLBACK WinMain
                                 break;
                         };
                         ChangeAxisCounter = 0.0f;
-
                     } else {
-                        ChangeAxisCounter += MsPerFrame;
+                        ChangeAxisCounter += WaitTimeCounter;
                     }
-
-                    Model = glm::rotate(Model, glm::radians(10.0f), randomRotateAxis);
-
+                    Model = glm::rotate(Model, glm::radians(10.0f) * (float)BackBuffer.camera.speed, randomRotateAxis);
                     // Wait to 17 milli s perframe for model to rotate
                     WaitTimeCounter = 0.0f;
-
                 } else {
                     WaitTimeCounter += MsPerFrame;
-                    //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
+                    printf("WaitTimeCounter: %f\n", WaitTimeCounter);
                 }
                 
                 glBindVertexArray(ScreenBuffer.glData.VAOs);

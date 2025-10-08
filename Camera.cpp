@@ -24,8 +24,8 @@ void UpdateCamera (Camera* camera, float DelayRatio) {
         camera->mouse.LastX = camera->mouse.xPos;
         camera->mouse.LastY = camera->mouse.yPos;        
             
-        camera->Yaw += camera->mouse.MouseXOffset * DelayRatio * SENSITIVITY;
-        camera->Pitch += camera->mouse.MouseYOffset * DelayRatio * SENSITIVITY;
+        camera->Yaw += camera->mouse.MouseXOffset * camera->speed * SENSITIVITY;
+        camera->Pitch += camera->mouse.MouseYOffset * camera->speed * SENSITIVITY;
 
         if(camera->Pitch > 90.0f){
             camera->Pitch = 90.0f;
@@ -36,15 +36,16 @@ void UpdateCamera (Camera* camera, float DelayRatio) {
         }
 
         if(camera->Yaw > 360.0f){
-            camera->Pitch = 360.0f;
+            camera->Yaw = 360.0f;
         }
 
         if(camera->Yaw < 0.0f){
             camera->Yaw = 0.0f;
         }
-    
+
+        // Direction based on mouse
     camera->Direction.x = glm::sin((glm::radians(camera->Yaw)));  
-    camera->Direction.z = glm::cos(glm::radians(camera->Yaw)) * glm::cos(glm::radians(camera->Pitch));
+    camera->Direction.z = glm::cos(glm::radians(camera->Yaw)) + glm::cos(glm::radians(camera->Pitch));
     camera->Direction.y = glm::sin((glm::radians(camera->Pitch)));  
 
 //Camera->LastFrameTime = FrameTime; ?? ??
