@@ -16,10 +16,10 @@ void UpdateCamera (Camera* camera, float DelayRatio) {
     // and z is cos(pitch)
     
     if(camera->mouse.moved){
-        camera->mouse.MouseXOffset = camera->mouse.xPos - camera->mouse.LastX;
+        camera->mouse.MouseXOffset = camera->mouse.LastX - camera->mouse.xPos;
         // NOTE: Still don't know why we have to do oppositely for Y offset cause of
         // the y axe go down
-        camera->mouse.MouseYOffset = camera->mouse.yPos - camera->mouse.LastY;
+        camera->mouse.MouseYOffset = camera->mouse.LastY - camera->mouse.yPos;
 
         camera->mouse.LastX = camera->mouse.xPos;
         camera->mouse.LastY = camera->mouse.yPos;        
@@ -44,9 +44,11 @@ void UpdateCamera (Camera* camera, float DelayRatio) {
         }
 
         // Direction based on mouse
-    camera->Direction.x = glm::sin((glm::radians(camera->Yaw)));  
-    camera->Direction.z = glm::cos(glm::radians(camera->Yaw)) + glm::cos(glm::radians(camera->Pitch));
-    camera->Direction.y = glm::sin((glm::radians(camera->Pitch)));  
+        // yaw is formed by x and x1
+// similarly Pitch formed by y and y1
+    camera->Direction.x = glm::cos((glm::radians(camera->Yaw)));  
+    camera->Direction.z = glm::sin(glm::radians(camera->Yaw)) + glm::sin(glm::radians(camera->Pitch));
+    camera->Direction.y = glm::cos((glm::radians(camera->Pitch)));  
 
 //Camera->LastFrameTime = FrameTime; ?? ??
         camera->mouse.moved = false;
