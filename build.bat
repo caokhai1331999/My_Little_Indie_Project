@@ -2,20 +2,23 @@
 mkdir build
 pushd build
 
-del *.obj
+del .\src\*.obj
 del *.pdb > NUL 2> NUL
 
 set DIRECTIVES_FLAG=/D:DEBUG=1 /D:INTERNAL=1
 set COMPILE_FLAG=/FC /Zi /EHsc
-set LIB_= strmiids.lib uuid.lib Kernel32.lib user32.lib gdi32.lib Opengl32.lib
+set LIB_= strmiids.lib uuid.lib Kernel32.lib user32.lib gdi32.lib Opengl32.lib assimp-vc143-mtd.lib
 set _include=..\include
-set glad_src=..\src
+set glad_src=..\include\glad
 rem set PDB_name=
 rem set dll_name=win32.dll
 set GLFW_INCLUDE_DIR="C:\Users\klove\Downloads\External_Libraries\glfw\glfw-3.4.bin.WIN64\include"
 
-set FILES=..\main.cpp ..\src\gl.c ..\src\wgl.c ..\handmade.cpp ..\shader.cpp ..\win32Game.cpp ..\SoundMaker.cpp ..\Camera.cpp
+set ASSIMP_DIR="C:\Users\klove\Documents\repos\GLFW2\Vulkan_Learning_Project\assimp\include"
 
+set ASSIMP_LIB="C:\Users\klove\Documents\repos\GLFW2\Vulkan_Learning_Project\assimp\lib\debug"
+
+set FILES=..\src\*.c*
 rem ..\SoundMaker.cpp  ..\GUIDs.cpp
 rem Mmdevapi.dll Audioses.dll /VERBOSE:LIB 
 rem remember to add these to use address sanitizer /EHsc /fsanitize=address
@@ -28,8 +31,8 @@ rem Let alone the hot Loading code later
 
 rem cl /LD ..\win32Game.cpp ..\main.cpp %COMPILE_FLAG% %DIRECTIVES_FLAG%  -I%_include% -I%glad_src% -link %LIB_% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /PDB:%PDB_name% %EXPORT_% /DEBUG/OUT:%dll_name%
 
-cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -link %LIB_% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006
-    
+cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% /LIBPATH:%ASSIMP_LIB% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006
+/subsystem:console
 rem if %ERRORLEVEL% EQU 0 (
 rem    @echo Announce: " compilation succeeded (^ w ^) "
 rem ) else (

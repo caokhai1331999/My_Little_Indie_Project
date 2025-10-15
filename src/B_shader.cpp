@@ -6,7 +6,7 @@
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
 
-#include "shader.h"
+#include "B_shader.h"
 
 // NOTE: Load shader code from source file to empty shader object
 // then compile it , next attach it to empty program finally link
@@ -32,7 +32,7 @@ void *GetAnyGLFuncAddress(const char *name)
 }
 // =============== let aside this alone touch it when it's time================
 
-void loadShader(Shader* shader, char* name, VertexType type){
+void loadShader(B_shader* shader, char* name, VertexType type){
     //Create File handle to current file for reading
     char* Error;
     shader->shader_file = CreateFileA(
@@ -60,7 +60,7 @@ void loadShader(Shader* shader, char* name, VertexType type){
             
                 //First Create an empty shader object by glCreateShader 
                 // BUG here
-                if(type == vertex){
+                if(type == vertex_){
                     shader->shaderID = glCreateShader(GL_VERTEX_SHADER);
                 } else {
                     shader->shaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -205,14 +205,16 @@ void checkCompileErrors(GLuint shader, const char* type)
     }
 };
 
-GLuint setupGLprogram(Shader* vshader, Shader* fshader){
+GLuint setupGLprogram(B_shader* vshader, B_shader* fshader, GLuint* ProgramID){
     //buffer->glData.ProgramID = glCreateProgram();
     unsigned int tempProgramID = glCreateProgram();
-
+    
     glAttachShader(tempProgramID, vshader->shaderID);
     glAttachShader(tempProgramID, fshader->shaderID);
     glLinkProgram(tempProgramID);
 
+    *ProgramID = tempProgramID;
+    printf("Program ID: %d %d\n", *ProgramID, tempProgramID);
     checkCompileErrors(vshader->shaderID, "VERTEX");
     checkCompileErrors(fshader->shaderID, "FRAGMENT");
     checkCompileErrors(tempProgramID, "PROGRAM");
