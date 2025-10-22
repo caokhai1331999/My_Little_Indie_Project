@@ -461,7 +461,7 @@ int CALLBACK WinMain
                 glm::mat4 Projection = glm::mat4(1.0f);
 
                 //View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
-                glm::vec3 Position = glm::vec3(2.0f, 4.0f, 0.0f);
+                glm::vec3 Position = glm::vec3(2.0f, -8.0f, 0.0f);
                 glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
                 glm::vec3 WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -495,7 +495,7 @@ int CALLBACK WinMain
                 BackBuffer.camera.fov = 45.0f;
                 Model = glm::translate(Model, glm::vec3(2.0f, -4.0f, 0.0f));
                 std::cout<<"Central rotating model is"<<glm::to_string(Model)<<std::endl;
-                Model2 = glm::translate(Model2, glm::vec3(-4.0f, -4.0f, 0.0f));
+                Model2 = glm::translate(Model2, glm::vec3(-4.0f, 4.0f, 0.0f));
                 std::cout<<"Stand still model 2 matrix is :"<<glm::to_string(Model2)<<std::endl;
 
                 BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
@@ -737,15 +737,14 @@ int CALLBACK WinMain
                 setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Plane);
                 glDrawArrays(GL_TRIANGLES, 0, 6);
 
-
-                glBindVertexArray(ScreenBuffer.glData.VAOs);
                 setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Model);
+                glBindVertexArray(ScreenBuffer.glData.VAOs);
                 glDrawArrays(GL_TRIANGLES, 0, 36);                
 
+                //glBindTexture(GL_TEXTURE_2D, 0);
                 //useProgram(ScreenBuffer.glData.ProgramIDs[1]);
-                //setMat4(ScreenBuffer.glData.ProgramIDs[1], "projection", Projection);
-                //setMat4(ScreenBuffer.glData.ProgramIDs[1], "view", BackBuffer.camera.view);
                 //setMat4(ScreenBuffer.glData.ProgramIDs[1], "model", Model2);
+                //glBindVertexArray(ScreenBuffer.glData.VAOs);
                 //DDraw(modell, &ScreenBuffer.glData.ProgramIDs[1]);
                 
                 LastCounter = EndCounter;

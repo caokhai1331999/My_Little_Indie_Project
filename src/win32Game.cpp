@@ -448,9 +448,11 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
                 glEnableVertexAttribArray(0);
 
+                //Normal
                 glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)3);
                 glEnableVertexAttribArray(1);
 
+                //TextCoord
                 glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)6);
                 glEnableVertexAttribArray(2);
 
