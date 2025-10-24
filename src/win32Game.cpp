@@ -456,6 +456,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)6);
                 glEnableVertexAttribArray(2);
 
+                // Mere Color
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.ColorVBO);
                 glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
                 glEnableVertexAttribArray(3);
@@ -489,8 +490,8 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 // NOTE: Found it: The temptexture is local to this fx so its
                 // data and address turn to null after the fx called
 
-                glGenTextures(1, &OBuffer->glData.textureHandle);
-                glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle );
+                //glGenTextures(1, &OBuffer->glData.textureHandle);
+                //glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle );
 // OBuffer->glData.textureHandle is the name of the texture
                 //last argument This is where point to the image data
                 // Why this doesn't work
@@ -508,33 +509,35 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                     //RenderSplendidGradient(OBuffer, NULL, BMPContent, 0, 0, 3);                    
                     //printf("Image content is NULL\n");
                 //}
+
 // NOTE: Focus on this
 
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
+                //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
  
                 //glPixelStorei(GL_UNPACK_ROW_LENGTH, OBuffer->Pitch / 4);
                 //
-                glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle);
-                glGenerateMipmap(GL_TEXTURE_2D);
-                
+                //glBindTexture(GL_TEXTURE_2D, 4);
+                //glGenerateMipmap(GL_TEXTURE_2D);
+                //
    //Wrapping
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
    //Filter
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//
+                //GLenum err = glGetError();
+//
+                //if (err != GL_NO_ERROR) {
+                    //printf("OpenGL Error after glTexImage2D: %x\n", err);
+                //}
+//
+                //if(OBuffer->glData.textureHandle!=NULL){
+                    //printf("Texture name is: %d\n", OBuffer->glData.textureHandle);
+                //} else {
+                    //printf("Some How texture is NULL???\n");
+                //}
 
-                GLenum err = glGetError();
-
-                if (err != GL_NO_ERROR) {
-                    printf("OpenGL Error after glTexImage2D: %x\n", err);
-                }
-
-                if(OBuffer->glData.textureHandle!=NULL){
-                    printf("Texture name is: %d\n", OBuffer->glData.textureHandle);
-                } else {
-                    printf("Some How texture is NULL???\n");
-                }
                 //NOTE: The commented part is one that is deprecated when using the
                 // new version of OPENGL
                 //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);

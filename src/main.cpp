@@ -446,7 +446,6 @@ int CALLBACK WinMain
                 loadShader(&Mvshader, "1.model.vs", (VertexType)vertex_);
                 loadShader(&Mfshader, "1.model.fs", (VertexType)fragment_);
 
-                unsigned int simple_model_shader;
                 setupGLprogram(&Mvshader, &Mfshader, &ScreenBuffer.glData.ProgramIDs[1]);
 
                 copyBufferData(&BackBuffer, &ScreenBuffer);
@@ -511,13 +510,29 @@ int CALLBACK WinMain
                     printf("NO program object created before\n");
                 }
 
-                setInt(ScreenBuffer.glData.ProgramIDs[0], "ttexture1", ScreenBuffer.glData.textureHandle);                
-                setMat4(ScreenBuffer.glData.ProgramIDs[0], "projection", BackBuffer.camera.projection);
+                if(glIsProgram(ScreenBuffer.glData.ProgramIDs[1])){
+                    useProgram(ScreenBuffer.glData.ProgramIDs[1]);
+                    printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[1]);
+                } else {
+                    glDebugMessageCallback(MessageCallback, 0);
+                    checkCompileErrors(vshader.shaderID, "Vertex");
+                    checkCompileErrors(fshader.shaderID, "Fragment");
+                    checkCompileErrors(ScreenBuffer.glData.ProgramIDs[1], "Program");
+                    printf("NO program object created before\n");
+                }
 
-                setMat4(ScreenBuffer.glData.ProgramIDs[1], "projection", BackBuffer.camera.projection);
+                //setInt(ScreenBuffer.glData.ProgramIDs[0], "ttexture1", ScreenBuffer.glData.textureHandle);                
+
+                useProgram(ScreenBuffer.glData.ProgramIDs[0]);
+                setMat4(ScreenBuffer.glData.ProgramIDs[0], "projection", BackBuffer.camera.projection);
                 std::cout<<"Projection mat: "<<glm::to_string(BackBuffer.camera.projection)<<std::endl;                
                 setMat4(ScreenBuffer.glData.ProgramIDs[0], "view", BackBuffer.camera.view);
+
+                useProgram(ScreenBuffer.glData.ProgramIDs[1]);
+                setMat4(ScreenBuffer.glData.ProgramIDs[1], "projection", BackBuffer.camera.projection);
                 setMat4(ScreenBuffer.glData.ProgramIDs[1], "view", BackBuffer.camera.view);
+                setVec3(ScreenBuffer.glData.ProgramIDs[1], "ViewPos", BackBuffer.camera.Position);
+                setVec3(ScreenBuffer.glData.ProgramIDs[1], "lightPos", glm::vec3(4.0f, 3.0f, 0.0f));
 
                 Model_* modell = nullptr;
                 modell = new Model_();
@@ -613,9 +628,7 @@ int CALLBACK WinMain
                 //else {
                     //printf("NO program object created before\n");
                 //}
-                //glActiveTexture(GL_TEXTURE0);
-                //glBindTexture(GL_TEXTURE_2D, 1);
-                //printf("Texture ID: %d\n", ScreenBuffer.glData.textureHandle[0]);
+
                 GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
                 // camera/view transformation
                 //Model = glm::rotate(Model, glm::radians(fov)*0.5f, glm::vec3(1.0f, 0.0f, 0.5f));
@@ -687,8 +700,12 @@ int CALLBACK WinMain
                             BackBuffer.camera.mouse.Wheeled = false;
                         }
 
-                setMat4(ScreenBuffer.glData.ProgramIDs[0], "view", BackBuffer.camera.view);
+                        useProgram(ScreenBuffer.glData.ProgramIDs[0]);
+                        setMat4(ScreenBuffer.glData.ProgramIDs[0], "view", BackBuffer.camera.view);
 
+                        useProgram(ScreenBuffer.glData.ProgramIDs[1]);
+                        setMat4(ScreenBuffer.glData.ProgramIDs[1], "view", BackBuffer.camera.view);
+                        
                 glm::vec3 randomRotateAxis = glm::vec3(0.4f* DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2));
                 
                 if(WaitTimeCounter >= 16.67f){
@@ -728,11 +745,9 @@ int CALLBACK WinMain
                     WaitTimeCounter += MsPerFrame;
                     //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
                 }
-
-                //setMat4(ScreenBuffer.glData.ProgramID, "model", Model2);
-                //glDrawArrays(GL_TRIANGLES, 0, 36);
                 
                  //Set vectices and color for plane
+                useProgram(ScreenBuffer.glData.ProgramIDs[0]);
                 glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
                 setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Plane);
                 glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -741,11 +756,10 @@ int CALLBACK WinMain
                 glBindVertexArray(ScreenBuffer.glData.VAOs);
                 glDrawArrays(GL_TRIANGLES, 0, 36);                
 
-                //glBindTexture(GL_TEXTURE_2D, 0);
-                //useProgram(ScreenBuffer.glData.ProgramIDs[1]);
-                //setMat4(ScreenBuffer.glData.ProgramIDs[1], "model", Model2);
-                //glBindVertexArray(ScreenBuffer.glData.VAOs);
-                //DDraw(modell, &ScreenBuffer.glData.ProgramIDs[1]);
+                useProgram(ScreenBuffer.glData.ProgramIDs[1]);
+                glBindVertexArray(ScreenBuffer.glData.VAOs);
+                setMat4(ScreenBuffer.glData.ProgramIDs[1], "model", Model2);
+                DDraw(modell, &ScreenBuffer.glData.ProgramIDs[1]);
                 
                 LastCounter = EndCounter;
                 LastCycleCounts = EndCycleCounts;

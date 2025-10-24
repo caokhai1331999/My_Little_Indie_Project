@@ -69,7 +69,7 @@ void UpdateCamera (Camera* camera, float DelayRatio) {
 //camera->Position + camera->Front,
             //glm::vec3(0.0f),
             // One above make camera rotate around center
-            !camera->focusCenter?LookedPoint:glm::vec3(0.0f),
+            !camera->focusCenter?LookedPoint:glm::vec3(-4.0f, 4.0f, 0.0f),
 //Position Where the camera is looking at (formular is AB-> = B - A(we can apply basic number subtraction rule))
             camera->Up
 //How camera is oriented (Normalized up vector of camera NOT WORLD)
