@@ -94,12 +94,15 @@ LRESULT CALLBACK MainWindowCallBack(
                     printf("Shift is HIT\n");
                     //XOffset += 10;                    
                 }
-                }
 
                 else if(vkCode == VK_BACK) {
-                    BackBuffer.camera.Direction = glm::vec3(0.0f) - BackBuffer.camera.Position;
-                    printf("Back to point at the center\n");
+                    BackBuffer.camera.Direction = glm::vec3(-4.0f, 4.0f, 0.0f) - BackBuffer.camera.Position;
+                    BackBuffer.camera.mouse.LastX = BackBuffer.camera.mouse.xPos;
+                    BackBuffer.camera.mouse.LastY = BackBuffer.camera.mouse.yPos;
+                    printf("Back to point at the backpack\n");
                     //XOffset += 10;                    
+                }
+                
                 }
 
                 if(!BackBuffer.camera.moved){
