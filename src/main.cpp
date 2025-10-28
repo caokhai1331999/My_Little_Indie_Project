@@ -97,17 +97,39 @@ LRESULT CALLBACK MainWindowCallBack(
 
                 else if(vkCode == VK_BACK) {
                     BackBuffer.camera.Direction = glm::vec3(-4.0f, 4.0f, 0.0f) - BackBuffer.camera.Position;
+
                     BackBuffer.camera.mouse.LastX = BackBuffer.camera.mouse.xPos;
                     BackBuffer.camera.mouse.LastY = BackBuffer.camera.mouse.yPos;
+                    BackBuffer.camera.mouse.MouseXOffset = 0;
+                    BackBuffer.camera.mouse.MouseYOffset = 0;
+
+                    printf("Direction X is %f\n", BackBuffer.camera.Direction.x);
+                    printf("Direction Y is %f\n", BackBuffer.camera.Direction.y);
+                    
+                    BackBuffer.camera.Yaw = glm::degrees(glm::acos(glm::clamp(BackBuffer.camera.Direction.x, -1.0f, 1.0f)));
+                    BackBuffer.camera.Pitch = glm::degrees(glm::acos(glm::clamp(BackBuffer.camera.Direction.y, -1.0f, 1.0f)));
+                    printf("Yaw is %f\n", BackBuffer.camera.Yaw);
+                    printf("Pitch is %f\n", BackBuffer.camera.Pitch);
+
+                    if(BackBuffer.camera.Yaw > 360.0f){
+                        BackBuffer.camera.Yaw -= 360.0f;
+                    }
+
+                    if(BackBuffer.camera.Pitch > 90.0f){
+                        BackBuffer.camera.Yaw -= 90.0f;
+                    }
+                    
                     printf("Back to point at the backpack\n");
+
+                    std::cout<<"Direction is: "<< glm::to_string(BackBuffer.camera.Direction)<<std::endl;
                     //XOffset += 10;                    
                 }
                 
                 }
 
                 if(!BackBuffer.camera.moved){
-                    std::cout<<"Camera Position is"<<glm::to_string(BackBuffer.camera.Position)<<std::endl;
-                    std::cout<<"Camera Direction is"<<glm::to_string(BackBuffer.camera.Direction)<<std::endl;
+                    //std::cout<<"Camera Position is"<<glm::to_string(BackBuffer.camera.Position)<<std::endl;
+                    //std::cout<<"Camera Direction is"<<glm::to_string(BackBuffer.camera.Direction)<<std::endl;
                     BackBuffer.camera.moved = true;
                 }
 
@@ -699,7 +721,10 @@ int CALLBACK WinMain
                         if(BackBuffer.camera.mouse.Wheeled)
                         {
                             BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
+                            glUseProgram(ScreenBuffer.glData.ProgramIDs[0]);
                             setMat4(ScreenBuffer.glData.ProgramIDs[0], "projection", BackBuffer.camera.projection);
+                            glUseProgram(ScreenBuffer.glData.ProgramIDs[1]);
+                            setMat4(ScreenBuffer.glData.ProgramIDs[1], "projection", BackBuffer.camera.projection);
                             BackBuffer.camera.mouse.Wheeled = false;
                         }
 
