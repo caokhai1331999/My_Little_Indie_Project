@@ -1,0 +1,63 @@
+
+---------------- Tue, 24 Jun 25: 10:30AM
+
+TODAY:
+       1. Time to hands on I/0 function
+       2. then -> Find out the way to loadImage(BMP or PNG) to OpenGL
+       DONE!
+       
+---------------- Tue, 08 Jul 25: 11:29AM
+
+Time to create Perspective world with View, Projection
+with every object (draw by some shader) 's position have to multiply to view and
+projection matrix
+
+---------------- Thu, 10 Jul 25: 10:21AM
+Component:
+           View + Projection matrix
+           Verticles -> to VAOs/VBO -> Bound to shader everytime You to want
+           draw it -> Shader(Vertex/Fragment) (Already have input awaiting
+           Fragment output) -> Set matrix -> Model/Projection and View -> Then Draw by glDrawArray
+           
+
+firstly first draw a cube here
+---------------- Thu, 10 Jul 25: 12:13PM
+
+
+---------------- Fri, 11 Jul 25: 12:28PM
+
+WHAT to FOCUS :
+  1 . GAME/APP main loop state machine (input, update and render) (KIND of GRASP)
+  2 . GRAPHIC (2D/3D) : * Linear algebra :
+                                         . Verticles + Normal vector + Texture Coor
+                                         . Graphic pipeline (model ->
+                                         projective(perspective)->
+                                         view(glm::lookat))
+                                         . 
+                        * Shader :
+                            ..Create: 
+                            ..souce code : ...vertex :
+                                         .. glPos = Model * Projection * View
+                                           ...fragment :
+                                         .. glColor = Texture(Texture * light
+                                         component) * Color
+                        * Lighting : . Sources type : Direct, point (distance
+  related algorithm), spot(Angle Cut Off Algorithm)
+                                     . Component : Ambient, Diffuse, Specular(
+  surface normal vector related)
+                                     
+  3 . SOUND :
+  4 . MEMORY:
+  5 . 
+  5.5 . SOFT SKILLS : __FUNCTION/LIBRARY Searching
+                      . Know where to read : return, main job, included header
+                      , arguments, types
+
+                      __
+---------------- Sun, 13 Jul 25: 01:20PM
+
+After successfully loading shader, test iti
+Then try to create perspective looking world
+
+---------------- Wed, 16 Jul 25: 01:45PM
+

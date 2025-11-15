@@ -26,6 +26,7 @@
 #endif
 
 #include <Windows.h>
+#include <Windowsx.h>
 #include <xinput.h>
 #include <stdio.h>
 #include <cmath>
@@ -67,6 +68,9 @@ typedef uint32_t uint32;
 typedef float real32;
 typedef double real64;
 
+const global_variable int Height = 720;
+const global_variable int Width = 1280;
+
 // NOTE: This is all about calling the function in the Xinput.h without the noticing from the compiler
 #define X_INPUT_GET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex,XINPUT_STATE *pState)
 typedef X_INPUT_GET_STATE(x_input_get_state);
@@ -95,10 +99,29 @@ X_INPUT_SET_STATE(XinputSetStateStub) {
 }
 global_variable x_input_set_state* XinputSetState_  = XinputSetStateStub;
 #define XinputSetState XinputSetState_
+
+//NOTE: Get mouse pos
+//
+//#define GET_X_LPARAM(name) int name(LPARAM lparam)
+//typedef GET_X_LPARAM(get_x_lparam);
+//GET_X_LPARAM(getxlparam) {
+    //return (NULL);
+//}
+//global_variable get_x_lparam* getxlparam_  = getxlparam;
+//#define get_x_lparam getxlparam_
+//
+//#define GET_Y_LPARAM(name) int name(LPARAM lparam)
+//typedef GET_Y_LPARAM(get_y_lparam);
+//GET_Y_LPARAM(getylparam) {
+    //return (NULL);
+//}
+//global_variable get_y_lparam* getylparam_  = getylparam;
+//#define get_y_lparam getylparam_
+//
+
 // ==================================================================
 
 typedef struct debug_read_file_result{
-
     uint32 Size;
     void* Content;
 }debug_read_file_result;
@@ -154,7 +177,6 @@ struct Game_Button_State{
 };
 
 union Game_Controller_Input{
-
     // NOTE: The union make it child var lie in one place and can be found in one
     // address
     bool32 IsAnalog;

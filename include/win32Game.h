@@ -6,10 +6,9 @@
    $Creator: Cao Khai(Casey disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
-#include "handmade.h"
 #include "Camera.h"
 #include "SoundMaker.h"
-
+#include <vector>
 struct win32Dimension{
     int PosX{0};
     int PosY{0};
@@ -19,14 +18,19 @@ struct win32Dimension{
 
 struct OpenGLData{
     unsigned int VAOs;
-    unsigned int ColorVAOs;
+    unsigned int PlaneVAOs;
+
     unsigned int VBO;
     unsigned int ColorVBO;
+    unsigned int PlaneVBO;
 
-    unsigned int ProgramID;
+    std::vector<GLuint> ProgramIDs;
     
     HGLRC openglRC;
     unsigned int textureHandle = 0;
+    OpenGLData(){
+        ProgramIDs = {0, 0};
+    }
 };
 
 struct Win32_OffScreen_Buffer{  
@@ -84,9 +88,6 @@ global_variable Game_State State = {};
 global_variable imagee_content* BMPContent;
 global_variable real32 WaitTimeCounter = 0.0f;
 
-const global_variable int Height = 720;
-const global_variable int Width = 1280;
-
 void GetWindowDimension(HWND Window);
 void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Height);
 
@@ -101,6 +102,7 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
 
 void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
 void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
+
 void APIENTRY MessageCallback(GLenum source,
                               GLenum type,
                               GLuint id,

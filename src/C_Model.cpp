@@ -17,7 +17,30 @@ void DDraw(Model_* model, GLuint* programID){
 
 void loadModel_(Model_* model, string path){
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene* scene = importer.ReadFile(path,
+    aiProcess_CalcTangentSpace       |
+    aiProcess_Triangulate            |
+    aiProcess_JoinIdenticalVertices  |
+    aiProcess_SortByPType);
+
+    std::string texture_file_ =    "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
+
+    const aiTexture* mTextures_ = scene->GetEmbeddedTexture(texture_file_.c_str());
+    aiMaterial* material = scene->mMaterials[0];
+    aiString texture_file;
+    //texture_file.C_str()="C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
+
+    material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), texture_file);
+
+    if(mTextures_ != NULL){
+       printf("Texture ID:%d\n", scene->GetEmbeddedTexture(texture_file_.c_str()));
+    } else {
+        printf("Embedded texture is NULL\n");
+        cout<<"ERROR::ASSIMP::"<<importer.GetErrorString()<<endl;
+        cout<<"ERROR::ASSIMP::"<<texture_file.C_Str()<<endl;
+    };
+
+
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
         cout<<"ERROR::ASSIMP::"<<importer.GetErrorString()<<endl;
     }

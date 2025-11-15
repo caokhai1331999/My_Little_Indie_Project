@@ -8,8 +8,7 @@
 #include <ctime>
 #include <cstdlib>
 #include "SoundMaker.h"
-#include "C_Model.h"
-#include "win32Game.h"
+#include "Tile.h"
 
 LRESULT CALLBACK MainWindowCallBack(
     HWND Window,
@@ -431,6 +430,7 @@ int CALLBACK WinMain
 #endif
 
             //=======================================================
+            std::srand(std::time(NULL));
             Game_Memory game_memory = {};
             game_memory.PermanentStorageSize = Megabytes(128);
             game_memory.TransientStorageSize = Megabytes((uint64)6);
@@ -443,6 +443,7 @@ int CALLBACK WinMain
             debug_read_file_result result;
             debug_read_file_result result2;
             if(game_memory.TransientStorage && game_memory.PermanentStorage){
+
                 //printf("About to read image\n");
                 // NOTE: ???? Why when I change to different bmp image it crashed
                 //byte order: AA BB GG RR bottom up                  
@@ -450,10 +451,19 @@ int CALLBACK WinMain
                 //JPGContent = DEBUGReadJPG("Harry and Accomplices.jpg", &result2);
                 //OpenGL part
                 Win32_Front_Buffer ScreenBuffer = Win32_Front_Buffer(BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, &BackBuffer.glData, BackBuffer.BitmapMemory);
+
+                // Randomize cube direction
+                std::srand(std::time(0));
+                float direction = 0.0f;
+                for (int x = 0 ; x < 100; x++){
+                    direction = ((std::rand()%3)*1.0f);
+                    fluxY[x+100] = direction;
+                    printf("cube index %d Y: %f, with direction %f %s\n", x, fluxY[x],fluxY[x+100],fluxY[x+100]==UPP_?"UP":fluxY[x+100]==DOWNN_?"DOWNN":"ROLL");
+                }
+                
 // Cause the ScreenData will be deleted out of the loop so
                 // We have to assign address of memory and glData to
                 //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
-                std::srand(std::time(NULL));
                 RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
                 InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
 
@@ -476,10 +486,11 @@ int CALLBACK WinMain
                 copyBufferData(&BackBuffer, &ScreenBuffer);
                 //????
                 //glm::mat4 View = glm::mat4(1.0f);
+                float UpdatedDegree = 0.0f;
+
                 glm::mat4 Model = glm::mat4(1.0f);
                 glm::mat4 Model2 = glm::mat4(1.0f);
                 glm::mat4 Plane = glm::mat4(1.0f);
-
                 Plane = glm::translate(Plane, glm::vec3(0.0f));
 
                 glm::mat4 Projection = glm::mat4(1.0f);
@@ -561,7 +572,8 @@ int CALLBACK WinMain
 
                 Model_* modell = nullptr;
                 modell = new Model_();
-                std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/backpack.obj";
+                //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/backpack.obj";
+                std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
                 loadModel_(modell, path);
                 
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
@@ -604,6 +616,8 @@ int CALLBACK WinMain
                 MSG Message;
                 //NOTE: This is where receiving the message to change
                 // for any change in window
+                //
+                //INPUT
                 while(PeekMessageA(&Message, 0, 0, 0, PM_REMOVE)) {
                     if(Message.message == WM_QUIT){
                         if(GlobalRunning){
@@ -623,6 +637,7 @@ int CALLBACK WinMain
                     //printf("Can not track Mouse event\n");                
                 //};                
 
+                //UPDATE
                 // ================================================================
             // NOTE: Sounding Part
                 WriteSoundToBuffer(&SoundBuffer, &SoundOutPut, SSamples);
@@ -735,6 +750,10 @@ int CALLBACK WinMain
                         setMat4(ScreenBuffer.glData.ProgramIDs[1], "view", BackBuffer.camera.view);
                         
                 glm::vec3 randomRotateAxis = glm::vec3(0.4f* DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2));
+
+                //setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Model);
+                //glBindVertexArray(ScreenBuffer.glData.VAOs);
+                //glDrawArrays(GL_TRIANGLES, 0, 36);
                 
                 if(WaitTimeCounter >= 16.67f){
                     //else {
@@ -744,7 +763,13 @@ int CALLBACK WinMain
                         //BackBuffer.camera.view = glm::lookAt(glm::vec3(CamX, 0.0f, CamZ), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
                         //setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
                     //}
-                    
+                    //Set vectices and color for plane
+                    UpdatedDegree += 5.0f;
+                    //printf("updated angle :%f\n", UpdatedDegree);
+                    if(UpdatedDegree*(float)BackBuffer.camera.speed > 360.0f){
+                        UpdatedDegree -= 360.0f/(float)BackBuffer.camera.speed;
+                    };
+
                     if(ChangeAxisCounter >= 1000.0f){
                         ChosenAxis = std::rand()*2;
                         switch(ChosenAxis){
@@ -773,8 +798,8 @@ int CALLBACK WinMain
                     WaitTimeCounter += MsPerFrame;
                     //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
                 }
-                
-                 //Set vectices and color for plane
+
+                //RENDER =====================================
                 useProgram(ScreenBuffer.glData.ProgramIDs[0]);
                 glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
                 setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Plane);
@@ -784,6 +809,9 @@ int CALLBACK WinMain
                 glBindVertexArray(ScreenBuffer.glData.VAOs);
                 glDrawArrays(GL_TRIANGLES, 0, 36);                
 
+                drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], BackBuffer.camera.speed, &UpdatedDegree);
+
+                
                 useProgram(ScreenBuffer.glData.ProgramIDs[1]);
                 glBindVertexArray(ScreenBuffer.glData.VAOs);
                 setMat4(ScreenBuffer.glData.ProgramIDs[1], "model", Model2);

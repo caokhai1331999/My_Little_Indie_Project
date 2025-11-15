@@ -21,6 +21,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "win32Game.h"
+#include <vector>
 #include <stdio.h>
 #include <string>
 #include <cstring>
@@ -28,10 +29,10 @@
 using namespace std;
 
 typedef bool VertexType;
-#define vertex (bool)true
-#define fragment (bool)false
+#define vertex_ (bool)true
+#define fragment_ (bool)false
 
-struct Shader{
+struct B_shader{
     HANDLE shader_file;
     LARGE_INTEGER file_size;
     unsigned int shaderID;
@@ -39,7 +40,9 @@ struct Shader{
     void* SourcePath;
 };
 
-void loadShader(Shader* shader, char* name, VertexType type);
+std::vector<GLuint> ProgramIDs;
+
+void loadShader(B_shader* shader, char* name, VertexType type);
 char* loadCurrentErr();
 
 // Set Int, bool, float and Vector
@@ -60,7 +63,7 @@ void setMat4(GLuint programID, const std::string name, const glm::mat4 &value);
 void useProgram(GLuint programID);
 
 // Attaching shader to program
-GLuint setupGLprogram(Shader* vshader, Shader* fshader);
+GLuint setupGLprogram(B_shader* vshader, B_shader* fshader, GLuint* ProgramID );
 void checkCompileErrors(GLuint shader, const char* type);
 
 #define SHADER_H

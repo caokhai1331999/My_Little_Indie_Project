@@ -545,6 +545,8 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 // Deprecated
                 //glEnable(GL_TEXTURE_2D);
                 glEnable(GL_DEPTH_TEST);
+                glEnable(GL_CULL_FACE);
+                glCullFace(GL_FRONT);
                 glDepthFunc(GL_LESS);
                 // GL 4.3+
                 glEnable(GL_DEBUG_OUTPUT);
@@ -640,7 +642,7 @@ void GameUpdateAndRender(Game_Memory* Memory, imagee_content* BMPContent ,Game_I
 
     // Display on the screen
     // The glitching sound driven me nearly crazy so I decided to turn it off
-    GameOutPutSound(SoundBuffer, State->Hz);
+    //GameOutPutSound(SoundBuffer, State->Hz);
 }
 
 void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer){

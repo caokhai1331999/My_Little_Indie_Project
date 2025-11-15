@@ -1,0 +1,515 @@
+
+---------------- Fri, 18 Jul 25: 10:14AM
+
+How To debug to check for function call success???
+
+---------------- Fri, 18 Jul 25: 03:48PM
+
+May all we need to do that is already known by us. Call function name and
+wglGetProcAddress to draw out the opengl extensions
+
+---------------- Sat, 19 Jul 25: 12:38PM
+
+I decided to use glad to load opengl extensions, due to the fact that calling
+wglgetprocaddress everytime I need to create shader or using it is wearing me
+down
+
+---------------- Sun, 20 Jul 25: 03:42PM
+
+Seemed macros Like GL_CLAMP is deprecated and was replaced by GL_CLAMP_TO_EDGE
+And so many macros like that is in the similar situation
+
+---------------- Sun, 20 Jul 25: 03:47PM
+
+OpenGL is just like SDL about when talking about method like texture
+
+---------------- Sun, 20 Jul 25: 04:01PM
+
+To use modern OpenGl.
+ . Create shader from source
+ . Make VAO and VBO
+ . Create matrix with Projection and View Matrix
+ . Load Matrix along with runtime and use glDrawArray or elements
+
+---------------- Mon, 21 Jul 25: 10:32AM
+
+So the wglGetProcAddress is failed. WHY????
+
+---------------- Sat, 26 Jul 25: 05:34PM
+
+On the way to figure out why the glad lib can not initialize. Forgot to add all
+extension to gl.h and wgl.h files
+
+---------------- Mon, 28 Jul 25: 11:00AM
+
+Seemed like the OpenGl context failed at the beginning before enable glad
+openglRC = wglCreateContext
+
+
+---------------- Tue, 29 Jul 25: 09:20AM
+
+wglCreateContext produce NULL
+
+REMEMBER! :Found out the bug I made it in wrong order which stalling me to
+create proper OpenGL context. I CREATED CONTEXT BEFORE SETING the PIXEL which is NOT ALLOWED
+
+---------------- Tue, 29 Jul 25: 11:18AM
+
+Now Time to debug shader loader
+
+---------------- Wed, 30 Jul 25: 10:36AM
+
+Still stuck at the shader source code loading.
+
+Then Time to move on to texture loading.
+Forgot the connecting pipeline between shader uniform and texture data for
+displaying -- May be they are linked automatically after the texture ID is
+defined
+
+Bug lied at readfile function
+Why the filesize.Quadpart is different than the byteread
+
+---------------- Thu, 31 Jul 25: 10:19AM
+
+Why the vs shader won't load while the fs one loaded successfully
+
+REMEMBER! : Many times the bugs not lied at the typo or syntax. But the
+way OpenGL or any api handshake with windows. Sometimes the order is wrong will
+lead to undefined behaviour
+
+---------------- Fri, 01 Aug 25: 11:18AM
+
+Forgot to close handle after reading the file but even after doing that
+The shader.vs file still couldn't be load
+
+---------------- Sat, 02 Aug 25: 11:45AM
+
+Turned out I also forgot to allocate the memory for the sourcecode content
+before read it SOLVED!
+
+One problem solved
+
+---------------- Sun, 03 Aug 25: 10:34AM
+
+
+---------------- Mon, 04 Aug 25: 11:04AM
+
+Turned out I forgot to bindtexture id to fragment shader program
+Another thing that I missed that I don't know why is that the: I missused
+glDrawElement function while after replacing it by glDrawArrays make it better
+
+---------------- Tue, 05 Aug 25: 10:54AM
+
+
+---------------- Wed, 06 Aug 25: 11:28AM
+
+I forgot to define the stride size(byte offset between consecutive vertex
+attribute)
+
+Next problem is the texture is not loaded
+
+---------------- Fri, 08 Aug 25: 10:29AM
+
+A lot of potential causes for shader not working issues
+
+1. The shader source code not actually work and the opengl use the default shader to
+draw 2 triangles -> That's the reason why there is no texture at all
+2. The texture creating step is wrong somewhere lead to no texture
+3. Another is that two shader weren't linked to the same program (But was
+checked and turned out not to be the caused)
+ 
+NOTE: The texture not loading reason is not lying at the pixel data transfer
+stage but the texture setup in of OpenGL
+
+NOTE: FragColor work but somehow the texture value passed is NULL
+
+Many issues related to the data passed between two buffer
+
+TODO: Solve the conflict between DeviceContext which is called chaotically
+Change the Data source from back to screen buffer solve the conflict of dc
+
+---------------- Sun, 10 Aug 25: 11:19AM
+
+There are two pixel src overlapped each other if I used win32Displaybufferwindow
+one is stretchDIB one is OpenGL Draw
+
+By adding the datatransfer switch to decide whether to transfer data efficiently
+I succeed stall data messing between back and screen buffer
+
+Somehow I have to call beginPaint and endpaint for window to work properly
+
+Why change the memory buffer pointer to screenbuffer cause VAOs is nuLL
+
+---------------- Mon, 11 Aug 25: 10:39AM
+
+Time to delve into why the image bit weren't shown in the triangle areas
+
+---------------- Tue, 12 Aug 25: 10:55AM
+
+The main cause for crash after resizing window is the renderGradient write pixel
+data in the wrong mismatched dimesion with the one declared in the
+resizedibsection
+
+---------------- Wed, 13 Aug 25: 11:33AM
+
+There is a high possibility that app use default shader instead of the shader
+I compiled
+
+NOTE: Turned out the program linking stage was wrong the whole time. But I don't
+know it cause I check compiling Errors in wrong way
+
+---------------- Thu, 14 Aug 25: 09:38AM
+
+Mismatched dimesion between buffer given DIB section and the actual pixel data
+cause app crash
+
+And by the way, May be the way the pixel arranged in memory made it can not be
+shown in the OpenGL drawn area (YES: THis is right the texture is wrong
+somewhere)
+
+NOTE: 
+
+---------------- Fri, 15 Aug 25: 10:48AM
+
+
+---------------- Sun, 17 Aug 25: 10:22AM
+
+Cause the CLAMP_TO_THE_EDGE option in glTexParameteri is not available in gl 3.3
+so I used GL_CLAMP_TO_BORDER. The pixel color seemed right.
+
+Now, the only problem is the texture Coor DONE!
+
+Time to move on to Perspective, Model and Camera algorithm to simulate the real
+world(3D) feel in the app
+
+REMEMBER! : Allocate for the core(key) information & knownledge that I have to know
+(or understand) and remember to make things work. These are usually an
+algorithm, the key function or core theory.. etc
+
+One more thing that I don't understand is. Why I have to add special or
+unrelated symbol to the end of the texture name to be able to pass the data to
+the uniform variable in the fragment shader????
+
+---------------- Mon, 18 Aug 25: 12:16PM
+
+Graphic pipepine: Model(local) -> World(Perspective) space-> Clip Space-> View
+Space(Camera) -> Clip Space??? -> Screen Space
+
+---------------- Mon, 18 Aug 25: 05:34PM
+
+After trying to apply 3d view on the texture lost I even don't see any cube at
+all
+
+---------------- Wed, 20 Aug 25: 12:25PM
+
+Actually I have to add symbol to any uniform name string to make the app
+actually find out the variable name. And from this time For some reason the data
+passed in make the shader even couldn't draw a mere triangle
+
+NOTE: Texture ID memory become garbage after calling transfer(or other process)
+Need to delve more to this next time
+
+---------------- Fri, 22 Aug 25: 12:00PM
+
+There is high possibility that the Buffer lost its assigned data to OpenGl cause
+NULL passing data
+
+// NOTE: Found it: The temptexture is local to this fx so its
+// data and address turn to null after the fx called
+
+---------------- Sat, 23 Aug 25: 12:02PM
+
+We can assure that the OpenGl use the default shader to draw these 2 triangles
+even it didn't produce which data we passed incorrectedly or which stage we failed to make our
+shader worked
+
+---------------- Sun, 24 Aug 25: 10:41AM
+
+Success narrow down/break down the bug to getuniform value from matrix. All the
+matrix value is NULL after passing to the shader 
+
+---------------- Mon, 25 Aug 25: 10:26AM
+
+Maybe the getuniform function only see the null termination symbol in
+std::string not the "char*"
+
+NOTE: Sum up today :
+ 1. Firstly, the OpenGl getuniform function only get full name with NULL
+ terminator while we pass the string with the c_str as the data not just mere
+ char*
+ 2. Finally, we did see the animation but not what we were expected( Instead of
+ textured cover rotating cube we only see the rotating flat(2D) rectangle)
+ ==> We have to delve more about these element matrixes
+
+---------------- Tue, 26 Aug 25: 12:46PM
+
+Once again It'was just the VBO,VAO process order. In other side, cause the
+texture I passed failed which left black or white color made me think the
+calculated matrix was wrong and make it 2D looking but no.
+
+---------------- Thu, 28 Aug 25: 10:06AM
+
+Time to delve into texture generator stage
+NOTE: What make texture turn dark while the passed image content wasn't even
+NULL
+
+---------------- Fri, 29 Aug 25: 11:41AM
+
+NOTE: Proper Initialization may solve alot of memory issues
+
+
+SOLVED! : Turned out Due to the IMPROPER INITIALIZATION of Front Buffer (All
+member DATA is NULL at the beginning) which made the bypassing stage through
+address go wrong(CAN'T bypass data to uninitialized value(NULL addressed)) ==>
+the texture is NULL(Dark)
+
+---------------- Mon, 01 Sep 25: 02:19PM
+
+Move Camera :
+ .Direction : position+= CameraDirection Vector*CameraSpeed
+
+---------------- Thu, 04 Sep 25: 10:33PM
+
+How to make camera position affect camera view matrix effectively??
+
+---------------- Fri, 05 Sep 25: 09:16PM
+
+
+---------------- Sat, 06 Sep 25: 11:14PM
+
+Cross is to calculate the perpenculiar vector of two given vectors
+
+Still vaguely know about how the camera actually move in simulated world.
+Got to delve more into that
+
+---------------- Sun, 07 Sep 25: 08:41PM
+
+By the way How to draw out position of model
+Why there was a glitch at camera moving. The time counter somewhat not working
+as I expect
+
+---------------- Wed, 10 Sep 25: 10:15PM
+
+One the way to complete the camera smooth moving based on mouse.
+
+---------------- Thu, 11 Sep 25: 10:04PM
+
+Don't know why the get position of mouse didn't work. Got to find out next time
+
+---------------- Sat, 13 Sep 25: 12:16PM
+
+Still far away from smooth mouse and camera move
+Okay I tuned it seemed smoother but the yaw and pitch didn't work the way we
+want.
+We have to fix them next time
+
+---------------- Mon, 15 Sep 25: 10:46PM
+
+The camera direction changed by mouse is somehow limited
+I think time to hands on creating the plane where everthing happening on it
+
+---------------- Thu, 18 Sep 25: 09:20AM
+
+NOTE: Why the right and front vecs effect is swapped to each other
+Calling glm lib inside struct initialization stage is somewhat mysterily wrong
+
+REMEMBER! :Turned out I used old and outdated front vec3 instead of updated direction vec to update position which caused unexpected movement
+
+---------------- Sat, 20 Sep 25: 10:22PM
+
+Time to make a plane or what we called ground for game entity to move
+
+Try to build a demo pokemon game using Isometric or looked above view
+
+---------------- Tue, 23 Sep 25: 08:10AM
+
+What to master (from doing this). Apply OpenGL graphics pinpeline and
+lighting and 3D Math on small demo of game.
+
+---------------- Tue, 23 Sep 25: 04:27PM
+
+Why the Pitch in camera view could not reach 90.0f (haven't solved yet)
+
+DONE mousewheeling changing camera fov
+
+---------------- Fri, 26 Sep 25: 12:11AM
+
+REMEMBER! : Comeback to basic concept. Vertices is the 3D position of points in
+NDC(Normalized Device Coordinates or we can call the visible region of OpenGL)
+
+---------------- Sat, 27 Sep 25: 11:30PM
+
+Lack of time so I just can set vao and vbo data. Still have to make plane mat
+and move it to position and set it before calling draw array
+
+---------------- Wed, 01 Oct 25: 12:09PM
+
+Weird triangle once again appeared unarrangedly. WHY???
+I was surely wrong somewhere in the setup pipeline
+Forgot to bind planeVBO to buffer then assign buffer data make unexpected
+overlapping plane vertice data to cube data which can explain why their is 3
+separate triangles ( 8 x 3 = 24 = sizeof(PlaneVerticles))
+
+---------------- Wed, 08 Oct 25: 09:09AM
+
+Today I have to figure out and fix the pitch angle limit. By the way, make
+camera follow the mouse direction DONE!
+
+---------------- Wed, 08 Oct 25: 01:08PM
+
+Time to move forward to Tile ground constructing
+
+---------------- Wed, 15 Oct 25: 10:51AM
+
+Once again I failed to initialize the vector in the struct
+
+Time to separately using 2 programs to render
+
+---------------- Wed, 15 Oct 25: 05:02PM
+
+Still have manifest the loaded model yet. something wrong with the texture and
+normal vector which make the
+This happend before the
+
+---------------- Wed, 22 Oct 25: 10:22AM
+
+While use the same shader program the model did show up but the texture is all
+black that may mean the gl_fragcolor is NULL
+But why I failed to use the second program. There must be some issues with the
+second shader
+
+Forgot that the Model struct has its own texture name to for shader binding that
+is texture_diffuse1
+
+main BUGs is lying inside the vertex shader code
+position is wrong plus showing no texture at all... ???
+
+SOLVED! The texture messed up due to I dont use the flip option of stbi lib
+which is used to load image
+
+TODO: Time to make the cube lit and the model have shadow
+
+ I Think I have hope to make my first game with the graphic I want
+
+---------------- Fri, 24 Oct 25: 08:55PM
+
+Add some light and we good to move forward to game engine
+Why after I focus on the backpack and move the mouse the direction keep
+drifting far away from expected focus object -
+SOLVED! by updating the lastxy to the current mouse pos -> NO fixed by updating
+the yaw and pitch angle based on given direction with the help of inverse cos -
+sin function (acos & asin)
+
+first of all I need to draw the tile by loop drawing similar/same tile model or
+plane
+
+Then delve more into animate character with the help of assimp lib (and physicx
+if needed) IMPORTANT
+
+Next Delve into popular effect like: particle and blast ...
+
+REMEMBER! : using address of allocated variable in function argument is
+considered safe
+
+REMEMBER! : One thing that I learnt is that acos is the inverse function of cos
+which give back the degree of angle in radians if we have cos value
+
+scroll wheel to change the fov seemed wrong
+
+Thanks to chatgpt reminding me that clamp function help get cos value in -1 to 1
+range (Which is failed to show model if out of range)
+
+forgot to call program before set mat cause unsynchronized changed among objects
+
+---------------- Tue, 28 Oct 25: 09:33AM
+
+Then delve more into animate character with the help of assimp lib (and physicx
+if needed) IMPORTANT
+
+first of all I need to draw the tile by loop drawing similar/same tile model or
+plane
+
+First try simple approaching way to draw tile
+First I tried to draw plane made by cube
+
+---------------- Tue, 28 Oct 25: 04:24PM
+
+---------------- Thu, 30 Oct 25: 09:19PM
+TODO: Search for the way pros made their background with opengl
+ Then consider should I use animation with assimp. Cause in order to use it I
+ have to understand how they work. Which is kind of complicated
+
+---------------- Thu, 30 Oct 25: 09:53PM
+
+
+---------------- Fri, 31 Oct 25: 09:10PM
+
+While I tried to play around with background cubes. The randomized direction
+seemed messed up, the same with the index calculating fomular. May be the type
+is wrong somewhere
+
+---------------- Sun, 02 Nov 25: 08:15PM
+SOLVED! the cube number miscalculation
+
+On the way to more randomized randomization
+result of rotate first and then translate will be different if we swap order and
+vice versa
+
+Why it randomize calculation didn't change the direction
+SOLVED! by remove static keyword which caused members of fluxY immutable
+no by assign to one specific variable in main function which change constantly
+over realtime
+
+How to keep and store a coor and angle of model constantly to create animation
+of rotation
+
+Keep rmodel (form of rotation fomation storage) then copy it to different clone
+in different position
+
+---------------- Tue, 04 Nov 25: 08:30PM
+
+May be the right way to clone rotating cube is store the constantly updating
+degree then pass to the cube matrix every time draw it
+
+IN one loop use the used model can cause unexpected position shift - SOLVED!
+
+TODO: Read more about the system of game engine that we have tile, moving
+object, light-shade shader, collision, (remember to apply the stage with all the
+memory store)
+
+---------------- Wed, 05 Nov 25: 08:32AM
+
+How can I reduce the memory of constantly increasing angle while still keep the
+cube spin smoothly - SOLVED! I failed by merely reduce the increasing angle with
+360.0f every it bigger than 360f without knowing that the cube actully just
+rotated 360.0f * camera speed(real angle is about more than 100.0f degree) which
+led to the jump glitch from about more than (360.0f * camera speed)(100.0f) back
+to 0.0f(while it should be 360.0f to 0.0f) 
+
+---------------- Fri, 07 Nov 25: 08:26AM
+
+TODO: Look for the nearest matter to read !!!
+
+---------------- Sun, 09 Nov 25: 08:04PM
+
+casey(handmade hero) start implemeting opengl from day 362
+
+I decide to make an indie game with legend of zelda/pokemon style with top-down
+looking. And the character will move with simple animation (Got to delve more to
+understand the animation with assimp(node-weight-))
+
+---------------- Tue, 11 Nov 25: 08:32PM
+Delve more to physics simulations
+  . First of all: the equation of motion: vector, acceleration, veclocity(how
+  fat and direction of thing)
+
+---------------- Thu, 13 Nov 25: 08:53PM
+
+IMPORTANT: Think of texture/image which is passed to the cube/plane as a group
+of pixel data
+
+That was right, I'm shifting from render basic cube and camera to building a
+simulating world
+
+---------------- Sat, 15 Nov 25: 08:24PM
+
