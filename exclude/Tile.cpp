@@ -7,30 +7,24 @@
    ======================================================================== */
 #include "Tile.h"
 
+Tile* LoadTileMap();
+void drawTile(Map_content* content, uint8_t VaoID = 0, uint8_t shaderID = 0){
 
-void DrawTile(std::string path, GLuint ShaderID){
-    std::ifstream file(".map");
-    std::string content;
-    content.resize(fs::file_size("file.txt"));
-    file.read(&content[0], content.size());
-    Tile temptile = {};
-
-    for(int i = 0; i<(int)file.size(), i++){
-        temptile = content[i];
-    };
-
-    // Draw here
-    debug_read_file_result* MapFile = DEBUGReadFileWhole("");
-    useProgram(ShaderID);
-    int i = 0;
-    for(int y = 0; y < MapHeight; y++){
-        for(int x = 0; x < MapWidth; x++)
-        {
-            // Set each Tile Matrix then Draw
-            //glBindVertexArray()
-            setMat4(MapFile->content[i]);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-            i++;
-        }
+    glUseProgram(shaderID);
+    float MapDimensInX = 10.0f;
+    float MapDimensInZ = 10.0f;
+    glm::vec3 tempTilePos = glm::vec3(0.0f);
+    glm::mat4 model = glm::mat4(1.0f);
+    
+    for (float y = 0.0; y < MapDimensInZ; x+=TILE_Z){
+        for (float x = 0.0; x < MapDimensInX; x+=TILE_X){
+            glm::tempTilePos.x = x;
+            glm::tempTilePos.y = y;
+            model = glm::translate(model, tempTilePos);
+            setMat4(shaderID, "model", model);
+            glDrawArray(GL_TRIANGLES, 0, 36);
+        }        
     }
+    // Repeatedly drawing a half cube as a tile
 }
+    
