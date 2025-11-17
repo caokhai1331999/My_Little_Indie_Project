@@ -23,11 +23,14 @@ void loadModel_(Model_* model, string path){
     aiProcess_JoinIdenticalVertices  |
     aiProcess_SortByPType);
 
-    std::string texture_file_ =    "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
-
-    const aiTexture* mTextures_ = scene->GetEmbeddedTexture(texture_file_.c_str());
-    aiMaterial* material = scene->mMaterials[0];
+    std::string texture_file_ =    "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
     aiString texture_file;
+
+    aiMesh* mesh = scene->mMeshes[meshIndex];
+    aiMaterial* mat = scene->mMaterials[ mesh->mMaterialIndex ];
+    aiString texPath;
+    mat->GetTexture(aiTextureType_DIFFUSE, 0, &texPath);
+    
     //texture_file.C_str()="C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
 
     material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), texture_file);
@@ -37,15 +40,14 @@ void loadModel_(Model_* model, string path){
     } else {
         printf("Embedded texture is NULL\n");
         cout<<"ERROR::ASSIMP::"<<importer.GetErrorString()<<endl;
-        cout<<"ERROR::ASSIMP::"<<texture_file.C_Str()<<endl;
     };
 
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
         cout<<"ERROR::ASSIMP::"<<importer.GetErrorString()<<endl;
     }
-    model->directory = path.substr(0, path.find_last_of('/'));
 
+    model->directory = path.substr(0, path.find_last_of('/'));
     processNode(model, scene->mRootNode, scene);
     
     for(unsigned int i = 0; i < model->meshes.size(); i++){
@@ -121,8 +123,10 @@ Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
 vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName){
     vector<Texture>textures ;
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++){
+
         aiString str;
         mat->GetTexture(type, i, &str);
+        printf("%s\n", str.C_Str());
         bool skip = false;
         for(unsigned int j = 0; j <model->loaded_textures.size(); j++){
             if(!std::strcmp(model->loaded_textures[j].path.data(), str.C_Str())){
