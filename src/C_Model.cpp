@@ -21,16 +21,7 @@ void loadModel_(Model_* model, string path){
     aiProcess_CalcTangentSpace       |
     aiProcess_Triangulate            |
     aiProcess_JoinIdenticalVertices  |
-    aiProcess_SortByPType);
-
-    std::string texture_file_ =    "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
-    aiString texture_file;
-
-    aiMesh* mesh = scene->mMeshes[meshIndex];
-    aiMaterial* mat = scene->mMaterials[ mesh->mMaterialIndex ];
-    aiString texPath;
-    mat->GetTexture(aiTextureType_DIFFUSE, 0, &texPath);
-    
+    aiProcess_SortByPType);    
     //texture_file.C_str()="C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
 
     material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), texture_file);
@@ -126,6 +117,8 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
 
         aiString str;
         mat->GetTexture(type, i, &str);
+        // IF mat is null
+        // manually load the texture to mat from png right here
         printf("%s\n", str.C_Str());
         bool skip = false;
         for(unsigned int j = 0; j <model->loaded_textures.size(); j++){
