@@ -24,14 +24,17 @@ void loadModel_(Model_* model, string path){
     aiProcess_SortByPType);    
     //texture_file.C_str()="C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
 
-    material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), texture_file);
+    //const char* path_= "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
+    //aiString texture_file_ = path_;
+    //aiMaterial* material = scene->mMaterials[0];
+    //material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), texture_file_);
 
-    if(mTextures_ != NULL){
-       printf("Texture ID:%d\n", scene->GetEmbeddedTexture(texture_file_.c_str()));
-    } else {
-        printf("Embedded texture is NULL\n");
-        cout<<"ERROR::ASSIMP::"<<importer.GetErrorString()<<endl;
-    };
+    //if(mTextures_ != NULL){
+       //printf("Texture ID:%d\n", scene->GetEmbeddedTexture(texture_file_.c_str()));
+    //} else {
+        //printf("Embedded texture is NULL\n");
+        //cout<<"ERROR::ASSIMP::"<<importer.GetErrorString()<<endl;
+    //};
 
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
@@ -39,11 +42,13 @@ void loadModel_(Model_* model, string path){
     }
 
     model->directory = path.substr(0, path.find_last_of('/'));
+// NODE
     processNode(model, scene->mRootNode, scene);
-    
+// MESH
     for(unsigned int i = 0; i < model->meshes.size(); i++){
         setupMesh(&model->meshes[i]);
     }
+// MATERIAL Inside mesh
 }
 
 void processNode(Model_* model, aiNode* node, const aiScene* scene){
@@ -97,8 +102,11 @@ Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
             indices.push_back(face.mIndices[j]);
         };
     }
-    // Process MATERIAL
-    if(mesh->mMaterialIndex > 0){
+
+            // Texture is simple a type which recall texture from given path
+    
+    //if(mesh->mMaterialIndex > 0){
+            // Process MATERIAL
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         // Texture is simple a type which recall texture from given path
         vector<Texture> diffuseMaps = loadMaterialTextures(model, material, 
@@ -106,9 +114,13 @@ Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         vector<Texture> specularMaps = loadMaterialTextures(model, material, 
                                                             aiTextureType_SPECULAR, "texture_specular");
-        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-    }
-    return Mesh(verticles, indices, textures);
+        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());    
+
+        //} else {
+            //printf("Somehow mesh have no material that means no texture; index: %d\n", mesh->mMaterialIndex);
+        //}
+
+        return Mesh(verticles, indices, textures);
 }
 
 vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName){
@@ -117,9 +129,9 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
 
         aiString str;
         mat->GetTexture(type, i, &str);
+        printf("Texture path is: %s\n", str.C_Str());
         // IF mat is null
         // manually load the texture to mat from png right here
-        printf("%s\n", str.C_Str());
         bool skip = false;
         for(unsigned int j = 0; j <model->loaded_textures.size(); j++){
             if(!std::strcmp(model->loaded_textures[j].path.data(), str.C_Str())){
