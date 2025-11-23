@@ -128,8 +128,8 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++){
 
         aiString str;
-        mat->GetTexture(type, i, &str);
         printf("Texture path is: %s\n", str.C_Str());
+        mat->GetTexture(type, i, &str);
         // IF mat is null
         // manually load the texture to mat from png right here
         bool skip = false;
