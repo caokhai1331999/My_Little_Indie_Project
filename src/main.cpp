@@ -574,8 +574,9 @@ int CALLBACK WinMain
                 modell = new Model_();
                 //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/backpack.obj";
                 std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
+                std::string texpath = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png/";
                 loadModel_(modell, path);
-                
+                modell->Texturedirectory = texpath.substr(0, path.find_last_of('/'));
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
                 printf("vertex array :%d\n", ScreenBuffer.glData.VAOs);
 

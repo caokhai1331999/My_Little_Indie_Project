@@ -8,7 +8,7 @@
 #include "C_Model.h"
 
 using namespace std;
-
+w
 void DDraw(Model_* model, GLuint* programID){
     for(unsigned int i = 0; i < model->meshes.size(); i++){
         Draw(&model->meshes[i], programID);
@@ -22,6 +22,43 @@ void loadModel_(Model_* model, string path){
     aiProcess_Triangulate            |
     aiProcess_JoinIdenticalVertices  |
     aiProcess_SortByPType);    
+
+// DEMO CODE:======================================================
+
+    // IF the embedded texture is NULL
+    if (scene->mNumTextures > 0) {
+        aiTexture* tex = scene->mTextures[0];
+    }
+
+    aiTexture* tex = scene->mTextures[i];
+    unsigned char* data = (unsigned char*)tex->pcData;
+    size_t size = tex->mWidth;
+    unsigned char* img = stbi_load_from_memory(data, size, &w, &h, &channels, 0);
+
+    
+    if (data)
+    {
+        GLenum format;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+
+// ===========================================================================
     //texture_file.C_str()="C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
 
     //const char* path_= "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
@@ -123,17 +160,19 @@ Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
         return Mesh(verticles, indices, textures);
 }
 
-vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName){
+vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, aiScene* scene){
     vector<Texture>textures ;
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++){
 
         aiString str;
-        printf("Texture path is: %s\n", str.C_Str());
         mat->GetTexture(type, i, &str);
+        ;
+        printf("Texture path is: %s\n", str.C_Str());
         // IF mat is null
         // manually load the texture to mat from png right here
         bool skip = false;
         for(unsigned int j = 0; j <model->loaded_textures.size(); j++){
+            // If the path length equal
             if(!std::strcmp(model->loaded_textures[j].path.data(), str.C_Str())){
                 model->loaded_textures.push_back(model->loaded_textures[j]);
                 skip = true;
@@ -142,12 +181,15 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
         };
         if(!skip){
             Texture texture;
+            //This is wrong in fbx case : How to fix this???
             texture.id = TextureFromFile(str.C_Str(), model->directory);
+            printf("texture path is:%s\n",model->directory);
             texture.type = typeName;
             texture.path = str.C_Str();
             textures.push_back(texture);
             model->loaded_textures.push_back(texture);
         }
+        // This part is responsible for loading image internally or from external file
     };
     return textures;
 }
@@ -162,35 +204,35 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
     int width, height, nrComponents;
 
     stbi_set_flip_vertically_on_load(true);
-    // This used stbi_load to load image
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-    
-    
-    if (data)
-    {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
 
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+        // This used stbi_load to load image
+        unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        if (data)
+        {
+            GLenum format;
+            if (nrComponents == 1)
+                format = GL_RED;
+            else if (nrComponents == 3)
+                format = GL_RGB;
+            else if (nrComponents == 4)
+                format = GL_RGBA;
 
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
-    }
-    return textureID;    
+            glBindTexture(GL_TEXTURE_2D, textureID);
+            glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            stbi_image_free(data);
+        }
+        else
+        {
+            std::cout << "Texture failed to load at path: " << path << std::endl;
+            stbi_image_free(data);
+        }
+    return textureID;
 }
