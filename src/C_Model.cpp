@@ -8,7 +8,7 @@
 #include "C_Model.h"
 
 using namespace std;
-w
+
 void DDraw(Model_* model, GLuint* programID){
     for(unsigned int i = 0; i < model->meshes.size(); i++){
         Draw(&model->meshes[i], programID);
@@ -25,38 +25,8 @@ void loadModel_(Model_* model, string path){
 
 // DEMO CODE:======================================================
 
-    // IF the embedded texture is NULL
-    if (scene->mNumTextures > 0) {
-        aiTexture* tex = scene->mTextures[0];
-    }
 
-    aiTexture* tex = scene->mTextures[i];
-    unsigned char* data = (unsigned char*)tex->pcData;
-    size_t size = tex->mWidth;
-    unsigned char* img = stbi_load_from_memory(data, size, &w, &h, &channels, 0);
 
-    
-    if (data)
-    {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
-
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data);
-    }
 
 // ===========================================================================
     //texture_file.C_str()="C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
@@ -147,10 +117,10 @@ Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         // Texture is simple a type which recall texture from given path
         vector<Texture> diffuseMaps = loadMaterialTextures(model, material, 
-                                                           aiTextureType_DIFFUSE, "texture_diffuse");
+                                                           aiTextureType_DIFFUSE, "texture_diffuse", scene);
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         vector<Texture> specularMaps = loadMaterialTextures(model, material, 
-                                                            aiTextureType_SPECULAR, "texture_specular");
+                                                            aiTextureType_SPECULAR, "texture_specular", scene);
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());    
 
         //} else {
@@ -160,13 +130,15 @@ Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
         return Mesh(verticles, indices, textures);
 }
 
-vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, aiScene* scene){
-    vector<Texture>textures ;
+vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene){
+    vector<Texture>textures;
+    if (scene->mNumTextures > 0){
+        TextureFromMemory(scene);
+    } else {
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++){
 
         aiString str;
         mat->GetTexture(type, i, &str);
-        ;
         printf("Texture path is: %s\n", str.C_Str());
         // IF mat is null
         // manually load the texture to mat from png right here
@@ -190,8 +162,9 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
             model->loaded_textures.push_back(texture);
         }
         // This part is responsible for loading image internally or from external file
-    };
-    return textures;
+    }
+    }
+    return textures;        
 }
 
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma){
@@ -234,5 +207,47 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
             std::cout << "Texture failed to load at path: " << path << std::endl;
             stbi_image_free(data);
         }
+    return textureID;
+}
+
+unsigned int TextureFromMemory(const aiScene* scene, bool gamma){
+    // IF the embedded texture is NULL
+    int width, height, nrComponents;
+    size_t size;
+    unsigned int textureID;
+    unsigned char* data = nullptr;
+    data = new unsigned char;
+    if (scene->mNumTextures > 0) {
+        aiTexture* tex = scene->mTextures[0];
+        for(unsigned int i = 0; i < scene->mNumTextures; i++){
+            size = tex->mWidth;
+            data = (unsigned char*)tex->pcData;
+            glGenTextures(1, &textureID);
+            stbi_set_flip_vertically_on_load(true);
+            unsigned char* img = stbi_load_from_memory(data, size, &width, &height, &nrComponents, 0);
+    
+            if (data)
+            {
+                GLenum format;
+                if (nrComponents == 1)
+                    format = GL_RED;
+                else if (nrComponents == 3)
+                    format = GL_RGB;
+                else if (nrComponents == 4)
+                    format = GL_RGBA;
+
+                glBindTexture(GL_TEXTURE_2D, textureID);
+                glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+                glGenerateMipmap(GL_TEXTURE_2D);
+
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                stbi_image_free(data);
+                tex++;
+            }
+        }
+    }
     return textureID;
 }
