@@ -22,13 +22,6 @@ void loadModel_(Model_* model, string path){
     aiProcess_Triangulate            |
     aiProcess_JoinIdenticalVertices  |
     aiProcess_SortByPType);    
-
-// DEMO CODE:======================================================
-
-
-
-
-// ===========================================================================
     //texture_file.C_str()="C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
 
     //const char* path_= "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
@@ -132,9 +125,10 @@ Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
 
 vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene){
     vector<Texture>textures;
-    if (scene->mNumTextures > 0){
-        TextureFromMemory(scene);
-    } else {
+
+    //if (scene->mNumTextures > 0){
+        //TextureFromMemory(scene);
+    //} else {
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++){
 
         aiString str;
@@ -147,23 +141,36 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
             // If the path length equal
             if(!std::strcmp(model->loaded_textures[j].path.data(), str.C_Str())){
                 model->loaded_textures.push_back(model->loaded_textures[j]);
+                printf("Loading texture from model\n");
                 skip = true;
                 break;
             }
         };
+
         if(!skip){
             Texture texture;
-            //This is wrong in fbx case : How to fix this???
-            texture.id = TextureFromFile(str.C_Str(), model->directory);
-            printf("texture path is:%s\n",model->directory);
-            texture.type = typeName;
-            texture.path = str.C_Str();
-            textures.push_back(texture);
-            model->loaded_textures.push_back(texture);
+            if(scene->mNumTextures == 0){                
+                texture.id = TextureFromFile(str.C_Str(), model->directory);
+                //This is wrong in fbx case : How to fix this???
+                printf("texture path is:%s\n",model->directory);
+                texture.type = typeName;
+                texture.path = str.C_Str();
+                textures.push_back(texture);
+            } else {
+                for(unsigned int i = 0; i < scene->mNumTextures; i++){
+                    // NOTE: Try to assign scene texture to model container
+                    // haven't test it yet
+                    texture = scene->mTextures[i];
+                    model->loaded_textures.push_back(texture);
+                        }
+                //texture.id = TextureFromMemory(scene, false);
+                //texture.type = typeName;
+                //texture.path = str.C_Str();
+            };
         }
         // This part is responsible for loading image internally or from external file
     }
-    }
+    //}
     return textures;        
 }
 
@@ -217,37 +224,32 @@ unsigned int TextureFromMemory(const aiScene* scene, bool gamma){
     unsigned int textureID;
     unsigned char* data = nullptr;
     data = new unsigned char;
-    if (scene->mNumTextures > 0) {
-        aiTexture* tex = scene->mTextures[0];
-        for(unsigned int i = 0; i < scene->mNumTextures; i++){
-            size = tex->mWidth;
-            data = (unsigned char*)tex->pcData;
-            glGenTextures(1, &textureID);
-            stbi_set_flip_vertically_on_load(true);
-            unsigned char* img = stbi_load_from_memory(data, size, &width, &height, &nrComponents, 0);
+    aiTexture* tex = scene->mTextures[0];
+    size = tex->mWidth;
+    data = (unsigned char*)tex->pcData;
+    glGenTextures(1, &textureID);
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char* img = stbi_load_from_memory(data, size, &width, &height, &nrComponents, 0);
     
-            if (data)
-            {
-                GLenum format;
-                if (nrComponents == 1)
-                    format = GL_RED;
-                else if (nrComponents == 3)
-                    format = GL_RGB;
-                else if (nrComponents == 4)
-                    format = GL_RGBA;
+    if (data)
+    {
+        GLenum format;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
 
-                glBindTexture(GL_TEXTURE_2D, textureID);
-                glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-                glGenerateMipmap(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
 
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                stbi_image_free(data);
-                tex++;
-            }
-        }
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        stbi_image_free(data);
     }
     return textureID;
 }
