@@ -109,11 +109,9 @@ Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
             // Process MATERIAL
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         // Texture is simple a type which recall texture from given path
-        vector<Texture> diffuseMaps = loadMaterialTextures(model, material, 
-                                                           aiTextureType_DIFFUSE, "texture_diffuse", scene);
+        vector<Texture> diffuseMaps = loadMaterialTextures(model, material, aiTextureType_DIFFUSE, "texture_diffuse", scene);
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-        vector<Texture> specularMaps = loadMaterialTextures(model, material, 
-                                                            aiTextureType_SPECULAR, "texture_specular", scene);
+        vector<Texture> specularMaps = loadMaterialTextures(model, material, aiTextureType_SPECULAR, "texture_specular", scene);
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());    
 
         //} else {
@@ -125,10 +123,6 @@ Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
 
 vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene){
     vector<Texture>textures;
-
-    //if (scene->mNumTextures > 0){
-        //TextureFromMemory(scene);
-    //} else {
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++){
 
         aiString str;
@@ -152,22 +146,30 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
             if(scene->mNumTextures == 0){                
                 texture.id = TextureFromFile(str.C_Str(), model->directory);
                 //This is wrong in fbx case : How to fix this???
-                printf("texture path is:%s\n",model->directory);
+                //printf("texture path is:%s\n",model->directory);
                 texture.type = typeName;
                 texture.path = str.C_Str();
                 textures.push_back(texture);
             } else {
-                for(unsigned int i = 0; i < scene->mNumTextures; i++){
-                    // NOTE: Try to assign scene texture to model container
-                    // haven't test it yet
-                    texture = scene->mTextures[i];
-                    model->loaded_textures.push_back(texture);
-                        }
-                //texture.id = TextureFromMemory(scene, false);
-                //texture.type = typeName;
-                //texture.path = str.C_Str();
+                //for(unsigned int i = 0; i < scene->mNumTextures; i++){
+
+/*
+            NOTE: Try to assign scene texture to model container
+            haven't test it yet
+
+            Things is more complicated than I thought. Actually we load embbedded one in wrong way. We have to load the texture matched with the mat index with
+            is produced by atoi (mat->getTexture().data + 1)
+*/
+
+                    printf("embbedded texture path is:%s\n",model->directory);
+                    int textIndex = atoi(str.data+1);
+                    texture.id = TextureFromMemory(scene, false, textIndex);
+                    texture.type = typeName;
+                    texture.path = str.C_Str();
+                    textures.push_back(texture);
+                }
             };
-        }
+        //}
         // This part is responsible for loading image internally or from external file
     }
     //}
@@ -217,14 +219,14 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
     return textureID;
 }
 
-unsigned int TextureFromMemory(const aiScene* scene, bool gamma){
+unsigned int TextureFromMemory(const aiScene* scene, bool gamma, int index){
     // IF the embedded texture is NULL
     int width, height, nrComponents;
     size_t size;
     unsigned int textureID;
     unsigned char* data = nullptr;
     data = new unsigned char;
-    aiTexture* tex = scene->mTextures[0];
+    aiTexture* tex = scene->mTextures[index];
     size = tex->mWidth;
     data = (unsigned char*)tex->pcData;
     glGenTextures(1, &textureID);
