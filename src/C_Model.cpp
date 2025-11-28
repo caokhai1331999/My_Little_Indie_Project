@@ -113,7 +113,7 @@ Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         vector<Texture> specularMaps = loadMaterialTextures(model, material, aiTextureType_SPECULAR, "texture_specular", scene);
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());    
-
+        //Load diffuse and specular map to texture
         //} else {
             //printf("Somehow mesh have no material that means no texture; index: %d\n", mesh->mMaterialIndex);
         //}
@@ -127,14 +127,15 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
 
         aiString str;
         mat->GetTexture(type, i, &str);
-        printf("Texture path is: %s\n", str.C_Str());
+        //printf("Texture path is: %s\n", str.C_Str());
         // IF mat is null
         // manually load the texture to mat from png right here
         bool skip = false;
         for(unsigned int j = 0; j <model->loaded_textures.size(); j++){
-            // If the path length equal
+            // If the path length equal (the texture existed)
             if(!std::strcmp(model->loaded_textures[j].path.data(), str.C_Str())){
-                model->loaded_textures.push_back(model->loaded_textures[j]);
+                //model->loaded_textures.push_back(model->loaded_textures[j]);
+                textures.push_back(model->loaded_textures[j]);
                 printf("Loading texture from model\n");
                 skip = true;
                 break;
@@ -144,12 +145,13 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
         if(!skip){
             Texture texture;
             if(scene->mNumTextures == 0){                
-                texture.id = TextureFromFile(str.C_Str(), model->directory);
                 //This is wrong in fbx case : How to fix this???
-                //printf("texture path is:%s\n",model->directory);
+                texture.id = TextureFromFile(str.C_Str(), model->directory);
+                printf("texture path is:%s\n",model->directory);
                 texture.type = typeName;
                 texture.path = str.C_Str();
                 textures.push_back(texture);
+                model->loaded_textures.push_back(texture);
             } else {
                 //for(unsigned int i = 0; i < scene->mNumTextures; i++){
 
@@ -163,10 +165,12 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
 
                     printf("embbedded texture path is:%s\n",model->directory);
                     int textIndex = atoi(str.data+1);
+                    // Bug here
                     texture.id = TextureFromMemory(scene, false, textIndex);
                     texture.type = typeName;
                     texture.path = str.C_Str();
                     textures.push_back(texture);
+                    model->loaded_textures.push_back(texture);
                 }
             };
         //}
@@ -185,7 +189,7 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
 
     int width, height, nrComponents;
 
-    stbi_set_flip_vertically_on_load(true);
+    //stbi_set_flip_vertically_on_load(true);
 
         // This used stbi_load to load image
         unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
