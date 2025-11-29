@@ -126,7 +126,11 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++){
 
         aiString str;
-        mat->GetTexture(type, i, &str);
+        if(mat->GetTexture(type, i, &str) == aiReturn_SUCCESS){
+            printf("Texture successfully retrieved %s\n", str.C_Str());
+        } else {
+            printf("Texture not found or error occured\n");            
+        };
         //printf("Texture path is: %s\n", str.C_Str());
         // IF mat is null
         // manually load the texture to mat from png right here
@@ -141,7 +145,7 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
                 break;
             }
         };
-
+        model->directory = model->directory + '\0';
         if(!skip){
             Texture texture;
             if(scene->mNumTextures == 0){                
@@ -163,10 +167,12 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
             is produced by atoi (mat->getTexture().data + 1)
 */
 
-                    printf("embbedded texture path is:%s\n",model->directory);
+                    
+                    printf("embbedded texture path is:%s\n",str.C_Str());
                     int textIndex = atoi(str.data+1);
+                    printf("Embedded texture index is %d\n", textIndex);
                     // Bug here
-                    texture.id = TextureFromMemory(scene, false, textIndex);
+                    texture.id = TextureFromMemory(scene, model->directory, false, &str);
                     texture.type = typeName;
                     texture.path = str.C_Str();
                     textures.push_back(texture);
@@ -206,6 +212,7 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
 
             glBindTexture(GL_TEXTURE_2D, textureID);
             glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+
             glGenerateMipmap(GL_TEXTURE_2D);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -223,39 +230,52 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
     return textureID;
 }
 
-unsigned int TextureFromMemory(const aiScene* scene, bool gamma, int index){
+unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bool gamma, aiString* path){
     // IF the embedded texture is NULL
+    string filename = string(path->C_Str());
+    filename = directory + '/' + filename;
     int width, height, nrComponents;
     size_t size;
     unsigned int textureID;
-    unsigned char* data = nullptr;
-    data = new unsigned char;
-    aiTexture* tex = scene->mTextures[index];
-    size = tex->mWidth;
-    data = (unsigned char*)tex->pcData;
-    glGenTextures(1, &textureID);
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char* img = stbi_load_from_memory(data, size, &width, &height, &nrComponents, 0);
-    
-    if (data)
-    {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
+    const aiTexture* tex = scene->GetEmbeddedTexture(filename.c_str());
 
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+    width = tex->mWidth;
+    height = tex->mWidth;
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        stbi_image_free(data);
+    if(tex){
+        unsigned char* data = (unsigned char*)tex->pcData;
+        glGenTextures(1, &textureID);
+        stbi_set_flip_vertically_on_load(true);
+        if(data){
+            char* img = (char *)stbi_load_from_memory(data, size, &width, &height, &nrComponents, 0);        
+            if (img)
+            {
+                GLenum format;
+                if (nrComponents == 1)
+                    format = GL_RED;
+                else if (nrComponents == 3)
+                    format = GL_RGB;
+                else if (nrComponents == 4)
+                    format = GL_RGBA;
+
+                glBindTexture(GL_TEXTURE_2D, textureID);
+                glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, img);
+                glGenerateMipmap(GL_TEXTURE_2D);
+
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                stbi_image_free(img);
+            } else {
+                printf("Got no data from Scene embedded texture\n");
+            }
+        } else {
+            printf("Data from aiTexture is NULL\n");
+        }
+    } else {
+        printf("Got no embedded texture from Scene\n");
     }
+    
     return textureID;
 }
