@@ -169,8 +169,6 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
 
                     
                     printf("embbedded texture path is:%s\n",str.C_Str());
-                    int textIndex = atoi(str.data+1);
-                    printf("Embedded texture index is %d\n", textIndex);
                     // Bug here
                     texture.id = TextureFromMemory(scene, model->directory, false, &str);
                     texture.type = typeName;
@@ -234,16 +232,25 @@ unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bo
     // IF the embedded texture is NULL
     string filename = string(path->C_Str());
     filename = directory + '/' + filename;
+
+    int textIndex = atoi((path->data)+1);
+    printf("Embedded texture index is %s\n", path->data);
+    char TextIndex[2] = {'*', (char)(textIndex + 48)};
     int width, height, nrComponents;
     size_t size;
     unsigned int textureID;
-    const aiTexture* tex = scene->GetEmbeddedTexture(filename.c_str());
-
-    width = tex->mWidth;
-    height = tex->mWidth;
+    const aiTexture* tex = scene->GetEmbeddedTexture(path->C_Str());
+    if(tex){
+        printf("We got a texture\n");
+    }else{
+        printf("Texture is NULL\n");
+    };
+    //const aiTexture* tex_ = scene->mTextures[textIndex];
 
     if(tex){
         unsigned char* data = (unsigned char*)tex->pcData;
+        width = tex->mWidth;
+        height = tex->mHeight;
         glGenTextures(1, &textureID);
         stbi_set_flip_vertically_on_load(true);
         if(data){
