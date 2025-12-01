@@ -240,6 +240,7 @@ unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bo
     size_t size;
     unsigned int textureID;
     const aiTexture* tex = scene->GetEmbeddedTexture(path->C_Str());
+
     if(tex){
         printf("We got a texture\n");
     }else{
