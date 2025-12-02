@@ -109,9 +109,9 @@ Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
             // Process MATERIAL
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         // Texture is simple a type which recall texture from given path
-        vector<Texture> diffuseMaps = loadMaterialTextures(model, material, aiTextureType_DIFFUSE, "texture_diffuse", scene);
+        vector<Texture> diffuseMaps = loadMaterialTextures(model, material, aiTextureType_DIFFUSE, "material.texture_diffuse1", scene);
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-        vector<Texture> specularMaps = loadMaterialTextures(model, material, aiTextureType_SPECULAR, "texture_specular", scene);
+        vector<Texture> specularMaps = loadMaterialTextures(model, material, aiTextureType_SPECULAR, "material.texture_specular1", scene);
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());    
         //Load diffuse and specular map to texture
         //} else {
@@ -230,33 +230,64 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
 
 unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bool gamma, aiString* path){
     // IF the embedded texture is NULL
-    string filename = string(path->C_Str());
-    filename = directory + '/' + filename;
+    //string filename = string(path->C_Str());
+    //filename = directory + '/' + filename;
+
+    //printf("Embedded texture index is %s\n", path->data);
+    //char TextIndex[2] = {'*', (char)(textIndex + 48)};
 
     int textIndex = atoi((path->data)+1);
-    printf("Embedded texture index is %s\n", path->data);
-    char TextIndex[2] = {'*', (char)(textIndex + 48)};
     int width, height, nrComponents;
     size_t size;
     unsigned int textureID;
-    const aiTexture* tex = scene->GetEmbeddedTexture(path->C_Str());
+
+    const aiTexture* tex = nullptr;
+    tex = new aiTexture;
+
+    //tex = scene->GetEmbeddedTexture(path->C_Str());
+    tex = scene->mTextures[textIndex];
+
+    bool switched = false;
+
+    while(!tex){
+        printf("Switch fetching texture from arry method\n");
+        if(!switched){
+            tex = scene->mTextures[textIndex];
+            switched = true;
+        }else{
+            tex = scene->GetEmbeddedTexture(path->C_Str());
+            switched = false;
+        }
+    }
+
+    char* img = nullptr;    
 
     if(tex){
         printf("We got a texture\n");
-    }else{
-        printf("Texture is NULL\n");
-    };
-    //const aiTexture* tex_ = scene->mTextures[textIndex];
-
-    if(tex){
-        unsigned char* data = (unsigned char*)tex->pcData;
-        width = tex->mWidth;
-        height = tex->mHeight;
         glGenTextures(1, &textureID);
         stbi_set_flip_vertically_on_load(true);
-        if(data){
-            char* img = (char *)stbi_load_from_memory(data, size, &width, &height, &nrComponents, 0);        
-            if (img)
+        if(tex->pcData){
+            //Wrong here
+
+            if(tex->mHeight == 0){
+                //NOTE: if the texture is compressed
+                size = tex->mWidth;
+                img = new char;
+                // This is where thing went wrong
+                img = (char*)stbi_load_from_memory((unsigned char*)tex->pcData , size, &width, &height, &nrComponents, 0);
+                printf("image specs: w: %d, h:%d, size:%d\n", tex->mWidth, tex->mHeight, size);
+
+            }else{
+                width = tex->mWidth;
+                height = tex->mHeight;
+
+                img = new char[4*width*height];
+                memcpy(img ,tex->pcData , 4*width*height);
+
+                nrComponents = 4;
+            }
+
+            if(img!=NULL)
             {
                 GLenum format;
                 if (nrComponents == 1)
@@ -266,7 +297,14 @@ unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bo
                 else if (nrComponents == 4)
                     format = GL_RGBA;
 
+
+                if(width%4 !=0){
+                    printf("align pixels\n");
+                    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+                }
+                
                 glBindTexture(GL_TEXTURE_2D, textureID);
+                printf("width is: %d, height is:%d, nrComponent is:%d \n", width, height, nrComponents);
                 glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, img);
                 glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -274,10 +312,14 @@ unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bo
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
                 stbi_image_free(img);
+                img = nullptr;
             } else {
                 printf("Got no data from Scene embedded texture\n");
             }
+            //delete data;
+            //data = nullptr;
         } else {
             printf("Data from aiTexture is NULL\n");
         }

@@ -564,12 +564,6 @@ int CALLBACK WinMain
                 std::cout<<"Projection mat: "<<glm::to_string(BackBuffer.camera.projection)<<std::endl;                
                 setMat4(ScreenBuffer.glData.ProgramIDs[0], "view", BackBuffer.camera.view);
 
-                useProgram(ScreenBuffer.glData.ProgramIDs[1]);
-                setMat4(ScreenBuffer.glData.ProgramIDs[1], "projection", BackBuffer.camera.projection);
-                setMat4(ScreenBuffer.glData.ProgramIDs[1], "view", BackBuffer.camera.view);
-                setVec3(ScreenBuffer.glData.ProgramIDs[1], "ViewPos", BackBuffer.camera.Position);
-                setVec3(ScreenBuffer.glData.ProgramIDs[1], "lightPos", glm::vec3(4.0f, 3.0f, 0.0f));
-
                 Model_* modell = nullptr;
                 modell = new Model_();
                 //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/backpack.obj";
@@ -612,223 +606,252 @@ int CALLBACK WinMain
                 float DelayedRatio = 0.0f;                
                 //Window = SetCapture(Window);
 
-                while(GlobalRunning) {
-                MSG Message;
-                //NOTE: This is where receiving the message to change
-                // for any change in window
+                useProgram(ScreenBuffer.glData.ProgramIDs[1]);
+                //setInt(ScreenBuffer.glData.ProgramIDs[1], "material.diffuse", 0);
+                //setInt(ScreenBuffer.glData.ProgramIDs[1], "material.specular", 1);
+                setFloat(ScreenBuffer.glData.ProgramIDs[1],"material.shininess", 32.0f);
                 //
-                //INPUT
-                while(PeekMessageA(&Message, 0, 0, 0, PM_REMOVE)) {
-                    if(Message.message == WM_QUIT){
-                        if(GlobalRunning){
-                            GlobalRunning = false;
+                setMat4(ScreenBuffer.glData.ProgramIDs[1], "projection", BackBuffer.camera.projection);
+                setMat4(ScreenBuffer.glData.ProgramIDs[1], "view", BackBuffer.camera.view);
+                setVec3(ScreenBuffer.glData.ProgramIDs[1], "ViewPos", BackBuffer.camera.Position);
+                //setVec3(ScreenBuffer.glData.ProgramIDs[1], "lightPos", glm::vec3(4.0f, 3.0f, 0.0f));                
+
+                // directional light
+                setVec3(ScreenBuffer.glData.ProgramIDs[1],"dirLight.direction", -0.2f, -1.0f, -0.3f);
+                setVec3(ScreenBuffer.glData.ProgramIDs[1],"dirLight.ambient", 0.05f, 0.05f, 0.05f);
+                setVec3(ScreenBuffer.glData.ProgramIDs[1],"dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+                setVec3(ScreenBuffer.glData.ProgramIDs[1],"dirLight.specular", 0.5f, 0.5f, 0.5f);
+
+                
+                //Set point light
+setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointlight.diffuse", 0.8f, 0.8f, 0.8f);
+setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointlight.ambient", 0.05f, 0.05f, 0.05f);
+setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointlight.specular", 1.0f, 1.0f, 1.0f);
+setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointlight.constant", 1.0f);
+setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointlight.linearTerm", 0.09f);
+setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointlight.quadraticTerm", 0.032f);
+
+                useProgram(ScreenBuffer.glData.ProgramIDs[0]);
+
+                while(GlobalRunning) {
+                    MSG Message;
+                    //NOTE: This is where receiving the message to change
+                    // for any change in window
+                    //
+                    //INPUT
+                    while(PeekMessageA(&Message, 0, 0, 0, PM_REMOVE)) {
+                        if(Message.message == WM_QUIT){
+                            if(GlobalRunning){
+                                GlobalRunning = false;
+                            }
                         }
+                        DispatchMessage(&Message);
+                        TranslateMessage(&Message);
                     }
-                    DispatchMessage(&Message);
-                    TranslateMessage(&Message);
-                }
-                if( MaxControllerCount > ArrayCount(Input->Controller)) {
-                    MaxControllerCount = ArrayCount(Input->Controller);   
-                }
-                TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent);
-                //if(TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent)){
+                    if( MaxControllerCount > ArrayCount(Input->Controller)) {
+                        MaxControllerCount = ArrayCount(Input->Controller);   
+                    }
+                    TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent);
+                    //if(TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent)){
                     //printf("Mouse event is being tracked\n");
-                //} else {
+                    //} else {
                     //printf("Can not track Mouse event\n");                
-                //};                
+                    //};                
 
-                //UPDATE
-                // ================================================================
-            // NOTE: Sounding Part
-                WriteSoundToBuffer(&SoundBuffer, &SoundOutPut, SSamples);
-                //=====================================================================
-                 //WHY????
-                 //Update here                
-                //printf("Just before Game update and render\n");                
-                // Attach VAO
-                if(BackBuffer.transferNeed){
-                    int count = 0;
-                    while (count < 6){
-                        count++;
-                    };
-                    if (count >= 5){
-                        copyBufferData(&BackBuffer, &ScreenBuffer);
-                        BackBuffer.transferNeed = false;                        
-                        displayBufferData(&BackBuffer, &ScreenBuffer);
-                        glViewport(0, 0, ScreenBuffer.BitmapWidth, ScreenBuffer.BitmapHeight);
-                    };
-                }
+                    //UPDATE
+                    // ================================================================
+                    // NOTE: Sounding Part
+                    WriteSoundToBuffer(&SoundBuffer, &SoundOutPut, SSamples);
+                    //=====================================================================
+                    //WHY????
+                    //Update here                
+                    //printf("Just before Game update and render\n");                
+                    // Attach VAO
+                    if(BackBuffer.transferNeed){
+                        int count = 0;
+                        while (count < 6){
+                            count++;
+                        };
+                        if (count >= 5){
+                            copyBufferData(&BackBuffer, &ScreenBuffer);
+                            BackBuffer.transferNeed = false;                        
+                            displayBufferData(&BackBuffer, &ScreenBuffer);
+                            glViewport(0, 0, ScreenBuffer.BitmapWidth, ScreenBuffer.BitmapHeight);
+                        };
+                    }
 
-                DeviceContext = GetDC(Window);
-                // use shader program
-                //printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
-                //DeviceContext = GetDC(Window);
-                glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);             
-                //printf("Program ID:%d \n", ScreenBuffer.glData.ProgramID);
-                //else {
+                    DeviceContext = GetDC(Window);
+                    // use shader program
+                    //printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
+                    //DeviceContext = GetDC(Window);
+                    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);             
+                    //printf("Program ID:%d \n", ScreenBuffer.glData.ProgramID);
+                    //else {
                     //printf("NO program object created before\n");
-                //}
+                    //}
 
-                GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
-                // camera/view transformation
-                //Model = glm::rotate(Model, glm::radians(fov)*0.5f, glm::vec3(1.0f, 0.0f, 0.5f));
+                    GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
+                    // camera/view transformation
+                    //Model = glm::rotate(Model, glm::radians(fov)*0.5f, glm::vec3(1.0f, 0.0f, 0.5f));
 
 
-                // Display on the screen
-                // The glitching sound driven me nearly crazy so I decided to turn it off                
-                // Ah got it. Texture data pass directly to shader(NOPE)
-                // We define that through setInt
-                //Why the &ScreenBuffer data doesn't show on the direct screen
+                    // Display on the screen
+                    // The glitching sound driven me nearly crazy so I decided to turn it off                
+                    // Ah got it. Texture data pass directly to shader(NOPE)
+                    // We define that through setInt
+                    //Why the &ScreenBuffer data doesn't show on the direct screen
 
-                LARGE_INTEGER EndCounter;
-                //In 1us(1/1000000)
-                QueryPerformanceCounter(&EndCounter);
+                    LARGE_INTEGER EndCounter;
+                    //In 1us(1/1000000)
+                    QueryPerformanceCounter(&EndCounter);
 
-                // Frame(cycles)
-                uint64 EndCycleCounts;
-                EndCycleCounts = __rdtsc();
+                    // Frame(cycles)
+                    uint64 EndCycleCounts;
+                    EndCycleCounts = __rdtsc();
  
-                  //__rdtsc() is an intrinsict (the one which looked like a function call
-                 //but it actually a hint to the compiler to a specific dissembly language intstruction)
+                    //__rdtsc() is an intrinsict (the one which looked like a function call
+                    //but it actually a hint to the compiler to a specific dissembly language intstruction)
 
 /*                
-                 S : Single 
-                 I : Instruction
-                 M : Multiple
-                 D : Data
+                  S : Single 
+                  I : Instruction
+                  M : Multiple
+                  D : Data
                 
 */                
 
-                // Number of ticks/frame
-                uint64 CyclesElapsed = EndCycleCounts - LastCycleCounts;
-                //NOTE: It based on the var type to decide what kind of the substraction to do
+                    // Number of ticks/frame
+                    uint64 CyclesElapsed = EndCycleCounts - LastCycleCounts;
+                    //NOTE: It based on the var type to decide what kind of the substraction to do
 
-                // Time elapsed of one cycle/frame in 1/000000 s
-                real32 ElapsedCounter = (real32)((real32)(EndCounter.QuadPart) - (real32)(LastCounter.QuadPart));
-                real32 McPerFrame = (real32)((real32)CyclesElapsed/(1000.f * 1000.f));
-                // Time elapsed of one cycle/frame in second
-                //real32 MsPerFrame = (real32)((1000 * (real32)ElapsedCounter) / (real32)PerfCountFrequency);
-                real32 MsPerFrame = (real32)((1000  * (real32)ElapsedCounter) / (real32)CyclesElapsed);
-                real32 FPS = (real32)((real32)PerfCountFrequency/(real32)ElapsedCounter);
+                    // Time elapsed of one cycle/frame in 1/000000 s
+                    real32 ElapsedCounter = (real32)((real32)(EndCounter.QuadPart) - (real32)(LastCounter.QuadPart));
+                    real32 McPerFrame = (real32)((real32)CyclesElapsed/(1000.f * 1000.f));
+                    // Time elapsed of one cycle/frame in second
+                    //real32 MsPerFrame = (real32)((1000 * (real32)ElapsedCounter) / (real32)PerfCountFrequency);
+                    real32 MsPerFrame = (real32)((1000  * (real32)ElapsedCounter) / (real32)CyclesElapsed);
+                    real32 FPS = (real32)((real32)PerfCountFrequency/(real32)ElapsedCounter);
 
 #if 0                
-                char Buffer[256];
-                //NOTE: The '%' is to decide the format of the next thing to print
-                 for example: %d is the 32 bit integer
-                sprintf(Buffer, "%f Miliseconds/Frame, %f FPS, %f Mc/f \n ", MsPerFrame, FPS, MsPerFrame);
-                OutputDebugStringA(Buffer);
- #endif                
+                    char Buffer[256];
+                    //NOTE: The '%' is to decide the format of the next thing to print
+                    for example: %d is the 32 bit integer
+                                      sprintf(Buffer, "%f Miliseconds/Frame, %f FPS, %f Mc/f \n ", MsPerFrame, FPS, MsPerFrame);
+                    OutputDebugStringA(Buffer);
+#endif                
 
-                int ChosenAxis = 0;
+                    int ChosenAxis = 0;
 
-                if(!RatioCalculated){
-                    printf("Ms per frame :%f \n", MsPerFrame);
-                    DelayedRatio = MsPerFrame/16.67f;
-                    printf("Delay Ratio: %f\n", DelayedRatio);
-                    BackBuffer.camera.speed = (1.5f * DelayedRatio);                
-                    printf("camera speed: %f\n", BackBuffer.camera.speed);
-                    RatioCalculated = true;
-                }
+                    if(!RatioCalculated){
+                        printf("Ms per frame :%f \n", MsPerFrame);
+                        DelayedRatio = MsPerFrame/16.67f;
+                        printf("Delay Ratio: %f\n", DelayedRatio);
+                        BackBuffer.camera.speed = (1.5f * DelayedRatio);                
+                        printf("camera speed: %f\n", BackBuffer.camera.speed);
+                        RatioCalculated = true;
+                    }
 
-                //if(BackBuffer.camera.moved || BackBuffer.camera.mouse.moved){
-                        UpdateCamera(&BackBuffer.camera, DelayedRatio);                    
+                    //if(BackBuffer.camera.moved || BackBuffer.camera.mouse.moved){
+                    UpdateCamera(&BackBuffer.camera, DelayedRatio);                    
                     //}
-                        if(BackBuffer.camera.mouse.Wheeled)
-                        {
-                            BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
-                            glUseProgram(ScreenBuffer.glData.ProgramIDs[0]);
-                            setMat4(ScreenBuffer.glData.ProgramIDs[0], "projection", BackBuffer.camera.projection);
-                            glUseProgram(ScreenBuffer.glData.ProgramIDs[1]);
-                            setMat4(ScreenBuffer.glData.ProgramIDs[1], "projection", BackBuffer.camera.projection);
-                            BackBuffer.camera.mouse.Wheeled = false;
-                        }
+                    if(BackBuffer.camera.mouse.Wheeled)
+                    {
+                        BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
+                        glUseProgram(ScreenBuffer.glData.ProgramIDs[0]);
+                        setMat4(ScreenBuffer.glData.ProgramIDs[0], "projection", BackBuffer.camera.projection);
+                        glUseProgram(ScreenBuffer.glData.ProgramIDs[1]);
+                        setMat4(ScreenBuffer.glData.ProgramIDs[1], "projection", BackBuffer.camera.projection);
+                        BackBuffer.camera.mouse.Wheeled = false;
+                    }
 
-                        useProgram(ScreenBuffer.glData.ProgramIDs[0]);
-                        setMat4(ScreenBuffer.glData.ProgramIDs[0], "view", BackBuffer.camera.view);
+                    useProgram(ScreenBuffer.glData.ProgramIDs[0]);
+                    setMat4(ScreenBuffer.glData.ProgramIDs[0], "view", BackBuffer.camera.view);
 
-                        useProgram(ScreenBuffer.glData.ProgramIDs[1]);
-                        setMat4(ScreenBuffer.glData.ProgramIDs[1], "view", BackBuffer.camera.view);
+                    useProgram(ScreenBuffer.glData.ProgramIDs[1]);
+                    setMat4(ScreenBuffer.glData.ProgramIDs[1], "view", BackBuffer.camera.view);
                         
-                glm::vec3 randomRotateAxis = glm::vec3(0.4f* DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2));
+                    glm::vec3 randomRotateAxis = glm::vec3(0.4f* DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2));
 
-                //setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Model);
-                //glBindVertexArray(ScreenBuffer.glData.VAOs);
-                //glDrawArrays(GL_TRIANGLES, 0, 36);
+                    // Start to add some basic lighting to the model
+                    useProgram(ScreenBuffer.glData.ProgramIDs[1]);
+                    //setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Model);
+                    //glBindVertexArray(ScreenBuffer.glData.VAOs);
+                    //glDrawArrays(GL_TRIANGLES, 0, 36);
                 
-                if(WaitTimeCounter >= 16.67f){
-                    //else {
+                    if(WaitTimeCounter >= 16.67f){
+                        //else {
                         //ViewRotateCount++;
                         //float CamX = sin(ViewRotateCount)*10.0f;
                         //float CamZ = cos(ViewRotateCount)*10.0f;
                         //BackBuffer.camera.view = glm::lookAt(glm::vec3(CamX, 0.0f, CamZ), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
                         //setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
-                    //}
-                    //Set vectices and color for plane
-                    UpdatedDegree += 5.0f;
-                    //printf("updated angle :%f\n", UpdatedDegree);
-                    if(UpdatedDegree*(float)BackBuffer.camera.speed > 360.0f){
-                        UpdatedDegree -= 360.0f/(float)BackBuffer.camera.speed;
-                    };
-
-                    if(ChangeAxisCounter >= 1000.0f){
-                        ChosenAxis = std::rand()*2;
-                        switch(ChosenAxis){
-                            case 0:
-                                randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2), 0, 0);
-                                break;
-                            case 1:
-                                randomRotateAxis = glm::vec3(0, 0.4f*(float)(std::rand()*2), 0);
-                                break;
-                            case 2:
-                                randomRotateAxis = glm::vec3(0, 0, 0.4f* (float)(std::rand()*2));
-                                break;
-                            default:
-                                randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2));
-                                break;
+                        //}
+                        //Set vectices and color for plane
+                        UpdatedDegree += 5.0f;
+                        //printf("updated angle :%f\n", UpdatedDegree);
+                        if(UpdatedDegree*(float)BackBuffer.camera.speed > 360.0f){
+                            UpdatedDegree -= 360.0f/(float)BackBuffer.camera.speed;
                         };
-                        ChangeAxisCounter = 0.0f;
-                        //printf("ChangeAxisCounter: %f\n", WaitTimeCounter);            
+
+                        if(ChangeAxisCounter >= 1000.0f){
+                            ChosenAxis = std::rand()*2;
+                            switch(ChosenAxis){
+                                case 0:
+                                    randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2), 0, 0);
+                                    break;
+                                case 1:
+                                    randomRotateAxis = glm::vec3(0, 0.4f*(float)(std::rand()*2), 0);
+                                    break;
+                                case 2:
+                                    randomRotateAxis = glm::vec3(0, 0, 0.4f* (float)(std::rand()*2));
+                                    break;
+                                default:
+                                    randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2));
+                                    break;
+                            };
+                            ChangeAxisCounter = 0.0f;
+                            //printf("ChangeAxisCounter: %f\n", WaitTimeCounter);            
+                        } else {
+                            ChangeAxisCounter += WaitTimeCounter;
+                        }
+                        Model = glm::rotate(Model, glm::radians(10.0f) * (float)BackBuffer.camera.speed, randomRotateAxis);
+                        // Wait to 17 milli s perframe for model to rotate
+                        WaitTimeCounter = 0.0f;
                     } else {
-                        ChangeAxisCounter += WaitTimeCounter;
+                        WaitTimeCounter += MsPerFrame;
+                        //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
                     }
-                    Model = glm::rotate(Model, glm::radians(10.0f) * (float)BackBuffer.camera.speed, randomRotateAxis);
-                    // Wait to 17 milli s perframe for model to rotate
-                    WaitTimeCounter = 0.0f;
-                } else {
-                    WaitTimeCounter += MsPerFrame;
-                    //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
-                }
 
-                //RENDER =====================================
-                useProgram(ScreenBuffer.glData.ProgramIDs[0]);
-                glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
-                setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Plane);
-                glDrawArrays(GL_TRIANGLES, 0, 6);
+                    //RENDER =====================================
+                    useProgram(ScreenBuffer.glData.ProgramIDs[0]);
+                    glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
+                    setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Plane);
+                    glDrawArrays(GL_TRIANGLES, 0, 6);
 
-                setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Model);
-                glBindVertexArray(ScreenBuffer.glData.VAOs);
-                glDrawArrays(GL_TRIANGLES, 0, 36);                
+                    setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Model);
+                    glBindVertexArray(ScreenBuffer.glData.VAOs);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);                
 
-                drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], BackBuffer.camera.speed, &UpdatedDegree);
+                    drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], BackBuffer.camera.speed, &UpdatedDegree);
 
                 
-                useProgram(ScreenBuffer.glData.ProgramIDs[1]);
-                glBindVertexArray(ScreenBuffer.glData.VAOs);
-                setMat4(ScreenBuffer.glData.ProgramIDs[1], "model", Model2);
-                DDraw(modell, &ScreenBuffer.glData.ProgramIDs[1]);
+                    useProgram(ScreenBuffer.glData.ProgramIDs[1]);
+                    glBindVertexArray(ScreenBuffer.glData.VAOs);
+                    setMat4(ScreenBuffer.glData.ProgramIDs[1], "model", Model2);
+                    DDraw(modell, &ScreenBuffer.glData.ProgramIDs[1]);
                 
-                LastCounter = EndCounter;
-                LastCycleCounts = EndCycleCounts;
+                    LastCounter = EndCounter;
+                    LastCycleCounts = EndCycleCounts;
 /*
-                MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per register 
-                MULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register  
+  MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per register 
+  MULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register  
 */
-                Game_Input* Temp = NewInput;
-                NewInput = OldInput;  //???? still don't understand
-                OldInput = Temp;
-                SwapBuffers(DeviceContext);
-                ReleaseDC(Window, DeviceContext);
-            }
+                    Game_Input* Temp = NewInput;
+                    NewInput = OldInput;  //???? still don't understand
+                    OldInput = Temp;
+                    SwapBuffers(DeviceContext);
+                    ReleaseDC(Window, DeviceContext);
+                }
             }                
             glDeleteVertexArrays(1, &BackBuffer.glData.VAOs);
             glDeleteBuffers(1, &BackBuffer.glData.VBO);
@@ -845,7 +868,7 @@ int CALLBACK WinMain
             }
 
             if (!GetProcessId(NULL)){
-                    ErrorExit();
+                ErrorExit();
             }
 
         }
