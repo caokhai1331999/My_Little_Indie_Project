@@ -107,6 +107,7 @@ LRESULT CALLBACK MainWindowCallBack(
                     
                     BackBuffer.camera.Yaw = glm::degrees(glm::acos(glm::clamp(BackBuffer.camera.Direction.x, -1.0f, 1.0f)));
                     BackBuffer.camera.Pitch = glm::degrees(glm::acos(glm::clamp(BackBuffer.camera.Direction.y, -1.0f, 1.0f)));
+
                     printf("Yaw is %f\n", BackBuffer.camera.Yaw);
                     printf("Pitch is %f\n", BackBuffer.camera.Pitch);
 
@@ -121,6 +122,8 @@ LRESULT CALLBACK MainWindowCallBack(
                     printf("Back to point at the backpack\n");
 
                     std::cout<<"Direction is: "<< glm::to_string(BackBuffer.camera.Direction)<<std::endl;
+
+                    SetCursorPos(BackBuffer.camera.mouse.xPos + 568, BackBuffer.camera.mouse.yPos + 384`);
                     //XOffset += 10;                    
                 }
                 
@@ -503,6 +506,14 @@ int CALLBACK WinMain
                 glm::vec3 Right =  glm::vec3(1.0f, 0.0f, 0.0f);
                 glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
 
+                // positions of the point lights
+                glm::vec3 pointLightPositions[] = {
+                    glm::vec3( 0.7f,  0.2f,  2.0f),
+                    glm::vec3( 2.3f, -3.3f, -4.0f),
+                    glm::vec3(-4.0f,  2.0f, -12.0f),
+                    glm::vec3( 0.0f,  0.0f, -3.0f)
+                };
+                
                 //set camera view here
                 //std::cout<<"View matrix from camera: "<<glm::to_string(BackBuffer.camera.view)<<std::endl;
                 BackBuffer.camera = Camera(BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, Position, Front, Right, Up);
@@ -624,13 +635,40 @@ int CALLBACK WinMain
 
                 
                 //Set point light
-setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointlight.diffuse", 0.8f, 0.8f, 0.8f);
-setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointlight.ambient", 0.05f, 0.05f, 0.05f);
-setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointlight.specular", 1.0f, 1.0f, 1.0f);
-setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointlight.constant", 1.0f);
-setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointlight.linearTerm", 0.09f);
-setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointlight.quadraticTerm", 0.032f);
+                setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].position", pointLightPositions[0]);
+setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].constant", 1.0f);
+setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].linearTerm", 0.09f);
+setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].quadraticTerm", 0.032f);
 
+        // point light 2
+        setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[1].position", pointLightPositions[1]);
+        setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+        setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
+        setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+        setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[1].constant", 1.0f);
+        setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[1].linear", 0.09f);
+        setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[1].quadratic", 0.032f);
+
+        // point light 3
+        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[2].position", pointLightPositions[2]);
+        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
+        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
+        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[2].specular", 1.0f, 1.0f, 1.0f);
+        //setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[2].constant", 1.0f);
+        //setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[2].linear", 0.09f);
+        //setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[2].quadratic", 0.032f);
+
+        // point light 4
+        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[3].position", pointLightPositions[3]);
+        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
+        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
+        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[3].specular", 1.0f, 1.0f, 1.0f);
+        //setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[3].constant", 1.0f);
+        //setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[3].linear", 0.09f);
+        //setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[3].quadratic", 0.032f);
                 useProgram(ScreenBuffer.glData.ProgramIDs[0]);
 
                 while(GlobalRunning) {
