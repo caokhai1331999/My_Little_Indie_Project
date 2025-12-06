@@ -105,18 +105,18 @@ Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
 
             // Texture is simple a type which recall texture from given path
     
-    //if(mesh->mMaterialIndex > 0){
+    if(mesh->mMaterialIndex > 0){
             // Process MATERIAL
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         // Texture is simple a type which recall texture from given path
-        vector<Texture> diffuseMaps = loadMaterialTextures(model, material, aiTextureType_DIFFUSE, "material.texture_diffuse1", scene);
+        vector<Texture> diffuseMaps = loadMaterialTextures(model, material, aiTextureType_DIFFUSE, "material.texture_diffused1", scene);
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         vector<Texture> specularMaps = loadMaterialTextures(model, material, aiTextureType_SPECULAR, "material.texture_specular1", scene);
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());    
         //Load diffuse and specular map to texture
-        //} else {
-            //printf("Somehow mesh have no material that means no texture; index: %d\n", mesh->mMaterialIndex);
-        //}
+        } else {
+            printf("Somehow mesh have no material that means no texture; index: %d\n", mesh->mMaterialIndex);
+        }
 
         return Mesh(verticles, indices, textures);
 }
@@ -145,13 +145,13 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
                 break;
             }
         };
-        model->directory = model->directory + '\0';
+
         if(!skip){
             Texture texture;
             if(scene->mNumTextures == 0){                
                 //This is wrong in fbx case : How to fix this???
                 texture.id = TextureFromFile(str.C_Str(), model->directory);
-                printf("texture path is:%s\n",model->directory);
+                //printf("texture path is:%s\n",model->directory);
                 texture.type = typeName;
                 texture.path = str.C_Str();
                 textures.push_back(texture);

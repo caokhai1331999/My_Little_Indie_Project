@@ -123,7 +123,18 @@ LRESULT CALLBACK MainWindowCallBack(
 
                     std::cout<<"Direction is: "<< glm::to_string(BackBuffer.camera.Direction)<<std::endl;
 
-                    SetCursorPos(BackBuffer.camera.mouse.xPos + 568, BackBuffer.camera.mouse.yPos + 384`);
+
+
+                    WINDOWPLACEMENT windowstatus = {};
+                    windowstatus.length = sizeof(WINDOWPLACEMENT);
+                    
+                    if(GetWindowPlacement(Window, &windowstatus)){
+                        printf("Window position(x, y) is: %d %d\n", windowstatus.rcNormalPosition.left, windowstatus.rcNormalPosition.top);
+                    } else {
+                        printf("Failed to get window status\n");
+                    }
+
+                    SetCursorPos(BackBuffer.camera.mouse.xPos + windowstatus.rcNormalPosition.left, BackBuffer.camera.mouse.yPos + windowstatus.rcNormalPosition.top);
                     //XOffset += 10;                    
                 }
                 
@@ -577,8 +588,8 @@ int CALLBACK WinMain
 
                 Model_* modell = nullptr;
                 modell = new Model_();
-                //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/backpack.obj";
-                std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
+                std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/backpack.obj";
+                //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
                 loadModel_(modell, path);
                 //modell->Texturedirectory = texpath.substr(0, path.find_last_of('/'));
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
