@@ -183,7 +183,6 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
     //}
     return textures;        
 }
-
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma){
     string filename = string(path);
     filename = directory + '/' + filename;
@@ -329,3 +328,11 @@ unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bo
     
     return textureID;
 }
+
+void SetVertexBoneDataToDefault(Vertex* vertex){
+    for (int i = 0; i < MAX_BONES, i++){
+        //NOTE: still don't understand about this ...
+        vertex->mBoneIDs[i] = -1;
+        vertex->m_Weights[i] = 0.0f;
+    }
+};
