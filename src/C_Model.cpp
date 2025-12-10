@@ -63,7 +63,23 @@ void processNode(Model_* model, aiNode* node, const aiScene* scene){
     }
 }
 
+// Bone processing step for skeletal animation
+void SetVertexBoneData(Vertex* vertex, int boneID, float weight){
+    for(int i = 0; i < MAX_BONE_WEIGHTS; i++){
+        if(vertex->mBoneIDs[i] > 0){
+            vertex->mBoneIDs[i] = boneID;
+            vertex->mWeight[i] = weight;
+            break;
+        }
+    }
+};
+
+void ExtractBoneWeightForVertices(std::vector& vertice, aiMesh* mesh, const aiScene* scene){
+    
+};
+
 Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
+
     vector<unsigned int>indices;
     vector<Texture>textures;
     vector<Vertex>verticles;
@@ -72,17 +88,22 @@ Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
 
     for(unsigned int i = 0; i < mesh->mNumVertices; i++){
         glm::vec3 vector;
+
         // Verticle is position
-        vector.x = mesh->mVertices[i].x;
-        vector.y = mesh->mVertices[i].y;
-        vector.z = mesh->mVertices[i].z;
-        vertex.Position = vector;
+        //vector.x = mesh->mVertices[i].x;
+        //vector.y = mesh->mVertices[i].y;
+        //vector.z = mesh->mVertices[i].z;
+        //vertex.Position = vector;
+        
+        //vector.x = mesh->mNormals[i].x;
+        //vector.y = mesh->mNormals[i].y;
+        //vector.z = mesh->mNormals[i].z;
+        //vertex.Normal = vector;
 
-        vector.x = mesh->mNormals[i].x;
-        vector.y = mesh->mNormals[i].y;
-        vector.z = mesh->mNormals[i].z;
-        vertex.Normal = vector;
-
+        // For skeletal animation
+        vertex.Position = AssimpGLMHelpers::GetGLMVec(mesh->mVertices[i]);
+        vertex.Normal = AssimpGLMHelpers::GetGLMVec(mesh->mNormals[i]);
+        
         if(mesh->mTextureCoords[0]){
             glm::vec2 vec;
             vec.x = mesh->mTextureCoords[0][i].x;
