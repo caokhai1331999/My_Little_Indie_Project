@@ -8,6 +8,7 @@
 #include "C_Mesh.h"
 
 void setupMesh(Mesh* mesh){
+
         glGenVertexArrays(1, &mesh->VAO);
         glGenBuffers(1, &mesh->VBO);
         glGenBuffers(1, &mesh->EBO);
