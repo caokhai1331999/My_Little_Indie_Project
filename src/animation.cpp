@@ -75,4 +75,6 @@ Bone* FindBone(const std::string& name){
     else return &(*iter);
 };
 
-;
+void ReadMissingBone(Animation& animation_class, const aiAnimation* animationn, Model* model){
+    int size = animation->mNumChannels;
+};
