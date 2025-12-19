@@ -67,3 +67,12 @@ glm::mat4 InterpolateRotation(Bone* bone = nullptr, float animationTime = 0.0f){
 
     return glm::toMat4(finalRotation);
 };
+
+Bone* FindBone(const std::string& name){
+    auto iter = find_if(m_Bone.begin(), m_Bone.end(), [&](const Bone& Bone){return Bone.GetBoneName() == name;});//lambda to findout address of bone that have the same name of given name
+    if(iter == m_Bones.end())return nullptr;
+    //return address of member that iter is pointing to
+    else return &(*iter);
+};
+
+;
