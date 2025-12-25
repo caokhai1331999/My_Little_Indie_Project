@@ -68,14 +68,14 @@ glm::mat4 InterpolateRotation(Bone* bone = nullptr, float animationTime = 0.0f){
     return glm::toMat4(finalRotation);
 };
 
-Bone* FindBone(const std::string& name){
+Bone* Animation::FindBone(const std::string& name){
     auto iter = find_if(m_Bone.begin(), m_Bone.end(), [&](const Bone& Bone){return Bone.GetBoneName() == name;});//lambda to findout address of bone that have the same name of given name
     if(iter == m_Bones.end())return nullptr;
     //return address of member that iter is pointing to
     else return &(*iter);
 };
 
-void ReadMissingBone(Animation& animation_class, const aiAnimation* animation, const Model* model){
+void Animation::ReadMissingBone(const aiAnimation* animation, const Model* model){
     int size = animation->mNumChannels;
 // Get these properties from model var
     std::map<std::string, BoneInfo> boneInfoMap = model->GetBoneInfoMap();
@@ -93,9 +93,46 @@ void ReadMissingBone(Animation& animation_class, const aiAnimation* animation, c
         }
         m_Bones.push_back(Bone(channel->mNodeName.data, boneInfoMap[channel->mNodeName.data].id, channel));
     }
-    animation_class->m_BoneInfoMap = boneInfoMap;
+    m_BoneInfoMap = boneInfoMap;
 };
 
-void ReadHierarchyData(Animation& animation, const AssimpNodeData& dest, const aiNode* src){
-    
+void Animation::ReadHierarchyData(const AssimpNodeData& dest, const aiNode* src){
+    assert(src);
+
+    Dest.name = src->mName.Data;
+    Dest.transformation = AssimpGLMHelpers::ConvertMatrixToGLMFormat(src->mTransformation);
+    Dest.childrenCount = src->mChildrenCount;
+
+    for(int i = 0; i < src->mChildrenCount; i++){
+        AssimpNodeData child = new AssimpNodeData;
+        ReadHierarchyData(child, src->mChildren[i]);
+        dest.children.push_back(child);
+    };
+};
+
+
+void Animatior::updateAnimationTime(const Animation& animation, float dt){
+    m_deltaTime = dt;
+    if(currentAnimation){
+        m_currentTime += m_deltaTime;
+        m_currentTime = fmod(m_currentTime, m_currentAnimation->GetDuration());
+        //calculate bone transform here;
+    };
+};
+
+void Animatior::playAnimation(Animation* pAnimation){
+    m_currentAnimation = pAnimation;
+    m_currentTime = 0.0f;
+};
+
+void calculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform){
+    std::string nodeName = node->name;
+    glm::mat4 nodeTransform = node->transformation;
+
+    Bone* bone = m_currentAnimation->FindBone(nodeName);
+
+    glm::mat4 globalTransform = nodeTransform * parentTransform;
+    std::map<std::string, BoneInfo> boneInfoMap = m_currentAnimation->getBoneIDMap();
+//WORKING====
+    for(int);
 };
