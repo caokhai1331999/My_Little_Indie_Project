@@ -54,6 +54,7 @@ void setVec3(GLuint programID, const char* name,  float x, float y, float z);
 
 void setBool(GLuint programID, const char* name, const bool value);
 void setInt(GLuint programID, const std::string name, const int value);
+void setFloat(GLuint programID, const std::string name, const float value);
 
 // Set Matrix
 void setMat3(GLuint programID, const char* name, const glm::mat3 &value);

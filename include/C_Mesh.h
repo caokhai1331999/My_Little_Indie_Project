@@ -48,6 +48,15 @@ struct Vertex {
 	float m_Weights[MAX_BONE_INFLUENCE];
 };
 
+// Data in bone weight[]
+struct Bone_Info{
+    // ID
+    unsigned int vertexID;
+
+    /*offset matrix which transform vertex from model space to bone space*/
+    glm::mat4 offsetMatrix;
+};
+
 struct Texture{
     unsigned int id;
     string type;
@@ -69,6 +78,8 @@ struct Mesh{
 };
 
 void setupMesh(Mesh* mesh = nullptr);
+void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
+void ExtractBoneWeightForVertices(std::vector& vertice, aiMesh* mesh, const aiScene* scene);
 void Draw(Mesh* mesh = nullptr, GLuint* programID = nullptr);
 
 #endif
