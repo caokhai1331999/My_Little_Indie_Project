@@ -6,6 +6,39 @@
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
 #include "animation.h"
+
+int Bone::GetPositionIndex(float animationTime){
+    for(int index = 0; index < mNumPositions - 1; index++){
+        // why animationTime < m_Positions[index].timestamp
+        if(animationTime < m_Positions[index + 1].timestamp){
+            return index;
+        }
+        assert(0);
+    }
+}
+
+int Bone::GetRotationIndex(float animationTime){
+    for(int index = 0; index < mNumRotations - 1; index++){
+        if(animationTime < m_Rotations[index + 1].timestamp){
+            return index;
+        }
+        assert(0);
+    }
+}
+
+int Bone::GetScalingIndex(float animationTime){
+    for(int index = 0; index < mNumRotations - 1; index++){
+        if(animationTime < m_Rotations[index + 1].timestamp){
+            return index;
+        }
+        assert(0);
+    }
+}
+
+void Bone::Update(float animationTime){
+    
+};
+
 // Get normalized value for Lerp and Slerp 
 float GetScaleFactor(float animationTime, float lastkeyTime, float nextkeyTime){
     float scaleFactor = 0.0f
@@ -125,14 +158,32 @@ void Animatior::playAnimation(Animation* pAnimation){
     m_currentTime = 0.0f;
 };
 
-void calculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform){
+
+
+void Animatior::calculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform){
+
     std::string nodeName = node->name;
     glm::mat4 nodeTransform = node->transformation;
 
     Bone* bone = m_currentAnimation->FindBone(nodeName);
 
+    if(bone){
+        bone->Update(m_CurrentTime);
+        nodeTransform = bone->GetLocalTransformation();
+    }
+    
     glm::mat4 globalTransform = nodeTransform * parentTransform;
+    //Find missing bones and do the same
     std::map<std::string, BoneInfo> boneInfoMap = m_currentAnimation->getBoneIDMap();
 //WORKING====
-    for(int);
+    if(boneInfoMap.find(nodeName) != boneInfoMap.end()){
+        int index =boneInfoMap[nodeName].id;
+        offset = boneInfoMap[nodeName].offset;
+        finalBoneMatrices[index] = globalTransform * offset;
+    }
+
+    for(int i = 0; i < node->ChildrenCount; i++){
+        // Global Transform now is used as parent transform
+        Animatior::calculateBoneTransform(&node->children[i], globalTransform);
+    }
 };
