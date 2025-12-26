@@ -36,7 +36,11 @@ int Bone::GetScalingIndex(float animationTime){
 }
 
 void Bone::Update(float animationTime){
-    
+    glm::mat4 Translation = InterpolatePosition(animationTime);
+    glm::mat4 Rotation = InterpolateRotation(animationTime);
+    glm::mat4 Scaling = InterpolateScaling(animationTime);
+
+    m_LocalTransform = Translation * Rotation * Scaling;
 };
 
 // Get normalized value for Lerp and Slerp 
