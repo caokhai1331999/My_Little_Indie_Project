@@ -513,3 +513,181 @@ simulating world
 
 ---------------- Sat, 15 Nov 25: 08:24PM
 
+Time to create png lib header to load texture for fbx. model
+
+---------------- Sun, 16 Nov 25: 08:33PM
+
+
+---------------- Mon, 17 Nov 25: 09:18PM
+
+Next we have to consider the physic simulation (collision, ...)
+
+---------------- Tue, 18 Nov 25: 09:10PM
+
+the app didn't even come to the load texture part cause somehow the
+mesh->mMaterialIndex = 0
+
+But even I force it to load the material it still NULL out
+
+Cloudflare is down today, I can't do further searching for information to solve
+the current issue!!!
+
+---------------- Sun, 23 Nov 25: 07:03PM
+
+I Think I find out the bug. But how to rearrange the code neatly still challenge
+me much
+
+After done solving the texture loading issue of fbx model. We move on to load
+the whole tile map on the plane
+
+---------------- Mon, 24 Nov 25: 08:27PM
+
+
+---------------- Tue, 25 Nov 25: 09:47PM
+
+// NOTE: Try to assign scene texture to model container
+
+---------------- Wed, 26 Nov 25: 09:47PM
+
+Things is more complicated than I thought. Actually we load embbedded one in
+wrong way. We have to load the texture matched with the mat index with is produced by atoi (mat->getTexture().data + 1)
+
+---------------- Thu, 27 Nov 25: 07:29PM
+Thing is I tried to load texture to already loaded group which caused conflict
+somehow
+
+Time to move on to move 2d moving game data to plane.
+Thing is exactly What to draw
+
+---------------- Fri, 28 Nov 25: 07:51PM
+ NOTE: Why the data got from scene->mTexture[] is NULL
+
+---------------- Sat, 29 Nov 25: 08:06PM
+
+DONE!: solving the null fbx model NULL texture By calling the
+const aiTexture* tex = scene->mTextures[textIndex] or     const aiTexture* tex = scene->GetEmbeddedTexture(path->C_Str());; which the textIndex is from the
+mat->GetTexture(,,&str) -> textID = atoi(str->data+1);
+
+Seem like it not
+
+TODO: Time to move on to complex object moving and simple skeletal animation 
+
+---------------- Sun, 30 Nov 25: 08:25PM
+
+Today for some reason the texture show again. There still alot enigmatic things
+I still don't know about
+
+---------------- Mon, 01 Dec 25: 10:33AM
+
+REMEMBER! :The way the fbx file load is unpredictable(external or
+embedded(sometime the embedded one is compressed)) which is the main reason why sometimes I see
+the texture sometimes not. Because we didn't cover all the possibilities.
+
+Now the other reasons why the texture sometimes black out is that I misput the
+format in the glImage2D and instead of told the stbi_load_image_from_memory to
+auto track the channel(0 in the last argu) I put the 4
+BY the way, forgot to flip vertically is also one of the reasons
+
+
+Time to fix the typo of fs file. Try to look for the checker online
+
+NOTE: I think this work. Time to add some light to make it brighter
+
+---------------- Tue, 02 Dec 25: 08:01PM
+
+Why everyTime I move the mouse after using backspace button, the camera shift to
+different direction immediately
+
+Got to fix that
+
+I think I found the reason. That is the posX and Y of the mouse is not matched
+with the real cursor position.
+
+---------------- Wed, 03 Dec 25: 07:28PM
+
+If I have free time, consider create a environment where all the light is global
+and function available to calculate pixel color of object
+
+---------------- Sat, 06 Dec 25: 09:01PM
+
+TODO: Delve more into how to define the ratio of model or object in 3D world which
+enable me to decide how big the object would looked
+
+DONE! the theory. Next time, we go code the real model animation 
+
+---------------- Mon, 08 Dec 25: 09:47PM
+
+Still on the way to complete skeletal animation
+
+---------------- Wed, 10 Dec 25: 01:40PM
+
+What needed to be understood?? what needed to be remembered first?
+
+Is that the whole scene/pattern first and the key information
+REMEMBER! : Time to develop a skill to read complex theorem/technical document
+(remember key factor and use diagram to present what I understand)
+
+---------------- Sat, 13 Dec 25: 08:07PM
+
+Today I keep on completing the animation stage
+
+NOTE: highlight keyword help me understand and remember complex document way
+better
+
+TODO: Sometimes, there is some uncontrolled thought that flow in my mind. Got to
+avoid that to gain max concentration 
+
+---------------- Tue, 16 Dec 25: 11:28AM
+
+NICE: The drawing tablet solved alot of my issues even though I have to ignore
+its malware driver.
+
+On the way to understand and complete the animation process.
+
+Interesting thing is, While I learn game/3d programming, I recognize the way to
+learn anything:
+  . Read complex documentation: + remember key information
+                                + Use diagram to map general knowledge in
+                                systematically way - (especially use handpen
+                                writing make me remeber thing much better)
+                                
+
+---------------- Fri, 19 Dec 25: 08:28AM
+
+on the way to complete the animation part
+
+While I'm on the way to complete this subject. I came across the issues that
+used to bugged me out years ago. What is differences between pointer(*) and
+reference(&) as argument in function declaration?
+
+ex: void foo(FOOs* a) ;FOOs A; foo(&A);
+    void foo(const FOOs& a) ; foo(A);
+
+Now I know that while the pointer is an address of var or object that we have to
+call &a to .Otherwise, The reference actually the alias of it.
+
+piece of advice: pointer is used whenever you want to step through the array
+mem in function
+
+                - But when pointer is possibly being NULL use references
+
+REMEMBER! :MY GOSH: Based on Casey Muratory(handmade hero) Reference is just a
+different syntactic way of talking about a pointer
+
+---------------- Mon, 22 Dec 25: 11:06AM
+
+On the way to nearly complete the first animation model.
+
+TODO: Come across with one question: Is that member function slower than the free
+one??
+
+So we still use few features of class without worrying about performance. These
+include member function private and public one to avoid stuffing more argument
+(These are just like struct with function)
+
+Avoid abstract, inherent, polymorphism and these caused alot of memory issues
+
+REMEMBER! :So to sum up all I can used from class syntax is the encapsulation features
+
+---------------- Thu, 25 Dec 25: 09:06AM
+

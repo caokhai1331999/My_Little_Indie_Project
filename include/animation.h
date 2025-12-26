@@ -6,6 +6,7 @@
    $Creator: Cao Khai(Casey's disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
+#include "C_Mesh.h"
 
 struct KeyPosition{
     glm::vec3 Position;
@@ -32,6 +33,7 @@ struct AssimpNodeData{
 class Bone{
 
 private:
+
     std::vector<KeyPosition>m_Positions;
     std::vector<KeyRotation>m_Rotations;
     std::vector<KeyScale>m_KeyScales;
@@ -91,37 +93,14 @@ public:
         glm::mat4 GetLocalTransformation()(return m_LocalTransform;);
         std::string GetBoneName(){return m_Name;};
         int GetBoneID(){return m_ID};
-
+        void Update(float animationTime);
         /*Return current index on mKeyPositions and interpolate it based on current animation time*/
-        int GetPositionIndex(float animationTime){
-            for(int index = 0; index < mNumPositions - 1; index++){
-        // why animationTime < m_Positions[index].timestamp
-                if(animationTime < m_Positions[index + 1].timestamp){
-                    return index;
-                }
-                assert(0);
-            }
-        }
-
+        int GetPositionIndex(float animationTime);
         /*Return current index on mRotations and interpolate it based on current animation time*/
-        int GetRotationIndex(float animationTime){
-            for(int index = 0; index < mNumRotations - 1; index++){
-                if(animationTime < m_Rotations[index + 1].timestamp){
-                    return index;
-                }
-                assert(0);
-            }
-        }
+        int GetRotationIndex(float animationTime);
 
         /*Return current index on mScalings and interpolate it based on current animation time*/
-        int GetScalingIndex(float animationTime){
-            for(int index = 0; index < mNumRotations - 1; index++){
-                if(animationTime < m_Rotations[index + 1].timestamp){
-                    return index;
-                }
-                assert(0);
-            }
-        }
+        int GetScalingIndex(float animationTime);
 };
 
 class Animation{
@@ -182,8 +161,9 @@ public:
     void updateAnimationTime(const Animation& animation, float dt);
     void playAnimation(Animation* pAnimation);
     void calculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform);
+    std::vector<glm::mat4>getFinalBoneMatrices(){return finalBoneMatrices};
 private:
-    std::vector<glm::mat4>finalTransformMatrices;
+    std::vector<glm::mat4>finalBoneMatrices;
     //Current Animation
     Animation* m_currentAnimation;
     float m_currentTime;
