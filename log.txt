@@ -691,3 +691,23 @@ REMEMBER! :So to sum up all I can used from class syntax is the encapsulation fe
 
 ---------------- Thu, 25 Dec 25: 09:06AM
 
+
+---------------- Fri, 26 Dec 25: 09:50PM
+
+TODO: Remember to move interpolation function inside bone class to make
+advantage of class encapsulation features
+
+---------------- Sun, 28 Dec 25: 09:06PM
+
+after done animating the model. Consider separating the MainWindowCallBack
+
+---------------- Tue, 30 Dec 25: 10:39AM
+
+Complete our animation class and run it today
+
+---------------- Tue, 30 Dec 25: 04:12PM
+TODAY I successfully assign collumn text edit
+REMEMBER! :the unrecognized class name is likely an duplicated header issues
+I still have a long way to fix these bug
+
+

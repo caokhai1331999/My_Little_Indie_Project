@@ -25,8 +25,14 @@
 #endif
 
 //#include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 //#include "camera.h"
 #include "B_shader.h"
 
@@ -78,8 +84,5 @@ struct Mesh{
 };
 
 void setupMesh(Mesh* mesh = nullptr);
-void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
-void ExtractBoneWeightForVertices(std::vector& vertice, aiMesh* mesh, const aiScene* scene);
-void Draw(Mesh* mesh = nullptr, GLuint* programID = nullptr);
 
 #endif

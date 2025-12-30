@@ -28,44 +28,68 @@
 
 using namespace std;
 
-typedef bool VertexType;
-#define vertex_ (bool)true
-#define fragment_ (bool)false
+typedef int ShaderType;
+
+#define vertex_ 0
+#define fragment_ 1
 
 struct B_shader{
+private:
     HANDLE shader_file;
     LARGE_INTEGER file_size;
-    unsigned int shaderID;
     void* SourceCode;
     void* SourcePath;
+    unsigned int ShaderID;
+    ShaderType ShaderType_;
+public:
+    void loadShader(char* name, ShaderType type);    
+    GLuint GetShaderID(){return ShaderID;};
 };
 
-std::vector<GLuint> ProgramIDs;
+class B_shader_program{
+private:
+    unsigned int ProgramID;
+    B_shader shaders[2];
+    
+public:
+    B_shader_program(char* vertex_file_name, char* fragment_file_name){
+        shaders[vertex_].loadShader(vertex_file_name, vertex_);
+        shaders[fragment_].loadShader(fragment_file_name, fragment_);
+        setupGLprogram();
+    };
 
-void loadShader(B_shader* shader, char* name, VertexType type);
-char* loadCurrentErr();
+    ~B_shader_program();
 
 // Set Int, bool, float and Vector
-void setVec2(GLuint programID, const char* name, const glm::vec2 &value);
-void setVec2(GLuint programID, const char* name, float x, float y);
+    void setVec2(const char* name, const glm::vec2 &value);
+    void setVec2(const char* name, float x, float y);
 
-void setVec3(GLuint programID, const char* name, const glm::vec3 &value);
-void setVec3(GLuint programID, const char* name,  float x, float y, float z);
+    void setVec3(const char* name, const glm::vec3 &value);
+    void setVec3(const char* name,  float x, float y, float z);
 
-void setBool(GLuint programID, const char* name, const bool value);
-void setInt(GLuint programID, const std::string name, const int value);
-void setFloat(GLuint programID, const std::string name, const float value);
+    void setBool(const char* name, const bool value);
+    void setInt(const std::string name, const int value);
+    void setFloat(const std::string name, const float value);
 
 // Set Matrix
-void setMat3(GLuint programID, const char* name, const glm::mat3 &value);
-void setMat4(GLuint programID, const std::string name, const glm::mat4 &value);
+    void setMat3(const char* name, const glm::mat3 &value);
+    void setMat4(const std::string name, const glm::mat4 &value);
 
 // Use the shader
-void useProgram(GLuint programID);
+    void use();
 
+    GLuint GetProgramID(){return ProgramID;};
 // Attaching shader to program
-GLuint setupGLprogram(B_shader* vshader, B_shader* fshader, GLuint* ProgramID );
-void checkCompileErrors(GLuint shader, const char* type);
+    GLuint setupGLprogram();
+
+// Load Current Errors
+};
+
+void useProgram(GLuint programId){glUseProgram(programId);};
+char* loadCurrentErr(GLuint ProgramID =0);
+void checkCompileErrors(GLuint shader, const char* type);   
+void* GetAnyGLFuncAddress(const char *name);
+std::vector<GLuint> ProgramIDs;
 
 #define SHADER_H
 #endif

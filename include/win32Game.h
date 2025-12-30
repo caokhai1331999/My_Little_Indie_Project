@@ -22,14 +22,22 @@ struct OpenGLData{
 
     unsigned int VBO;
     unsigned int ColorVBO;
-    unsigned int PlaneVBO;
+    unsigned int PlaneVBO;  
 
     std::vector<GLuint> ProgramIDs;
     
     HGLRC openglRC;
-    unsigned int textureHandle = 0;
+    unsigned int textureHandle;
+
     OpenGLData(){
-        ProgramIDs = {0, 0};
+        //Maybe buggy this part
+        // need to be careful
+        VAOs     = 0;       
+        PlaneVAOs = 0;
+        VBO      = 0;     
+        ColorVBO = 0;
+        PlaneVBO = 0;
+        textureHandle = 0;
     }
 };
 

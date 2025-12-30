@@ -16,6 +16,7 @@
 #include "C_Mesh.h"
 
 struct Model_{
+private:
     // Model data
     vector<Mesh>meshes;
     string directory;
@@ -25,7 +26,10 @@ struct Model_{
     int mBoneCounter = 0;
     bool gammaCorrection;
     Model_(const char *path = nullptr, bool gamma = false):gammaCorrection(gamma){
-    };    
+    };
+public:
+    void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
+    void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
 };
 
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);
@@ -41,6 +45,8 @@ int GetBoneCount(Model_* model){
     return model->mBoneCounter;
 };
 void SetVertexBoneDataToDefault(Vertex* vertex);
+
+void Draw(Mesh* mesh = nullptr, GLuint* programID = nullptr);
 
 void DDraw(Model_* model = nullptr, GLuint* programID = nullptr);
 #endif

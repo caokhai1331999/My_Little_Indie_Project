@@ -315,7 +315,7 @@
   "Comment on c/c++ file format or batch code"
   (interactive)
   (when (buffer-file-name)
-    (if (string-match-p "\\.\\(c\\|cpp\\)" buffer-file-name)
+    (if (string-match-p "\\.\\(c\\|cpp\\|h\\)" buffer-file-name)
 	;;whenever in c/c++ file
 	(progn (if (and (or (use-region-p) (mark)) (/=(line-number-at-pos(mark)) (line-number-at-pos(point))))
 		   ;;whenever region more than one line
@@ -329,8 +329,9 @@
 					       (if (<(line-number-at-pos(point))(line-number-at-pos(mark)))
 						   ;; But this didn't
 						   ;; Why mark + 1 make this eternal loop
+						   ;; bugs lied at next-line
 						   (progn
-						     (save-excursion  (while (< (line-number-at-pos(point))(+ (line-number-at-pos(mark)) 1)) (back-to-indentation)(insert "//")(forward-line 1))) ))
+						     (save-excursion  (while (< (line-number-at-pos(point))(+ (line-number-at-pos(mark)) 1)) (back-to-indentation)(insert "//")(forward-line 1))) )
 						 ;; This case worked
 						 (progn (save-excursion (while (>(+(line-number-at-pos (point)) 1)(line-number-at-pos (mark))) (back-to-indentation)(insert "//")(previous-line))))))
 					   (progn 					 (if (> (line-number-at-pos(mark)) (line-number-at-pos(point)) )
@@ -435,12 +436,13 @@
   "Delete whitespace characters or words before point."
   (interactive)
   (save-excursion
-    (if (looking-back "\\s-+")
-        (delete-horizontal-space)
-      ;;(if (thing-at-point 'word)
+      ;; So eq is the equality test(compare fx) and ?\s present for white space
+      (if (eq (char-before) ?\s) (delete-horizontal-space))
+      ;; litterally non-space+space or space+non-space char
+      (if(looking-back "[^0-9a-zA-Z]" 1)(backward-delete-char 1))
       (let ((start (point)))
-	(skip-chars-backward "^ \t\n_(){}<>,.*+-/:?\%")
-	(delete-region (point) start)))))
+      (skip-chars-backward "0-9A-Za-z\t" (line-beginning-position))
+	(delete-region (point) start))))
 ;;)
 
 (defun append-rectangles-side-by-side (start1 end1 start2 end2)
@@ -544,7 +546,7 @@
    '(("\\<\\(TODO:\\)" 1 'font-lock-fixme-face t)
      ("\\<\\(NOTE:\\)" 1 'font-lock-note-face t)
      ("\\<\\(DONE!\\)" 1 'font-lock-jobDone-face t)
-     ("\\<\\(WORKING!!\\)" 1 'font-lock-working-face t)
+     ("\\<\\(WORKING ON IT!!\\)" 1 'font-lock-working-face t)
      ("\\<\\(SOLVED!\\)" 1 'font-lock-solved-face t)
      ("\\<\\(REMEMBER! :\\)" 1 'font-lock-remember-face t))
    'append)) ;; use 'append to not overwrite existing highlighting
@@ -621,9 +623,9 @@
   (other-window 1))
 (define-key global-map "\em" 'make-without-asking)
 
-(setq todo-file "src/Todo.txt")
-(setq log-file "src/log.txt")
-(setq issue-file "src/ArisedIssues.txt")
+(setq todo-file "./Todo.txt")
+(setq log-file "./log.txt")
+(setq issue-file "./ArisedIssues.txt")
 
 (defun insert-timeofday ()
   (interactive "*")
@@ -725,8 +727,13 @@
 (global-set-key (kbd "C-y") 'scroll-up-command)
 (global-unset-key (kbd "C-v"))
 (global-set-key (kbd "C-v") 'yank)
-(global-unset-key (kbd "C-x r"))
+
+; Column Text edit
 (global-set-key (kbd "C-x r") 'copy-rectangle-as-kill)
+(global-set-key [f3] 'kill-rectangle)
+(global-set-key (kbd "C-y r") 'yank-rectangle)
+(global-set-key (kbd "C-s r") 'string-rectangle)
+
 ;;(global-unset-key (kbd "C-s r"))
 ;;(global-unset-key (kbd "C-s r") 'append-rectangles-side-by-side)
 
@@ -737,6 +744,10 @@
 (global-set-key (kbd "<f3>") 'isearch-or-repeat)
 (global-set-key (kbd "S-<f3>") 'isearch-repeat-backward)
 
+;;Replace string
+(global-unset-key (kbd "C-x r"))
+(global-set-key (kbd "C-x r") 'replace-string)
+
 (global-set-key (kbd "C-s") 'save-buffer)
 (define-key global-map (kbd "C-l") 'clone-region-or-line)
 (define-key global-map (kbd "C-p") 'dynamic-copy)
@@ -744,6 +755,7 @@
 
 (global-unset-key (kbd "C-x o"))
 (global-unset-key (kbd "C-<backspace>"))
+(global-unset-key (kbd "M-<backspace>"))
 
 					;comment
 (global-unset-key (kbd "M-;"))
@@ -757,6 +769,7 @@
 (global-set-key [M-down] 'move-line-down)
 					;other
 (global-set-key (kbd "C-<backspace>") 'my-backward-kill-word)
+(global-set-key (kbd "M-<backspace>") 'backward-kill-sentence)
 (global-set-key (kbd "C-h") 'shell)
 (global-set-key (kbd "C-z") 'undo)
 (global-set-key (kbd "C-x u") 'suspend-frame)

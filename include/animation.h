@@ -6,6 +6,12 @@
    $Creator: Cao Khai(Casey's disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
+#include <sstream>
+#include <map>
+#include <vector>
+
+#include <assimp_glm_helpers.h>
+
 #include "C_Mesh.h"
 
 struct KeyPosition{
@@ -25,7 +31,7 @@ struct KeyScale{
 
 struct AssimpNodeData{
     glm::mat4 transformation;
-    std::string name;
+    string name;
     int childrenCount;
     std::vector<AssimpNodeData>children;
 };
@@ -53,10 +59,10 @@ private:
         //First build up POSITION of Bone first
         int m_NumPositions = channel->mNumPositionKeys;
         for(int positionIndex = 0; positionIndex < m_NumPositions; positionIndex++){
-            aiVector3D aiPosition = channel->mPositionKeys[positionIndex];
+            aiVector3D aiPosition = channel->mPositionKeys[positionIndex].mValue;
             float timeStamp = channel->mPositionKeys[positionIndex].mTime;
 
-            KeyPostion Data;
+            KeyPosition Data;
             Data.Position = AssimpGLMHelpers::GetGLMVec(aiPosition);
             Data.timestamp = timeStamp;
             m_Positions.push_back(Data);
@@ -65,11 +71,11 @@ private:
         //Then the Rotation
         int m_NumRotations = channel->mNumRotationKeys;
         for(int rotationIndex = 0; rotationIndex < mNumRotations; rotationIndex++){
-            aiVector3D aiOrientation = channel->mRotationKeys[rotationIndex];
+            aiVector3D aiOrientation = channel->mRotationKeys[rotationIndex].mValue;
             float timeStamp = channel->mRotationKeys[rotationIndex].mTime;
 
             KeyRotation Data;
-            Data.Orientation = aiRotation;
+            Data.Orientation = AssimpGLMHelpers::GetGLMQuat(aiOrientation);
             Data.timestamp = timeStamp;
 
             m_Rotations.push_back(Data);
@@ -83,40 +89,44 @@ private:
             float timestamp = channel->mScalingKeys[scalingIndex].mTime;
 
             KeyScale Data;
-            Data.Scale = scale;
+            Data.Scale = AssimpGLMHelpers::GetGLMVec(scale);
             Data.timestamp = timestamp;
             m_KeyScales.push_back(Data);
         };
-
+    }
         /* Interpolate b/w translation, rotations and scalings based on the current time and prepare for the final transform matrices by combining all key transformation*/
 public:
-        glm::mat4 GetLocalTransformation()(return m_LocalTransform;);
+    glm::mat4 GetLocalTransformation(){return m_LocalTransform;};
         std::string GetBoneName(){return m_Name;};
-        int GetBoneID(){return m_ID};
+    int GetBoneID(){return m_ID;};
         void Update(float animationTime);
         /*Return current index on mKeyPositions and interpolate it based on current animation time*/
         int GetPositionIndex(float animationTime);
         /*Return current index on mRotations and interpolate it based on current animation time*/
         int GetRotationIndex(float animationTime);
-
         /*Return current index on mScalings and interpolate it based on current animation time*/
         int GetScalingIndex(float animationTime);
+
+        // insert bone
+        glm::mat4 InterpolatePosition(float animationTime = 0.0f);
+        glm::mat4 InterpolateScaling(float animationTime = 0.0f);
+        glm::mat4 InterpolateRotation(float animationTime = 0.0f);        
 };
 
 class Animation{
 public:
     Animation() = default;
 
-    Animation(animationPath, model){
+    Animation(char* animationPath = nullptr, Model_* model){
         // assert throw out the error when 0 is the value
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
         // Still don't understand this part
         assert(scene && scene->mRootNode);
         auto animation = scene->m_Animations[0];
-        mDuration = animation->m_Duration;
-        m_TickPerSecond = animation->mTicksPerSecond;
-        ReadHeirarchyData(m_RootNode, scene->m_RootNode);
+        m_Duration = animation->m_Duration;
+        m_TicksPerSecond = animation->mTicksPerSecond;
+        ReadHierarchyData(m_RootNode, scene->mRootNode);
         ReadMissingBone(animation, *model);
     };
 
@@ -135,10 +145,6 @@ public:
 
     // Get normalized value for Lerp and Slerp
     float GetScaleFactor(float animationTime, float lastkeyTime, float nextkeyTime);
-
-    glm::mat4 InterpolatePosition(Bone* bone = nullptr, float animationTime = 0.0f);
-    glm::mat4 InterpolateScaling(Bone* bone = nullptr, float animationTime = 0.0f);
-    glm::mat4 InterpolateRotation(Bone* bone = nullptr, float animationTime = 0.0f);
 
 // Part that finish the animation process
     Bone* FindBone(const std::string& name);
