@@ -342,3 +342,50 @@ void SetVertexBoneDataToDefault(Vertex* vertex){
         vertex->m_Weights[i] = 0.0f;
     }
 };
+
+
+
+// Bone processing step for skeletal animation
+void Model_::SetVertexBoneData(Vertex* vertex, int boneID, float weight){
+    for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
+        if(vertex->m_BoneIDs[i] > 0){
+            vertex->m_BoneIDs[i] = boneID;
+            vertex->m_Weight[i] = weight;
+            break;
+        }
+    }
+};
+
+void Model_::ExtractBoneWeightForVertices(std::vector& vertice, aiMesh* mesh, const aiScene* scene){
+    for(int boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++){
+        int boneID = -1;
+        //What is mName
+        std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+        if(m_BoneInfoMap.find(boneName) == m_BoneInfoMap.end()){
+            Bone_Info newboneinfo ;
+// On the way of learning here
+            newboneinfo.id = mBoneCounter;
+            newboneinfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(mesh->mBone[boneIndex]->mOffsetMatrix);
+            mBoneInfoMap[boneName] = newboneinfo;
+
+            boneID = mBoneCounter;
+            mBoneCounter++;
+        }else{
+            boneID = mBoneInfoMap[boneName].id;
+        }
+        assert(boneID != -1);
+        //what exactly weights's type is
+        auto weights = mesh->mBones[boneIndex]->mWeights;
+        int numWeights = mesh->mBones[boneIndex]->mNumWeights;
+        for(int weightIndex = 0; weightIndex < numWeights; weightIndex++){
+            int vertexId = weights[weightIndex].mVertexId;
+            float weight = weights[weightIndex].mWeight;
+            assert(vertexId <= vertices.size());
+            SetVertexBoneData(vertices[vertexId], boneID, weight);
+        }
+    }
+    
+    // assert check whether the argument is unequal to 0 or not
+    
+};
+

@@ -481,39 +481,23 @@ int CALLBACK WinMain
                 RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
                 InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
 
-                B_shader vshader;
-                B_shader fshader;
+                //Basic shader
+                B_shader_program* basic_shader_ = new B_shader_program("shader.vs", "shader.fs");             ScreenBuffer.glData.ProgramIDs.push_back(basic_shader_->GetProgramID());
 
-                loadShader(&vshader, "shader.vs", (VertexType)vertex_);
-                loadShader(&fshader, "shader.fs", (VertexType)fragment_);
+                //basic model shader
+                B_shader_program* model_shader_ = new B_shader_program("1.model.vs", "1.model.fs");                ScreenBuffer.glData.ProgramIDs.push_back(model_shader_->GetProgramID());
 
-                setupGLprogram(&vshader, &fshader, &ScreenBuffer.glData.ProgramIDs[0]);
-
-                B_shader Mvshader;
-                B_shader Mfshader;
-
-                loadShader(&Mvshader, "1.model.vs", (VertexType)vertex_);
-                loadShader(&Mfshader, "1.model.fs", (VertexType)fragment_);
-
-                setupGLprogram(&Mvshader, &Mfshader, &ScreenBuffer.glData.ProgramIDs[1]);
-
-                B_shader animateVShader;
-                B_shader animateFShader;
-
-                loadShader(&Mvshader, "2.skeletal_animation.vs", (VertexType)vertex_);
-                loadShader(&Mfshader, "2.skeletal_animation.fs", (VertexType)fragment_);
-
-                ScreenBuffer.glData.ProgramIDs.push_back(3);
-                setupGLprogram(&animateVShader, &animateFShader, &ScreenBuffer.glData.ProgramIDs[2]);
-
+                B_shader_program* animating_shader_ = new B_shader_program("2.skeletal_animation.vs", "2.skeletal_animation.fs");                ScreenBuffer.glData.ProgramIDs.push_back(animating_shader_->GetProgramID());
                 
                 copyBufferData(&BackBuffer, &ScreenBuffer);
                 //????
                 //glm::mat4 View = glm::mat4(1.0f);
                 float UpdatedDegree = 0.0f;
 
-                glm::mat4 Model = glm::mat4(1.0f);
-                glm::mat4 Model2 = glm::mat4(1.0f);
+                glm::mat4 basic_cube_core = glm::mat4(1.0f);
+                glm::mat4 backpack_core = glm::mat4(1.0f);
+                glm::mat4 dancing_vampire_core = glm::mat4(1.0f);
+
                 glm::mat4 Plane = glm::mat4(1.0f);
                 Plane = glm::translate(Plane, glm::vec3(0.0f));
 
@@ -560,11 +544,15 @@ int CALLBACK WinMain
                 std::cout<<"Up vec: "<<glm::to_string(BackBuffer.camera.Up)<<std::endl;
 
                 BackBuffer.camera.fov = 45.0f;
-                Model = glm::translate(Model, glm::vec3(2.0f, -4.0f, 0.0f));
-                std::cout<<"Central rotating model is"<<glm::to_string(Model)<<std::endl;
-                Model2 = glm::translate(Model2, glm::vec3(-4.0f, 4.0f, 0.0f));
-                std::cout<<"Stand still model 2 matrix is :"<<glm::to_string(Model2)<<std::endl;
+                basic_cube_core = glm::translate(basic_cube_core, glm::vec3(2.0f, -4.0f, 0.0f));
+                std::cout<<"Central rotating model is"<<glm::to_string(basic_cube_core)<<std::endl;
+                backpack_core = glm::translate(backpack_core, glm::vec3(-4.0f, 4.0f, 0.0f));
+                std::cout<<"Stand still model 2 matrix is :"<<glm::to_string(backpack_core)<<std::endl;
 
+                // Set containing model for dancing vampire
+                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, -0.4f, 0.0f));
+                dancing_vampire_core = glm::scale(dancing_vampire_core, glm::vec3(0.5f,0.5f,0.5f));
+                
                 BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
                 
                 if(glIsProgram(ScreenBuffer.glData.ProgramIDs[0])){
@@ -572,20 +560,31 @@ int CALLBACK WinMain
                     printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[0]);
                 } else {
                     glDebugMessageCallback(MessageCallback, 0);
-                    checkCompileErrors(vshader.shaderID, "Vertex");
-                    checkCompileErrors(fshader.shaderID, "Fragment");
+                    checkCompileErrors(basic_shader_->shaders[vertex_], "Vertex");
+                    checkCompileErrors(basic_shader_->shaders[fragment_], "Fragment");
                     checkCompileErrors(ScreenBuffer.glData.ProgramIDs[0], "Program");
                     printf("NO program object created before\n");
                 }
 
                 if(glIsProgram(ScreenBuffer.glData.ProgramIDs[1])){
-                    useProgram(ScreenBuffer.glData.ProgramIDs[1]);
+                    basic_model_shader->use();
                     printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[1]);
                 } else {
                     glDebugMessageCallback(MessageCallback, 0);
-                    checkCompileErrors(vshader.shaderID, "Vertex");
-                    checkCompileErrors(fshader.shaderID, "Fragment");
+                    checkCompileErrors(basic_model_shader->shaders[vertex_], "Vertex");
+                    checkCompileErrors(basic_model_shader->shaders[fragment_], "Fragment");
                     checkCompileErrors(ScreenBuffer.glData.ProgramIDs[1], "Program");
+                    printf("NO program object created before\n");
+                }
+
+                if(glIsProgram(ScreenBuffer.glData.ProgramIDs[2])){
+                    animating_shader_->use();
+                    printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[2]);
+                } else {
+                    glDebugMessageCallback(MessageCallback, 0);
+                    checkCompileErrors(animating_shader_->shaders[vertex_], "Vertex");
+                    checkCompileErrors(animating_shader_->shaders[fragment_], "Fragment");
+                    checkCompileErrors(ScreenBuffer.glData.ProgramIDs[2], "Program");
                     printf("NO program object created before\n");
                 }
 
@@ -596,13 +595,23 @@ int CALLBACK WinMain
                 std::cout<<"Projection mat: "<<glm::to_string(BackBuffer.camera.projection)<<std::endl;                
                 setMat4(ScreenBuffer.glData.ProgramIDs[0], "view", BackBuffer.camera.view);
 
-                Model_* modell = nullptr;
-                modell = new Model_();
-                //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/backpack.obj";
+                Model_* backpack = nullptr;
+                backpack = new Model_();
+                std::string backpack_path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/backpack.obj";
+                loadModel(backpack, backpack_path);
                 //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
-                std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/media/dancing_vampire.dae";
-                loadModel_(modell, path);
-                //modell->Texturedirectory = texpath.substr(0, path.find_last_of('/'));
+
+//NOW THE ANIMATING PART
+                Model_* dancing_vampire = nullptr;
+                dancing_vampire = new Model_();;
+                std::string dancing_vampire_path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/media/dancing_vampire.dae";
+                loadModel(dancing_vampire, dancing_vampire_path);
+                Animation* danceAnimation(dancing_vampire_path, dancing_vampire);
+                Animator* animator(danceAnimation);
+                
+                
+
+//modell->Texturedirectory = texpath.substr(0, path.find_last_of('/'));
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
                 printf("vertex array :%d\n", ScreenBuffer.glData.VAOs);
 
@@ -810,6 +819,16 @@ setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].quadraticTerm", 0.032
                         RatioCalculated = true;
                     }
 
+                    // Wait to 17 milli s perframe for model to rotate
+
+                    // Update animating model based on frame time
+                    // => calculate finalTransformmatrices and set to
+                    auto Transform = Animator->finalBoneMatrices;
+                    for(int i = 0; i < Tranform.size(); i++){
+                        animating_shader_->setMat4("finalBoneMatrices[" + std::to_string(i) + "]", Transform[i]);
+                    };
+                    
+                    
                     //if(BackBuffer.camera.moved || BackBuffer.camera.mouse.moved){
                     UpdateCamera(&BackBuffer.camera, DelayedRatio);                    
                     //}
@@ -823,12 +842,13 @@ setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].quadraticTerm", 0.032
                         BackBuffer.camera.mouse.Wheeled = false;
                     }
 
-                    useProgram(ScreenBuffer.glData.ProgramIDs[0]);
-                    setMat4(ScreenBuffer.glData.ProgramIDs[0], "view", BackBuffer.camera.view);
+                    basic_shader_->use(ScreenBuffer.glData.ProgramIDs[0]);
+                    basic_shader_->setMat4("view", BackBuffer.camera.view);
 
-                    useProgram(ScreenBuffer.glData.ProgramIDs[1]);
-                    setMat4(ScreenBuffer.glData.ProgramIDs[1], "view", BackBuffer.camera.view);
-                        
+                    basic_model_shader->use(ScreenBuffer.glData.ProgramIDs[1]);
+                    basic_model_shader->setMat4("view", BackBuffer.camera.view);
+
+                    
                     glm::vec3 randomRotateAxis = glm::vec3(0.4f* DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2));
 
                     // Start to add some basic lighting to the model
@@ -873,8 +893,8 @@ setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].quadraticTerm", 0.032
                         } else {
                             ChangeAxisCounter += WaitTimeCounter;
                         }
-                        Model = glm::rotate(Model, glm::radians(10.0f) * (float)BackBuffer.camera.speed, randomRotateAxis);
-                        // Wait to 17 milli s perframe for model to rotate
+                        basic_cube_core = glm::rotate(basic_cube_core, glm::radians(10.0f) * (float)BackBuffer.camera.speed, randomRotateAxis);                        
+                        
                         WaitTimeCounter = 0.0f;
                     } else {
                         WaitTimeCounter += MsPerFrame;
@@ -882,23 +902,30 @@ setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].quadraticTerm", 0.032
                     }
 
                     //RENDER =====================================
-                    useProgram(ScreenBuffer.glData.ProgramIDs[0]);
+                    basic_shader_->use();
                     glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
-                    setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Plane);
+                    basic_shader_->setMat4("model", Plane);
                     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-                    setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Model);
+                    basic_shader_->setMat4("model", basic_cube_core);
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);                
+                    glDrawArrays(GL_TRIANGLES, 0, 36)
+
 
                     drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], BackBuffer.camera.speed, &UpdatedDegree);
 
-                
-                    useProgram(ScreenBuffer.glData.ProgramIDs[1]);
+                    //Draw the backpack
+                    basic_model_shader->use();
+                    basic_shader_->setMat4("model", backpack_core);
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
-                    setMat4(ScreenBuffer.glData.ProgramIDs[1], "model", Model2);
-                    DDraw(modell, &ScreenBuffer.glData.ProgramIDs[1]);
-                
+                    DDraw(dancing_vampire, &ScreenBuffer.glData.ProgramIDs[1]);
+                    
+// Now Draw the vampire
+                    animating_shader_->use();
+                    glBindVertexArray(ScreenBuffer.glData.VAOs);
+                    animating_shader->setMat4( "model", dancing_vampire_core);
+                    DDraw(dancing_vampire, &ScreenBuffer.glData.ProgramIDs[2]);                    
+                    
                     LastCounter = EndCounter;
                     LastCycleCounts = EndCycleCounts;
 /*

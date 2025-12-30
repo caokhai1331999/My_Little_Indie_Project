@@ -11,7 +11,7 @@
 // NOTE: Load shader code from source file to empty shader object
 // then compile it , next attach it to empty program finally link
 // that small program and delete the shader
-void *GetAnyGLFuncAddress(const char *name)
+void* GetAnyGLFuncAddress(const char *name)
 {
   void *p = (void *)wglGetProcAddress(name);
   if(p == 0 ||
@@ -32,61 +32,61 @@ void *GetAnyGLFuncAddress(const char *name)
 }
 // =============== let aside this alone touch it when it's time================
 
-void loadShader(B_shader* shader, char* name, VertexType type){
+void B_shader::loadShader(char* name, ShaderType type){
     //Create File handle to current file for reading
     char* Error;
-    shader->shader_file = CreateFileA(
+    shader_file = CreateFileA(
                                      name,
                                      GENERIC_READ,
                                      0,0,
                                      OPEN_EXISTING,
                                      0,0);
 
-        if(shader->shader_file != INVALID_HANDLE_VALUE)
+        if(shader_file != INVALID_HANDLE_VALUE)
     {
         DWORD ByteRead;
 
-        if(GetFileSizeEx(shader->shader_file, &shader->file_size)){
-            shader->file_size.QuadPart = safetruncateUint64(shader->file_size.QuadPart);
+        if(GetFileSizeEx(shader_file, &file_size)){
+            file_size.QuadPart = safetruncateUint64(file_size.QuadPart);
         }
 
-        shader->SourceCode = VirtualAlloc(0, shader->file_size.QuadPart, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+        SourceCode = VirtualAlloc(0, file_size.QuadPart, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
 
-        if(shader->SourceCode){
+        if(SourceCode){
 
-            if((ReadFile(shader->shader_file, shader->SourceCode, shader->file_size.QuadPart, &ByteRead, NULL))){
+            if((ReadFile(shader_file, SourceCode, file_size.QuadPart, &ByteRead, NULL))){
 
                 printf("Load file: %s successfully, File size is %d\n", name, ByteRead);
             
                 //First Create an empty shader object by glCreateShader 
                 // BUG here
                 if(type == vertex_){
-                    shader->shaderID = glCreateShader(GL_VERTEX_SHADER);
+                    shaders[vertex_].shaderID = glCreateShader(GL_VERTEX_SHADER);
                 } else {
-                    shader->shaderID = glCreateShader(GL_FRAGMENT_SHADER);
+                    shaders[fragment_].shaderID = glCreateShader(GL_FRAGMENT_SHADER);
                 }
 
                 // Then Sourcing it with glShaderSource
                 // Seemed like glShaderSource doesn't relate to file content
                 // It just need path
                 // 2nd arg is number of shader in source, 4th is an array of string length
-                const char* CodeContent = (char* )shader->SourceCode;
-                glShaderSource(shader->shaderID, 1, &CodeContent, NULL);
+                const char* CodeContent = (char* )SourceCode;
+                glShaderSource(shaderID, 1, &CodeContent, NULL);
                 //Next compile this shader with glCompileShader
-                glCompileShader(shader->shaderID);
+                glCompileShader(shaderID);
                 //Attach it(glAttachShader) with the already created(glCreateProgram) empty program
                 //Finally delete already attached shader
 
-                checkCompileErrors(shader->shaderID, type?"Vertex":"Fragment");
+                checkCompileErrors(shaderID, type?"Vertex":"Fragment");
                 const GLubyte* ver = glGetString(GL_VERSION);
                 if (ver)
                     printf("OpenGL version: %s\n", ver);
                 else
                     printf("glGetString(GL_VERSION) returned NULL\n");
 
-                //glDeleteShader(shader->shaderID);
-                DEBUGFreeFileMemory(shader->SourceCode);
-                CloseHandle(shader->shader_file);
+                //glDeleteShader(shaderID);
+                DEBUGFreeFileMemory(SourceCode);
+                CloseHandle(shader_file);
             } else {
                 Error = loadCurrentErr();
                 DWORD err = GetLastError();
@@ -123,17 +123,17 @@ char* loadCurrentErr(){
     return errorContent;
 }
 
-void useProgram(GLuint programID){
-    glUseProgram(programID);
+void B_shader_program::use(){
+    glUseProgram(ProgramID);
 }
 
 // Set Int, bool,
-void setBool(GLuint programID, const char* name, const bool value){
-    glUniform1i(glGetUniformLocation(programID, name), (int)value);
+void B_shader_program::setBool(const char* name, const bool value){
+    glUniform1i(glGetUniformLocation(ProgramID, name), (int)value);
 };
 
-void setInt(GLuint programID, const std::string name, const int value){
-    glUniform1i(glGetUniformLocation(programID, name.c_str()), value);
+void B_shader_program::setInt(const std::string name, const int value){
+    glUniform1i(glGetUniformLocation(ProgramID, name.c_str()), value);
     if(name.c_str()==""){
         printf("name content is NULL\n");
     }
@@ -142,8 +142,8 @@ void setInt(GLuint programID, const std::string name, const int value){
     }
 };
 
-void setFloat(GLuint programID, const std::string name, const float value){
-    glUniform1f(glGetUniformLocation(programID, name.c_str()), value);
+void B_shader_program::setFloat(const std::string name, const float value){
+    glUniform1f(glGetUniformLocation(ProgramID, name.c_str()), value);
     if(name.c_str()==""){
         printf("name content is NULL\n");
     }
@@ -153,29 +153,29 @@ void setFloat(GLuint programID, const std::string name, const float value){
 };
 
 //Vector 2nd argument is number of vector
-void setVec2(GLuint programID, const char* name, const glm::vec2 &value){
-    glUniform2fv(glGetUniformLocation(programID, name), 1, &value[0]);
+void B_shader_program::setVec2(const char* name, const glm::vec2 &value){
+    glUniform2fv(glGetUniformLocation(ProgramID, name), 1, &value[0]);
 }
 
-void setVec2(GLuint programID, const char* name, float x, float y){
+void B_shader_program::setVec2(const char* name, float x, float y){
     glm::vec2 value = glm::vec2(x, y);
-    glUniform2f(glGetUniformLocation(programID, name), x, y);
+    glUniform2f(glGetUniformLocation(ProgramID, name), x, y);
 }
 
-void setVec3(GLuint programID, const char* name, const glm::vec3 &value){
-    glUniform3fv(glGetUniformLocation(programID, name), 1, &value[0]);
+void B_shader_program::setVec3(const char* name, const glm::vec3 &value){
+    glUniform3fv(glGetUniformLocation(ProgramID, name), 1, &value[0]);
 }
-void setVec3(GLuint programID, const char* name, float x, float y, float z){
-    glUniform3f(glGetUniformLocation(programID, name), x, y, z);
+void B_shader_program::setVec3(const char* name, float x, float y, float z){
+    glUniform3f(glGetUniformLocation(ProgramID, name), x, y, z);
 }
 
 // Set Matrix, 3rd is GL_Boolean transpose
-void setMat3(GLuint programID, const char* name, const glm::mat3 &value){
-    glUniformMatrix3fv(glGetUniformLocation(programID, name), 1, GL_FALSE, &value[0][0]);
+void B_shader_program::setMat3(const char* name, const glm::mat3 &value){
+    glUniformMatrix3fv(glGetUniformLocation(ProgramID, name), 1, GL_FALSE, &value[0][0]);
 };
 
-void setMat4(GLuint programID, const std::string name, const glm::mat4 &value){
-    glUniformMatrix4fv(glGetUniformLocation(programID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+void B_shader_program::setMat4(const std::string name, const glm::mat4 &value){
+    glUniformMatrix4fv(glGetUniformLocation(ProgramID, name.c_str()), 1, GL_FALSE, &value[0][0]);
     //printf("pointer to matrix is: 0x%hx\n",&value[0][0]);
  };
 
@@ -216,18 +216,18 @@ void checkCompileErrors(GLuint shader, const char* type)
     }
 };
 
-GLuint setupGLprogram(B_shader* vshader, B_shader* fshader, GLuint* ProgramID){
+GLuint B_shader_program::setupGLprogram(){
     //buffer->glData.ProgramID = glCreateProgram();
     unsigned int tempProgramID = glCreateProgram();
     
-    glAttachShader(tempProgramID, vshader->shaderID);
-    glAttachShader(tempProgramID, fshader->shaderID);
+    glAttachShader(tempProgramID, shaders[vertex_].ShaderID);
+    glAttachShader(tempProgramID, shaders[fragment_].ShaderID);
     glLinkProgram(tempProgramID);
 
-    *ProgramID = tempProgramID;
-    printf("Program ID: %d %d\n", *ProgramID, tempProgramID);
-    checkCompileErrors(vshader->shaderID, "VERTEX");
-    checkCompileErrors(fshader->shaderID, "FRAGMENT");
+    ProgramID = tempProgramID;
+    printf("Program ID: %d %d\n", ProgramID, tempProgramID);
+    checkCompileErrors(shaders[vertex_].ShaderID, "VERTEX");
+    checkCompileErrors(shaders[fragment_].ShaderID, "FRAGMENT");
     checkCompileErrors(tempProgramID, "PROGRAM");
     
     if(glGetError() != GL_NO_ERROR){
@@ -235,11 +235,11 @@ GLuint setupGLprogram(B_shader* vshader, B_shader* fshader, GLuint* ProgramID){
         cout<<"OpenGL Error: "<< glGetError()<<endl;
     };
 
-    glDetachShader(tempProgramID, vshader->shaderID); 
-    glDetachShader(tempProgramID, fshader->shaderID); 
+    glDetachShader(tempProgramID, shaders[vertex_].ShaderID); 
+    glDetachShader(tempProgramID, shaders[fragment_].ShaderID); 
 
-    glDeleteShader(vshader->shaderID);
-    glDeleteShader(fshader->shaderID);
+    glDeleteShader(shaders[vertex_].ShaderID);
+    glDeleteShader(shaders[fragment_].ShaderID);
 
     return tempProgramID;
 }
