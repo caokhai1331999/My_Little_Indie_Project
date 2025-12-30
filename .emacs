@@ -1,4 +1,4 @@
-;;Melpa package function
+;Melpa package function
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 ;; Comment/uncomment this line to enable MELPA Stable if desired.
@@ -727,8 +727,17 @@
 (global-set-key (kbd "C-y") 'scroll-up-command)
 (global-unset-key (kbd "C-v"))
 (global-set-key (kbd "C-v") 'yank)
-(global-unset-key (kbd "C-x r"))
-(global-set-key (kbd "C-x r") 'copy-rectangle-as-kill)
+
+; Column Text edit
+(global-unset-key (kbd "C-r"))
+(global-set-key (kbd "C-r c") 'copy-rectangle-as-kill)
+(global-unset-key (kbd "C-r k"))
+(global-set-key (kbd "C-r k") 'kill-rectangle)
+(global-unset-key (kbd "C-r y"))
+(global-set-key (kbd "C-r y") 'yank-rectangle)
+(global-unset-key (kbd "C-r r"))
+(global-set-key (kbd "C-r r") 'string-rectangle)
+
 ;;(global-unset-key (kbd "C-s r"))
 ;;(global-unset-key (kbd "C-s r") 'append-rectangles-side-by-side)
 
@@ -738,6 +747,10 @@
 (global-set-key (kbd "<f3>") 'isearch-repeat-forward)
 (global-set-key (kbd "<f3>") 'isearch-or-repeat)
 (global-set-key (kbd "S-<f3>") 'isearch-repeat-backward)
+
+;;Replace string
+(global-unset-key (kbd "C-x r"))
+(global-set-key (kbd "C-x r") 'replace-string)
 
 (global-set-key (kbd "C-s") 'save-buffer)
 (define-key global-map (kbd "C-l") 'clone-region-or-line)
