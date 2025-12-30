@@ -56,7 +56,7 @@ float GetScaleFactor(float animationTime, float lastkeyTime, float nextkeyTime){
 
 // Figure out which Postion key to interpolation b/w interpolate and return the
 // final matrix
-glm::mat4 InterpolatePosition(Bone* bone = nullptr, float animationTime = 0.0f){
+glm::mat4 Bone::InterpolatePosition(float animationTime = 0.0f){
 
     if(Bone->m_NumPosition == 1)
         return glm::translate(glm::mat4(1.0f), Bone->m_Positions[0].Postion);
@@ -74,7 +74,7 @@ glm:vec3 finalPosition = glm::mix(bone->m_Positions[pt0index].Position, bone->m_
 
 // Figure out which Scale key to interpolation b/w interpolate and return the
 // final matrix
-glm::mat4 InterpolateScaling(Bone* bone = nullptr, float animationTime = 0.0f){
+glm::mat4 Bone::InterpolateScaling(float animationTime = 0.0f){
 
     if(Bone->m_NumScalings == 1)
         return glm::scale(glm::mat4(1.0f), Bone->m_Scales[0].Scale);
@@ -90,7 +90,7 @@ glm::mat4 InterpolateScaling(Bone* bone = nullptr, float animationTime = 0.0f){
 
 // Figure out which Scale key to interpolation b/w interpolate and return the
 // final matrix
-glm::mat4 InterpolateRotation(Bone* bone = nullptr, float animationTime = 0.0f){
+glm::mat4 Bone::InterpolateRotation(float animationTime = 0.0f){
     if(Bone->m_NumRotations == 1){
         auto rotation = Bone->m_Rotations[0].orientation;
         glm::toMat4(rotation);

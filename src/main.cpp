@@ -497,6 +497,16 @@ int CALLBACK WinMain
 
                 setupGLprogram(&Mvshader, &Mfshader, &ScreenBuffer.glData.ProgramIDs[1]);
 
+                B_shader animateVShader;
+                B_shader animateFShader;
+
+                loadShader(&Mvshader, "2.skeletal_animation.vs", (VertexType)vertex_);
+                loadShader(&Mfshader, "2.skeletal_animation.fs", (VertexType)fragment_);
+
+                ScreenBuffer.glData.ProgramIDs.push_back(3);
+                setupGLprogram(&animateVShader, &animateFShader, &ScreenBuffer.glData.ProgramIDs[2]);
+
+                
                 copyBufferData(&BackBuffer, &ScreenBuffer);
                 //????
                 //glm::mat4 View = glm::mat4(1.0f);
@@ -588,8 +598,9 @@ int CALLBACK WinMain
 
                 Model_* modell = nullptr;
                 modell = new Model_();
-                std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/backpack.obj";
+                //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/backpack.obj";
                 //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
+                std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/media/dancing_vampire.dae";
                 loadModel_(modell, path);
                 //modell->Texturedirectory = texpath.substr(0, path.find_last_of('/'));
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
@@ -746,7 +757,6 @@ setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].quadraticTerm", 0.032
 
                     // Display on the screen
                     // The glitching sound driven me nearly crazy so I decided to turn it off                
-                    // Ah got it. Texture data pass directly to shader(NOPE)
                     // We define that through setInt
                     //Why the &ScreenBuffer data doesn't show on the direct screen
 
