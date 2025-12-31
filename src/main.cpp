@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include "SoundMaker.h"
 #include "Tile.h"
+#inlcude "animator.h"
 
 LRESULT CALLBACK MainWindowCallBack(
     HWND Window,
