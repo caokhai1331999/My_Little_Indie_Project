@@ -711,3 +711,9 @@ REMEMBER! :the unrecognized class name is likely an duplicated header issues
 I still have a long way to fix these bug
 
 
+
+---------------- Thu, 01 Jan 26: 10:18PM
+
+TODO: install emacs 28.1 in order to use lsp-mode
+      install clangd or use clangd server
+      all set up is done by .emacs
