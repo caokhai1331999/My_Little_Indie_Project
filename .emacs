@@ -1,12 +1,12 @@
 ;Melpa package function
 (require 'package)
-;;(add-to-list 'package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
-				 ;;("melpa" . "https://melpa.org/packages/")
-				 ;;("melpa-stable" . "http://stable.melpa.org/packages/")))
-(setq package-archives
-      '(("gnu"   . "https://elpa.gnu.org/packages/")
-	("melpa" . "https://melpa.org/packages/")
-	("melpa-stable" . "https://stable.melpa.org/packages/")))
+(add-to-list 'package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
+				 ("melpa" . "https://melpa.org/packages/")
+				 ("melpa-stable" . "https://stable.melpa.org/packages/")))
+;;(setq package-archives
+      ;;'(("gnu"   . "https://elpa.gnu.org/packages/")
+	;;("melpa" . "https://melpa.org/packages/")
+	;;("melpa-stable" . "https://stable.melpa.org/packages/")))
 ;; Comment/uncomment this line to enable MELPA Stable if desired.
 ;; See `package-archive-priorities` and `package-pinned-packages`.
 ;; Most users will not need or want to do this.
@@ -187,6 +187,11 @@
   :hook (lsp-mode . company-mode))
 (setq lsp-diagnostics-provider :flymake)
 
+(setq lsp-project-root-functions
+      '(lsp--suggest-project-root))
+
+(setq lsp-auto-guess-root t)
+(setq lsp-ask-about-project-root nil)
   
 					;Handle a little ; in the end and // at the beginning of line
   (defun ckhai-little-character-insert-fun()

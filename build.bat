@@ -32,7 +32,7 @@ rem Let alone the hot Loading code later
 rem cl /LD ..\win32Game.cpp ..\main.cpp %COMPILE_FLAG% %DIRECTIVES_FLAG%  -I%_include% -I%glad_src% -link %LIB_% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /PDB:%PDB_name% %EXPORT_% /DEBUG/OUT:%dll_name%
 
 cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% /LIBPATH:%ASSIMP_LIB% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006
-/subsystem:console
+/subsystem:consolew
 rem if %ERRORLEVEL% EQU 0 (
 rem    @echo Announce: " compilation succeeded (^ w ^) "
 rem ) else (
