@@ -1,0 +1,24 @@
+
+[
+  {
+    "directory": "w:/",
+    "command": "cl /std:c++20 /EHsc /Zi /FC /Iinclude /I../include/glad /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /DDEBUG /c src/animation.cpp",
+  { ... "file":src/animation.cpp },
+  { ... "file":src/animator.cpp  },
+  { ... "file":src/Bone.cpp      },
+  { ... "file":src/B_shader.cpp  },
+  { ... "file":src/Camera.cpp    },
+  { ... "file":src/C_Mesh.cpp    },
+  { ... "file":src/C_Model.cpp   },
+  { ... "file":src/gl.c          },
+  { ... "file":src/glad.c        },
+  { ... "file":src/glad_wgl.c    },
+  { ... "file":src/handmade.cpp  },
+  { ... "file":src/main.cpp      },
+  { ... "file":src/SoundMaker.cp },
+  { ... "file":src/testOpenGL.cp },
+  { ... "file":src/Tile.cpp      },
+  { ... "file":src/wgl.c         },
+  { ... "file":src/win32Game.cpp },
+  }
+]
