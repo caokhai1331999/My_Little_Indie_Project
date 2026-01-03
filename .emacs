@@ -181,11 +181,15 @@
     (if (transient-mark-mode) (transient-mark-mode 'toggle)(message "reset trasient mark"))
     )
 
+  ;; LSP part
 (add-hook 'c-mode-hook #'lsp-deferred)
 (add-hook 'c++-mode-hook #'lsp-deferred)
 (use-package company
   :hook (lsp-mode . company-mode))
 (setq lsp-diagnostics-provider :flymake)
+
+(setq projectile-project-root-files-top-down-recurring
+      '(".git" ".clangd" "compile_commands.json"))
 
 (setq lsp-project-root-functions
       '(lsp--suggest-project-root))
