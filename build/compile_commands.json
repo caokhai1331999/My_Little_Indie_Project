@@ -1,0 +1,134 @@
+
+[
+  {
+    "directory": "w:/build",
+    "command": "cl /FC /Zi /EHsc /std:c++20 /DDEBUG=1 /DINTERNAL=1 /I../include /I../include/glad /I\"C:/Users/klove/Downloads/External_Libraries/glfw/glfw-3.4.bin.WIN64/include\" /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /c ../src/main.cpp",
+    "file": "w:/src/main.cpp"
+  }
+]
+
+
+[
+  {
+    "directory": "w:/build",
+    "command": "cl /FC /Zi /EHsc /std:c++20 /DDEBUG=1 /DINTERNAL=1 /I../include /I../include/glad /I\"C:/Users/klove/Downloads/External_Libraries/glfw/glfw-3.4.bin.WIN64/include\" /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /c ../src/animation.cpp",
+    "file": "w:/src/animator.cpp"
+  }
+]
+
+
+[
+  {
+    "directory": "w:/build",
+    "command": "cl /FC /Zi /EHsc /std:c++20 /DDEBUG=1 /DINTERNAL=1 /I../include /I../include/glad /I\"C:/Users/klove/Downloads/External_Libraries/glfw/glfw-3.4.bin.WIN64/include\" /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /c ../src/Bone.cpp",
+    "file": "w:/src/Bone.cpp"
+  }
+]
+
+
+[
+  {
+    "directory": "w:/build",
+    "command": "cl /FC /Zi /EHsc /std:c++20 /DDEBUG=1 /DINTERNAL=1 /I../include /I../include/glad /I\"C:/Users/klove/Downloads/External_Libraries/glfw/glfw-3.4.bin.WIN64/include\" /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /c ../src/B_shader.cpp",
+    "file": "w:/src/B_shader.cpp"
+  }
+]
+
+
+[
+  {
+    "directory": "w:/build",
+    "command": "cl /FC /Zi /EHsc /std:c++20 /DDEBUG=1 /DINTERNAL=1 /I../include /I../include/glad /I\"C:/Users/klove/Downloads/External_Libraries/glfw/glfw-3.4.bin.WIN64/include\" /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /c ../src/Camera.cpp",
+    "file": "w:/src/Camera.cpp"
+  }
+]
+
+
+[
+  {
+    "directory": "w:/build",
+    "command": "cl /FC /Zi /EHsc /std:c++20 /DDEBUG=1 /DINTERNAL=1 /I../include /I../include/glad /I\"C:/Users/klove/Downloads/External_Libraries/glfw/glfw-3.4.bin.WIN64/include\" /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /c ../src/C_Mesh.cpp",
+    "file": "w:/src/C_Mesh.cpp"
+  }
+]
+
+
+[
+  {
+    "directory": "w:/build",
+    "command": "cl /FC /Zi /EHsc /std:c++20 /DDEBUG=1 /DINTERNAL=1 /I../include /I../include/glad /I\"C:/Users/klove/Downloads/External_Libraries/glfw/glfw-3.4.bin.WIN64/include\" /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /c ../src/C_Model.cpp",
+    "file": "w:/src/C_Model.cpp"
+  }
+]
+
+
+[
+  {
+    "directory": "w:/build",
+    "command": "cl /FC /Zi /EHsc /std:c++20 /DDEBUG=1 /DINTERNAL=1 /I../include /I../include/glad /I\"C:/Users/klove/Downloads/External_Libraries/glfw/glfw-3.4.bin.WIN64/include\" /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /c ../src/gl.c",
+    "file": "w:/src/gl.c"
+  }
+]
+
+
+[
+  {
+    "directory": "w:/build",
+    "command": "cl /FC /Zi /EHsc /std:c++20 /DDEBUG=1 /DINTERNAL=1 /I../include /I../include/glad /I\"C:/Users/klove/Downloads/External_Libraries/glfw/glfw-3.4.bin.WIN64/include\" /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /c ../src/glad.c",
+    "file": "w:/src/glad.c"
+  }
+]
+
+
+[
+  {
+    "directory": "w:/build",
+    "command": "cl /FC /Zi /EHsc /std:c++20 /DDEBUG=1 /DINTERNAL=1 /I../include /I../include/glad /I\"C:/Users/klove/Downloads/External_Libraries/glfw/glfw-3.4.bin.WIN64/include\" /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /c ../src/glad_wgl.c",
+    "file": "w:/src/glad_wgl.c"
+  }
+]
+
+
+[
+  {
+    "directory": "w:/build",
+    "command": "cl /FC /Zi /EHsc /std:c++20 /DDEBUG=1 /DINTERNAL=1 /I../include /I../include/glad /I\"C:/Users/klove/Downloads/External_Libraries/glfw/glfw-3.4.bin.WIN64/include\" /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /c ../src/handmade.cpp",
+    "file": "w:/src/handmade.cpp"
+  }
+]
+
+
+[
+  {
+    "directory": "w:/build",
+    "command": "cl /FC /Zi /EHsc /std:c++20 /DDEBUG=1 /DINTERNAL=1 /I../include /I../include/glad /I\"C:/Users/klove/Downloads/External_Libraries/glfw/glfw-3.4.bin.WIN64/include\" /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /c ../src/SoundMaker.cpp",
+    "file": "w:/src/SoundMaker.cpp"
+  }
+]
+
+
+[
+  {
+    "directory": "w:/build",
+    "command": "cl /FC /Zi /EHsc /std:c++20 /DDEBUG=1 /DINTERNAL=1 /I../include /I../include/glad /I\"C:/Users/klove/Downloads/External_Libraries/glfw/glfw-3.4.bin.WIN64/include\" /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /c ../src/Tile.cpp",
+    "file": "w:/src/Tile.cpp"
+  }
+]
+
+
+[
+  {
+    "directory": "w:/build",
+    "command": "cl /FC /Zi /EHsc /std:c++20 /DDEBUG=1 /DINTERNAL=1 /I../include /I../include/glad /I\"C:/Users/klove/Downloads/External_Libraries/glfw/glfw-3.4.bin.WIN64/include\" /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /c ../src/wgl.c",
+    "file": "w:/src/wgl.c"
+  }
+]
+
+
+[
+  {
+    "directory": "w:/build",
+    "command": "cl /FC /Zi /EHsc /std:c++20 /DDEBUG=1 /DINTERNAL=1 /I../include /I../include/glad /I\"C:/Users/klove/Downloads/External_Libraries/glfw/glfw-3.4.bin.WIN64/include\" /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /c ../src/win32Game.cpp",
+    "file": "w:/src/win32Game.cpp"
+  }
+]
