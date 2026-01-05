@@ -296,6 +296,7 @@
 ;;set up lsp
 (add-hook 'c-mode-hook #'lsp-deferred)
 (add-hook 'c++-mode-hook #'lsp-deferred)
+
 (setq lsp-clients-clangd-executable "clangd")
 
 (use-package company
@@ -305,7 +306,15 @@
       '(".git" ".clangd" "compile_commands.json"))
 
 (setq lsp-auto-guess-root t)
+(add-hook 'c-mode-hook
+          (lambda ()
+            (setq-local flymake-diagnostic-functions nil)))
+
+(add-hook 'c++-mode-hook
+          (lambda ()
+            (setq-local flymake-diagnostic-functions nil)))
 (setq lsp-prefer-flymake nil)
+
 ;;Hide Tools bar
 (tool-bar-mode 0)
 

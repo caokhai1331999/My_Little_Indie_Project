@@ -31,7 +31,7 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4 pare
     Bone* bone = m_currentAnimation->FindBone(nodeName);
 
     if(bone){
-        bone->Update(m_CurrentTime);
+        bone->Update(m_currentTime);
         nodeTransform = bone->GetLocalTransformation();
     }
     
@@ -45,7 +45,7 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4 pare
         finalBoneMatrices[index] = globalTransform * offset;
     }
 
-    for(int i = 0; i < node->ChildrenCount; i++){
+    for(int i = 0; i < node->childrenCount; i++){
         // Global Transform now is used as parent transform
         Animator::calculateBoneTransform(&node->children[i], globalTransform);
     }
