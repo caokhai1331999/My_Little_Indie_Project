@@ -1,15 +1,11 @@
 ;Melpa package function
 (require 'package)
-(add-to-list 'package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
-				 ("melpa" . "https://melpa.org/packages/")
-				 ("melpa-stable" . "https://stable.melpa.org/packages/")))
-;;(setq package-archives
-      ;;'(("gnu"   . "https://elpa.gnu.org/packages/")
-	;;("melpa" . "https://melpa.org/packages/")
-	;;("melpa-stable" . "https://stable.melpa.org/packages/")))
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 ;; Comment/uncomment this line to enable MELPA Stable if desired.
 ;; See `package-archive-priorities` and `package-pinned-packages`.
 ;; Most users will not need or want to do this.
+;;(add-to-list 'package-archives
+;;'("melpa-stable" . "http://stable.melpa.org/packages/") t)
 
 (package-initialize)
 
@@ -181,22 +177,6 @@
     (if (transient-mark-mode) (transient-mark-mode 'toggle)(message "reset trasient mark"))
     )
 
-  ;; LSP part
-(add-hook 'c-mode-hook #'lsp-deferred)
-(add-hook 'c++-mode-hook #'lsp-deferred)
-(use-package company
-  :hook (lsp-mode . company-mode))
-(setq lsp-diagnostics-provider :flymake)
-
-(setq projectile-project-root-files-top-down-recurring
-      '(".git" ".clangd" "compile_commands.json"))
-
-(setq lsp-project-root-functions
-      '(lsp--suggest-project-root))
-
-(setq lsp-auto-guess-root t)
-(setq lsp-ask-about-project-root nil)
-  
 					;Handle a little ; in the end and // at the beginning of line
   (defun ckhai-little-character-insert-fun()
     (interactive)
@@ -807,81 +787,68 @@
    [default default default italic underline success warning error])
  '(ansi-color-names-vector
    ["#2d3743" "#ff4242" "#74af68" "#dbdb95" "#34cae2" "#008b8b" "#00ede1" "#e1e1e0"])
- '(auto-save-default nil)
- '(auto-save-interval 0)
- '(auto-save-list-file-prefix nil)
- '(auto-save-timeout 0)
- '(auto-show-mode t t)
  '(beacon-color "#cc6666")
  '(company-quickhelp-color-background "#4F4F4F")
  '(company-quickhelp-color-foreground "#DCDCCC")
- '(compilation-message-face 'default)
+ '(compilation-message-face (quote default))
  '(cua-global-mark-cursor-color "#3cafa5")
  '(cua-normal-cursor-color "#8d9fa1")
  '(cua-overwrite-cursor-color "#c49619")
  '(cua-read-only-cursor-color "#93a61a")
- '(custom-enabled-themes '(monokai))
+ '(custom-enabled-themes (quote (monokai)))
  '(custom-safe-themes
-   '("8dbbcb2b7ea7e7466ef575b60a92078359ac260c91fe908685b3983ab8e20e3f" "443e2c3c4dd44510f0ea8247b438e834188dc1c6fb80785d83ad3628eadf9294" "56044c5a9cc45b6ec45c0eb28df100d3f0a576f18eef33ff8ff5d32bac2d9700" "4fda8201465755b403a33e385cf0f75eeec31ca8893199266a6aeccb4adedfa4" "60ada0ff6b91687f1a04cc17ad04119e59a7542644c7c59fc135909499400ab8" "00cec71d41047ebabeb310a325c365d5bc4b7fab0a681a2a108d32fb161b4006" "3fe1ebb870cc8a28e69763dde7b08c0f6b7e71cc310ffc3394622e5df6e4f0da" "b54376ec363568656d54578d28b95382854f62b74c32077821fdfd604268616a" "b99e334a4019a2caa71e1d6445fc346c6f074a05fcbb989800ecbe54474ae1b0" "a9abd706a4183711ffcca0d6da3808ec0f59be0e8336868669dc3b10381afb6f" "8d8207a39e18e2cc95ebddf62f841442d36fcba01a2a9451773d4ed30b632443" "a138ec18a6b926ea9d66e61aac28f5ce99739cf38566876dc31e29ec8757f6e2" "2dd4951e967990396142ec54d376cced3f135810b2b69920e77103e0bcedfba9" "6945dadc749ac5cbd47012cad836f92aea9ebec9f504d32fe89a956260773ca4" "7a424478cb77a96af2c0f50cfb4e2a88647b3ccca225f8c650ed45b7f50d9525" "2e05569868dc11a52b08926b4c1a27da77580daa9321773d92822f7a639956ce" "be84a2e5c70f991051d4aaf0f049fa11c172e5d784727e0b525565bb1533ec78" "fee7287586b17efbfda432f05539b58e86e059e78006ce9237b8732fde991b4c" "7f1d414afda803f3244c6fb4c2c64bea44dac040ed3731ec9d75275b9e831fe5" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "82d2cac368ccdec2fcc7573f24c3f79654b78bf133096f9b40c20d97ec1d8016" "f5b6be56c9de9fd8bdd42e0c05fecb002dedb8f48a5f00e769370e4517dde0e8" "57a29645c35ae5ce1660d5987d3da5869b048477a7801ce7ab57bfb25ce12d3e" "833ddce3314a4e28411edf3c6efde468f6f2616fc31e17a62587d6a9255f4633" "d89e15a34261019eec9072575d8a924185c27d3da64899905f8548cbd9491a36" default))
+   (quote
+    ("443e2c3c4dd44510f0ea8247b438e834188dc1c6fb80785d83ad3628eadf9294" "56044c5a9cc45b6ec45c0eb28df100d3f0a576f18eef33ff8ff5d32bac2d9700" "4fda8201465755b403a33e385cf0f75eeec31ca8893199266a6aeccb4adedfa4" "60ada0ff6b91687f1a04cc17ad04119e59a7542644c7c59fc135909499400ab8" "00cec71d41047ebabeb310a325c365d5bc4b7fab0a681a2a108d32fb161b4006" "3fe1ebb870cc8a28e69763dde7b08c0f6b7e71cc310ffc3394622e5df6e4f0da" "b54376ec363568656d54578d28b95382854f62b74c32077821fdfd604268616a" "b99e334a4019a2caa71e1d6445fc346c6f074a05fcbb989800ecbe54474ae1b0" "a9abd706a4183711ffcca0d6da3808ec0f59be0e8336868669dc3b10381afb6f" "8d8207a39e18e2cc95ebddf62f841442d36fcba01a2a9451773d4ed30b632443" "a138ec18a6b926ea9d66e61aac28f5ce99739cf38566876dc31e29ec8757f6e2" "2dd4951e967990396142ec54d376cced3f135810b2b69920e77103e0bcedfba9" "6945dadc749ac5cbd47012cad836f92aea9ebec9f504d32fe89a956260773ca4" "7a424478cb77a96af2c0f50cfb4e2a88647b3ccca225f8c650ed45b7f50d9525" "2e05569868dc11a52b08926b4c1a27da77580daa9321773d92822f7a639956ce" "be84a2e5c70f991051d4aaf0f049fa11c172e5d784727e0b525565bb1533ec78" "fee7287586b17efbfda432f05539b58e86e059e78006ce9237b8732fde991b4c" "7f1d414afda803f3244c6fb4c2c64bea44dac040ed3731ec9d75275b9e831fe5" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "82d2cac368ccdec2fcc7573f24c3f79654b78bf133096f9b40c20d97ec1d8016" "f5b6be56c9de9fd8bdd42e0c05fecb002dedb8f48a5f00e769370e4517dde0e8" "57a29645c35ae5ce1660d5987d3da5869b048477a7801ce7ab57bfb25ce12d3e" "833ddce3314a4e28411edf3c6efde468f6f2616fc31e17a62587d6a9255f4633" "d89e15a34261019eec9072575d8a924185c27d3da64899905f8548cbd9491a36" default)))
  '(debug-on-error t)
- '(delete-auto-save-files nil)
- '(delete-old-versions 'other)
- '(electric-pair-mode 1)
  '(exwm-floating-border-color "#262626")
  '(fci-rule-color "#383838")
- '(flycheck-color-mode-line-face-to-color 'mode-line-buffer-id)
- '(frame-background-mode 'dark)
- '(global-hl-line-mode 1)
- '(highlight-changes-colors '("#e2468f" "#7a7ed2"))
+ '(flycheck-color-mode-line-face-to-color (quote mode-line-buffer-id))
+ '(frame-background-mode (quote dark))
+ '(highlight-changes-colors (quote ("#e2468f" "#7a7ed2")))
  '(highlight-symbol-colors
-   '("#3c6f408d329d" "#0c4a45f64ce3" "#486e33913532" "#1fac3bea568d" "#2ec943ac3324" "#449935a7314d" "#0b04411b5986"))
+   (quote
+    ("#3c6f408d329d" "#0c4a45f64ce3" "#486e33913532" "#1fac3bea568d" "#2ec943ac3324" "#449935a7314d" "#0b04411b5986")))
  '(highlight-symbol-foreground-color "#9eacac")
  '(highlight-tail-colors
-   '(("#01323d" . 0)
+   (quote
+    (("#01323d" . 0)
      ("#687f00" . 20)
      ("#008981" . 30)
      ("#0069b0" . 50)
      ("#936d00" . 60)
      ("#a72e01" . 70)
      ("#a81761" . 85)
-     ("#01323d" . 100)))
+     ("#01323d" . 100))))
  '(hl-bg-colors
-   '("#936d00" "#a72e01" "#ae1212" "#a81761" "#3548a2" "#0069b0" "#008981" "#687f00"))
+   (quote
+    ("#936d00" "#a72e01" "#ae1212" "#a81761" "#3548a2" "#0069b0" "#008981" "#687f00")))
  '(hl-fg-colors
-   '("#002732" "#002732" "#002732" "#002732" "#002732" "#002732" "#002732" "#002732"))
- '(hl-paren-colors '("#3cafa5" "#c49619" "#3c98e0" "#7a7ed2" "#93a61a"))
- '(imenu-auto-rescan-maxout 500000)
- '(imenu-auto-rescant t)
+   (quote
+    ("#002732" "#002732" "#002732" "#002732" "#002732" "#002732" "#002732" "#002732")))
+ '(hl-paren-colors (quote ("#3cafa5" "#c49619" "#3c98e0" "#7a7ed2" "#93a61a")))
  '(jdee-db-active-breakpoint-face-colors (cons "#000000" "#8CD0D3"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#000000" "#7F9F7F"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#000000" "#494949"))
- '(kept-new-versions 5)
- '(kept-old-versions 5)
  '(lsp-ui-doc-border "#9eacac")
  '(magit-diff-use-overlays nil)
- '(make-backup-file-name-function 'ignore)
- '(make-backup-files nil)
- '(mouse-wheel-follow-mouse nil)
- '(mouse-wheel-progressive-speed nil)
- '(mouse-wheel-scroll-amount '(12))
  '(nrepl-message-colors
-   '("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3"))
+   (quote
+    ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
  '(objed-cursor-color "#CC9393")
- '(package-selected-packages '(lsp-mode circadian doom-themes solarized-theme))
- '(pdf-view-midnight-colors '("#DCDCCC" . "#383838"))
+ '(package-selected-packages (quote (circadian doom-themes solarized-theme)))
+ '(pdf-view-midnight-colors (quote ("#DCDCCC" . "#383838")))
  '(pos-tip-background-color "#01323d")
  '(pos-tip-foreground-color "#9eacac")
  '(rustic-ansi-faces
    ["#3F3F3F" "#CC9393" "#7F9F7F" "#F0DFAF" "#8CD0D3" "#DC8CC3" "#93E0E3" "#DCDCDC"])
- '(setq electric-pair-preserve-balance)
  '(smartrep-mode-line-active-bg (solarized-color-blend "#93a61a" "#01323d" 0.2))
  '(term-default-bg-color "#002732")
  '(term-default-fg-color "#8d9fa1")
- '(toggle-debug-on-error nil)
  '(vc-annotate-background "#2B2B2B")
  '(vc-annotate-background-mode nil)
  '(vc-annotate-color-map
-   '((20 . "#BC8383")
+   (quote
+    ((20 . "#BC8383")
      (40 . "#CC9393")
      (60 . "#DFAF8F")
      (80 . "#D0BF8F")
@@ -898,28 +865,57 @@
      (300 . "#7CB8BB")
      (320 . "#8CD0D3")
      (340 . "#94BFF3")
-     (360 . "#DC8CC3")))
+     (360 . "#DC8CC3"))))
  '(vc-annotate-very-old-color "#DC8CC3")
- '(version-control nil)
  '(weechat-color-list
-   '(unspecified "#002732" "#01323d" "#ae1212" "#ec423a" "#687f00" "#93a61a" "#936d00" "#c49619" "#0069b0" "#3c98e0" "#a81761" "#e2468f" "#008981" "#3cafa5" "#8d9fa1" "#60767e"))
+   (quote
+    (unspecified "#002732" "#01323d" "#ae1212" "#ec423a" "#687f00" "#93a61a" "#936d00" "#c49619" "#0069b0" "#3c98e0" "#a81761" "#e2468f" "#008981" "#3cafa5" "#8d9fa1" "#60767e")))
  '(window-divider-mode nil)
  '(xterm-color-names
    ["#01323d" "#ec423a" "#93a61a" "#c49619" "#3c98e0" "#e2468f" "#3cafa5" "#faf3e0"])
  '(xterm-color-names-bright
-   ["#002732" "#db5823" "#62787f" "#60767e" "#8d9fa1" "#7a7ed2" "#9eacac" "#ffffee"]))
+   ["#002732" "#db5823" "#62787f" "#60767e" "#8d9fa1" "#7a7ed2" "#9eacac" "#ffffee"])
+ 
+ ;;Auto Complete parenthesises
+ '(electric-pair-mode 1)
+ '(setq electric-pair-preserve-balance nil)
+
+ ;;Auto highlight line
+ '(global-hl-line-mode 1)
+
+ ;;Start with debug init
+ '(toggle-debug-on-error)
+
+ '(auto-save-default nil)
+ '(auto-save-interval 0)
+ '(auto-save-list-file-prefix nil)
+ '(auto-save-timeout 0)
+ '(auto-show-mode t t)
+ '(delete-auto-save-files nil)
+ '(delete-old-versions (quote other))
+ '(imenu-auto-rescant t)
+ '(imenu-auto-rescan-maxout 500000)
+ '(kept-new-versions 5)
+ '(kept-old-versions 5)
+ '(make-backup-file-name-function (quote ignore))
+ '(make-backup-files nil)
+ '(mouse-wheel-follow-mouse nil)
+ '(mouse-wheel-progressive-speed nil)
+ '(mouse-wheel-scroll-amount (quote (12)))
+ '(version-control nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(menu ((t (:background "#2e2e2e" :foreground "#FFB2F9")))))
+ )
 
 ;;Trigger circadian-setup
 (circadian-setup)
 
 ;;Menu bar custom and title bar
-
+(custom-set-faces
+ `(menu ((t (:background "#2e2e2e" :foreground "#FFB2F9")))))
 
 ;; Enable transparent scrollbar
 ;;(set-face-attribute 'vertical-scroll-bar nil :background "none")
