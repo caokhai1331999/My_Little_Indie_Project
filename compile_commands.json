@@ -2,7 +2,7 @@
 [
   {
     "directory": "w:/",
-    "command": "cl /std:c++20 /EHsc /Zi /FC /Iinclude /I../include/glad /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /DDEBUG /c src/animation.cpp",
+      "command": "cl /std:c++20 /EHsc /Zi /FC /Iinclude /I../include/glad /I\"C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/assimp/include\" /DDEBUG /c src/main.cpp",
   { ... "file":src/animation.cpp },
   { ... "file":src/animator.cpp  },
   { ... "file":src/Bone.cpp      },

@@ -17,7 +17,7 @@ Bone* Animation::FindBone(const std::string& name){
     else {return &(*iter);}
 };
 
-void Animation::ReadMissingBone(const aiAnimation* animation, const Model_* model){
+void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
     int size = animation->mNumChannels;
 // Get these properties from model var
     std::map<std::string, Bone_Info> boneInfoMap = model->GetBoneInfoMap();
