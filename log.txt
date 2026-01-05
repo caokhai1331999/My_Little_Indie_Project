@@ -718,6 +718,12 @@ TODO: install emacs 28.1 in order to use lsp-mode
       install clangd or use clangd server
       all set up is done by .emacs
 
+<<<<<<< HEAD
 ---------------- Sat, 03 Jan 26: 04:44PM
 
 TODO: backup w:clangd and build\compile_commands.json to github
+=======
+---------------- Mon, 05 Jan 26: 03:14PM
+
+success install lsp and company
+>>>>>>> fd202e9 (update)

@@ -63,7 +63,7 @@ void processNode(Model_* model, aiNode* node, const aiScene* scene){
     }
 }
 
-Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
+Mesh Model_::processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
 
     vector<unsigned int>indices;
     vector<Texture>textures;
