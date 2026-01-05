@@ -40,11 +40,17 @@
 ;;set up lsp
 (add-hook 'c-mode-hook #'lsp-deferred)
 (add-hook 'c++-mode-hook #'lsp-deferred)
+<<<<<<< HEAD:emacs.txt
+=======
+(use-package company
+  :hook (lsp-mode . company-mode))
+>>>>>>> c9b6348 (latest update):.emacs
+
+(setq projectile-project-root-files-top-down-recurring
+      '(".git" ".clangd" "compile_commands.json"))
 
 (setq lsp-auto-guess-root t)
 (setq lsp-prefer-flymake nil)
-(setq projectile-project-root-files-top-down-recurring
-      '(".git" ".clangd" "compile_commands.json"))
 
 
 ;;(setq grep-program "findstr")
@@ -795,7 +801,11 @@
  '(ansi-color-faces-vector
    [default default default italic underline success warning error])
  '(ansi-color-names-vector
+<<<<<<< HEAD:emacs.txt
    ["#2d3743" "#ff4242" "#74af68" "#dbdb95" "#34cae2" "#008b8b" "#00ede1" "#e1e1e0"])
+=======
+   ["#ece3cc" "#d2212d" "#489100" "#ad8900" "#0072d4" "#ca4898" "#009c8f" "#fbf3db"])
+>>>>>>> c9b6348 (latest update):.emacs
  '(auto-save-default nil)
  '(auto-save-interval 0)
  '(auto-save-list-file-prefix nil)
@@ -856,7 +866,12 @@
  '(nrepl-message-colors
    '("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3"))
  '(objed-cursor-color "#CC9393")
+<<<<<<< HEAD:emacs.txt
  '(package-selected-packages '(circadian doom-themes solarized-theme))
+=======
+ '(package-selected-packages
+   '(lsp-dart spinner lsp-mode circadian doom-themes solarized-theme))
+>>>>>>> c9b6348 (latest update):.emacs
  '(pdf-view-midnight-colors '("#DCDCCC" . "#383838"))
  '(pos-tip-background-color "#01323d")
  '(pos-tip-foreground-color "#9eacac")
