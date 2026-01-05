@@ -717,3 +717,7 @@ I still have a long way to fix these bug
 TODO: install emacs 28.1 in order to use lsp-mode
       install clangd or use clangd server
       all set up is done by .emacs
+
+---------------- Sat, 03 Jan 26: 04:44PM
+
+TODO: backup w:clangd and build\compile_commands.json to github
