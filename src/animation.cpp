@@ -10,9 +10,11 @@
 
 Bone* Animation::FindBone(const std::string& name){
     auto iter = find_if(m_Bones.begin(), m_Bones.end(), [&](const Bone& Bone){return Bone.GetBoneName() == name;});//lambda to findout address of bone that have the same name of given name
-    if(iter == m_Bones.end())return nullptr;
+    if(iter == m_Bones.end()){
+        return nullptr;
+    }
     //return address of member that iter is pointing to
-    else return &(*iter);
+    else {return &(*iter);}
 };
 
 void Animation::ReadMissingBone(const aiAnimation* animation, const Model* model){
@@ -28,10 +30,10 @@ void Animation::ReadMissingBone(const aiAnimation* animation, const Model* model
         std::string boneName = animation->mNodeName.data;
 
         if(boneInfoMap.find(boneName) == boneInfoMap.end()){
-            boneInfoMap[boneName].id = boneCount;
+            boneInfoMap[boneName].m_ID = boneCount;
             boneCount++;
         }
-        m_Bones.push_back(Bone(channel->mNodeName.data, boneInfoMap[channel->mNodeName.data].id, channel));
+        m_Bones.push_back(Bone(channel->mNodeName.data, boneInfoMap[channel->mNodeName.data].m_ID, channel));
     }
     m_BoneInfoMap = boneInfoMap;
 };
@@ -39,12 +41,12 @@ void Animation::ReadMissingBone(const aiAnimation* animation, const Model* model
 void Animation::ReadHierarchyData(const AssimpNodeData& dest, const aiNode* src){
     assert(src);
 
-    Dest.name = src->mName.Data;
-    Dest.transformation = AssimpGLMHelpers::ConvertMatrixToGLMFormat(src->mTransformation);
-    Dest.childrenCount = src->mChildrenCount;
+    dest.name = src->mName.data;
+    dest.transformation = AssimpGLMHelpers::ConvertMatrixToGLMFormat(src->mTransformation);
+    dest.childrenCount = src->mNumChildren;
 
-    for(int i = 0; i < src->mChildrenCount; i++){
-        AssimpNodeData child = new AssimpNodeData;
+    for(int i = 0; i < src->mNumChildren; i++){
+        AssimpNodeData child;
         ReadHierarchyData(child, src->mChildren[i]);
         dest.children.push_back(child);
     };
