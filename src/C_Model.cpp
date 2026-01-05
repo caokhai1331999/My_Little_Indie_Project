@@ -41,7 +41,7 @@ void loadModel_(Model_* model, string path){
         cout<<"ERROR::ASSIMP::"<<importer.GetErrorString()<<endl;
     }
 
-    model->directory = path.substr(0, path.find_last_of('/'));
+    model->GetModelDir() = &path.substr(0, path.find_last_of('/'));
 // NODE
     processNode(model, scene->mRootNode, scene);
 // MESH
@@ -356,7 +356,11 @@ void Model_::SetVertexBoneData(Vertex* vertex, int boneID, float weight){
     }
 };
 
-void Model_::ExtractBoneWeightForVertices(std::vector& vertice, aiMesh* mesh, const aiScene* scene){
+void Model_::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene){
+
+    auto& boneInfoMap = m_BoneInfoMap;
+    int& boneCount = m_BoneCounter;
+
     for(int boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++){
         int boneID = -1;
         //What is mName
@@ -369,7 +373,7 @@ void Model_::ExtractBoneWeightForVertices(std::vector& vertice, aiMesh* mesh, co
             mBoneInfoMap[boneName] = newboneinfo;
 
             boneID = mBoneCounter;
-            mBoneCounter++;
+            boneCount++;
         }else{
             boneID = mBoneInfoMap[boneName].id;
         }

@@ -13,9 +13,10 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "assimp_glm_helpers.h"
 #include "C_Mesh.h"
 
-struct Model_{
+class Model_{
 private:
     // Model data
     vector<Mesh>meshes;
@@ -30,6 +31,13 @@ private:
 public:
     void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
     void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
+
+    string* GetModelDir(){return &directory;};
+// About skeletal animation
+    std::map<std::string, Bone_Info>*GetBoneInfoMap(Model_* model){return model->m_BoneInfoMap;}
+    int GetBoneCount(Model_* model){
+        return model->mBoneCounter;
+    };
 };
 
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);
@@ -38,12 +46,6 @@ void loadModel_(Model_*model, string path);
 void processNode(Model_* model, aiNode* node, const aiScene* scene);
 Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene);
 vector <Texture>loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene);
-
-// About skeletal animation
-std::map<std::string, Bone_Info>*GetBoneInfoMap(Model_* model){return model->m_BoneInfoMap;}
-int GetBoneCount(Model_* model){
-    return model->mBoneCounter;
-};
 void SetVertexBoneDataToDefault(Vertex* vertex);
 
 void Draw(Mesh* mesh = nullptr, GLuint* programID = nullptr);

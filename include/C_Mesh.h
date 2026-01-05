@@ -57,10 +57,10 @@ struct Vertex {
 // Data in bone weight[]
 struct Bone_Info{
     // ID
-    unsigned int vertexID;
+    unsigned int id;
 
     /*offset matrix which transform vertex from model space to bone space*/
-    glm::mat4 offsetMatrix;
+    glm::mat4 offset;
 };
 
 struct Texture{

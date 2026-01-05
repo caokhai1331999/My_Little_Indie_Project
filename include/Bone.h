@@ -1,4 +1,4 @@
-#if !defined(ANIMATION_H)
+#if !defined(BONE_H)
 /* ========================================================================
    $File: $
    $Date: $
@@ -6,14 +6,21 @@
    $Creator: Cao Khai(Casey's disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
+
+/*For Bone*/
+#include <list>
 #include <sstream>
 #include <map>
 #include <vector>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include <assimp_glm_helpers.h>
 
-#include "C_Mesh.h"
-#include "Bone.h"
 #include "C_Model.h"
 
 struct KeyPosition{
@@ -30,6 +37,7 @@ struct KeyScale{
     glm::vec3 Scale;
     float timestamp;
 };
+
 
 struct AssimpNodeData{
     glm::mat4 transformation;
@@ -99,7 +107,7 @@ private:
         /* Interpolate b/w translation, rotations and scalings based on the current time and prepare for the final transform matrices by combining all key transformation*/
 public:
     glm::mat4 GetLocalTransformation(){return m_LocalTransform;};
-        std::string& GetBoneName(){return m_Name;};
+        std::string GetBoneName(){return m_Name;};
     int GetBoneID(){return m_ID;};
         void Update(float animationTime);
         /*Return current index on mKeyPositions and interpolate it based on current animation time*/
@@ -115,68 +123,6 @@ public:
         glm::mat4 InterpolateRotation(float animationTime = 0.0f);        
 };
 
-class Animation{
-public:
-    Animation() = default;
 
-    Animation(char* animationPath = nullptr, Model_* model = nullptr){
-        // assert throw out the error when 0 is the value
-        Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
-        // Still don't understand this part
-        assert(scene && scene->mRootNode);
-        auto animation = scene->mAnimations[0];
-        m_Duration = animation->m_Duration;
-        m_TicksPerSecond = animation->mTicksPerSecond;
-        ReadHierarchyData(m_RootNode, scene->mRootNode);
-        ReadMissingBone(animation, *model);
-    };
-
-    ~Animation(){};
-
-
-    
-    inline float GetTicksPerSecond(){return m_TicksPerSecond;};
-    inline float GetDuration(){return m_Duration;};
-    inline const std::map<std::string, Bone_Info>& GetBoneIDMap(){return m_Bone_InfoMap;};
-    
-// Functions
-    void ConstructBone(); 
-    void Update();
-/*For interpolation each key then the whole*/
-
-    // Get normalized value for Lerp and Slerp
-    float GetScaleFactor(float animationTime, float lastkeyTime, float nextkeyTime);
-
-// Part that finish the animation process
-    Bone* FindBone(const std::string& name);
-    void ReadMissingBone(const aiAnimation* animation, const Model_* model);
-    void ReadHierarchyData(AssimpNodeData& dest, const aiNode* src);
-
-private:
-    float m_Duration;
-    int m_TicksPerSecond;
-    std::vector<Bone> m_Bones;
-    AssimpNodeData m_RootNode;
-    std::map<std::string, Bone_Info> m_Bone_InfoMap;
-};
-
-//NOTE: Now the animator class
-
-class Animator{
-
-public:
-    void updateAnimationTime(const Animation& animation, float dt);
-    void playAnimation(Animation* pAnimation);
-    void calculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform);
-    std::vector<glm::mat4>getFinalBoneMatrices(){return finalBoneMatrices;};
-private:
-    std::vector<glm::mat4>finalBoneMatrices;
-    //Current Animation
-    Animation* m_currentAnimation;
-    float m_currentTime;
-    float m_deltaTime;
-};
-
-#define ANIMATION_H
+#define BONE_H
 #endif
