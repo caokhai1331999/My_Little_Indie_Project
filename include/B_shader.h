@@ -75,6 +75,9 @@ public:
     void setMat3(const char* name, const glm::mat3 &value);
     void setMat4(const std::string name, const glm::mat4 &value);
 
+// Return shaderID
+    GLuint getVertexShaderID(){return shaders[vertex_].GetShaderID();}; 
+    GLuint getFragmentShaderID(){return shaders[fragment_].GetShaderID();}; 
 // Use the shader
     void use();
 

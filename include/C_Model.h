@@ -9,6 +9,8 @@
 
 #define C_MODEL_H
 
+#include <map>
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -17,7 +19,8 @@
 #include "C_Mesh.h"
 
 class Model_{
-private:
+//private:
+public:
     // Model data
     vector<Mesh>meshes;
     std::string directory;
@@ -28,13 +31,12 @@ private:
     bool gammaCorrection;
     Model_(const char *path = nullptr, bool gamma = false):gammaCorrection(gamma){
     };
-public:
     void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
     void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
     Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene);
     string* GetModelDir(){return &directory;};
 // About skeletal animation
-    std::map<std::string, Bone_Info>*GetBoneInfoMap(Model_* model){return model->m_BoneInfoMap;}
+    std::map<std::string, Bone_Info>*GetBoneInfoMap(Model_* model){return model->m_BoneInfoMap;};
     int GetBoneCount(Model_* model){
         return model->mBoneCounter;
     };

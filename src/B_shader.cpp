@@ -61,9 +61,9 @@ void B_shader::loadShader(char* name, ShaderType type){
                 //First Create an empty shader object by glCreateShader 
                 // BUG here
                 if(type == vertex_){
-                    shaders[vertex_].shaderID = glCreateShader(GL_VERTEX_SHADER);
+                    ShaderID = glCreateShader(GL_VERTEX_SHADER);
                 } else {
-                    shaders[fragment_].shaderID = glCreateShader(GL_FRAGMENT_SHADER);
+                    ShaderID = glCreateShader(GL_FRAGMENT_SHADER);
                 }
 
                 // Then Sourcing it with glShaderSource
@@ -71,13 +71,13 @@ void B_shader::loadShader(char* name, ShaderType type){
                 // It just need path
                 // 2nd arg is number of shader in source, 4th is an array of string length
                 const char* CodeContent = (char* )SourceCode;
-                glShaderSource(shaderID, 1, &CodeContent, NULL);
+                glShaderSource(ShaderID, 1, &CodeContent, NULL);
                 //Next compile this shader with glCompileShader
-                glCompileShader(shaderID);
+                glCompileShader(ShaderID);
                 //Attach it(glAttachShader) with the already created(glCreateProgram) empty program
                 //Finally delete already attached shader
 
-                checkCompileErrors(shaderID, type?"Vertex":"Fragment");
+                checkCompileErrors(ShaderID, type?"Vertex":"Fragment");
                 const GLubyte* ver = glGetString(GL_VERSION);
                 if (ver)
                     printf("OpenGL version: %s\n", ver);

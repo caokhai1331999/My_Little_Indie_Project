@@ -336,9 +336,9 @@ unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bo
 }
 
 void SetVertexBoneDataToDefault(Vertex* vertex){
-    for (int i = 0; i < MAX_BONES, i++){
+    for (int i = 0; i < MAX_BONES; i++){
         //NOTE: still don't understand about this ...
-        vertex->mBoneIDs[i] = -1;
+        vertex->m_BoneIDs[i] = -1;
         vertex->m_Weights[i] = 0.0f;
     }
 };
@@ -350,7 +350,7 @@ void Model_::SetVertexBoneData(Vertex* vertex, int boneID, float weight){
     for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
         if(vertex->m_BoneIDs[i] > 0){
             vertex->m_BoneIDs[i] = boneID;
-            vertex->m_Weight[i] = weight;
+            vertex->m_Weights[i] = weight;
             break;
         }
     }
