@@ -41,7 +41,7 @@ void loadModel_(Model_* model, string path){
         cout<<"ERROR::ASSIMP::"<<importer.GetErrorString()<<endl;
     }
 
-    model->GetModelDir() = &path.substr(0, path.find_last_of('/'));
+    &model->directory = path.substr(0, path.find_last_of('/'));
 // NODE
     processNode(model, scene->mRootNode, scene);
 // MESH
@@ -55,7 +55,7 @@ void processNode(Model_* model, aiNode* node, const aiScene* scene){
     // process all the node'scene meshes (if any)
     for(unsigned int i = 0; i < node->mNumMeshes; i++){
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        model->meshes.push_back(processMesh(model, mesh, scene));
+        model->meshes.push_back(model->processMesh(model, mesh, scene));
     }
     // then do the same for each of its children
     for(unsigned int i = 0; i < node->mNumChildren; i++){
@@ -280,7 +280,7 @@ unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bo
                 img = new char;
                 // This is where thing went wrong
                 img = (char*)stbi_load_from_memory((unsigned char*)tex->pcData , size, &width, &height, &nrComponents, 0);
-                printf("image specs: w: %d, h:%d, size:%d\n", tex->mWidth, tex->mHeight, size);
+                printf("image specs: w: %d, h:%d, size:%d\n", tex->mWidth, tex->mHeight, (int)size);
 
             }else{
                 width = tex->mWidth;
@@ -336,7 +336,7 @@ unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bo
 }
 
 void SetVertexBoneDataToDefault(Vertex* vertex){
-    for (int i = 0; i < MAX_BONES; i++){
+    for (int i = 0; i < MAX_BONES_INFLUENCE; i++){
         //NOTE: still don't understand about this ...
         vertex->m_BoneIDs[i] = -1;
         vertex->m_Weights[i] = 0.0f;
@@ -368,14 +368,14 @@ void Model_::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh*
         if(m_BoneInfoMap.find(boneName) == m_BoneInfoMap.end()){
             Bone_Info newboneinfo ;
 // On the way of learning here
-            newboneinfo.id = mBoneCounter;
-            newboneinfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(mesh->mBone[boneIndex]->mOffsetMatrix);
-            mBoneInfoMap[boneName] = newboneinfo;
+            newboneinfo.id = m_BoneCounter;
+            newboneinfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
+            m_BoneInfoMap[boneName] = newboneinfo;
 
-            boneID = mBoneCounter;
+            boneID = m_BoneCounter;
             boneCount++;
         }else{
-            boneID = mBoneInfoMap[boneName].id;
+            boneID = m_BoneInfoMap[boneName].id;
         }
         assert(boneID != -1);
         //what exactly weights's type is

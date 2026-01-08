@@ -9,7 +9,7 @@
 #include <cstdlib>
 #include "SoundMaker.h"
 #include "Tile.h"
-#inlcude "animator.h"
+#include "animator.h"
 
 LRESULT CALLBACK MainWindowCallBack(
     HWND Window,
@@ -560,20 +560,22 @@ int CALLBACK WinMain
                     useProgram(ScreenBuffer.glData.ProgramIDs[0]);
                     printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[0]);
                 } else {
-                    glDebugMessageCallback(MessageCallback, 0);
-                    checkCompileErrors(basic_shader_->shaders[vertex_], "Vertex");
-                    checkCompileErrors(basic_shader_->shaders[fragment_], "Fragment");
-                    checkCompileErrors(ScreenBuffer.glData.ProgramIDs[0], "Program");
+                  glDebugMessageCallback(MessageCallback, 0);
+
+                  checkCompileErrors(                      basic_shader_->shaders[vertex_].GetShaderID(), "Vertex");
+                  checkCompileErrors(basic_shader_->shaders[fragment_].GetShaderID(), "Fragment");
+
+                         checkCompileErrors(ScreenBuffer.glData.ProgramIDs[0], "Program");
                     printf("NO program object created before\n");
                 }
 
                 if(glIsProgram(ScreenBuffer.glData.ProgramIDs[1])){
-                    basic_model_shader->use();
+                    model_shader_->use();
                     printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[1]);
                 } else {
                     glDebugMessageCallback(MessageCallback, 0);
-                    checkCompileErrors(basic_model_shader->shaders[vertex_], "Vertex");
-                    checkCompileErrors(basic_model_shader->shaders[fragment_], "Fragment");
+                    checkCompileErrors(model_shader_->shaders[vertex_], "Vertex");
+                    checkCompileErrors(model_shader_->shaders[fragment_], "Fragment");
                     checkCompileErrors(ScreenBuffer.glData.ProgramIDs[1], "Program");
                     printf("NO program object created before\n");
                 }
@@ -652,55 +654,56 @@ int CALLBACK WinMain
                 useProgram(ScreenBuffer.glData.ProgramIDs[1]);
                 //setInt(ScreenBuffer.glData.ProgramIDs[1], "material.diffuse", 0);
                 //setInt(ScreenBuffer.glData.ProgramIDs[1], "material.specular", 1);
-                setFloat(ScreenBuffer.glData.ProgramIDs[1],"material.shininess", 32.0f);
+                model_shader_->setFloat("material.shininess", 32.0f);
                 //
-                setMat4(ScreenBuffer.glData.ProgramIDs[1], "projection", BackBuffer.camera.projection);
-                setMat4(ScreenBuffer.glData.ProgramIDs[1], "view", BackBuffer.camera.view);
-                setVec3(ScreenBuffer.glData.ProgramIDs[1], "ViewPos", BackBuffer.camera.Position);
-                //setVec3(ScreenBuffer.glData.ProgramIDs[1], "lightPos", glm::vec3(4.0f, 3.0f, 0.0f));                
+                model_shader_->setMat4( "projection", BackBuffer.camera.projection);
+                model_shader_->setMat4( "view", BackBuffer.camera.view);
+                model_shader_->setVec3( "ViewPos", BackBuffer.camera.Position);
+                //model_shader_->setVec3( "lightPos", glm::vec3(4.0f, 3.0f, 0.0f));                
 
                 // directional light
-                setVec3(ScreenBuffer.glData.ProgramIDs[1],"dirLight.direction", -0.2f, -1.0f, -0.3f);
-                setVec3(ScreenBuffer.glData.ProgramIDs[1],"dirLight.ambient", 0.05f, 0.05f, 0.05f);
-                setVec3(ScreenBuffer.glData.ProgramIDs[1],"dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-                setVec3(ScreenBuffer.glData.ProgramIDs[1],"dirLight.specular", 0.5f, 0.5f, 0.5f);
+                model_shader_->setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+                model_shader_->setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+                model_shader_->setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+                model_shader_->setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
 
                 
-                //Set point light
-                setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].position", pointLightPositions[0]);
-setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
-setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
-setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].constant", 1.0f);
-setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].linearTerm", 0.09f);
-setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].quadraticTerm", 0.032f);
+                //Model_Shader_->Set point light
+                model_shader_->setVec3("pointLights[0].position", pointLightPositions[0]);
+                model_shader_->setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+                model_shader_->setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+                model_shader_->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+                model_shader_->setFloat("pointLights[0].constant", 1.0f);
+                model_shader_->setFloat("pointLights[0].linearTerm", 0.09f);
+                model_shader_->setFloat("pointLights[0].quadraticTerm", 0.032f);
 
-        // point light 2
-        setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[1].position", pointLightPositions[1]);
-        setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
-        setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
-        setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[1].specular", 1.0f, 1.0f, 1.0f);
-        setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[1].constant", 1.0f);
-        setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[1].linear", 0.09f);
-        setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[1].quadratic", 0.032f);
+                // point light 2
+                //model_shader_->setVec3("pointLights[1].position", pointLightPositions[1]);
+                //model_shader_->setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+                //model_shader_->setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
+                //model_shader_->setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+                //model_shader_->setFloat("pointLights[1].constant", 1.0f);
+                //model_shader_->setFloat("pointLights[1].linear", 0.09f);
+                //model_shader_->setFloat("pointLights[1].quadratic", 0.032f);
 
-        // point light 3
-        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[2].position", pointLightPositions[2]);
-        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
-        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
-        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[2].specular", 1.0f, 1.0f, 1.0f);
-        //setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[2].constant", 1.0f);
-        //setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[2].linear", 0.09f);
-        //setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[2].quadratic", 0.032f);
+                // point light 3
+                 //model_shader_->setVec3("pointLights[2].position", pointLightPositions[2]);
+                 //model_shader_->setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
+                 //model_shader_->setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
+                 //model_shader_->setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
+                 //model_shader_->setFloat("pointLights[2].constant", 1.0f);
+                 //model_shader_->setFloat("pointLights[2].linear", 0.09f);
+                 //model_shader_->setFloat("pointLights[2].quadratic", 0.032f);
 
-        // point light 4
-        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[3].position", pointLightPositions[3]);
-        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
-        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
-        //setVec3(ScreenBuffer.glData.ProgramIDs[1],"pointLights[3].specular", 1.0f, 1.0f, 1.0f);
-        //setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[3].constant", 1.0f);
-        //setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[3].linear", 0.09f);
-        //setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[3].quadratic", 0.032f);
+                // point light 4
+                 //model_shader_->setVec3("pointLights[3].position", pointLightPositions[3]);
+                 //model_shader_->setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
+                 //model_shader_->setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
+                 //model_shader_->setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
+                 //model_shader_->setFloat("pointLights[3].constant", 1.0f);
+                 //model_shader_->setFloat("pointLights[3].linear", 0.09f);
+                 //model_shader_->setFloat("pointLights[3].quadratic", 0.032f);
+
                 useProgram(ScreenBuffer.glData.ProgramIDs[0]);
 
                 while(GlobalRunning) {
@@ -824,7 +827,7 @@ setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].quadraticTerm", 0.032
 
                     // Update animating model based on frame time
                     // => calculate finalTransformmatrices and set to
-                    auto Transform = Animator->finalBoneMatrices;
+                    auto Transform = animator->getFinalBoneMatrices();
                     for(int i = 0; i < Tranform.size(); i++){
                         animating_shader_->setMat4("finalBoneMatrices[" + std::to_string(i) + "]", Transform[i]);
                     };
@@ -846,8 +849,8 @@ setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].quadraticTerm", 0.032
                     basic_shader_->use(ScreenBuffer.glData.ProgramIDs[0]);
                     basic_shader_->setMat4("view", BackBuffer.camera.view);
 
-                    basic_model_shader->use(ScreenBuffer.glData.ProgramIDs[1]);
-                    basic_model_shader->setMat4("view", BackBuffer.camera.view);
+                    model_shader_->use(ScreenBuffer.glData.ProgramIDs[1]);
+                    model_shader_->setMat4("view", BackBuffer.camera.view);
 
                     
                     glm::vec3 randomRotateAxis = glm::vec3(0.4f* DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2));
@@ -916,7 +919,7 @@ setFloat(ScreenBuffer.glData.ProgramIDs[1],"pointLights[0].quadraticTerm", 0.032
                     drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], BackBuffer.camera.speed, &UpdatedDegree);
 
                     //Draw the backpack
-                    basic_model_shader->use();
+                    model_shader_->use();
                     basic_shader_->setMat4("model", backpack_core);
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
                     DDraw(dancing_vampire, &ScreenBuffer.glData.ProgramIDs[1]);
