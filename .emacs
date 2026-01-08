@@ -870,7 +870,7 @@
    '("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3"))
  '(objed-cursor-color "#CC9393")
  '(package-selected-packages
-   '(company lsp-dart spinner lsp-mode circadian doom-themes solarized-theme))
+   '(monokai-theme company lsp-dart spinner lsp-mode circadian solarized-theme))
  '(pdf-view-midnight-colors '("#DCDCCC" . "#383838"))
  '(pos-tip-background-color "#01323d")
  '(pos-tip-foreground-color "#9eacac")
