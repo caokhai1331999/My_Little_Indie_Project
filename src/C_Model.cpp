@@ -41,7 +41,7 @@ void loadModel_(Model_* model, string path){
         cout<<"ERROR::ASSIMP::"<<importer.GetErrorString()<<endl;
     }
 
-    &model->directory = path.substr(0, path.find_last_of('/'));
+    model->directory = path.substr(0, path.find_last_of('/'));
 // NODE
     processNode(model, scene->mRootNode, scene);
 // MESH
@@ -336,7 +336,7 @@ unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bo
 }
 
 void SetVertexBoneDataToDefault(Vertex* vertex){
-    for (int i = 0; i < MAX_BONES_INFLUENCE; i++){
+    for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
         //NOTE: still don't understand about this ...
         vertex->m_BoneIDs[i] = -1;
         vertex->m_Weights[i] = 0.0f;
@@ -385,7 +385,7 @@ void Model_::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh*
             int vertexId = weights[weightIndex].mVertexId;
             float weight = weights[weightIndex].mWeight;
             assert(vertexId <= vertices.size());
-            SetVertexBoneData(vertices[vertexId], boneID, weight);
+            SetVertexBoneData(&vertices[vertexId], boneID, weight);
         }
     }
     

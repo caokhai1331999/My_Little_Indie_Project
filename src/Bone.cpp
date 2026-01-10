@@ -67,7 +67,7 @@ glm::mat4 Bone::InterpolatePosition(float animationTime){
     int pt1index = pt0index + 1;
     float scaleFactor = GetScaleFactor(animationTime, m_Positions[pt0index].timestamp, m_Positions[pt1index].timestamp);
 
-    glm:vec3 finalPosition = glm::mix(m_Positions[pt0index].Position, m_Positions[pt1index].Position, scaleFactor);
+    glm::vec3 finalPosition = glm::mix(m_Positions[pt0index].Position, m_Positions[pt1index].Position, scaleFactor);
 
     glm::mat4 finalTransformMatrix = glm::translate(glm::mat4(1.0f), finalPosition);
 
@@ -86,7 +86,7 @@ glm::mat4 Bone::InterpolateScaling(float animationTime){
     int pt1index = pt0index + 1;
     float scaleFactor = GetScaleFactor(animationTime, m_KeyScales[pt0index].timestamp, m_KeyScales[pt1index].timestamp);
 
-    glm:vec3 finalScale = glm::mix(m_KeyScales[pt0index].Scale, m_KeyScales[pt1index].Scale, scaleFactor);
+    glm::vec3 finalScale = glm::mix(m_KeyScales[pt0index].Scale, m_KeyScales[pt1index].Scale, scaleFactor);
 
     return glm::scale(glm::mat4(1.0f), finalScale);    
 };

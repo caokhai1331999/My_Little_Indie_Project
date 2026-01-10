@@ -573,9 +573,10 @@ int CALLBACK WinMain
                     model_shader_->use();
                     printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[1]);
                 } else {
-                    glDebugMessageCallback(MessageCallback, 0);
-                    checkCompileErrors(model_shader_->shaders[vertex_], "Vertex");
-                    checkCompileErrors(model_shader_->shaders[fragment_], "Fragment");
+                  glDebugMessageCallback(MessageCallback, 0);
+                 checkCompileErrors(                      model_shader_->shaders[vertex_].GetShaderID(), "Vertex");
+                 checkCompileErrors(model_shader_->shaders[fragment_].GetShaderID(), "Fragment");
+
                     checkCompileErrors(ScreenBuffer.glData.ProgramIDs[1], "Program");
                     printf("NO program object created before\n");
                 }
@@ -585,8 +586,8 @@ int CALLBACK WinMain
                     printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[2]);
                 } else {
                     glDebugMessageCallback(MessageCallback, 0);
-                    checkCompileErrors(animating_shader_->shaders[vertex_], "Vertex");
-                    checkCompileErrors(animating_shader_->shaders[fragment_], "Fragment");
+                    checkCompileErrors(animating_shader_->shaders[vertex_].GetShaderID(), "Vertex");
+                    checkCompileErrors(animating_shader_->shaders[fragment_].GetShaderID(), "Fragment");
                     checkCompileErrors(ScreenBuffer.glData.ProgramIDs[2], "Program");
                     printf("NO program object created before\n");
                 }
@@ -594,7 +595,7 @@ int CALLBACK WinMain
                 //setInt(ScreenBuffer.glData.ProgramIDs[0], "ttexture1", ScreenBuffer.glData.textureHandle);                
 
                 useProgram(ScreenBuffer.glData.ProgramIDs[0]);
-                setMat4(ScreenBuffer.glData.ProgramIDs[0], "projection", BackBuffer.camera.projection);
+                basic_shader_->setMat4("projection", BackBuffer.camera.projection);
                 std::cout<<"Projection mat: "<<glm::to_string(BackBuffer.camera.projection)<<std::endl;                
                 setMat4(ScreenBuffer.glData.ProgramIDs[0], "view", BackBuffer.camera.view);
 

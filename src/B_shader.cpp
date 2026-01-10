@@ -220,8 +220,8 @@ GLuint B_shader_program::setupGLprogram(){
     //buffer->glData.ProgramID = glCreateProgram();
     unsigned int tempProgramID = glCreateProgram();
     
-    glAttachShader(tempProgramID, shaders[vertex_].ShaderID);
-    glAttachShader(tempProgramID, shaders[fragment_].ShaderID);
+    glAttachShader(tempProgramID, shaders[vertex_].GetShaderID());
+    glAttachShader(tempProgramID, shaders[fragment_].GetShaderID());
     glLinkProgram(tempProgramID);
 
     ProgramID = tempProgramID;
