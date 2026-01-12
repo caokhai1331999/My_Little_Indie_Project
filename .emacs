@@ -303,7 +303,7 @@
   :hook (lsp-mode . company-mode))
 
 (setq projectile-project-root-files-top-down-recurring
-      '(".git" ".clangd" "compile_commands.json"))
+      '(".\envir_files\.git" ".\envir_files\.clangd" ".\envir_files\compile_commands.json"))
 
 (setq lsp-auto-guess-root t)
 (add-hook 'c-mode-hook
