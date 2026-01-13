@@ -49,9 +49,9 @@ public:
 class B_shader_program{
 private:
     unsigned int ProgramID;
-    B_shader shaders[2];
     
 public:
+    B_shader shaders[2];
     B_shader_program(char* vertex_file_name, char* fragment_file_name){
         shaders[vertex_].loadShader(vertex_file_name, vertex_);
         shaders[fragment_].loadShader(fragment_file_name, fragment_);
@@ -89,10 +89,26 @@ public:
 };
 
 void useProgram(GLuint programId){glUseProgram(programId);};
-char* loadCurrentErr(GLuint ProgramID =0);
+char* loadCurrentErr();
 void checkCompileErrors(GLuint shader, const char* type);   
 void* GetAnyGLFuncAddress(const char *name);
 std::vector<GLuint> ProgramIDs;
+
+
+void setVec2(GLuint ShaderID, const char* name, const glm::vec2 &value);
+void setVec2(GLuint ShaderID, const char *name, float x, float y);
+
+void setVec3(GLuint ShaderID, const char *name, const glm::vec3 &value);
+void setVec3(GLuint ShaderID, const char *name, float x, float y, float z);
+
+void setBool(GLuint ShaderID, const char *name, const bool value);
+void setInt(GLuint ShaderID, const std::string name, const int value);
+void setFloat(GLuint ShaderID, const std::string name, const float value);
+
+// Set Matrix
+void setMat3(GLuint ShaderID, const char *name, const glm::mat3 &value);
+void setMat4(GLuint ShaderID, const std::string name, const glm::mat4 &value);
+
 
 #define SHADER_H
 #endif

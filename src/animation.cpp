@@ -9,18 +9,24 @@
 #include "animation.h"
 
 Bone* Animation::FindBone(const std::string& name){
-    auto iter = find_if(m_Bones.begin(), m_Bones.end(), [&](const Bone& Bone){return Bone.GetBoneName() == name;});//lambda to findout address of bone that have the same name of given name
-    if(iter == m_Bones.end()){
+  auto iter = find_if(m_Bones.begin(), m_Bones.end(),
+                      [&](const Bone& Bone)
+                      {
+                          return Bone.GetBoneName() == name; //line 15
+                      });//lambda to findout address of bone that have the same name of given name
+  
+  
+  if(iter == m_Bones.end()){
         return nullptr;
-    }
     //return address of member that iter is pointing to
-    else {return &(*iter);}
+    }else {return &(*iter);}
 };
 
 void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
     int size = animation->mNumChannels;
 // Get these properties from model var
-    std::map<std::string, Bone_Info> boneInfoMap = &model->GetBoneInfoMap();
+    std::map<std::string, Bone_Info>* boneInfoMap;
+    boneInfoMap = model->GetBoneInfoMap();
     int boneCount = model->GetBoneCount();
 
     //Reading channels (bone engaged in an animation and keyframes)
@@ -29,11 +35,11 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
         aiNodeAnim* channel = animation->mChannels[i];
         std::string boneName = channel->mNodeName.data;
 
-        if(boneInfoMap.find(boneName) == boneInfoMap.end()){
-            boneInfoMap[boneName].id = boneCount;
+        if((*boneInfoMap).find(boneName) == (*boneInfoMap).end()){
+            (*boneInfoMap)[boneName].id = boneCount;
             (boneCount)++;
         }
-        m_Bones.push_back(Bone(channel->mNodeName.data, boneInfoMap[channel->mNodeName.data].id, channel));
+        m_Bones.push_back(Bone(channel->mNodeName.data, (*boneInfoMap)[channel->mNodeName.data].id, channel));
     }
     m_Bone_InfoMap = boneInfoMap;
 };

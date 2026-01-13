@@ -365,17 +365,17 @@ void Model_::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh*
         int boneID = -1;
         //What is mName
         std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
-        if(m_BoneInfoMap.find(boneName) == m_BoneInfoMap.end()){
+        if(m_BoneInfoMap->find(boneName) == m_BoneInfoMap->end()){
             Bone_Info newboneinfo ;
 // On the way of learning here
             newboneinfo.id = m_BoneCounter;
             newboneinfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
-            m_BoneInfoMap[boneName] = newboneinfo;
+            (*m_BoneInfoMap)[boneName] = newboneinfo;
 
             boneID = m_BoneCounter;
             boneCount++;
         }else{
-            boneID = m_BoneInfoMap[boneName].id;
+            boneID = (*m_BoneInfoMap)[boneName].id;
         }
         assert(boneID != -1);
         //what exactly weights's type is

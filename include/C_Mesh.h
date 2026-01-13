@@ -37,7 +37,8 @@
 #include "B_shader.h"
 
 
-using namespace std; 
+using namespace std;
+
 #define MAX_BONE_INFLUENCE 4
 
 struct Vertex {

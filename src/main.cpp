@@ -608,9 +608,9 @@ int CALLBACK WinMain
 //NOW THE ANIMATING PART
                 Model_* dancing_vampire = nullptr;
                 dancing_vampire = new Model_();;
-                std::string dancing_vampire_path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/media/dancing_vampire.dae";
+                std::string dancing_vampire_path = "W:/build/media/dancing_vampire.dae";
                 loadModel_(dancing_vampire, dancing_vampire_path);
-                Animation* danceAnimation = new Animation(dancing_vampire_path, dancing_vampire);
+                Animation* danceAnimation = new Animation((char*)dancing_vampire_path.c_str(), dancing_vampire);
                 Animator* animator = new Animator(danceAnimation);
                 
                 

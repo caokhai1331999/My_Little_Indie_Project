@@ -287,7 +287,6 @@ GLuint B_shader_program::setupGLprogram(){
     //printf("OpenGL Error: %d\n", glGetError());
         cout<<"OpenGL Error: "<< glGetError()<<endl;
     };
-
     glDetachShader(tempProgramID, shaders[vertex_].GetShaderID()); 
     glDetachShader(tempProgramID, shaders[fragment_].GetShaderID()); 
 

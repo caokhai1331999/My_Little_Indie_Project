@@ -12,10 +12,15 @@
 class Animator{
 
 public:
+    Animator(Animation *animation = nullptr) { m_currentAnimation = animation; };
+    ~Animator();
+
     void updateAnimationTime(const Animation& animation, float dt);
     void playAnimation(Animation* pAnimation);
     void calculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform);
+
     std::vector<glm::mat4>getFinalBoneMatrices(){return finalBoneMatrices;};
+
 private:
     std::vector<glm::mat4>finalBoneMatrices;
     //Current Animation

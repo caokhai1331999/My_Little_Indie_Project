@@ -37,11 +37,11 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4 pare
     
     glm::mat4 globalTransform = nodeTransform * parentTransform;
     //Find missing bones and do the same
-    std::map<std::string, Bone_Info> boneInfoMap = m_currentAnimation->GetBoneIDMap();
+    std::map<std::string, Bone_Info>* boneInfoMap = m_currentAnimation->GetBoneIDMap();
 //WORKING====
-    if(boneInfoMap.find(nodeName) != boneInfoMap.end()){
-        int index =boneInfoMap[nodeName].id;
-        glm::mat4 offset = boneInfoMap[nodeName].offset;
+    if((*boneInfoMap).find(nodeName) != (*boneInfoMap).end()){
+        int index =(*boneInfoMap)[nodeName].id;
+        glm::mat4 offset = (*boneInfoMap)[nodeName].offset;
         finalBoneMatrices[index] = globalTransform * offset;
     }
 

@@ -21,7 +21,10 @@ public:
     Animation() = default;
 
     Animation(char* animationPath = nullptr, Model_* model = nullptr){
-        // assert throw out the error when 0 is the value
+      // assert throw out the error when 0 is the value
+        m_Bone_InfoMap = nullptr;
+        m_Bone_InfoMap = new std::map<std::string, Bone_Info>;
+        
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
         // Still don't understand this part
@@ -39,7 +42,7 @@ public:
     
     inline float GetTicksPerSecond(){return m_TicksPerSecond;};
     inline float GetDuration(){return m_Duration;};
-    inline const std::map<std::string, Bone_Info>& GetBoneIDMap(){return m_Bone_InfoMap;};
+    inline std::map<std::string, Bone_Info>* GetBoneIDMap() const {return m_Bone_InfoMap;};
     
 // Functions
     void ConstructBone(); 
@@ -59,7 +62,7 @@ private:
     int m_TicksPerSecond;
     std::vector<Bone> m_Bones;
     AssimpNodeData m_RootNode;
-    std::map<std::string, Bone_Info> m_Bone_InfoMap;
+    std::map<std::string, Bone_Info>* m_Bone_InfoMap;
 };
 #define ANIMATION_H
 #endif
