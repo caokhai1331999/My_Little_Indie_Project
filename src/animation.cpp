@@ -30,10 +30,10 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
         std::string boneName = channel->mNodeName.data;
 
         if(boneInfoMap.find(boneName) == boneInfoMap.end()){
-            boneInfoMap[boneName].m_ID = boneCount;
+            boneInfoMap[boneName].id = boneCount;
             (boneCount)++;
         }
-        m_Bones.push_back(Bone(channel->mNodeName.data, boneInfoMap[channel->mNodeName.data].m_ID, channel));
+        m_Bones.push_back(Bone(channel->mNodeName.data, boneInfoMap[channel->mNodeName.data].id, channel));
     }
     m_Bone_InfoMap = boneInfoMap;
 };

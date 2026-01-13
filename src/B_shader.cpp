@@ -179,6 +179,59 @@ void B_shader_program::setMat4(const std::string name, const glm::mat4 &value){
     //printf("pointer to matrix is: 0x%hx\n",&value[0][0]);
  };
 
+
+// Set Int, bool,
+void setBool( GLuint ShaderID, const char* name, const bool value){
+    glUniform1i(glGetUniformLocation(ShaderID, name), (int)value);
+};
+
+void setInt( GLuint ShaderID, const std::string name, const int value){
+    glUniform1i(glGetUniformLocation(ShaderID, name.c_str()), value);
+    if(name.c_str()==""){
+        printf("name content is NULL\n");
+    }
+    if(&value == 0x00){
+        printf("value content is NULL\n");        
+    }
+};
+
+void setFloat( GLuint ShaderID, const std::string name, const float value){
+    glUniform1f(glGetUniformLocation(ShaderID, name.c_str()), value);
+    if(name.c_str()==""){
+        printf("name content is NULL\n");
+    }
+    if(&value == 0x00){
+        printf("value content is NULL\n");        
+    }
+};
+
+//Vector 2nd argument is number of vector
+void setVec2( GLuint ShaderID, const char* name, const glm::vec2 &value){
+    glUniform2fv(glGetUniformLocation(ShaderID, name), 1, &value[0]);
+}
+
+void setVec2( GLuint ShaderID, const char* name, float x, float y){
+    glm::vec2 value = glm::vec2(x, y);
+    glUniform2f(glGetUniformLocation(ShaderID, name), x, y);
+}
+
+void setVec3( GLuint ShaderID, const char* name, const glm::vec3 &value){
+    glUniform3fv(glGetUniformLocation(ShaderID, name), 1, &value[0]);
+}
+void setVec3( GLuint ShaderID, const char* name, float x, float y, float z){
+    glUniform3f(glGetUniformLocation(ShaderID, name), x, y, z);
+}
+
+// Set Matrix, 3rd is GL_Boolean transpose
+void setMat3( GLuint ShaderID, const char* name, const glm::mat3 &value){
+    glUniformMatrix3fv(glGetUniformLocation(ShaderID, name), 1, GL_FALSE, &value[0][0]);
+};
+
+void setMat4( GLuint ShaderID, const std::string name, const glm::mat4 &value){
+    glUniformMatrix4fv(glGetUniformLocation(ShaderID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+    //printf("pointer to matrix is: 0x%hx\n",&value[0][0]);
+ };
+
 void checkCompileErrors(GLuint shader, const char* type)
 {
     GLint success;
@@ -226,8 +279,8 @@ GLuint B_shader_program::setupGLprogram(){
 
     ProgramID = tempProgramID;
     printf("Program ID: %d %d\n", ProgramID, tempProgramID);
-    checkCompileErrors(shaders[vertex_].ShaderID, "VERTEX");
-    checkCompileErrors(shaders[fragment_].ShaderID, "FRAGMENT");
+    checkCompileErrors(shaders[vertex_].GetShaderID(), "VERTEX");
+    checkCompileErrors(shaders[fragment_].GetShaderID(), "FRAGMENT");
     checkCompileErrors(tempProgramID, "PROGRAM");
     
     if(glGetError() != GL_NO_ERROR){
@@ -235,11 +288,11 @@ GLuint B_shader_program::setupGLprogram(){
         cout<<"OpenGL Error: "<< glGetError()<<endl;
     };
 
-    glDetachShader(tempProgramID, shaders[vertex_].ShaderID); 
-    glDetachShader(tempProgramID, shaders[fragment_].ShaderID); 
+    glDetachShader(tempProgramID, shaders[vertex_].GetShaderID()); 
+    glDetachShader(tempProgramID, shaders[fragment_].GetShaderID()); 
 
-    glDeleteShader(shaders[vertex_].ShaderID);
-    glDeleteShader(shaders[fragment_].ShaderID);
+    glDeleteShader(shaders[vertex_].GetShaderID());
+    glDeleteShader(shaders[fragment_].GetShaderID());
 
     return tempProgramID;
 }

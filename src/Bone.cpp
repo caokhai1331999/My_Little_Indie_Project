@@ -103,7 +103,7 @@ glm::mat4 Bone::InterpolateRotation(float animationTime){
     int pt1index = pt0index + 1;
     float scaleFactor = GetScaleFactor(animationTime, m_Rotations[pt0index].timestamp, m_Rotations[pt1index].timestamp);;
 
-    glm::quat finalRotation = glm::Lerp(animationTime, m_Rotations[pt0index].orientaion, m_Rotations[pt0index].orientaion, scaleFactor);
+    glm::quat finalRotation = glm::slerp(m_Rotations[pt0index].Orientation, m_Rotations[pt1index].Orientation, scaleFactor);
 
     return glm::toMat4(finalRotation);
 };

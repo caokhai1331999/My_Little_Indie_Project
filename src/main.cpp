@@ -602,16 +602,16 @@ int CALLBACK WinMain
                 Model_* backpack = nullptr;
                 backpack = new Model_();
                 std::string backpack_path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/backpack.obj";
-                loadModel(backpack, backpack_path);
+                loadModel_(backpack, backpack_path);
                 //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
 
 //NOW THE ANIMATING PART
                 Model_* dancing_vampire = nullptr;
                 dancing_vampire = new Model_();;
                 std::string dancing_vampire_path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/media/dancing_vampire.dae";
-                loadModel(dancing_vampire, dancing_vampire_path);
-                Animation* danceAnimation(dancing_vampire_path, dancing_vampire);
-                Animator* animator(danceAnimation);
+                loadModel_(dancing_vampire, dancing_vampire_path);
+                Animation* danceAnimation = new Animation(dancing_vampire_path, dancing_vampire);
+                Animator* animator = new Animator(danceAnimation);
                 
                 
 
@@ -829,7 +829,7 @@ int CALLBACK WinMain
                     // Update animating model based on frame time
                     // => calculate finalTransformmatrices and set to
                     auto Transform = animator->getFinalBoneMatrices();
-                    for(int i = 0; i < Tranform.size(); i++){
+                    for(int i = 0; i < Transform.size(); i++){
                         animating_shader_->setMat4("finalBoneMatrices[" + std::to_string(i) + "]", Transform[i]);
                     };
                     
@@ -841,16 +841,16 @@ int CALLBACK WinMain
                     {
                         BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
                         glUseProgram(ScreenBuffer.glData.ProgramIDs[0]);
-                        setMat4(ScreenBuffer.glData.ProgramIDs[0], "projection", BackBuffer.camera.projection);
+                        basic_shader_->setMat4("projection", BackBuffer.camera.projection);
                         glUseProgram(ScreenBuffer.glData.ProgramIDs[1]);
-                        setMat4(ScreenBuffer.glData.ProgramIDs[1], "projection", BackBuffer.camera.projection);
+                        model_shader_->setMat4("projection", BackBuffer.camera.projection);
                         BackBuffer.camera.mouse.Wheeled = false;
                     }
 
-                    basic_shader_->use(ScreenBuffer.glData.ProgramIDs[0]);
+                    basic_shader_->use();
                     basic_shader_->setMat4("view", BackBuffer.camera.view);
 
-                    model_shader_->use(ScreenBuffer.glData.ProgramIDs[1]);
+                    model_shader_->use();
                     model_shader_->setMat4("view", BackBuffer.camera.view);
 
                     
@@ -914,7 +914,7 @@ int CALLBACK WinMain
 
                     basic_shader_->setMat4("model", basic_cube_core);
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
-                    glDrawArrays(GL_TRIANGLES, 0, 36)
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
                     drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], BackBuffer.camera.speed, &UpdatedDegree);
@@ -928,7 +928,7 @@ int CALLBACK WinMain
 // Now Draw the vampire
                     animating_shader_->use();
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
-                    animating_shader->setMat4( "model", dancing_vampire_core);
+                    animating_shader_->setMat4( "model", dancing_vampire_core);
                     DDraw(dancing_vampire, &ScreenBuffer.glData.ProgramIDs[2]);                    
                     
                     LastCounter = EndCounter;
