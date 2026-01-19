@@ -22,8 +22,8 @@ public:
 
     Animation(char* animationPath = nullptr, Model_* model = nullptr){
       // assert throw out the error when 0 is the value
-        m_Bone_InfoMap = nullptr;
-        m_Bone_InfoMap = new std::map<std::string, Bone_Info>;
+        m_Bones.reserve(100);
+        m_Bone_InfoMap.reserve(100);;
         
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
@@ -34,7 +34,8 @@ public:
         m_TicksPerSecond = animation->mTicksPerSecond;
         ReadHierarchyData(m_RootNode, scene->mRootNode);
         ReadMissingBone(animation, model);
-    };
+
+        };
 
     ~Animation(){};
 
@@ -60,9 +61,9 @@ public:
 private:
     float m_Duration;
     int m_TicksPerSecond;
-    std::vector<Bone> m_Bones;
     AssimpNodeData m_RootNode;
-    std::map<std::string, Bone_Info>* m_Bone_InfoMap;
+    std::vector<Bone> m_Bones;
+    std::map<std::string, Bone_Info> m_Bone_InfoMap;
 };
 #define ANIMATION_H
 #endif

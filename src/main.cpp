@@ -829,8 +829,8 @@ int CALLBACK WinMain
                     // Update animating model based on frame time
                     // => calculate finalTransformmatrices and set to
                     auto Transform = animator->getFinalBoneMatrices();
-                    for(int i = 0; i < Transform.size(); i++){
-                        animating_shader_->setMat4("finalBoneMatrices[" + std::to_string(i) + "]", Transform[i]);
+                    for(int i = 0; i < Transform->size(); i++){
+                        animating_shader_->setMat4("finalBoneMatrices[" + std::to_string(i) + "]", (*Transform)[i]);
                     };
                     
                     

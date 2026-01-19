@@ -42,7 +42,6 @@ struct KeyScale{
 struct AssimpNodeData{
     glm::mat4 transformation;
     string name;
-    int childrenCount;
     std::vector<AssimpNodeData>children;
 };
 

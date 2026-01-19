@@ -41,7 +41,7 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
         }
         m_Bones.push_back(Bone(channel->mNodeName.data, (*boneInfoMap)[channel->mNodeName.data].id, channel));
     }
-    m_Bone_InfoMap = boneInfoMap;
+    m_Bone_InfoMap = (*boneInfoMap);
 };
 
 void Animation::ReadHierarchyData(AssimpNodeData& dest, const aiNode* src){
@@ -49,8 +49,10 @@ void Animation::ReadHierarchyData(AssimpNodeData& dest, const aiNode* src){
 
     dest.name = src->mName.data;
     dest.transformation = AssimpGLMHelpers::ConvertMatrixToGLMFormat(src->mTransformation);
-    dest.childrenCount = src->mNumChildren;
-
+    dest.children.resize(src->mNumChildren);
+    // as told this line prevent children vector from reallocating after an
+    // element is added(which is believed would speed things up)
+    dest.children.reserve(src->mNumChildren);
     for(int i = 0; i < src->mNumChildren; i++){
         AssimpNodeData child;
         ReadHierarchyData(child, src->mChildren[i]);
