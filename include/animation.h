@@ -1,3 +1,4 @@
+#include <unordered_map>
 #if !defined(ANIMATION_H)
 /* ========================================================================
    $File: $
@@ -7,7 +8,7 @@
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
 #include <sstream>
-#include <map>
+#include <unordered_map>
 #include <vector>
 
 #include <assimp_glm_helpers.h>
@@ -43,7 +44,7 @@ public:
     
     inline float GetTicksPerSecond(){return m_TicksPerSecond;};
     inline float GetDuration(){return m_Duration;};
-    inline std::map<std::string, Bone_Info>* GetBoneIDMap() const {return m_Bone_InfoMap;};
+    inline std::unordered_map<std::string, Bone_Info>* GetBoneIDMap() {return &m_Bone_InfoMap;};
     
 // Functions
     void ConstructBone(); 
@@ -63,7 +64,7 @@ private:
     int m_TicksPerSecond;
     AssimpNodeData m_RootNode;
     std::vector<Bone> m_Bones;
-    std::map<std::string, Bone_Info> m_Bone_InfoMap;
+    std::unordered_map<std::string, Bone_Info> m_Bone_InfoMap;
 };
 #define ANIMATION_H
 #endif

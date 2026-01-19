@@ -20,7 +20,7 @@ public:
 
     void updateAnimationTime(const Animation& animation, float dt);
     void playAnimation(Animation* pAnimation);
-    void calculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform);
+    void calculateBoneTransform(const AssimpNodeData* node, glm::mat4* parentTransform);
 
     std::vector<glm::mat4>*getFinalBoneMatrices(){return &finalBoneMatrices;};
 

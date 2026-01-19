@@ -9,7 +9,7 @@
 
 #define C_MODEL_H
 
-#include <map>
+#include <unordered_map>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -26,7 +26,7 @@ public:
     std::string directory;
     std::string Texturedirectory;
     vector<Texture>loaded_textures;
-    std::map<std::string, Bone_Info>* m_BoneInfoMap;
+    std::unordered_map<std::string, Bone_Info>* m_BoneInfoMap;
     int m_BoneCounter;
     bool gammaCorrection;
 
@@ -34,7 +34,7 @@ public:
         : gammaCorrection(gamma) {
       m_BoneCounter = 0;
       m_BoneInfoMap = nullptr;
-      m_BoneInfoMap = new std::map<std::string, Bone_Info>;
+      m_BoneInfoMap = new std::unordered_map<std::string, Bone_Info>;
     };
 
     void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
@@ -42,7 +42,7 @@ public:
     Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene);
     string* GetModelDir(){return &directory;};
 // About skeletal animation
-    std::map<std::string, Bone_Info>*GetBoneInfoMap(){return m_BoneInfoMap;};
+    std::unordered_map<std::string, Bone_Info>*GetBoneInfoMap(){return m_BoneInfoMap;};
     int GetBoneCount() { return m_BoneCounter;};
 };
 

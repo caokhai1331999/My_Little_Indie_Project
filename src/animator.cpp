@@ -6,6 +6,7 @@
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
 #include "animator.h"
+#include <unordered_map>
 
 void Animator::updateAnimationTime(const Animation& animation, float dt){
     m_deltaTime = dt;
@@ -23,9 +24,9 @@ void Animator::playAnimation(Animation* pAnimation){
 
 
 
-void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform){
+void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* parentTransform){
 
-    std::string nodeName = node->name;
+    const std::string& nodeName = node->name;
     glm::mat4 nodeTransform = node->transformation;
 
     Bone* bone = m_currentAnimation->FindBone(nodeName);
@@ -35,9 +36,9 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4 pare
         nodeTransform = bone->GetLocalTransformation();
     }
     
-    glm::mat4 globalTransform = nodeTransform * parentTransform;
+    glm::mat4 globalTransform = nodeTransform * (*parentTransform);
     //Find missing bones and do the same
-    std::map<std::string, Bone_Info>* boneInfoMap = m_currentAnimation->GetBoneIDMap();
+    std::unordered_map<std::string, Bone_Info>* boneInfoMap = m_currentAnimation->GetBoneIDMap();
 //WORKING====
     if((*boneInfoMap).find(nodeName) != (*boneInfoMap).end()){
         int index =(*boneInfoMap)[nodeName].id;
@@ -45,9 +46,9 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4 pare
         finalBoneMatrices[index] = globalTransform * offset;
     }
 
-    for(int i = 0; i < node->childrenCount; i++){
+    for(int i = 0; i < node->children.size(); i++){
         // Global Transform now is used as parent transform
-        Animator::calculateBoneTransform(&node->children[i], globalTransform);
+        Animator::calculateBoneTransform(&node->children[i], &globalTransform);
     }
 };
 

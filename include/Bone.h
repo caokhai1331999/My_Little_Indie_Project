@@ -106,7 +106,7 @@ public:
     }
         /* Interpolate b/w translation, rotations and scalings based on the current time and prepare for the final transform matrices by combining all key transformation*/    
   glm::mat4 GetLocalTransformation(){return m_LocalTransform;};
-        std::string GetBoneName() const {return m_Name;};
+        const std::string* GetBoneName() const {return &m_Name;};
     int GetBoneID(){return m_ID;};
         void Update(float animationTime);
         /*Return current index on mKeyPositions and interpolate it based on current animation time*/
