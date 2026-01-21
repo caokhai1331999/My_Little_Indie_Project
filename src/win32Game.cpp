@@ -676,8 +676,8 @@ void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* F
     printf("VBO              |  %d         | %d\n", BackBuffer->glData.VBO, FrontBuffer->glData.VBO);
     printf("ColorVBO         |  %d         | %d\n", BackBuffer->glData.ColorVBO, FrontBuffer->glData.ColorVBO);
     printf("TextureID        |  %d         | %d\n", BackBuffer->glData.textureHandle, FrontBuffer->glData.textureHandle);
-    printf("ProgramID        |  %d         | %d\n", BackBuffer->glData.ProgramIDs[0], FrontBuffer->glData.ProgramIDs[0]);
-    printf("ProgramID        |  %d         | %d\n", BackBuffer->glData.ProgramIDs[1], FrontBuffer->glData.ProgramIDs[1]);
+    //printf("ProgramID        |  %d         | %d\n", BackBuffer->glData.ProgramIDs[0], FrontBuffer->glData.ProgramIDs[0]);
+    //printf("ProgramID        |  %d         | %d\n", BackBuffer->glData.ProgramIDs[1], FrontBuffer->glData.ProgramIDs[1]);
     printf("Memory Address   |0x%x |0x%x \n", BackBuffer->BitmapMemory, FrontBuffer->BitmapMemory);
     printf("DirectMem Address|0x%x size:%d |       \n", BackBuffer->BitmapMemoryForDirectBlit, BackBuffer->BitmapMemorySize);
     printf("=====================================\n");

@@ -24,7 +24,7 @@ struct OpenGLData{
     unsigned int ColorVBO;
     unsigned int PlaneVBO;  
 
-    std::vector<GLuint> ProgramIDs;
+    std::vector<GLuint> ProgramIDs = {};
     
     HGLRC openglRC;
     unsigned int textureHandle;
