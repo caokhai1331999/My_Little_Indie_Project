@@ -482,13 +482,18 @@ int CALLBACK WinMain
                 RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
                 InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
 
-                //Basic shader
-                B_shader_program* basic_shader_ = new B_shader_program("shader.vs", "shader.fs");             ScreenBuffer.glData.ProgramIDs.push_back(basic_shader_->GetProgramID());
+                // Basic shader
+                std::string shader_name = "basic brush";
+                B_shader_program* basic_shader_ = new B_shader_program("shader.vs", "shader.fs", shader_name.c_str());             ScreenBuffer.glData.ProgramIDs.push_back(basic_shader_->GetProgramID());
 
+                //shader_name.clear();
+                shader_name = "model drawing brush";
                 //basic model shader
-                B_shader_program* model_shader_ = new B_shader_program("1.model.vs", "1.model.fs");                ScreenBuffer.glData.ProgramIDs.push_back(model_shader_->GetProgramID());
+                B_shader_program* model_shader_ = new B_shader_program("1.model.vs", "1.model.fs", shader_name.c_str());                ScreenBuffer.glData.ProgramIDs.push_back(model_shader_->GetProgramID());
 
-                B_shader_program* animating_shader_ = new B_shader_program("2.skeletal_animation.vs", "2.skeletal_animation.fs");                ScreenBuffer.glData.ProgramIDs.push_back(animating_shader_->GetProgramID());
+                //shader_name.clear();                
+                shader_name = "animating sketching brush";
+                B_shader_program* animating_shader_ = new B_shader_program("2.skeletal_animation.vs", "2.skeletal_animation.fs", shader_name.c_str());                ScreenBuffer.glData.ProgramIDs.push_back(animating_shader_->GetProgramID());
                 
                 copyBufferData(&BackBuffer, &ScreenBuffer);
                 //????
@@ -561,11 +566,7 @@ int CALLBACK WinMain
                     printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[0]);
                 } else {
                   glDebugMessageCallback(MessageCallback, 0);
-
-                  checkCompileErrors(                      basic_shader_->shaders[vertex_].GetShaderID(), "Vertex");
-                  checkCompileErrors(basic_shader_->shaders[fragment_].GetShaderID(), "Fragment");
-
-                         checkCompileErrors(ScreenBuffer.glData.ProgramIDs[0], "Program");
+                  checkCompileErrors(ScreenBuffer.glData.ProgramIDs[0], programme_, "basic brush");
                     printf("NO program object created before\n");
                 }
 
@@ -574,11 +575,8 @@ int CALLBACK WinMain
                     printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[1]);
                 } else {
                   glDebugMessageCallback(MessageCallback, 0);
-                 checkCompileErrors(                      model_shader_->shaders[vertex_].GetShaderID(), "Vertex");
-                 checkCompileErrors(model_shader_->shaders[fragment_].GetShaderID(), "Fragment");
-
-                    checkCompileErrors(ScreenBuffer.glData.ProgramIDs[1], "Program");
-                    printf("NO program object created before\n");
+                    checkCompileErrors(ScreenBuffer.glData.ProgramIDs[1], programme_, "model drawing brush");
+                    printf("model drawing program object is buggy\n");
                 }
 
                 if(glIsProgram(ScreenBuffer.glData.ProgramIDs[2])){
@@ -586,10 +584,7 @@ int CALLBACK WinMain
                     printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[2]);
                 } else {
                     glDebugMessageCallback(MessageCallback, 0);
-                    checkCompileErrors(animating_shader_->shaders[vertex_].GetShaderID(), "Vertex");
-                    checkCompileErrors(animating_shader_->shaders[fragment_].GetShaderID(), "Fragment");
-                    checkCompileErrors(ScreenBuffer.glData.ProgramIDs[2], "Program");
-                    printf("NO program object created before\n");
+                    printf("animating sketching program object is buggy \n");
                 }
 
                 //setInt(ScreenBuffer.glData.ProgramIDs[0], "ttexture1", ScreenBuffer.glData.textureHandle);                

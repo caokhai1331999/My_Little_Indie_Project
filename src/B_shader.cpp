@@ -77,7 +77,7 @@ void B_shader::loadShader(char* name, ShaderType type){
                 //Attach it(glAttachShader) with the already created(glCreateProgram) empty program
                 //Finally delete already attached shader
 
-                checkCompileErrors(ShaderID, type?"Vertex":"Fragment");
+                checkCompileErrors(ShaderID, type, name);
                 const GLubyte* ver = glGetString(GL_VERSION);
                 if (ver)
                     printf("OpenGL version: %s\n", ver);
@@ -232,44 +232,54 @@ void setMat4( GLuint ShaderID, const std::string name, const glm::mat4 &value){
     //printf("pointer to matrix is: 0x%hx\n",&value[0][0]);
  };
 
-void checkCompileErrors(GLuint shader, const char* type)
+void checkCompileErrors(GLuint shader, const ShaderType type, const char* programName)
 {
     GLint success;
     GLint infoLength = 0;
-    GLchar* infoLog;
-    if (type != "PROGRAM")
+    char* infoLog = nullptr;
+
+    if (type == programme_)
     {
-        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-        glGetProgramiv(shader, GL_INFO_LOG_LENGTH, &infoLength);
-        if(infoLog != nullptr){
+        glGetProgramiv(shader, GL_LINK_STATUS, &success);
+        if (success == GL_FALSE) {
+
+          glGetProgramiv(shader, GL_INFO_LOG_LENGTH, &infoLength);
+          if (infoLog != nullptr) {
             free(infoLog);
-        }
-            infoLog = (GLchar*)malloc(infoLength);
-        if (!success )
-        {
-            if(infoLength > 1){
-                glGetShaderInfoLog(shader, infoLength, NULL, infoLog);
-                printf("ERROR::SHADER_COMPILATION_ERROR of type: %s is %s\n", type, infoLog);
-            }
+          }
+          infoLog = (char *)malloc((size_t)infoLength);
+
+          if (infoLength > 1) {
+            // reinterpret_cast<GLchar*>
+            glGetProgramInfoLog(shader, infoLength, NULL, (infoLog));
+            printf("ERROR::PROGRAM_LINKING_ERROR of programme name: %s , info "
+                   "length: %d, detail: %s\n",
+                   programName, infoLength, (char *)infoLog);
+          }
+        } else {
+          printf("Success linking and compiling programme name: %s\n",
+                 (char *)programName);
         }
     }
     else
     {
-        glGetProgramiv(shader, GL_LINK_STATUS, &success);
-        glGetProgramiv(shader, GL_INFO_LOG_LENGTH, &infoLength);        
-        if (!success|| (infoLength > 0))
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+        if (success == GL_FALSE)
         {
             if(infoLog != nullptr){
                 free(infoLog);
             }
-            infoLog = (GLchar*)malloc(infoLength);
-            glGetProgramInfoLog(shader, infoLength, NULL, infoLog);
-            printf("ERROR::PROGRAM_LINKING_ERROR of type: %s is %s\n", type, infoLog);
-        }
+            glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLength);            
+            infoLog = (char *)malloc((size_t)infoLength);
+            glGetShaderInfoLog(shader, infoLength, NULL, infoLog);
+            printf("ERROR::SHADER_COMPILING_ERROR of type: %s, of programname %s, infoLength:%d, detail: %s\n", type?"Fragment":"Vertex", programName, (int)infoLength, (char* )infoLog);
+        } else {
+            printf("Success compiling shader type: %s of programme name %s\n", type?"Fragment":"Vertex", programName);
+          }
     }
 };
 
-GLuint B_shader_program::setupGLprogram(){
+GLuint B_shader_program::setupGLprogram(const char* programName){
     //buffer->glData.ProgramID = glCreateProgram();
     unsigned int tempProgramID = glCreateProgram();
     
@@ -278,10 +288,9 @@ GLuint B_shader_program::setupGLprogram(){
     glLinkProgram(tempProgramID);
 
     ProgramID = tempProgramID;
+    checkCompileErrors(tempProgramID, programme_, programName);
+
     printf("Program ID: %d %d\n", ProgramID, tempProgramID);
-    checkCompileErrors(shaders[vertex_].GetShaderID(), "VERTEX");
-    checkCompileErrors(shaders[fragment_].GetShaderID(), "FRAGMENT");
-    checkCompileErrors(tempProgramID, "PROGRAM");
     
     if(glGetError() != GL_NO_ERROR){
     //printf("OpenGL Error: %d\n", glGetError());

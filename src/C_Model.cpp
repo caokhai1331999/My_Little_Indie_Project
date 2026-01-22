@@ -161,6 +161,7 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
                 texture.type = typeName;
                 texture.path = str.C_Str();
                 textures.push_back(texture);
+                printf("Start loading texture from external file , model path is :%s\n",(char* )model->directory.c_str());
                 model->loaded_textures.push_back(texture);
             } else {
                 //for(unsigned int i = 0; i < scene->mNumTextures; i++){
@@ -174,7 +175,7 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
 */
 
                     
-                    printf("embbedded texture path is:%s\n",str.C_Str());
+                printf("Start loading texture from embbedded texture, path is:%s\n",(char* )str.C_Str());
                     // Bug here
                     texture.id = TextureFromMemory(scene, model->directory, false, &str);
                     texture.type = typeName;

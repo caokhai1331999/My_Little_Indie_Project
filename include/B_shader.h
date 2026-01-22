@@ -32,6 +32,7 @@ typedef int ShaderType;
 
 #define vertex_ 0
 #define fragment_ 1
+#define programme_ 2
 
 struct B_shader{
 private:
@@ -52,10 +53,10 @@ private:
     
 public:
     B_shader shaders[2];
-    B_shader_program(char* vertex_file_name, char* fragment_file_name){
+    B_shader_program(char* vertex_file_name, char* fragment_file_name, const char* programName = nullptr){
         shaders[vertex_].loadShader(vertex_file_name, vertex_);
         shaders[fragment_].loadShader(fragment_file_name, fragment_);
-        setupGLprogram();
+        setupGLprogram(programName);
     };
 
     ~B_shader_program();
@@ -83,14 +84,14 @@ public:
 
     GLuint GetProgramID(){return ProgramID;};
 // Attaching shader to program
-    GLuint setupGLprogram();
+    GLuint setupGLprogram(const char* programName);
 
 // Load Current Errors
 };
 
 void useProgram(GLuint programId){glUseProgram(programId);};
 char* loadCurrentErr();
-void checkCompileErrors(GLuint shader, const char* type);   
+void checkCompileErrors(GLuint shader, const ShaderType type, const char* programName);   
 void* GetAnyGLFuncAddress(const char *name);
 std::vector<GLuint> ProgramIDs;
 
