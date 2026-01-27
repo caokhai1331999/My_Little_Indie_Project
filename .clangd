@@ -1,5 +1,0 @@
-CompileFlags:
-  CompilationDatabase: build
-  Add:
-    - -fms-extensions
-    - -fms-compatibility
