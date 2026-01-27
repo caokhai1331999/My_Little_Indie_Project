@@ -739,3 +739,8 @@ Maybe because I change the infolength from int to size_t solve the problem
 
 REMEMBER! : Delve deeper to know more about size difference. For ex: int16 vs
 int32
+
+---------------- Wed, 28 Jan 26: 12:05AM
+
+Got to figure out how to proactively pull what I want for dir on different pc
+with file with same name with different content while still can pull or push
