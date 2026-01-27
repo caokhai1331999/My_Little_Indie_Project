@@ -5,6 +5,6 @@ rem xcopy C:\"Users\klove\Downloads\External_Libraries" E:\"External_Libraries\"
 rem xcopy C:\"Users\klove\Documents\repos" E:\"repos\" /D /Y /S
 rem xcopy C:\Users\klove\AppData\Roaming\.ema* E:\"First Window app" /D /Y /S
 
-xcopy C:\Users\klove\AppData\Roaming\.ema* "W:\" /Y /S
+rem xcopy C:\Users\klove\AppData\Roaming\.ema* "W:\" /Y /S
 
 sh.exe .\backupOnline.sh
