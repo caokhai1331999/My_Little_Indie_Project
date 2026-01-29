@@ -43,7 +43,7 @@ struct DirLight{
  vec3 specular;
 };
 
-uniform DirLight dirlight;
+uniform DirLight dirLight;
 
 struct PointLight{
  // Inherent component
@@ -234,23 +234,24 @@ void main()
 
 	// when the light source is blocked how to simulate them
   	vec3 viewDir = normalize( ViewPos - FragPos);// work
-	vec3 lightDir;
-	vec3 reflectDir;
+
+	//vec3 lightDir;
+	//vec3 reflectDir;
 
 	// DIRECTIONAL
 	// Light(No light source position)
-	result = CalcDirLight(dirlight, norm, viewDir);
+	result = CalcDirLight(dirLight, norm, viewDir);
 
 	// POINT
 	for (int i = 0; i < NR_POINT_LIGHTS; i++)
 	{	
-	    result += CalcPointLight(pointLights[i], norm, viewDir);
+	   result += CalcPointLight(pointLights[i], norm, viewDir);
 	}
 
 	// Emission vec3 emission = texture(material.emissionMap, TexCoord).rgb;
 	    //result += CalcPointLight(pointlight, norm, viewDir);
 	// SPOT
-	lightDir = normalize(spotlight.position - FragPos);// lightDir is the direction from flashlight to the fragment
+	//lightDir = normalize(spotlight.position - FragPos);// lightDir is the direction from flashlight to the fragment
 // NOTHING wrong with the calcspotlight fx. The model messed something else up
 	//result += CalcSpotLight(spotlight, norm, viewDir);
 

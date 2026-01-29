@@ -18,6 +18,10 @@
 #include "assimp_glm_helpers.h"
 #include "C_Mesh.h"
 
+static bool first_diffuse_time = true;
+static bool first_specular_time = true;
+static bool first_time = true;
+
 class Model_{
 //private:
 public:

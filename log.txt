@@ -722,12 +722,10 @@ TODO: install emacs 28.1 in order to use lsp-mode
 ---------------- Sat, 03 Jan 26: 04:44PM
 
 TODO: backup w:clangd and build\compile_commands.json to github
-=======
+
 ---------------- Mon, 05 Jan 26: 03:14PM
 
 success install lsp and company
->>>>>>> fd202e9 (update)
-
 ---------------- Thu, 22 Jan 26: 10:44AM
 
 Seemed like the second method which initialize the boneTransform with the first
@@ -740,12 +738,17 @@ Maybe because I change the infolength from int to size_t solve the problem
 REMEMBER! : Delve deeper to know more about size difference. For ex: int16 vs
 int32
 
-<<<<<<< HEAD
+---------------- Tue, 27 Jan 26: 08:32PM
+
 ---------------- Wed, 28 Jan 26: 12:05AM
 
 Got to figure out how to proactively pull what I want for dir on different pc
 with file with same name with different content while still can pull or push
-=======
----------------- Tue, 27 Jan 26: 08:32PM
 
->>>>>>> 5bb0029 (update log)
+---------------- Thu, 29 Jan 26: 10:39AM
+
+Seemed like program can not find the texture inside dae file. Something wrong
+about the program
+
+first bug: the stbiload can not load diffuse and specular.png image for texture
+other bug: animation vertex shader didn't work

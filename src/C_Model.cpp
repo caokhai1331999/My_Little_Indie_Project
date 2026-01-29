@@ -10,8 +10,12 @@
 using namespace std;
 
 void DDraw(Model_* model, GLuint* programID){
-    for(unsigned int i = 0; i < model->meshes.size(); i++){
-        Draw(&model->meshes[i], programID);
+    if(model != nullptr && programID != nullptr){
+        for(unsigned int i = 0; i < model->meshes.size(); i++){
+            Draw(&model->meshes[i], programID);
+        }   
+    } else {
+        printf("model or programID is NULL\n");
     }
 }
 
@@ -111,18 +115,25 @@ Mesh Model_::processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
 
             // Texture is simple a type which recall texture from given path
     
-    if(mesh->mMaterialIndex > 0){
-            // Process MATERIAL
+    //if(mesh->mMaterialIndex > 0){
+        // Process MATERIAL
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         // Texture is simple a type which recall texture from given path
-        vector<Texture> diffuseMaps = loadMaterialTextures(model, material, aiTextureType_DIFFUSE, "material.texture_diffused1", scene);
-        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-        vector<Texture> specularMaps = loadMaterialTextures(model, material, aiTextureType_SPECULAR, "material.texture_specular1", scene);
-        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());    
-        //Load diffuse and specular map to texture
-        } else {
-            printf("Somehow mesh have no material that means no texture; index: %d\n", mesh->mMaterialIndex);
+        if(material != nullptr){
+            vector<Texture> diffuseMaps = loadMaterialTextures(model, material, aiTextureType_DIFFUSE, "material.texture_diffused1", scene);
+            textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+            //printf("Loading diffuse texture to mesh\n");
+
+            vector<Texture> specularMaps = loadMaterialTextures(model, material, aiTextureType_SPECULAR, "material.texture_specular1", scene);
+            textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());    
+            //printf("Loading specular texture to mesh\n");
+            //Load diffuse and specular map to texture            
+                  } else {
+            printf("material is null\n");
         }
+    //} else {
+        //printf("Somehow mesh have no material that means no texture; index: %d\n", mesh->mMaterialIndex);
+    //}
 
         return Mesh(verticles, indices, textures);
 }
@@ -130,28 +141,46 @@ Mesh Model_::processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
 vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene){
     vector<Texture>textures;
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++){
-
         aiString str;
         if(mat->GetTexture(type, i, &str) == aiReturn_SUCCESS){
-            printf("Texture successfully retrieved %s\n", str.C_Str());
+            if(std::strcmp(str.C_Str(),"specular.jpg") == 0){
+                if(first_specular_time){
+                    printf("Texture successfully retrieved %s\n", str.C_Str());
+                    first_specular_time = false;
+                };
+            } else {
+                if(first_diffuse_time){
+                    printf("Texture successfully retrieved %s\n", str.C_Str());
+                    first_diffuse_time = false;
+                };                    
+            }
+
         } else {
-            printf("Texture not found or error occured\n");            
+            if(first_diffuse_time){
+                printf("Texture not found or error occured\n");            
+                first_diffuse_time = false;
+            };
         };
         //printf("Texture path is: %s\n", str.C_Str());
         // IF mat is null
         // manually load the texture to mat from png right here
         bool skip = false;
         for(unsigned int j = 0; j <model->loaded_textures.size(); j++){
+
+            if(first_time){
+                printf("Loading texture from model\n");
+                first_time = false;
+            }
+
             // If the path length equal (the texture existed)
             if(!std::strcmp(model->loaded_textures[j].path.data(), str.C_Str())){
                 //model->loaded_textures.push_back(model->loaded_textures[j]);
                 textures.push_back(model->loaded_textures[j]);
-                printf("Loading texture from model\n");
                 skip = true;
                 break;
             }
-        };
 
+        };
         if(!skip){
             Texture texture;
             if(scene->mNumTextures == 0){                
@@ -163,33 +192,37 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
                 textures.push_back(texture);
                 printf("Start loading texture from external file , model path is :%s\n",(char* )model->directory.c_str());
                 model->loaded_textures.push_back(texture);
-            } else {
+            } else
+            {
                 //for(unsigned int i = 0; i < scene->mNumTextures; i++){
 
 /*
-            NOTE: Try to assign scene texture to model container
-            haven't test it yet
+  NOTE: Try to assign scene texture to model container
+  haven't test it yet
 
-            Things is more complicated than I thought. Actually we load embbedded one in wrong way. We have to load the texture matched with the mat index with
-            is produced by atoi (mat->getTexture().data + 1)
+  Things is more complicated than I thought. Actually we load embbedded one in wrong way. We have to load the texture matched with the mat index with
+  is produced by atoi (mat->getTexture().data + 1)
 */
 
-                    
+                           
+            
                 printf("Start loading texture from embbedded texture, path is:%s\n",(char* )str.C_Str());
-                    // Bug here
-                    texture.id = TextureFromMemory(scene, model->directory, false, &str);
-                    texture.type = typeName;
-                    texture.path = str.C_Str();
-                    textures.push_back(texture);
-                    model->loaded_textures.push_back(texture);
-                }
+                // Bug here
+                texture.id = TextureFromMemory(scene, model->directory, false, &str);
+                texture.type = typeName;
+                texture.path = str.C_Str();
+                textures.push_back(texture);
+                model->loaded_textures.push_back(texture);
             };
-        //}
+            // if 
+
+                   }
         // This part is responsible for loading image internally or from external file
     }
     //}
     return textures;        
 }
+
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma){
     string filename = string(path);
     filename = directory + '/' + filename;

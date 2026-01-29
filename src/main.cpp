@@ -498,7 +498,7 @@ int CALLBACK WinMain
                 copyBufferData(&BackBuffer, &ScreenBuffer);
                 //????
                 //glm::mat4 View = glm::mat4(1.0f);
-                float UpdatedDegree = 0.0f;
+                float UpdatedAngle = 0.0f;
 
                 glm::mat4 basic_cube_core = glm::mat4(1.0f);
                 glm::mat4 backpack_core = glm::mat4(1.0f);
@@ -598,6 +598,7 @@ int CALLBACK WinMain
                 backpack = new Model_();
                 std::string backpack_path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/backpack.obj";
                 loadModel_(backpack, backpack_path);
+
                 //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
 
 //NOW THE ANIMATING PART
@@ -673,14 +674,14 @@ int CALLBACK WinMain
                 model_shader_->setFloat("pointLights[0].linearTerm", 0.09f);
                 model_shader_->setFloat("pointLights[0].quadraticTerm", 0.032f);
 
-                // point light 2
-                //model_shader_->setVec3("pointLights[1].position", pointLightPositions[1]);
-                //model_shader_->setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
-                //model_shader_->setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
-                //model_shader_->setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
-                //model_shader_->setFloat("pointLights[1].constant", 1.0f);
-                //model_shader_->setFloat("pointLights[1].linear", 0.09f);
-                //model_shader_->setFloat("pointLights[1].quadratic", 0.032f);
+                 //point light 2
+                model_shader_->setVec3("pointLights[1].position", pointLightPositions[1]);
+                model_shader_->setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+                model_shader_->setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
+                model_shader_->setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+                model_shader_->setFloat("pointLights[1].constant", 1.0f);
+                model_shader_->setFloat("pointLights[1].linearTerm", 0.09f);
+                model_shader_->setFloat("pointLights[1].quadraticTerm", 0.032f);
 
                 // point light 3
                  //model_shader_->setVec3("pointLights[2].position", pointLightPositions[2]);
@@ -823,10 +824,6 @@ int CALLBACK WinMain
 
                     // Update animating model based on frame time
                     // => calculate finalTransformmatrices and set to
-                    auto Transform = animator->getFinalBoneMatrices();
-                    for(int i = 0; i < Transform->size(); i++){
-                        animating_shader_->setMat4("finalBoneMatrices[" + std::to_string(i) + "]", (*Transform)[i]);
-                    };
                     
                     
                     //if(BackBuffer.camera.moved || BackBuffer.camera.mouse.moved){
@@ -866,10 +863,10 @@ int CALLBACK WinMain
                         //setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
                         //}
                         //Set vectices and color for plane
-                        UpdatedDegree += 5.0f;
-                        //printf("updated angle :%f\n", UpdatedDegree);
-                        if(UpdatedDegree*(float)BackBuffer.camera.speed > 360.0f){
-                            UpdatedDegree -= 360.0f/(float)BackBuffer.camera.speed;
+                        UpdatedAngle += 5.0f;
+                        //printf("updated angle :%f\n", UpdatedAngle);
+                        if(UpdatedAngle*(float)BackBuffer.camera.speed > 360.0f){
+                            UpdatedAngle -= 360.0f/(float)BackBuffer.camera.speed;
                         };
 
                         if(ChangeAxisCounter >= 1000.0f){
@@ -912,19 +909,25 @@ int CALLBACK WinMain
                     glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
-                    drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], BackBuffer.camera.speed, &UpdatedDegree);
+                    drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], BackBuffer.camera.speed, &UpdatedAngle);
 
                     //Draw the backpack
                     model_shader_->use();
-                    basic_shader_->setMat4("model", backpack_core);
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
-                    DDraw(dancing_vampire, &ScreenBuffer.glData.ProgramIDs[1]);
+                    GLuint brushID = model_shader_->GetProgramID();
+                    model_shader_->setMat4("model", backpack_core);
+                    DDraw(backpack, &brushID);
                     
 // Now Draw the vampire
                     animating_shader_->use();
-                    glBindVertexArray(ScreenBuffer.glData.VAOs);
                     animating_shader_->setMat4( "model", dancing_vampire_core);
-                    DDraw(dancing_vampire, &ScreenBuffer.glData.ProgramIDs[2]);                    
+                    auto Transform = animator->getFinalBoneMatrices();
+                    for(int i = 0; i < Transform->size(); i++){
+                        animating_shader_->setMat4("finalBoneMatrices[" + std::to_string(i) + "]", (*Transform)[i]);
+                    };
+                    glBindVertexArray(ScreenBuffer.glData.VAOs);
+                    brushID = animating_shader_->GetProgramID();
+                    DDraw(dancing_vampire, &brushID);                    
                     
                     LastCounter = EndCounter;
                     LastCycleCounts = EndCycleCounts;
