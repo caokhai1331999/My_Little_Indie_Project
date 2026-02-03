@@ -35,7 +35,7 @@ public:
     bool gammaCorrection;
 
     Model_(const char *path = nullptr, bool gamma = false)
-        : gammaCorrection(gamma) {
+            : gammaCorrection(gamma), directory(path) {
       m_BoneCounter = 0;
       m_BoneInfoMap = nullptr;
       m_BoneInfoMap = new std::unordered_map<std::string, Bone_Info>;

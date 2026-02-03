@@ -186,7 +186,7 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
             if(scene->mNumTextures == 0){                
                 //This is wrong in fbx case : How to fix this???
                 texture.id = TextureFromFile(str.C_Str(), model->directory);
-                //printf("texture path is:%s\n",model->directory);
+                printf("texture path is:%s\n",model->directory);
                 texture.type = typeName;
                 texture.path = str.C_Str();
                 textures.push_back(texture);
