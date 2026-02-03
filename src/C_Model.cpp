@@ -233,8 +233,10 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
     int width, height, nrComponents;
 
     //stbi_set_flip_vertically_on_load(true);
-
         // This used stbi_load to load image
+
+    // TODO: find out why stbi load failed to load image data
+    // and create alternative function if there is no way to fix this    
         unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
 
         if (data)

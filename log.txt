@@ -752,3 +752,6 @@ about the program
 
 first bug: the stbiload can not load diffuse and specular.png image for texture
 other bug: animation vertex shader didn't work
+
+---------------- Sun, 01 Feb 26: 09:09PM
+
