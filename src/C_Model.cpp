@@ -187,11 +187,11 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
             if(scene->mNumTextures == 0){                
                 //This is wrong in fbx case : How to fix this???
                 texture.id = TextureFromFile(str.C_Str(), model->directory);
-                printf("texture path is:%s\n",model->directory);
+                printf("texture path is:%s\n",model->directory.c_str());
                 texture.type = typeName;
                 texture.path = str.C_Str();
                 textures.push_back(texture);
-                printf("Start loading texture from external file , model path is :%s\n",model->directory);
+                printf("Start loading texture from external file , model path is :%s\n",model->directory.c_str());
                 model->loaded_textures.push_back(texture);
             } else
             {
