@@ -35,7 +35,7 @@ public:
     bool gammaCorrection;
 
     Model_(const char *path = nullptr, bool gamma = false)
-            : gammaCorrection(gamma), directory(path) {
+        : gammaCorrection(gamma) {
       m_BoneCounter = 0;
       m_BoneInfoMap = nullptr;
       m_BoneInfoMap = new std::unordered_map<std::string, Bone_Info>;
@@ -44,7 +44,7 @@ public:
     void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
     void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
     Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene);
-    string* GetModelDir(){return &directory;};
+    std::string* GetModelDir(){return &directory;};
 // About skeletal animation
     std::unordered_map<std::string, Bone_Info>*GetBoneInfoMap(){return m_BoneInfoMap;};
     int GetBoneCount() { return m_BoneCounter;};

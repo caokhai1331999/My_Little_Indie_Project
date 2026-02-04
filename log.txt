@@ -755,3 +755,10 @@ other bug: animation vertex shader didn't work
 
 ---------------- Sun, 01 Feb 26: 09:09PM
 
+
+---------------- Wed, 04 Feb 26: 12:41PM
+
+Must init window before call createwindow function
+
+may be the mainwindowcallback call the uninitialized window handle before it is
+created    

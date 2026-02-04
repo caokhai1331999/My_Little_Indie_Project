@@ -44,8 +44,9 @@ void loadModel_(Model_* model, string path){
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
         cout<<"ERROR::ASSIMP::"<<importer.GetErrorString()<<endl;
     }
-
-    model->directory = path.substr(0, path.find_last_of('/'));
+//NOTE: This part is wrong
+    std::string dir = path.substr(0, path.find_last_of('/'));
+    model->directory = (char*)dir.c_str();
 // NODE
     processNode(model, scene->mRootNode, scene);
 // MESH
@@ -156,10 +157,10 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
             }
 
         } else {
-            if(first_diffuse_time){
+            //if(first_diffuse_time){
                 printf("Texture not found or error occured\n");            
-                first_diffuse_time = false;
-            };
+                //first_diffuse_time = false;
+            //};
         };
         //printf("Texture path is: %s\n", str.C_Str());
         // IF mat is null
@@ -190,7 +191,7 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
                 texture.type = typeName;
                 texture.path = str.C_Str();
                 textures.push_back(texture);
-                printf("Start loading texture from external file , model path is :%s\n",(char* )model->directory.c_str());
+                printf("Start loading texture from external file , model path is :%s\n",model->directory);
                 model->loaded_textures.push_back(texture);
             } else
             {
@@ -236,8 +237,8 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
         // This used stbi_load to load image
 
     // TODO: find out why stbi load failed to load image data
-    // and create alternative function if there is no way to fix this    
-        unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+    // and create alternative function if there is no way to fix this
+     unsigned char *data = (unsigned char*)stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
 
         if (data)
         {

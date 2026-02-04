@@ -61,6 +61,10 @@ struct Win32_OffScreen_Buffer{
     
     const int BytesPerPixel = 4;
 };
+
+LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
+                                    LPARAM Lparam);
+
 bool isNull(GLuint* member = nullptr);
 void PassGLData(OpenGLData* BackData, OpenGLData* FrontData);
 struct Win32_Front_Buffer{  
@@ -118,6 +122,8 @@ void APIENTRY MessageCallback(GLenum source,
                               GLsizei length,
                               const GLchar* message,
                               const void* userParam);
+
+void ErrorExit();
 
 #define WIN32GAME_H
 #endif

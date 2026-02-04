@@ -201,7 +201,7 @@ void DEBUGFreeFileMemory(void* memory){
 }
 
 imagee_content* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
-    imagee_content* result = new imagee_content();
+    imagee_content* result = (imagee_content*)malloc(sizeof(struct imagee_content));
     ReadResult = DEBUGReadFileWhole(filename);
      if(ReadResult->Size != 0){
 
@@ -210,13 +210,13 @@ imagee_content* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult)
 
          uint32* pixels = (uint32* )((uint8 *)ReadResult->Content + HeadResult->bfOffBits);
 
-         result->ImageContent = pixels;
          result->Width = HeadResult->Width;
          result->Height = HeadResult->Height;
+         result->ImageContent = pixels;
 
          
          
-         uint32* SourceDest = pixels;
+         //uint32* SourceDest = pixels;
 //NOTE: For OpenGL this original arranging order work but not for passing directly to window graphic
          
          
