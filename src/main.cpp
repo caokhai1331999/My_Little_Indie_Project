@@ -11,6 +11,8 @@
 #include "Tile.h"
 #include "animator.h"
 
+bool first_size = true;
+
 LRESULT CALLBACK MainWindowCallBack(
     HWND Window,
     UINT Message,
@@ -30,16 +32,19 @@ LRESULT CALLBACK MainWindowCallBack(
       // NOTE: Whenever the window is resized, this function capture the size
       // of the new window and update a new proper DIB for that
       // DIB is a table where store BIT color infor
-      //case WM_SIZE: {
-      //GetWindowDimension(Window);
-//
-      //Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
-      //if (!BackBuffer.transferNeed) {
-        //BackBuffer.transferNeed = true;
-      //}
-      //glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
-      //OutputDebugStringA("WM_SIZE\n");
-    //} break;
+      case WM_SIZE: {
+          if(first_size){
+              first_size = false;
+          } else {
+            GetWindowDimension(Window);
+            Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
+            if (!BackBuffer.transferNeed) {
+              BackBuffer.transferNeed = true;
+            }
+            glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
+            OutputDebugStringA("WM_SIZE\n");
+            }
+    } break;
         
         case WM_CLOSE:
         {
@@ -376,16 +381,17 @@ int CALLBACK WinMain
   // NOTE: This one count is for counting the frame
   int64 PerfCountFrequency = (int64)(PerfCountFrequencyResult.QuadPart);
   win32LoadXInput();
+  WNDCLASSEXA WindowClass = {};
+  WindowClass.cbSize = sizeof(WNDCLASSEXA);
+  WindowClass.style = CS_HREDRAW|CS_VREDRAW;
   HWND Window = {};
-  WNDCLASSA WindowClass = {};
-  // WindowClass.style = CS_HREDRAW|CS_VREDRAW;
   WindowClass.lpfnWndProc = MainWindowCallBack;
   WindowClass.hInstance = Instance;
   WindowClass.lpszClassName = "First Game Window Class";
-  Win32ResizeDIBSection(&BackBuffer, Dimens.Height, Dimens.Width);
+  //Win32ResizeDIBSection(&BackBuffer, Dimens.Height, Dimens.Width);
 
   // NOTE: I forgot to init window
-  if (RegisterClassA(&WindowClass)) {
+  if (RegisterClassExA(&WindowClass)) {
 
     Window = CreateWindowExA(
         // NOTE: The window didn't show up is because the first argument
@@ -394,6 +400,7 @@ int CALLBACK WinMain
         CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, Instance, 0);
 
     if (Window) {
+
       OpenConsole();
       int displayCount = ShowCursor(true);
       printf("display count: %d\n", displayCount);

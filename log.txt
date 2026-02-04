@@ -762,3 +762,8 @@ Must init window before call createwindow function
 
 may be the mainwindowcallback call the uninitialized window handle before it is
 created    
+
+---------------- Wed, 04 Feb 26: 05:21PM
+
+accidently fixed hidden bug. On create window automatically call the resize
+command which is immaturely cause the widow w and h is not set yet
