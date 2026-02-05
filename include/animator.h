@@ -18,7 +18,7 @@ public:
       };
     ~Animator();
 
-    void updateAnimationTime(const Animation& animation, float dt);
+    void updateAnimationTime(float dt);
     void playAnimation(Animation* pAnimation);
     void calculateBoneTransform(const AssimpNodeData* node, glm::mat4* parentTransform);
 

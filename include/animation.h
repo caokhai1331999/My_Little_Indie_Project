@@ -58,7 +58,7 @@ public:
     Bone* FindBone(const std::string& name);
     void ReadMissingBone(const aiAnimation* animation, Model_* model);
     void ReadHierarchyData(AssimpNodeData& dest, const aiNode* src);
-
+    AssimpNodeData* getRootNode(){return &m_RootNode;};
 private:
     float m_Duration;
     int m_TicksPerSecond;

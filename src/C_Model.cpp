@@ -184,8 +184,8 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
         };
         if(!skip){
             Texture texture;
-            if(scene->mNumTextures == 0){                
                 //This is wrong in fbx case : How to fix this???
+            if(scene->mNumTextures == 0){                
                 texture.id = TextureFromFile(str.C_Str(), model->directory);
                 printf("texture path is:%s\n",model->directory.c_str());
                 texture.type = typeName;
@@ -197,16 +197,16 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
             {
                 //for(unsigned int i = 0; i < scene->mNumTextures; i++){
 
-/*
-  NOTE: Try to assign scene texture to model container
-  haven't test it yet
+                /*
+                  NOTE: Try to assign scene texture to model container
+                  haven't test it yet
 
-  Things is more complicated than I thought. Actually we load embbedded one in wrong way. We have to load the texture matched with the mat index with
-  is produced by atoi (mat->getTexture().data + 1)
-*/
+                  Things is more complicated than I thought. Actually we load
+                  embbedded one in wrong way. We have to load the texture
+                  matched with the mat index with is produced by atoi
+                  (mat->getTexture().data + 1)
+                */
 
-                           
-            
                 printf("Start loading texture from embbedded texture, path is:%s\n",(char* )str.C_Str());
                 // Bug here
                 texture.id = TextureFromMemory(scene, model->directory, false, &str);
@@ -225,9 +225,10 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
 }
 
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma){
-    string filename = string(path);
-    filename = directory + '/' + filename;
-
+  std::string filename = string(path);
+  //May the file path is insufficient here
+  filename = directory + '/' + filename;
+    printf("texture file path: %s\n", filename.c_str());
     unsigned int textureID;
     glGenTextures(1, &textureID);
 
@@ -261,9 +262,7 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
             stbi_image_free(data);
-        }
-        else
-        {
+        } else {
             std::cout << "Texture failed to load at path: " << path << std::endl;
             stbi_image_free(data);
         }

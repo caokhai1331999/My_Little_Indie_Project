@@ -11,358 +11,364 @@
 #include "Tile.h"
 #include "animator.h"
 
-bool first_size = true;
+bool32 first_size = true;
+bool32 first_announce = true;
 
-LRESULT CALLBACK MainWindowCallBack(
-    HWND Window,
-    UINT Message,
-    WPARAM Wparam,
-    LPARAM Lparam    
-                                    )
-{
-    LRESULT result;
-    bool fDraw = false;
-    POINT ptPrevious = {};
-    switch(Message) {
+LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
+                                    LPARAM Lparam) {
+  LRESULT result;
+  bool fDraw = false;
+  POINT ptPrevious = {};
+  switch (Message) {
 
-    case WM_CREATE: {
-      printf("On Window creating stage\n");
-    } break;
-      // What is DeviceContext for in this case??
-      // NOTE: Whenever the window is resized, this function capture the size
-      // of the new window and update a new proper DIB for that
-      // DIB is a table where store BIT color infor
-      case WM_SIZE: {
-          if(first_size){
-              first_size = false;
-          } else {
-            GetWindowDimension(Window);
-            Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
-            if (!BackBuffer.transferNeed) {
-              BackBuffer.transferNeed = true;
-            }
-            glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
-            OutputDebugStringA("WM_SIZE\n");
-            }
-    } break;
-        
-        case WM_CLOSE:
-        {
-            GlobalRunning = false;
-            OutputDebugStringA("WM_CLOSE\n");
-        }break;
-
-        case WM_KEYDOWN:
-        {
-            bool IsDown = ((Lparam &(1 << 31)) == 0);
-            bool WasDown = ((Lparam &(1 << 30)) != 0);
-            
-            uint32 vkCode = Wparam;
-            if(IsDown){
-                if(vkCode == 'W') {
-                    //Actually the front vec is at the back of the camera
-                    //State.BlueOffset+= 10;
-                    BackBuffer.camera.Position +=  glm::normalize(BackBuffer.camera.Direction) * BackBuffer.camera.speed;
-                    printf("Up is HIT\n");
-                }
-
-                else if(vkCode == 'S') {
-                    State.GreenOffset+= 10;
-                    BackBuffer.camera.Position -= glm::normalize(BackBuffer.camera.Direction) * BackBuffer.camera.speed;
-                    printf("Down is HIT\n");
-                }
-
-                else if(vkCode == 'A') {
-                    //XOffset -= 10;
-                    OutputDebugStringA("Left Button :");
-                    //if(WasDown) {                    
-                    // Not Camera front and up
-                        BackBuffer.camera.Position -=  glm::normalize(glm::cross(BackBuffer.camera.Direction, BackBuffer.camera.Up)) * BackBuffer.camera.speed;
-                    //OutputDebugStringA(" Was Down");
-                    //}
-                    printf("LEFT is HIT\n");
-                }
-
-                else if(vkCode == 'D') {
-                    BackBuffer.camera.Position += glm::normalize(glm::cross(BackBuffer.camera.Direction, BackBuffer.camera.Up)) * BackBuffer.camera.speed;
-                    printf("Right is HIT\n");
-                    //XOffset += 10;                    
-                }
-
-                else if(vkCode == VK_SPACE) {
-                    BackBuffer.camera.Position += BackBuffer.camera.Up * BackBuffer.camera.speed;
-                    printf("Space is HIT\n");
-                    //XOffset += 10;                    
-                }
-
-                else if(vkCode == VK_SHIFT) {
-                    BackBuffer.camera.Position -= BackBuffer.camera.Up * BackBuffer.camera.speed;
-                    printf("Shift is HIT\n");
-                    //XOffset += 10;                    
-                }
-
-                else if(vkCode == VK_BACK) {
-                    BackBuffer.camera.Direction = glm::vec3(-4.0f, 4.0f, 0.0f) - BackBuffer.camera.Position;
-
-                    BackBuffer.camera.mouse.LastX = BackBuffer.camera.mouse.xPos;
-                    BackBuffer.camera.mouse.LastY = BackBuffer.camera.mouse.yPos;
-                    BackBuffer.camera.mouse.MouseXOffset = 0;
-                    BackBuffer.camera.mouse.MouseYOffset = 0;
-
-                    printf("Direction X is %f\n", BackBuffer.camera.Direction.x);
-                    printf("Direction Y is %f\n", BackBuffer.camera.Direction.y);
-                    
-                    BackBuffer.camera.Yaw = glm::degrees(glm::acos(glm::clamp(BackBuffer.camera.Direction.x, -1.0f, 1.0f)));
-                    BackBuffer.camera.Pitch = glm::degrees(glm::acos(glm::clamp(BackBuffer.camera.Direction.y, -1.0f, 1.0f)));
-
-                    printf("Yaw is %f\n", BackBuffer.camera.Yaw);
-                    printf("Pitch is %f\n", BackBuffer.camera.Pitch);
-
-                    if(BackBuffer.camera.Yaw > 360.0f){
-                        BackBuffer.camera.Yaw -= 360.0f;
-                    }
-
-                    if(BackBuffer.camera.Pitch > 90.0f){
-                        BackBuffer.camera.Yaw -= 90.0f;
-                    }
-                    
-                    printf("Back to point at the backpack\n");
-
-                    std::cout<<"Direction is: "<< glm::to_string(BackBuffer.camera.Direction)<<std::endl;
-
-
-
-                    WINDOWPLACEMENT windowstatus = {};
-                    windowstatus.length = sizeof(WINDOWPLACEMENT);
-                    
-                    if(GetWindowPlacement(Window, &windowstatus)){
-                        printf("Window position(x, y) is: %d %d\n", windowstatus.rcNormalPosition.left, windowstatus.rcNormalPosition.top);
-                    } else {
-                        printf("Failed to get window status\n");
-                    }
-
-                    SetCursorPos(BackBuffer.camera.mouse.xPos + windowstatus.rcNormalPosition.left, BackBuffer.camera.mouse.yPos + windowstatus.rcNormalPosition.top);
-                    //XOffset += 10;                    
-                }
-                
-                }
-
-                if(!BackBuffer.camera.moved){
-                    //std::cout<<"Camera Position is"<<glm::to_string(BackBuffer.camera.Position)<<std::endl;
-                    //std::cout<<"Camera Direction is"<<glm::to_string(BackBuffer.camera.Direction)<<std::endl;
-                    BackBuffer.camera.moved = true;
-                }
-
-                //if(vkCode == VK_LEFT) {
-                //
-                //OutputDebugStringA("Left Button :");
-                //if(IsDown) {                    
-                //OutputDebugStringA(" Is Down");
-                //
-                //}
-                //OutputDebugStringA("\n");
-                //}
-
-                if(vkCode == VK_ESCAPE){
-                    if(GlobalRunning){
-                        GlobalRunning = false;
-                    }
-                }                
-        }break;
-
-        case WM_MOUSEWHEEL:
-        {
-            float wheelPos = GET_WHEEL_DELTA_WPARAM(Wparam)*0.1f;
-            //printf("Wheel delta: %d\n", (GET_WHEEL_DELTA_WPARAM(Wparam)));
-            BackBuffer.camera.fov += wheelPos * BackBuffer.camera.speed;
-
-            if(BackBuffer.camera.fov < 1.0f){
-                BackBuffer.camera.fov = 1.0f;
-            }
-
-            if(BackBuffer.camera.fov > 45.0f){
-                BackBuffer.camera.fov = 45.0f;
-            }
-            printf("Mouse Wheel is rolling, Wheel: %f, fov: %f\n", wheelPos, BackBuffer.camera.fov);
-
-            if(!BackBuffer.camera.mouse.Wheeled){
-                BackBuffer.camera.mouse.Wheeled = true;
-            }
-
-        }break;
-
-        case WM_MOUSELEAVE:
-        {
-            if(BackBuffer.camera.mouse.LastX != BackBuffer.BitmapWidth/2){
-                BackBuffer.camera.mouse.LastX = BackBuffer.BitmapWidth/2;
-            }
-
-            if(BackBuffer.camera.mouse.LastY != BackBuffer.BitmapHeight/2){
-                BackBuffer.camera.mouse.LastY = BackBuffer.BitmapHeight/2;
-            }
-            
-                //printf("Mouse Pos X: %d, Y: %d\n", BackBuffer.camera.mouse.LastX, BackBuffer.camera.mouse.LastY);
-                if(BackBuffer.camera.mouse.moved){
-                    //std::cout<<"Camera Position is"<<glm::to_string(BackBuffer.camera.Position)<<std::endl;
-                    //std::cout<<"Camera Direction is"<<glm::to_string(BackBuffer.camera.Direction)<<std::endl;
-                    BackBuffer.camera.mouse.moved = false;
-                }
-            
-        }break;
-        
-        case WM_LBUTTONDOWN:
-        {
-            uint32 vkCode = Wparam;
-                //if(vkCode == VK_LBUTTON) {
-                    if(!BackBuffer.camera.focusCenter){
-                        BackBuffer.camera.focusCenter = true;
-                    }
-                    printf("Mouse LButton is HIT\n");
-                //}
-                //return 0;
-        }break;
-
-        case WM_LBUTTONUP:
-        {
-            //uint32 vkCode = Wparam;
-            //if(vkCode == VK_LBUTTON) {
-                if(BackBuffer.camera.focusCenter){
-                    BackBuffer.camera.focusCenter = false;
-                }
-                printf("Mouse LButton is released\n");
-            //}
-            //return 0;
-        }break;
-
-        case WM_MOUSEHOVER:{
-            if(TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent)){
-                printf("Mouse event is being tracked\n");
-            } else {
-                printf("Can not track Mouse event\n");                
-            };
-        }break;
-
-        case WM_MOUSEMOVE:{
-            if (fDraw) 
-            { 
-                DeviceContext = GetDC(Window); 
-                MoveToEx(DeviceContext, ptPrevious.x, ptPrevious.y, NULL); 
-                LineTo(DeviceContext, ptPrevious.x = LOWORD(Lparam), 
-                       ptPrevious.y = HIWORD(Lparam)); 
-                ReleaseDC(Window, DeviceContext); 
-            }
-
-            BackBuffer.camera.mouse.xPos =  GET_X_LPARAM(Lparam); 
-//
-            //if(BackBuffer.camera.mouse.xPos > BackBuffer.BitmapWidth){
-                //BackBuffer.camera.mouse.xPos = BackBuffer.BitmapWidth;
-            //}
-//
-            //if(BackBuffer.camera.mouse.xPos < 0){
-                //BackBuffer.camera.mouse.xPos = 0;
-            //}
-//
-            BackBuffer.camera.mouse.yPos = GET_Y_LPARAM(Lparam); 
-//
-            //if(BackBuffer.camera.mouse.yPos > BackBuffer.BitmapHeight){
-                //BackBuffer.camera.mouse.yPos = BackBuffer.BitmapHeight;
-            //}
-//
-            //if(BackBuffer.camera.mouse.yPos < 0){
-                //BackBuffer.camera.mouse.yPos = 0;
-            //}
-            //
-            //printf("Mouse x pos: %d\n", BackBuffer.camera.mouse.xPos);
-            //printf("Mouse y pos: %d\n", BackBuffer.camera.mouse.yPos);
-
-            if(!BackBuffer.camera.mouse.moved){
-                BackBuffer.camera.mouse.moved = true;
-            }
-            //return 0L;             
-
-        }break;         
-
-        case WM_SYSKEYDOWN:
-        {
-            uint32 vkCode = Wparam;
-            bool AltkeyisDown = ((Lparam &(1 << 29)) != 0);
-            if((vkCode == VK_F4) && AltkeyisDown) {
-                GlobalRunning = false;
-            }                                        
-            OutputDebugStringA("WM_SYSKEYDOWN\n");            
-        }break;
-
-        case WM_SYSKEYUP:
-        {            
-            OutputDebugStringA("WM_SYSKEYUP\n");            
-        }break;
-
-        case WM_KEYUP:
-        {
-            uint32 vkCode = Wparam;
-            //NOTE: This is whether bit 30 or 0 (never 1).
-            // So if it is bit 30 it is down 
-            bool WasDown = ((Lparam &(1 << 30)) != 0);
-            bool IsDown = ((Lparam &(1 << 31)) == 0);            
-            //if (WasDown != IsDown) {
-                
-            //else
-                if(vkCode == VK_TAB) {
-                    if(SoundOutPut.hz == 128){
-                        SoundOutPut.hz = 256;
-                    } else if (SoundOutPut.hz == 256) {
-                        SoundOutPut.hz = 512;
-                    } else {
-                        SoundOutPut.hz = 128;                        
-                    }
-                    char Output[256];
-                    sprintf(Output, "TAB button hitted, Current Hert is: %d\n", SoundOutPut.hz);
-                    SoundOutPut.WavePeriod = SoundOutPut.SamplePerSecond/SoundOutPut.hz;
-                    
-                    OutputDebugStringA("TAB button hitted");                  
-                }
-
-        }break;
-        
-        case WM_DESTROY:
-        {
-            GlobalRunning = false;
-            PostQuitMessage(0);
-            OutputDebugStringA("WM_DESTROY\n");            
-        }break;
-        
-        case WM_PAINT:            
-        {
- 
-            BeginPaint(Window, NULL);
-            HDC tempDC = GetDC(Window);
-            // Start to save bit drawing data to the current HDC
-            //RenderSplendidGradient(&BackBuffer, NULL, BMPContent, 0, 0, 4);
-            Win32DisplayBufferWindow(tempDC, Dimens.Width, Dimens.Height, &BackBuffer);
-
-            if(glGetError() != GL_NO_ERROR){
-                printf("OpenGL Error: %d\n", glGetError());
-            };
-
-            //glBindVertexArray(BackBuffer.glData.VAOs);
-            //glDrawArrays(GL_TRIANGLES, 0, 6);
-            SwapBuffers(tempDC);            
-            EndPaint(Window, NULL);
-            ReleaseDC(Window, tempDC);
-
-            OutputDebugStringA("WM_PAINT\n");
-        }break;
-           
-        default:
-        {
-            OutputDebugStringA("DEFAULT\n");
-            result = DefWindowProcA(Window, Message, Wparam, Lparam);
-        }break;
+  case WM_CREATE: {
+    printf("On Window creating stage\n");
+  } break;
+  // What is DeviceContext for in this case??
+  // NOTE: Whenever the window is resized, this function capture the size
+  // of the new window and update a new proper DIB for that
+  // DIB is a table where store BIT color infor
+  case WM_SIZE: {
+    if (first_size) {
+      first_size = false;
+    } else {
+      GetWindowDimension(Window);
+      Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
+      if (!BackBuffer.transferNeed) {
+        BackBuffer.transferNeed = true;
+      }
+      glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
+      OutputDebugStringA("WM_SIZE\n");
     }
-    //return 0L;         
-    return result;
-}
+  } break;
 
+  case WM_CLOSE: {
+    GlobalRunning = false;
+    OutputDebugStringA("WM_CLOSE\n");
+  } break;
+
+  case WM_KEYDOWN: {
+    bool IsDown = ((Lparam & (1 << 31)) == 0);
+    bool WasDown = ((Lparam & (1 << 30)) != 0);
+
+    uint32 vkCode = Wparam;
+    if (IsDown) {
+      if (vkCode == 'W') {
+        // Actually the front vec is at the back of the camera
+        // State.BlueOffset+= 10;
+        BackBuffer.camera.Position +=
+            glm::normalize(BackBuffer.camera.Direction) *
+            BackBuffer.camera.speed;
+        printf("Up is HIT\n");
+      }
+
+      else if (vkCode == 'S') {
+        State.GreenOffset += 10;
+        BackBuffer.camera.Position -=
+            glm::normalize(BackBuffer.camera.Direction) *
+            BackBuffer.camera.speed;
+        printf("Down is HIT\n");
+      }
+
+      else if (vkCode == 'A') {
+        // XOffset -= 10;
+        OutputDebugStringA("Left Button :");
+        // if(WasDown) {
+        //  Not Camera front and up
+        BackBuffer.camera.Position -=
+            glm::normalize(
+                glm::cross(BackBuffer.camera.Direction, BackBuffer.camera.Up)) *
+            BackBuffer.camera.speed;
+        // OutputDebugStringA(" Was Down");
+        // }
+        printf("LEFT is HIT\n");
+      }
+
+      else if (vkCode == 'D') {
+        BackBuffer.camera.Position +=
+            glm::normalize(
+                glm::cross(BackBuffer.camera.Direction, BackBuffer.camera.Up)) *
+            BackBuffer.camera.speed;
+        printf("Right is HIT\n");
+        // XOffset += 10;
+      }
+
+      else if (vkCode == VK_SPACE) {
+        BackBuffer.camera.Position +=
+            BackBuffer.camera.Up * BackBuffer.camera.speed;
+        printf("Space is HIT\n");
+        // XOffset += 10;
+      }
+
+      else if (vkCode == VK_SHIFT) {
+        BackBuffer.camera.Position -=
+            BackBuffer.camera.Up * BackBuffer.camera.speed;
+        printf("Shift is HIT\n");
+        // XOffset += 10;
+      }
+
+      else if (vkCode == VK_BACK) {
+        BackBuffer.camera.Direction =
+            glm::vec3(-4.0f, 4.0f, 0.0f) - BackBuffer.camera.Position;
+
+        BackBuffer.camera.mouse.LastX = BackBuffer.camera.mouse.xPos;
+        BackBuffer.camera.mouse.LastY = BackBuffer.camera.mouse.yPos;
+        BackBuffer.camera.mouse.MouseXOffset = 0;
+        BackBuffer.camera.mouse.MouseYOffset = 0;
+
+        printf("Direction X is %f\n", BackBuffer.camera.Direction.x);
+        printf("Direction Y is %f\n", BackBuffer.camera.Direction.y);
+
+        BackBuffer.camera.Yaw = glm::degrees(
+            glm::acos(glm::clamp(BackBuffer.camera.Direction.x, -1.0f, 1.0f)));
+        BackBuffer.camera.Pitch = glm::degrees(
+            glm::acos(glm::clamp(BackBuffer.camera.Direction.y, -1.0f, 1.0f)));
+
+        printf("Yaw is %f\n", BackBuffer.camera.Yaw);
+        printf("Pitch is %f\n", BackBuffer.camera.Pitch);
+
+        if (BackBuffer.camera.Yaw > 360.0f) {
+          BackBuffer.camera.Yaw -= 360.0f;
+        }
+
+        if (BackBuffer.camera.Pitch > 90.0f) {
+          BackBuffer.camera.Yaw -= 90.0f;
+        }
+
+        printf("Back to point at the backpack\n");
+
+        std::cout << "Direction is: "
+                  << glm::to_string(BackBuffer.camera.Direction) << std::endl;
+
+        WINDOWPLACEMENT windowstatus = {};
+        windowstatus.length = sizeof(WINDOWPLACEMENT);
+
+        if (GetWindowPlacement(Window, &windowstatus)) {
+          printf("Window position(x, y) is: %d %d\n",
+                 windowstatus.rcNormalPosition.left,
+                 windowstatus.rcNormalPosition.top);
+        } else {
+          printf("Failed to get window status\n");
+        }
+
+        SetCursorPos(
+            BackBuffer.camera.mouse.xPos + windowstatus.rcNormalPosition.left,
+            BackBuffer.camera.mouse.yPos + windowstatus.rcNormalPosition.top);
+        // XOffset += 10;
+      }
+    }
+
+    if (!BackBuffer.camera.moved) {
+      // std::cout<<"Camera Position
+      // is"<<glm::to_string(BackBuffer.camera.Position)<<std::endl;
+      // std::cout<<"Camera Direction
+      // is"<<glm::to_string(BackBuffer.camera.Direction)<<std::endl;
+      BackBuffer.camera.moved = true;
+    }
+
+    // if(vkCode == VK_LEFT) {
+    //
+    // OutputDebugStringA("Left Button :");
+    // if(IsDown) {
+    // OutputDebugStringA(" Is Down");
+    //
+    // }
+    // OutputDebugStringA("\n");
+    // }
+
+    if (vkCode == VK_ESCAPE) {
+      if (GlobalRunning) {
+        GlobalRunning = false;
+      }
+    }
+  } break;
+
+  case WM_MOUSEWHEEL: {
+    float wheelPos = GET_WHEEL_DELTA_WPARAM(Wparam) * 0.1f;
+    // printf("Wheel delta: %d\n", (GET_WHEEL_DELTA_WPARAM(Wparam)));
+    BackBuffer.camera.fov += wheelPos * BackBuffer.camera.speed;
+
+    if (BackBuffer.camera.fov < 1.0f) {
+      BackBuffer.camera.fov = 1.0f;
+    }
+
+    if (BackBuffer.camera.fov > 45.0f) {
+      BackBuffer.camera.fov = 45.0f;
+    }
+    printf("Mouse Wheel is rolling, Wheel: %f, fov: %f\n", wheelPos,
+           BackBuffer.camera.fov);
+
+    if (!BackBuffer.camera.mouse.Wheeled) {
+      BackBuffer.camera.mouse.Wheeled = true;
+    }
+
+  } break;
+
+  case WM_MOUSELEAVE: {
+    if (BackBuffer.camera.mouse.LastX != BackBuffer.BitmapWidth / 2) {
+      BackBuffer.camera.mouse.LastX = BackBuffer.BitmapWidth / 2;
+    }
+
+    if (BackBuffer.camera.mouse.LastY != BackBuffer.BitmapHeight / 2) {
+      BackBuffer.camera.mouse.LastY = BackBuffer.BitmapHeight / 2;
+    }
+
+    // printf("Mouse Pos X: %d, Y: %d\n", BackBuffer.camera.mouse.LastX,
+    // BackBuffer.camera.mouse.LastY);
+    if (BackBuffer.camera.mouse.moved) {
+      // std::cout<<"Camera Position
+      // is"<<glm::to_string(BackBuffer.camera.Position)<<std::endl;
+      // std::cout<<"Camera Direction
+      // is"<<glm::to_string(BackBuffer.camera.Direction)<<std::endl;
+      BackBuffer.camera.mouse.moved = false;
+    }
+
+  } break;
+
+  case WM_LBUTTONDOWN: {
+    uint32 vkCode = Wparam;
+    // if(vkCode == VK_LBUTTON) {
+    if (!BackBuffer.camera.focusCenter) {
+      BackBuffer.camera.focusCenter = true;
+    }
+    printf("Mouse LButton is HIT\n");
+    //}
+    // return 0;
+  } break;
+
+  case WM_LBUTTONUP: {
+    // uint32 vkCode = Wparam;
+    // if(vkCode == VK_LBUTTON) {
+    if (BackBuffer.camera.focusCenter) {
+      BackBuffer.camera.focusCenter = false;
+    }
+    printf("Mouse LButton is released\n");
+    //}
+    // return 0;
+  } break;
+
+  case WM_MOUSEHOVER: {
+    if (TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent)) {
+      printf("Mouse event is being tracked\n");
+    } else {
+      printf("Can not track Mouse event\n");
+    };
+  } break;
+
+  case WM_MOUSEMOVE: {
+    if (fDraw) {
+      DeviceContext = GetDC(Window);
+      MoveToEx(DeviceContext, ptPrevious.x, ptPrevious.y, NULL);
+      LineTo(DeviceContext, ptPrevious.x = LOWORD(Lparam),
+             ptPrevious.y = HIWORD(Lparam));
+      ReleaseDC(Window, DeviceContext);
+    }
+
+    BackBuffer.camera.mouse.xPos = GET_X_LPARAM(Lparam);
+    //
+    // if(BackBuffer.camera.mouse.xPos > BackBuffer.BitmapWidth){
+    // BackBuffer.camera.mouse.xPos = BackBuffer.BitmapWidth;
+    //}
+    //
+    // if(BackBuffer.camera.mouse.xPos < 0){
+    // BackBuffer.camera.mouse.xPos = 0;
+    //}
+    //
+    BackBuffer.camera.mouse.yPos = GET_Y_LPARAM(Lparam);
+    //
+    // if(BackBuffer.camera.mouse.yPos > BackBuffer.BitmapHeight){
+    // BackBuffer.camera.mouse.yPos = BackBuffer.BitmapHeight;
+    //}
+    //
+    // if(BackBuffer.camera.mouse.yPos < 0){
+    // BackBuffer.camera.mouse.yPos = 0;
+    //}
+    //
+    // printf("Mouse x pos: %d\n", BackBuffer.camera.mouse.xPos);
+    // printf("Mouse y pos: %d\n", BackBuffer.camera.mouse.yPos);
+
+    if (!BackBuffer.camera.mouse.moved) {
+      BackBuffer.camera.mouse.moved = true;
+    }
+    // return 0L;
+
+  } break;
+
+  case WM_SYSKEYDOWN: {
+    uint32 vkCode = Wparam;
+    bool AltkeyisDown = ((Lparam & (1 << 29)) != 0);
+    if ((vkCode == VK_F4) && AltkeyisDown) {
+      GlobalRunning = false;
+    }
+    OutputDebugStringA("WM_SYSKEYDOWN\n");
+  } break;
+
+  case WM_SYSKEYUP: {
+    OutputDebugStringA("WM_SYSKEYUP\n");
+  } break;
+
+  case WM_KEYUP: {
+    uint32 vkCode = Wparam;
+    // NOTE: This is whether bit 30 or 0 (never 1).
+    //  So if it is bit 30 it is down
+    bool WasDown = ((Lparam & (1 << 30)) != 0);
+    bool IsDown = ((Lparam & (1 << 31)) == 0);
+    // if (WasDown != IsDown) {
+
+    // else
+    if (vkCode == VK_TAB) {
+      if (SoundOutPut.hz == 128) {
+        SoundOutPut.hz = 256;
+      } else if (SoundOutPut.hz == 256) {
+        SoundOutPut.hz = 512;
+      } else {
+        SoundOutPut.hz = 128;
+      }
+      char Output[256];
+      sprintf(Output, "TAB button hitted, Current Hert is: %d\n",
+              SoundOutPut.hz);
+      SoundOutPut.WavePeriod = SoundOutPut.SamplePerSecond / SoundOutPut.hz;
+
+      OutputDebugStringA("TAB button hitted");
+    }
+
+  } break;
+
+  case WM_DESTROY: {
+    GlobalRunning = false;
+    PostQuitMessage(0);
+    OutputDebugStringA("WM_DESTROY\n");
+  } break;
+
+  case WM_PAINT: {
+
+    BeginPaint(Window, NULL);
+    HDC tempDC = GetDC(Window);
+    // Start to save bit drawing data to the current HDC
+    RenderSplendidGradient(&BackBuffer, NULL, BMPContent, 0, 0, 4);
+    Win32DisplayBufferWindow(tempDC, Dimens.Width, Dimens.Height, &BackBuffer);
+
+    if (glGetError() != GL_NO_ERROR) {
+      printf("OpenGL Error: %d\n", glGetError());
+    };
+
+    // glBindVertexArray(BackBuffer.glData.VAOs);
+    // glDrawArrays(GL_TRIANGLES, 0, 6);
+    SwapBuffers(tempDC);
+    EndPaint(Window, NULL);
+    ReleaseDC(Window, tempDC);
+
+    OutputDebugStringA("WM_PAINT\n");
+  } break;
+
+  default: {
+    OutputDebugStringA("DEFAULT\n");
+    result = DefWindowProcA(Window, Message, Wparam, Lparam);
+  } break;
+  }
+  // return 0L;
+  return result;
+}
 
 int CALLBACK WinMain
 (HINSTANCE Instance,
@@ -370,10 +376,6 @@ int CALLBACK WinMain
  PSTR cmdline,
  int cmdshow)
 {
-  debug_read_file_result result2;
-  debug_read_file_result result;
-  BMPContent = new imagee_content;
-  BMPContent = DEBUGReadBMP("Harry_and_Accomplices_rescaled.bmp", &result);
   LARGE_INTEGER PerfCountFrequencyResult;
   QueryPerformanceCounter(&PerfCountFrequencyResult);
   // NOTE: Actually, this the counts per second
@@ -438,22 +440,31 @@ int CALLBACK WinMain
             //=====================================================
 
           if(game_memory.TransientStorage && game_memory.PermanentStorage){
+            debug_read_file_result result2;
+            debug_read_file_result result;
+            BMPContent = new imagee_content;
+            BMPContent = DEBUGReadBMP("Harry_and_Accomplices_rescaled.bmp", &result);
+            // printf("About to read image\n");
+            //  NOTE: ???? Why when I change to different bmp image it crashed
+            // byte order: AA BB GG RR bottom up
+            // JPGContent = DEBUGReadJPG("Harry and Accomplices.jpg", &result2);
+            // OpenGL part
+            Win32_Front_Buffer ScreenBuffer = Win32_Front_Buffer(
+                BackBuffer.BitmapWidth, BackBuffer.BitmapHeight,
+                &BackBuffer.glData, BackBuffer.BitmapMemory);
 
-                //printf("About to read image\n");
-                // NOTE: ???? Why when I change to different bmp image it crashed
-                //byte order: AA BB GG RR bottom up                  
-                //JPGContent = DEBUGReadJPG("Harry and Accomplices.jpg", &result2);
-                //OpenGL part
-                Win32_Front_Buffer ScreenBuffer = Win32_Front_Buffer(BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, &BackBuffer.glData, BackBuffer.BitmapMemory);
-
-                // Randomize cube direction
-                std::srand(std::time(0));
-                float direction = 0.0f;
-                for (int x = 0 ; x < 100; x++){
-                    direction = ((std::rand()%3)*1.0f);
-                    fluxY[x+100] = direction;
-                    printf("cube index %d Y: %f, with direction %f %s\n", x, fluxY[x],fluxY[x+100],fluxY[x+100]==UPP_?"UP":fluxY[x+100]==DOWNN_?"DOWNN":"ROLL");
-                }
+            // Randomize cube direction
+            std::srand(std::time(0));
+            float direction = 0.0f;
+            for (int x = 0; x < 100; x++) {
+              direction = ((std::rand() % 3) * 1.0f);
+              fluxY[x + 100] = direction;
+              printf("cube index %d Y: %f, with direction %f %s\n", x, fluxY[x],
+                     fluxY[x + 100],
+                     fluxY[x + 100] == UPP_     ? "UP"
+                     : fluxY[x + 100] == DOWNN_ ? "DOWNN"
+                                                : "ROLL");
+            }
                 
 // Cause the ScreenData will be deleted out of the loop so
                 // We have to assign address of memory and glData to
@@ -586,7 +597,8 @@ int CALLBACK WinMain
                 std::string dancing_vampire_path = "W:/build/media/dancing_vampire.dae";
                 loadModel_(dancing_vampire, dancing_vampire_path);
                 Animation* danceAnimation = new Animation((char*)dancing_vampire_path.c_str(), dancing_vampire);
-                Animator* animator = new Animator(danceAnimation);
+                Animator *animator = new Animator(danceAnimation);
+                ;
                 
                 
 
@@ -833,6 +845,7 @@ int CALLBACK WinMain
                     //glBindVertexArray(ScreenBuffer.glData.VAOs);
                     //glDrawArrays(GL_TRIANGLES, 0, 36);
                 
+                    animator->updateAnimationTime(WaitTimeCounter);
                     if(WaitTimeCounter >= 16.67f){
                         //else {
                         //ViewRotateCount++;
@@ -841,6 +854,8 @@ int CALLBACK WinMain
                         //BackBuffer.camera.view = glm::lookAt(glm::vec3(CamX, 0.0f, CamZ), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
                         //setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
                         //}
+                        // Update animation
+
                         //Set vectices and color for plane
                         UpdatedAngle += 5.0f;
                         //printf("updated angle :%f\n", UpdatedAngle);
@@ -900,10 +915,18 @@ int CALLBACK WinMain
 // Now Draw the vampire
                     animating_shader_->use();
                     animating_shader_->setMat4( "model", dancing_vampire_core);
-                    auto Transform = animator->getFinalBoneMatrices();
+                    animating_shader_->setMat4( "projection", Projection);
+                    animating_shader_->setMat4( "view", BackBuffer.camera.view);
+                    std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
                     for(int i = 0; i < Transform->size(); i++){
-                        animating_shader_->setMat4("finalBoneMatrices[" + std::to_string(i) + "]", (*Transform)[i]);
+                      animating_shader_->setMat4("finalBoneMatrices[boneIds[" +
+                                                     std::to_string(i) + "]]",
+                                                 (*Transform)[i]);
+                      if(first_announce) {
+                          printf("finalBoneMatrices[boneIds[ %d ]]",(int)i);
+                      }
                     };
+                    if(first_announce){first_announce = false;};
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
                     brushID = animating_shader_->GetProgramID();
                     DDraw(dancing_vampire, &brushID);                    

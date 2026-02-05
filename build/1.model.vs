@@ -22,7 +22,7 @@ void main()
 	// This is to create a world space coor of fragment
 
      FragPos = vec3(model *vec4(aPos, 1.0f));
-     Normal = mat3(transpose(inverse(view * model))) * aNormal;
+     Normal = vec3(transpose(inverse(view * model))) * aNormal;
 
      TexCoord = aTexCoord;
 }

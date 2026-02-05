@@ -766,4 +766,8 @@ created
 ---------------- Wed, 04 Feb 26: 05:21PM
 
 accidently fixed hidden bug. On create window automatically call the resize
-command which is immaturely cause the widow w and h is not set yet
+command which is immaturely call the current the widow w and h which is not set yet
+
+---------------- Thu, 05 Feb 26: 11:08AM
+
+There are a memory violation at ptindex at rotation interpolation function
