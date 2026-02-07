@@ -845,8 +845,8 @@ int CALLBACK WinMain
                     //glBindVertexArray(ScreenBuffer.glData.VAOs);
                     //glDrawArrays(GL_TRIANGLES, 0, 36);
                 
-                    animator->updateAnimationTime(WaitTimeCounter);
                     if(WaitTimeCounter >= 16.67f){
+                        animator->updateAnimationTime(WaitTimeCounter);
                         //else {
                         //ViewRotateCount++;
                         //float CamX = sin(ViewRotateCount)*10.0f;

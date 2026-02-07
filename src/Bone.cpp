@@ -32,7 +32,7 @@ int Bone::GetScalingIndex(float animationTime){
         if(animationTime < m_Rotations[index + 1].timestamp){
             return index;
         }
-        assert(0);
+        //assert(0);
     }
 }
 

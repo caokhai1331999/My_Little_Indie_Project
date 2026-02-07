@@ -771,3 +771,8 @@ command which is immaturely call the current the widow w and h which is not set 
 ---------------- Thu, 05 Feb 26: 11:08AM
 
 There are a memory violation at ptindex at rotation interpolation function
+
+---------------- Sat, 07 Feb 26: 09:08PM
+
+NOTE: There was some underlying bug in the data transfer from aichannel to bone
+class which cause the mNumRotations is 0

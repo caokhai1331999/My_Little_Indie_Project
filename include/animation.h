@@ -35,7 +35,6 @@ public:
         m_TicksPerSecond = animation->mTicksPerSecond;
         ReadHierarchyData(m_RootNode, scene->mRootNode);
         ReadMissingBone(animation, model);
-
         };
 
     ~Animation(){};
