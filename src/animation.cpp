@@ -33,7 +33,9 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
     //Reading channels (bone engaged in an animation and keyframes)
 
     for(int i = 0; i < size; i++){
-        aiNodeAnim* channel = animation->mChannels[i];
+        //TODO: Debug here
+        aiNodeAnim *channel = animation->mChannels[i];
+        assert(channel);
         std::string boneName = channel->mNodeName.data;
 
         if((*boneInfoMap).find(boneName) == (*boneInfoMap).end()){

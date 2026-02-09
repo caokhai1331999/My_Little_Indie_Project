@@ -775,4 +775,9 @@ There are a memory violation at ptindex at rotation interpolation function
 ---------------- Sat, 07 Feb 26: 09:08PM
 
 NOTE: There was some underlying bug in the data transfer from aichannel to bone
-class which cause the mNumRotations is 0
+class which cause the mNumRotations/Pos/Scale is 0
+
+---------------- Mon, 09 Feb 26: 09:10PM
+
+NOTE: FOUND OUT: I forgot to implement the constructbone function
+So the bone class never be initialized

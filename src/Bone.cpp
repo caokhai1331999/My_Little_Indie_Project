@@ -28,11 +28,11 @@ int Bone::GetRotationIndex(float animationTime){
 }
 
 int Bone::GetScalingIndex(float animationTime){
-    for(int index = 0; index < mNumRotations - 1; index++){
-        if(animationTime < m_Rotations[index + 1].timestamp){
+    for(int index = 0; index < mNumScalings - 1; index++){
+        if(animationTime < m_KeyScales[index + 1].timestamp){
             return index;
         }
-        //assert(0);
+        assert(0);
     }
 }
 
