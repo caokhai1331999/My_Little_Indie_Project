@@ -256,10 +256,10 @@ if(windowDummy == NULL)
   printf("%s\n", buffer);
 }
 
-if (!GetProcessId(NULL)) {
-  ErrorExit();
-  return false;
-}
+//if (!GetProcessId(NULL)) {
+  //ErrorExit();
+  //return false;
+//}
 
 
 
@@ -298,24 +298,24 @@ wglGetExtensionsStringARB = (PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress(
 else
     return false;
 
-if (wglGetExtensionsStringARB != nullptr) {
-  GLint64 numExtensions;
-  glGetInteger64v(GL_NUM_EXTENSIONS, &numExtensions);
-  std::cout << "Available Extensions:\n";
-  for (GLint64 i = 0; i < numExtensions; ++i) {
-    const GLubyte *extensionName = glGetStringi(GL_EXTENSIONS, i);
-
-    std::cout << "\n\t" << (const char *)extensionName;
-
-    if (std::strcmp((const char *)extensionName, "WGL_ARB_create_context") ==
-        0) {
-      wglCreateContextAttribsARB =
+//if (wglGetExtensionsStringARB != nullptr) {
+  //GLint64 numExtensions;
+  //glGetInteger64v(GL_NUM_EXTENSIONS, &numExtensions);
+  //std::cout << "Available Extensions:\n";
+  //for (GLint64 i = 0; i < numExtensions; ++i) {
+    //const GLubyte *extensionName = glGetStringi(GL_EXTENSIONS, i);
+//
+    //std::cout << "\n\t" << (const char *)extensionName;
+//
+    //if (std::strcmp((const char *)extensionName, "WGL_ARB_create_context") ==
+        //0) {
+wglCreateContextAttribsARB =    
           (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress(
               "wglCreateContextAttribsARB");
-    }
-  }
-} else
-    return false;
+    //}
+  //}
+//} else
+    //return false;
 
 // succeed enable wgl extension
 // Working window and context
@@ -359,7 +359,7 @@ HDC windowDC = GetDC(window);
             // NOTE: Failed right at the beginning
             bool success = false;
             // Next create OPENGL context
-            // OBuffer->glData.openglRC = wglCreateContext(windowDC);
+             //OBuffer->glData.openglRC = wglCreateContext(windowDC);
 
             const GLint attribList[] = {
               WGL_CONTEXT_MAJOR_VERSION_ARB,
@@ -372,10 +372,9 @@ HDC windowDC = GetDC(window);
 
 //======================================================================
             if(wglMakeCurrent(windowDC, OBuffer->glData.openglRC)){
-
                 // NOTE: Failed right at the beginning
                 success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
-
+                assert(success);
                 if(success)
                 {
                     //OpenConsole();
