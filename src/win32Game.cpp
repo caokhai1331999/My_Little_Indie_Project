@@ -218,10 +218,109 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
 bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* bmpContent){
     // first device context gotten from current window
     // printf("Start to init OpenGL\n");
-    HDC windowDC = GetDC(window);
         // Create the pixel format features
-       // Then describe it
-        PIXELFORMATDESCRIPTOR desiredPixelFormat = {};
+
+    // Dummy window and context here =====================================
+// Source - https://stackoverflow.com/q/45937728
+// Posted by D.G. Redd, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-02-10, License - CC BY-SA 3.0
+
+WNDCLASSW wcDummy = {0};
+wcDummy.lpfnWndProc     = +[](HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){return DefWindowProcW(hWnd, message, wParam, lParam);};
+wcDummy.hInstance       = GetModuleHandle(0);
+wcDummy.hbrBackground   = (HBRUSH)(COLOR_BACKGROUND);
+wcDummy.lpszClassName   = L"Dummy";
+wcDummy.style           = CS_OWNDC;
+
+if(!RegisterClassW(&wcDummy))
+{
+  DWORD errorCode = GetLastError();
+  char buffer[256] = {};
+  FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, buffer,
+                 sizeof(buffer), NULL);
+  printf("%s\n", buffer);
+  return false;
+}
+
+std::wstring title = L"dummy window for wgl beforehand init";
+
+HWND windowDummy = CreateWindowW(wcDummy.lpszClassName, title.c_str(), WS_DISABLED, 0, 0, 640, 480, 0, 0, wcDummy.hInstance, NULL);
+
+if(windowDummy == NULL)
+{
+  printf("dummy Window for wgl init is NULL\n");
+  DWORD errorCode = GetLastError();
+  char buffer[256] = {};
+  FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, buffer,
+                 sizeof(buffer), NULL);
+  printf("%s\n", buffer);
+}
+
+if (!GetProcessId(NULL)) {
+  ErrorExit();
+  return false;
+}
+
+
+
+PIXELFORMATDESCRIPTOR pfdDummy =
+{
+    sizeof(PIXELFORMATDESCRIPTOR),
+    1,
+    PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+    PFD_TYPE_RGBA,
+    32,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    24,
+    8,
+    0, 0, 0, 0, 0, 0
+};
+
+HDC dummyDrawingContext = GetDC(windowDummy);
+
+INT pixelFormatDummy = ChoosePixelFormat(dummyDrawingContext, &pfdDummy);
+SetPixelFormat(dummyDrawingContext, pixelFormatDummy, &pfdDummy);
+
+HGLRC dummyContext = wglCreateContext(dummyDrawingContext);
+wglMakeCurrent(dummyDrawingContext, dummyContext);
+
+//Succeed make enable wgl
+PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetExtensionsStringARB = nullptr;
+PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = nullptr;
+
+if(wglGetCurrentContext() != NULL)
+{
+
+wglGetExtensionsStringARB = (PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress(
+    "wglGetExtensionsStringARB");
+
+}
+else
+    return false;
+
+if (wglGetExtensionsStringARB != nullptr) {
+  GLint64 numExtensions;
+  glGetInteger64v(GL_NUM_EXTENSIONS, &numExtensions);
+  std::cout << "Available Extensions:\n";
+  for (GLint64 i = 0; i < numExtensions; ++i) {
+    const GLubyte *extensionName = glGetStringi(GL_EXTENSIONS, i);
+
+    std::cout << "\n\t" << (const char *)extensionName;
+
+    if (std::strcmp((const char *)extensionName, "WGL_ARB_create_context") ==
+        0) {
+      wglCreateContextAttribsARB =
+          (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress(
+              "wglCreateContextAttribsARB");
+    }
+  }
+} else
+    return false;
+
+// succeed enable wgl extension
+// Working window and context
+HDC windowDC = GetDC(window);
+    PIXELFORMATDESCRIPTOR desiredPixelFormat = {};
         desiredPixelFormat.nSize = sizeof(desiredPixelFormat);
         desiredPixelFormat.nVersion =  1;
         desiredPixelFormat.iPixelType = PFD_TYPE_RGBA;
@@ -259,8 +358,19 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
 
             // NOTE: Failed right at the beginning
             bool success = false;
-// Next create OPENGL context
-            OBuffer->glData.openglRC = wglCreateContext(windowDC);
+            // Next create OPENGL context
+            // OBuffer->glData.openglRC = wglCreateContext(windowDC);
+
+            const GLint attribList[] = {
+              WGL_CONTEXT_MAJOR_VERSION_ARB,
+              3,
+              WGL_CONTEXT_MINOR_VERSION_ARB,
+              3,
+              0
+            };
+             OBuffer->glData.openglRC = wglCreateContextAttribsARB(windowDC, NULL, attribList);
+
+//======================================================================
             if(wglMakeCurrent(windowDC, OBuffer->glData.openglRC)){
 
                 // NOTE: Failed right at the beginning
@@ -269,7 +379,9 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 if(success)
                 {
                     //OpenConsole();
-                    //printf("GLAD load successfully\n");                    
+                    //printf("GLAD load successfully\n");
+                    printf("VERSION: %s", glGetString(GL_VERSION));
+                    printf("Renderer: %s\n", glGetString(GL_RENDERER));
                     //
                 //float trianglesVerticles [] = {
                     //FRONT FACE
@@ -559,8 +671,12 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
                 if (ver)
                     printf("OpenGL version: %s\n", ver);
                 else
-                    printf("glGetString(GL_VERSION) returned NULL\n");
+                  printf("glGetString(GL_VERSION) returned NULL\n");
 
+                //Delete dummy here
+
+                wglDeleteContext(dummyContext);
+                DestroyWindow(windowDummy);
                 }
                 else
                 {

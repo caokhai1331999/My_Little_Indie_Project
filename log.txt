@@ -781,3 +781,13 @@ class which cause the mNumRotations/Pos/Scale is 0
 
 NOTE: FOUND OUT: I forgot to implement the constructbone function
 So the bone class never be initialized
+
+---------------- Tue, 10 Feb 26: 12:48PM
+
+We need a dummy context to try-and-trute wgl get extenstion thing and enable gl
+settings before making working drawing context
+
+from what chatgpt told. Cause the new extension can not be enabled in old
+context
+we have to create a dummy old one to enable basic feature to call getextesion
+function inorder to enable new feature for new context
