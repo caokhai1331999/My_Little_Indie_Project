@@ -25,7 +25,8 @@ Bone* Animation::FindBone(const std::string& name){
 
 void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
     int size = animation->mNumChannels;
-// Get these properties from model var
+
+    // Get these properties from model var
     std::unordered_map<std::string, Bone_Info>* boneInfoMap;
     boneInfoMap = model->GetBoneInfoMap();
     int boneCount = model->GetBoneCount();
@@ -53,9 +54,9 @@ void Animation::ReadHierarchyData(AssimpNodeData& dest, const aiNode* src){
     dest.name = src->mName.data;
     dest.transformation = AssimpGLMHelpers::ConvertMatrixToGLMFormat(src->mTransformation);
     dest.children.resize(src->mNumChildren);
+    dest.children.reserve(src->mNumChildren);
     // as told this line prevent children vector from reallocating after an
     // element is added(which is believed would speed things up)
-    dest.children.reserve(src->mNumChildren);
     for(int i = 0; i < src->mNumChildren; i++){
         AssimpNodeData child;
         ReadHierarchyData(child, src->mChildren[i]);

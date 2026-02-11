@@ -791,3 +791,21 @@ from what chatgpt told. Cause the new extension can not be enabled in old
 context
 we have to create a dummy old one to enable basic feature to call getextesion
 function inorder to enable new feature for new context
+
+---------------- Wed, 11 Feb 26: 08:25PM
+
+Why the dummy and wglCreateContextAttribsARB work on my intel i5 3230m with
+on-board gpu but not my pc mobo with r5 5600x and rtx 3060
+
+Come back to main issue here. There are two possible explain for this buggy data
+transfer from model file.dae to container which make cause memory violation.
+
+1. The model itself have something off
+2. My code is wrong somewhere
+
+focus on the 2nd scenario
+
+we are tracking at the animation class where the assimpNodedate is copied
+then bone information is recursively written
+
+According to the report the Bone data is copied wrongly

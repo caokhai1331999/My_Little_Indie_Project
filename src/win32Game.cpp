@@ -368,11 +368,15 @@ HDC windowDC = GetDC(window);
               3,
               0
             };
-             OBuffer->glData.openglRC = wglCreateContextAttribsARB(windowDC, NULL, attribList);
+
+            OBuffer->glData.openglRC = wglCreateContextAttribsARB(windowDC, NULL, attribList);
 
 //======================================================================
             if(wglMakeCurrent(windowDC, OBuffer->glData.openglRC)){
-                // NOTE: Failed right at the beginning
+                //Delete dummy here
+                wglDeleteContext(dummyContext);
+                DestroyWindow(windowDummy);
+              // NOTE: Failed right at the beginning
                 success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
                 assert(success);
                 if(success)
@@ -672,10 +676,6 @@ HDC windowDC = GetDC(window);
                 else
                   printf("glGetString(GL_VERSION) returned NULL\n");
 
-                //Delete dummy here
-
-                wglDeleteContext(dummyContext);
-                DestroyWindow(windowDummy);
                 }
                 else
                 {
