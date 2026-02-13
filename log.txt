@@ -809,3 +809,12 @@ we are tracking at the animation class where the assimpNodedate is copied
 then bone information is recursively written
 
 According to the report the Bone data is copied wrongly
+
+Remember to check out the environment path for opengl32.dll on little beast.
+Maybe the error is lying an underlying basic one
+
+The model did have proper data. Thing only happen when we start to play the
+animation
+
+NOTE: The finalbonematrices inside animator wasn't initialized/calculated at all
+

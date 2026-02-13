@@ -593,14 +593,11 @@ int CALLBACK WinMain
 
 //NOW THE ANIMATING PART
                 Model_* dancing_vampire = nullptr;
-                dancing_vampire = new Model_();;
+                dancing_vampire = new Model_();
                 std::string dancing_vampire_path = "W:/build/media/dancing_vampire.dae";
                 loadModel_(dancing_vampire, dancing_vampire_path);
                 Animation* danceAnimation = new Animation((char*)dancing_vampire_path.c_str(), dancing_vampire);
                 Animator *animator = new Animator(danceAnimation);
-                ;
-                
-                
 
 //modell->Texturedirectory = texpath.substr(0, path.find_last_of('/'));
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
@@ -918,15 +915,21 @@ int CALLBACK WinMain
                     animating_shader_->setMat4( "projection", Projection);
                     animating_shader_->setMat4( "view", BackBuffer.camera.view);
                     std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
-                    for(int i = 0; i < Transform->size(); i++){
-                      animating_shader_->setMat4("finalBoneMatrices[boneIds[" +
-                                                     std::to_string(i) + "]]",
-                                                 (*Transform)[i]);
-                      if(first_announce) {
-                          printf("finalBoneMatrices[boneIds[ %d ]]",(int)i);
-                      }
-                    };
-                    if(first_announce){first_announce = false;};
+                    if (Transform->size() > 1) {
+                      for (int i = 0; i < Transform->size(); i++) {
+                        animating_shader_->setMat4(
+                            "finalBoneMatrices[boneIds[" + std::to_string(i) +
+                                "]]",
+                            (*Transform)[i]);
+                        if (first_announce) {
+                          printf("finalBoneMatrices[boneIds[ %d ]]", (int)i);
+                        }
+                      };
+                      if (first_announce) {
+                        first_announce = false;
+                      };
+                    }
+
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
                     brushID = animating_shader_->GetProgramID();
                     DDraw(dancing_vampire, &brushID);                    
