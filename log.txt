@@ -817,4 +817,4 @@ The model did have proper data. Thing only happen when we start to play the
 animation
 
 NOTE: The finalbonematrices inside animator wasn't initialized/calculated at all
-
+NOTE: Errors was lying on the deprecated gl+wgl files
