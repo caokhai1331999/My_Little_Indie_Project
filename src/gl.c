@@ -306,6 +306,7 @@ int GLAD_GL_EXT_draw_instanced = 0;
 int GLAD_GL_EXT_draw_range_elements = 0;
 int GLAD_GL_EXT_external_buffer = 0;
 int GLAD_GL_EXT_fog_coord = 0;
+int GLAD_GL_EXT_fragment_shading_rate = 0;
 int GLAD_GL_EXT_framebuffer_blit = 0;
 int GLAD_GL_EXT_framebuffer_blit_layers = 0;
 int GLAD_GL_EXT_framebuffer_multisample = 0;
@@ -324,6 +325,7 @@ int GLAD_GL_EXT_light_texture = 0;
 int GLAD_GL_EXT_memory_object = 0;
 int GLAD_GL_EXT_memory_object_fd = 0;
 int GLAD_GL_EXT_memory_object_win32 = 0;
+int GLAD_GL_EXT_mesh_shader = 0;
 int GLAD_GL_EXT_misc_attribute = 0;
 int GLAD_GL_EXT_multi_draw_arrays = 0;
 int GLAD_GL_EXT_multisample = 0;
@@ -1093,6 +1095,8 @@ PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC glad_glDrawElementsInstancedBaseVertex 
 PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXBASEINSTANCEPROC glad_glDrawElementsInstancedBaseVertexBaseInstance = NULL;
 PFNGLDRAWELEMENTSINSTANCEDEXTPROC glad_glDrawElementsInstancedEXT = NULL;
 PFNGLDRAWMESHARRAYSSUNPROC glad_glDrawMeshArraysSUN = NULL;
+PFNGLDRAWMESHTASKSEXTPROC glad_glDrawMeshTasksEXT = NULL;
+PFNGLDRAWMESHTASKSINDIRECTEXTPROC glad_glDrawMeshTasksIndirectEXT = NULL;
 PFNGLDRAWMESHTASKSINDIRECTNVPROC glad_glDrawMeshTasksIndirectNV = NULL;
 PFNGLDRAWMESHTASKSNVPROC glad_glDrawMeshTasksNV = NULL;
 PFNGLDRAWRANGEELEMENTARRAYAPPLEPROC glad_glDrawRangeElementArrayAPPLE = NULL;
@@ -1207,6 +1211,7 @@ PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC glad_glFramebufferRenderbufferEXT = NULL;
 PFNGLFRAMEBUFFERSAMPLELOCATIONSFVARBPROC glad_glFramebufferSampleLocationsfvARB = NULL;
 PFNGLFRAMEBUFFERSAMPLELOCATIONSFVNVPROC glad_glFramebufferSampleLocationsfvNV = NULL;
 PFNGLFRAMEBUFFERSAMPLEPOSITIONSFVAMDPROC glad_glFramebufferSamplePositionsfvAMD = NULL;
+PFNGLFRAMEBUFFERSHADINGRATEEXTPROC glad_glFramebufferShadingRateEXT = NULL;
 PFNGLFRAMEBUFFERTEXTUREPROC glad_glFramebufferTexture = NULL;
 PFNGLFRAMEBUFFERTEXTURE1DPROC glad_glFramebufferTexture1D = NULL;
 PFNGLFRAMEBUFFERTEXTURE1DEXTPROC glad_glFramebufferTexture1DEXT = NULL;
@@ -1342,6 +1347,7 @@ PFNGLGETFRAGMENTLIGHTFVSGIXPROC glad_glGetFragmentLightfvSGIX = NULL;
 PFNGLGETFRAGMENTLIGHTIVSGIXPROC glad_glGetFragmentLightivSGIX = NULL;
 PFNGLGETFRAGMENTMATERIALFVSGIXPROC glad_glGetFragmentMaterialfvSGIX = NULL;
 PFNGLGETFRAGMENTMATERIALIVSGIXPROC glad_glGetFragmentMaterialivSGIX = NULL;
+PFNGLGETFRAGMENTSHADINGRATESEXTPROC glad_glGetFragmentShadingRatesEXT = NULL;
 PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC glad_glGetFramebufferAttachmentParameteriv = NULL;
 PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXTPROC glad_glGetFramebufferAttachmentParameterivEXT = NULL;
 PFNGLGETFRAMEBUFFERPARAMETERFVAMDPROC glad_glGetFramebufferParameterfvAMD = NULL;
@@ -1861,7 +1867,9 @@ PFNGLMULTIDRAWELEMENTSINDIRECTAMDPROC glad_glMultiDrawElementsIndirectAMD = NULL
 PFNGLMULTIDRAWELEMENTSINDIRECTBINDLESSCOUNTNVPROC glad_glMultiDrawElementsIndirectBindlessCountNV = NULL;
 PFNGLMULTIDRAWELEMENTSINDIRECTBINDLESSNVPROC glad_glMultiDrawElementsIndirectBindlessNV = NULL;
 PFNGLMULTIDRAWELEMENTSINDIRECTCOUNTARBPROC glad_glMultiDrawElementsIndirectCountARB = NULL;
+PFNGLMULTIDRAWMESHTASKSINDIRECTCOUNTEXTPROC glad_glMultiDrawMeshTasksIndirectCountEXT = NULL;
 PFNGLMULTIDRAWMESHTASKSINDIRECTCOUNTNVPROC glad_glMultiDrawMeshTasksIndirectCountNV = NULL;
+PFNGLMULTIDRAWMESHTASKSINDIRECTEXTPROC glad_glMultiDrawMeshTasksIndirectEXT = NULL;
 PFNGLMULTIDRAWMESHTASKSINDIRECTNVPROC glad_glMultiDrawMeshTasksIndirectNV = NULL;
 PFNGLMULTIDRAWRANGEELEMENTARRAYAPPLEPROC glad_glMultiDrawRangeElementArrayAPPLE = NULL;
 PFNGLMULTIMODEDRAWARRAYSIBMPROC glad_glMultiModeDrawArraysIBM = NULL;
@@ -2422,6 +2430,8 @@ PFNGLSHADEROP3EXTPROC glad_glShaderOp3EXT = NULL;
 PFNGLSHADERSOURCEPROC glad_glShaderSource = NULL;
 PFNGLSHADERSOURCEARBPROC glad_glShaderSourceARB = NULL;
 PFNGLSHADERSTORAGEBLOCKBINDINGPROC glad_glShaderStorageBlockBinding = NULL;
+PFNGLSHADINGRATECOMBINEROPSEXTPROC glad_glShadingRateCombinerOpsEXT = NULL;
+PFNGLSHADINGRATEEXTPROC glad_glShadingRateEXT = NULL;
 PFNGLSHADINGRATEIMAGEBARRIERNVPROC glad_glShadingRateImageBarrierNV = NULL;
 PFNGLSHADINGRATEIMAGEPALETTENVPROC glad_glShadingRateImagePaletteNV = NULL;
 PFNGLSHADINGRATESAMPLEORDERCUSTOMNVPROC glad_glShadingRateSampleOrderCustomNV = NULL;
@@ -5256,6 +5266,13 @@ static void glad_gl_load_GL_EXT_fog_coord( GLADuserptrloadfunc load, void* userp
     glad_glFogCoordfEXT = (PFNGLFOGCOORDFEXTPROC) load(userptr, "glFogCoordfEXT");
     glad_glFogCoordfvEXT = (PFNGLFOGCOORDFVEXTPROC) load(userptr, "glFogCoordfvEXT");
 }
+static void glad_gl_load_GL_EXT_fragment_shading_rate( GLADuserptrloadfunc load, void* userptr) {
+    if(!GLAD_GL_EXT_fragment_shading_rate) return;
+    glad_glFramebufferShadingRateEXT = (PFNGLFRAMEBUFFERSHADINGRATEEXTPROC) load(userptr, "glFramebufferShadingRateEXT");
+    glad_glGetFragmentShadingRatesEXT = (PFNGLGETFRAGMENTSHADINGRATESEXTPROC) load(userptr, "glGetFragmentShadingRatesEXT");
+    glad_glShadingRateCombinerOpsEXT = (PFNGLSHADINGRATECOMBINEROPSEXTPROC) load(userptr, "glShadingRateCombinerOpsEXT");
+    glad_glShadingRateEXT = (PFNGLSHADINGRATEEXTPROC) load(userptr, "glShadingRateEXT");
+}
 static void glad_gl_load_GL_EXT_framebuffer_blit( GLADuserptrloadfunc load, void* userptr) {
     if(!GLAD_GL_EXT_framebuffer_blit) return;
     glad_glBlitFramebufferEXT = (PFNGLBLITFRAMEBUFFEREXTPROC) load(userptr, "glBlitFramebufferEXT");
@@ -5392,6 +5409,13 @@ static void glad_gl_load_GL_EXT_memory_object_win32( GLADuserptrloadfunc load, v
     if(!GLAD_GL_EXT_memory_object_win32) return;
     glad_glImportMemoryWin32HandleEXT = (PFNGLIMPORTMEMORYWIN32HANDLEEXTPROC) load(userptr, "glImportMemoryWin32HandleEXT");
     glad_glImportMemoryWin32NameEXT = (PFNGLIMPORTMEMORYWIN32NAMEEXTPROC) load(userptr, "glImportMemoryWin32NameEXT");
+}
+static void glad_gl_load_GL_EXT_mesh_shader( GLADuserptrloadfunc load, void* userptr) {
+    if(!GLAD_GL_EXT_mesh_shader) return;
+    glad_glDrawMeshTasksEXT = (PFNGLDRAWMESHTASKSEXTPROC) load(userptr, "glDrawMeshTasksEXT");
+    glad_glDrawMeshTasksIndirectEXT = (PFNGLDRAWMESHTASKSINDIRECTEXTPROC) load(userptr, "glDrawMeshTasksIndirectEXT");
+    glad_glMultiDrawMeshTasksIndirectCountEXT = (PFNGLMULTIDRAWMESHTASKSINDIRECTCOUNTEXTPROC) load(userptr, "glMultiDrawMeshTasksIndirectCountEXT");
+    glad_glMultiDrawMeshTasksIndirectEXT = (PFNGLMULTIDRAWMESHTASKSINDIRECTEXTPROC) load(userptr, "glMultiDrawMeshTasksIndirectEXT");
 }
 static void glad_gl_load_GL_EXT_multi_draw_arrays( GLADuserptrloadfunc load, void* userptr) {
     if(!GLAD_GL_EXT_multi_draw_arrays) return;
@@ -7267,6 +7291,7 @@ static int glad_gl_find_extensions_gl(void) {
     GLAD_GL_EXT_draw_range_elements = glad_gl_has_extension(exts, exts_i, "GL_EXT_draw_range_elements");
     GLAD_GL_EXT_external_buffer = glad_gl_has_extension(exts, exts_i, "GL_EXT_external_buffer");
     GLAD_GL_EXT_fog_coord = glad_gl_has_extension(exts, exts_i, "GL_EXT_fog_coord");
+    GLAD_GL_EXT_fragment_shading_rate = glad_gl_has_extension(exts, exts_i, "GL_EXT_fragment_shading_rate");
     GLAD_GL_EXT_framebuffer_blit = glad_gl_has_extension(exts, exts_i, "GL_EXT_framebuffer_blit");
     GLAD_GL_EXT_framebuffer_blit_layers = glad_gl_has_extension(exts, exts_i, "GL_EXT_framebuffer_blit_layers");
     GLAD_GL_EXT_framebuffer_multisample = glad_gl_has_extension(exts, exts_i, "GL_EXT_framebuffer_multisample");
@@ -7285,6 +7310,7 @@ static int glad_gl_find_extensions_gl(void) {
     GLAD_GL_EXT_memory_object = glad_gl_has_extension(exts, exts_i, "GL_EXT_memory_object");
     GLAD_GL_EXT_memory_object_fd = glad_gl_has_extension(exts, exts_i, "GL_EXT_memory_object_fd");
     GLAD_GL_EXT_memory_object_win32 = glad_gl_has_extension(exts, exts_i, "GL_EXT_memory_object_win32");
+    GLAD_GL_EXT_mesh_shader = glad_gl_has_extension(exts, exts_i, "GL_EXT_mesh_shader");
     GLAD_GL_EXT_misc_attribute = glad_gl_has_extension(exts, exts_i, "GL_EXT_misc_attribute");
     GLAD_GL_EXT_multi_draw_arrays = glad_gl_has_extension(exts, exts_i, "GL_EXT_multi_draw_arrays");
     GLAD_GL_EXT_multisample = glad_gl_has_extension(exts, exts_i, "GL_EXT_multisample");
@@ -7826,6 +7852,7 @@ int gladLoadGLUserPtr( GLADuserptrloadfunc load, void *userptr) {
     glad_gl_load_GL_EXT_draw_range_elements(load, userptr);
     glad_gl_load_GL_EXT_external_buffer(load, userptr);
     glad_gl_load_GL_EXT_fog_coord(load, userptr);
+    glad_gl_load_GL_EXT_fragment_shading_rate(load, userptr);
     glad_gl_load_GL_EXT_framebuffer_blit(load, userptr);
     glad_gl_load_GL_EXT_framebuffer_blit_layers(load, userptr);
     glad_gl_load_GL_EXT_framebuffer_multisample(load, userptr);
@@ -7840,6 +7867,7 @@ int gladLoadGLUserPtr( GLADuserptrloadfunc load, void *userptr) {
     glad_gl_load_GL_EXT_memory_object(load, userptr);
     glad_gl_load_GL_EXT_memory_object_fd(load, userptr);
     glad_gl_load_GL_EXT_memory_object_win32(load, userptr);
+    glad_gl_load_GL_EXT_mesh_shader(load, userptr);
     glad_gl_load_GL_EXT_multi_draw_arrays(load, userptr);
     glad_gl_load_GL_EXT_multisample(load, userptr);
     glad_gl_load_GL_EXT_paletted_texture(load, userptr);

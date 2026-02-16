@@ -348,9 +348,9 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
     RenderSplendidGradient(&BackBuffer, NULL, BMPContent, 0, 0, 4);
     Win32DisplayBufferWindow(tempDC, Dimens.Width, Dimens.Height, &BackBuffer);
 
-    if (glGetError() != GL_NO_ERROR) {
-      printf("OpenGL Error: %d\n", glGetError());
-    };
+    //if (glGetError() != GL_NO_ERROR) {
+      //printf("OpenGL Error: %d\n", glGetError());
+    //};
 
     // glBindVertexArray(BackBuffer.glData.VAOs);
     // glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -586,7 +586,7 @@ int CALLBACK WinMain
 
                 Model_* backpack = nullptr;
                 backpack = new Model_();
-                std::string backpack_path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/backpack.obj";
+                std::string backpack_path = "./media/backpack/source/Survival_BackPack_2.fbx";
                 loadModel_(backpack, backpack_path);
 
                 //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
@@ -594,7 +594,7 @@ int CALLBACK WinMain
 //NOW THE ANIMATING PART
                 Model_* dancing_vampire = nullptr;
                 dancing_vampire = new Model_();
-                std::string dancing_vampire_path = "W:/build/media/dancing_vampire.dae";
+                std::string dancing_vampire_path = "./media/dancing_vampire.dae";
                 loadModel_(dancing_vampire, dancing_vampire_path);
                 Animation* danceAnimation = new Animation((char*)dancing_vampire_path.c_str(), dancing_vampire);
                 Animator *animator = new Animator(danceAnimation);

@@ -315,7 +315,15 @@ wglCreateContextAttribsARB =
     //}
   //}
 //} else
-    //return false;
+// return false;
+// Delete dummy here
+if (wglCreateContextAttribsARB) {
+    printf("Succeed get wglCreateContextAttribsARB function pointer\n");
+    wglDeleteContext(dummyContext);
+    DestroyWindow(windowDummy);
+} else {
+    printf("wglCreateContextAttribsARB is NULL\n");    
+}
 
 // succeed enable wgl extension
 // Working window and context
@@ -361,23 +369,24 @@ HDC windowDC = GetDC(window);
             // Next create OPENGL context
              //OBuffer->glData.openglRC = wglCreateContext(windowDC);
 
-            const GLint attribList[] = {
-              WGL_CONTEXT_MAJOR_VERSION_ARB,
-              3,
-              WGL_CONTEXT_MINOR_VERSION_ARB,
-              3,
-              0
-            };
+            const GLint attribList[] = {WGL_CONTEXT_MAJOR_VERSION_ARB,
+                                        3,
+                                        WGL_CONTEXT_MINOR_VERSION_ARB,
+                                        3,
+                                        WGL_CONTEXT_PROFILE_MASK_ARB,
+                                        WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+                                        0};
 
             OBuffer->glData.openglRC = wglCreateContextAttribsARB(windowDC, NULL, attribList);
 
-//======================================================================
+            printf("VERSION: %s", wglGetExtensionsStringARB(windowDC));
+            printf("%p\n",GetProcAddress(LoadLibraryA("opengl32.dll"), "glGetString"));
+
+            //======================================================================
             if(wglMakeCurrent(windowDC, OBuffer->glData.openglRC)){
-                //Delete dummy here
-                wglDeleteContext(dummyContext);
-                DestroyWindow(windowDummy);
               // NOTE: Failed right at the beginning
-                success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
+                //success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
+                success = gladLoadGL((GLADloadfunc)GetAnyGLFuncAddress);
                 assert(success);
                 if(success)
                 {

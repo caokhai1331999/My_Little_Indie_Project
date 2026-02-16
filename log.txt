@@ -818,3 +818,14 @@ animation
 
 NOTE: The finalbonematrices inside animator wasn't initialized/calculated at all
 NOTE: Errors was lying on the deprecated gl+wgl files
+
+---------------- Mon, 16 Feb 26: 07:37PM
+
+NOTE: Find out the issues, I called the GLGetError before initializing the
+opengl lib
+
+---------------- Tue, 17 Feb 26: 12:57AM
+
+I had to use the custom function given by chatGPT to load glgetstring from
+opengl32.dll. Currently, I can init gl . Now I can focus on bone animation data
+transfer

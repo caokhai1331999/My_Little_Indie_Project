@@ -235,3 +235,14 @@ imagee_content* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult)
      return result;
 }
 
+void* GetAnyGLFuncAddress(const char* name)
+{
+    void* p = (void*)wglGetProcAddress(name);
+    if (!p)
+    {
+        static HMODULE module =
+            LoadLibraryA("opengl32.dll");
+        p = (void*)GetProcAddress(module, name);
+    }
+    return p;
+}
