@@ -829,3 +829,6 @@ opengl lib
 I had to use the custom function given by chatGPT to load glgetstring from
 opengl32.dll. Currently, I can init gl . Now I can focus on bone animation data
 transfer
+
+---------------- Tue, 17 Feb 26: 12:47PM
+

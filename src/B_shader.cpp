@@ -11,25 +11,26 @@
 // NOTE: Load shader code from source file to empty shader object
 // then compile it , next attach it to empty program finally link
 // that small program and delete the shader
-void* GetAnyGLFuncAddress(const char *name)
-{
-  void *p = (void *)wglGetProcAddress(name);
-  if(p == 0 ||
-    (p == (void*)0x1) || (p == (void*)0x2) || (p == (void*)0x3) ||
-    (p == (void*)-1) )
-  {
-    HMODULE module = LoadLibraryA("opengl32.dll");
-    if(module!=NULL){
-        p = (void *)GetProcAddress(module, name);
-    } else {
-        printf("Couldn't load OpenGl library: %s\n", loadCurrentErr());
-    }
-  } else {
-      printf("Can find function with given name\n"); \
-  }
 
-  return p;
-}
+ //void* GetAnyGLFuncAddress(const char *name)
+//{
+  //void *p = (void *)wglGetProcAddress(name);
+  //if(p == 0 ||
+    //(p == (void*)0x1) || (p == (void*)0x2) || (p == (void*)0x3) ||
+    //(p == (void*)-1) )
+  //{
+    //HMODULE module = LoadLibraryA("opengl32.dll");
+    //if(module!=NULL){
+        //p = (void *)GetProcAddress(module, name);
+    //} else {
+        //printf("Couldn't load OpenGl library: %s\n", loadCurrentErr());
+    //}
+  //} else {
+      //printf("Can't find function with given name\n");
+  //}
+//
+  //return p;
+//}
 // =============== let aside this alone touch it when it's time================
 
 void B_shader::loadShader(char* name, ShaderType type){

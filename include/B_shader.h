@@ -92,7 +92,7 @@ public:
 void useProgram(GLuint programId){glUseProgram(programId);};
 char* loadCurrentErr();
 void checkCompileErrors(GLuint shader, const ShaderType type, const char* programName);   
-void* GetAnyGLFuncAddress(const char *name);
+//void* GetAnyGLFuncAddress(const char *name);
 std::vector<GLuint> ProgramIDs;
 
 

@@ -235,6 +235,7 @@ imagee_content* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult)
      return result;
 }
 
+// NOTE: Why this function can replace the wglGetProcaddress
 void* GetAnyGLFuncAddress(const char* name)
 {
     void* p = (void*)wglGetProcAddress(name);
@@ -245,4 +246,5 @@ void* GetAnyGLFuncAddress(const char* name)
         p = (void*)GetProcAddress(module, name);
     }
     return p;
+    //May be the wglgetprocaddress does work I have to use getprocaddress instead
 }
