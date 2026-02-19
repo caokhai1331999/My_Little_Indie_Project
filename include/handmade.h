@@ -21,8 +21,9 @@
 
 #if !defined
 #define GLAD_LIB
-#include <glad/gl.h>
-#include <glad/wgl.h>
+#include <glad/glad_wgl.h>
+#include <glad/glad.h>
+//#include <glad/wgl.h>
 #endif
 
 #include <Windows.h>

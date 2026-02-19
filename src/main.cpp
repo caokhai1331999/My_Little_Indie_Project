@@ -37,8 +37,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
       if (!BackBuffer.transferNeed) {
         BackBuffer.transferNeed = true;
       }
-      //glViewport(0, 0, BackBuffer.BitmapWidth, BzackBuffer.BitmapHeight);
-      glViewport(0, 0, Dimens.Width, Dimens.Height);
+      glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
       OutputDebugStringA("WM_SIZE\n");
     }
   } break;
@@ -341,26 +340,26 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
     OutputDebugStringA("WM_DESTROY\n");
   } break;
 
-  case WM_PAINT: {
-
-    BeginPaint(Window, NULL);
-    HDC tempDC = GetDC(Window);
+  //case WM_PAINT: {
+//
+    //BeginPaint(Window, NULL);
+    //HDC tempDC = GetDC(Window);
     // Start to save bit drawing data to the current HDC
     //RenderSplendidGradient(&BackBuffer, NULL, BMPContent, 0, 0, 4);
-    Win32DisplayBufferWindow(tempDC, Dimens.Width, Dimens.Height, &BackBuffer);
+    //Win32DisplayBufferWindow(tempDC, Dimens.Width, Dimens.Height, &BackBuffer);
 
-    if (glGetError() != GL_NO_ERROR) {
-      printf("OpenGL Error: %d\n", glGetError());
-    };
+    //if (glGetError() != GL_NO_ERROR) {
+      //printf("OpenGL Error: %d\n", glGetError());
+    //};
 
     // glBindVertexArray(BackBuffer.glData.VAOs);
     // glDrawArrays(GL_TRIANGLES, 0, 6);
-    SwapBuffers(tempDC);
-    EndPaint(Window, NULL);
-    ReleaseDC(Window, tempDC);
-
-    OutputDebugStringA("WM_PAINT\n");
-  } break;
+    //SwapBuffers(tempDC);
+    //EndPaint(Window, NULL);
+    //ReleaseDC(Window, tempDC);
+//
+    //OutputDebugStringA("WM_PAINT\n");
+  //} break;
 
   default: {
     OutputDebugStringA("DEFAULT\n");
