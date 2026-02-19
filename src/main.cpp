@@ -37,7 +37,8 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
       if (!BackBuffer.transferNeed) {
         BackBuffer.transferNeed = true;
       }
-      glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
+      //glViewport(0, 0, BackBuffer.BitmapWidth, BzackBuffer.BitmapHeight);
+      glViewport(0, 0, Dimens.Width, Dimens.Height);
       OutputDebugStringA("WM_SIZE\n");
     }
   } break;
@@ -345,12 +346,12 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
     BeginPaint(Window, NULL);
     HDC tempDC = GetDC(Window);
     // Start to save bit drawing data to the current HDC
-    RenderSplendidGradient(&BackBuffer, NULL, BMPContent, 0, 0, 4);
+    //RenderSplendidGradient(&BackBuffer, NULL, BMPContent, 0, 0, 4);
     Win32DisplayBufferWindow(tempDC, Dimens.Width, Dimens.Height, &BackBuffer);
 
-    //if (glGetError() != GL_NO_ERROR) {
-      //printf("OpenGL Error: %d\n", glGetError());
-    //};
+    if (glGetError() != GL_NO_ERROR) {
+      printf("OpenGL Error: %d\n", glGetError());
+    };
 
     // glBindVertexArray(BackBuffer.glData.VAOs);
     // glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -390,7 +391,7 @@ int CALLBACK WinMain
   WindowClass.lpfnWndProc = MainWindowCallBack;
   WindowClass.hInstance = Instance;
   WindowClass.lpszClassName = "First Game Window Class";
-  //Win32ResizeDIBSection(&BackBuffer, Dimens.Height, Dimens.Width);
+  Win32ResizeDIBSection(&BackBuffer, Dimens.Height, Dimens.Width);
 
   // NOTE: I forgot to init window
   if (RegisterClassExA(&WindowClass)) {
@@ -421,10 +422,10 @@ int CALLBACK WinMain
         printf("Refresh rate is : %dHz\n", refreshRate);
       };
 
-#if INTERNAL
-            LPVOID BaseAddress = megabytes(5);
+#ifdef INTERNAL
+      LPVOID BaseAddress = (LPVOID)Megabytes(5);
 #else
-            LPVOID BaseAddress = 0;
+      LPVOID BaseAddress = 0;
 #endif
 
             //=======================================================
@@ -442,8 +443,9 @@ int CALLBACK WinMain
           if(game_memory.TransientStorage && game_memory.PermanentStorage){
             debug_read_file_result result2;
             debug_read_file_result result;
-            BMPContent = new imagee_content;
-            BMPContent = DEBUGReadBMP("Harry_and_Accomplices_rescaled.bmp", &result);
+            //BMPContent = new imagee_content;
+            //BMPContent = DEBUGReadBMP("Harry_and_Accomplices_rescaled.bmp", &result);
+            BMPContent = DEBUGReadBMP("adventure_.jpg", &result);
             // printf("About to read image\n");
             //  NOTE: ???? Why when I change to different bmp image it crashed
             // byte order: AA BB GG RR bottom up
@@ -843,7 +845,7 @@ int CALLBACK WinMain
                     //glDrawArrays(GL_TRIANGLES, 0, 36);
                 
                     if(WaitTimeCounter >= 16.67f){
-                        animator->updateAnimationTime(WaitTimeCounter);
+                        //animator->updateAnimationTime(WaitTimeCounter);
                         //else {
                         //ViewRotateCount++;
                         //float CamX = sin(ViewRotateCount)*10.0f;

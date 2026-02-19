@@ -379,16 +379,21 @@ HDC windowDC = GetDC(window);
 
             OBuffer->glData.openglRC = wglCreateContextAttribsARB(windowDC, NULL, attribList);
 
-            printf("VERSION: %s", wglGetExtensionsStringARB(windowDC));
-            printf("%p\n",GetProcAddress(LoadLibraryA("opengl32.dll"), "glGetString"));
+            //printf("%p\n",GetProcAddress(LoadLibraryA("opengl32.dll"), "glGetString"));
 
             //======================================================================
             if(wglMakeCurrent(windowDC, OBuffer->glData.openglRC)){
-              // NOTE: Failed right at the beginning
-                //success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
-                success = gladLoadGL((GLADloadfunc)GetAnyGLFuncAddress);
-                assert(success);
-                if(success)
+        // NOTE: Failed right at the beginning
+        // success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
+
+#ifdef ON_LITTLE_BEAST
+        success = gladLoadGL((GLADloadfunc)GetAnyGLFuncAddress);
+#else 
+        success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
+#endif
+        assert(success);
+
+        if(success)
                 {
                     //OpenConsole();
                     //printf("GLAD load successfully\n");

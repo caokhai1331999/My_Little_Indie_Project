@@ -828,7 +828,19 @@ opengl lib
 
 I had to use the custom function given by chatGPT to load glgetstring from
 opengl32.dll. Currently, I can init gl . Now I can focus on bone animation data
-transfer
+transfer which is infact call out loadlibrary of opengl32.dll and getprocaddress
+as an alternative of wglgetprocaddress
 
 ---------------- Tue, 17 Feb 26: 12:47PM
 
+
+---------------- Wed, 18 Feb 26: 11:54AM
+
+time to create jpg
+
+---------------- Fri, 20 Feb 26: 12:00AM
+
+seemed like after updating gpu driver thing worked smoother
+
+especially the wglgetprocaddress can now call out the glgetstring function
+pointer

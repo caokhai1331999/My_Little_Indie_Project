@@ -7,6 +7,7 @@
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
 #include "Camera.h"
+#include "handmade.h"
 #include "SoundMaker.h"
 #include "utility"
 #include <vector>

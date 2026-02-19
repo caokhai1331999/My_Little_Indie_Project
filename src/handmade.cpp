@@ -8,7 +8,7 @@
 #include "handmade.h"
 
 uint32 safetruncateUint64(uint64 value){
-    Assert(value <= 0xFFFFFFFF);
+    //Assert(value <= 0xFFFFFFFF);
     uint32 result = value;
     return result;
 }
@@ -246,5 +246,5 @@ void* GetAnyGLFuncAddress(const char* name)
         p = (void*)GetProcAddress(module, name);
     }
     return p;
-    //May be the wglgetprocaddress does work I have to use getprocaddress instead
+    //May be the wglgetprocaddress doesn't on pc case work I have to use getprocaddress instead
 }
