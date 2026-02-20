@@ -781,10 +781,16 @@ int CALLBACK WinMain
                     // Number of ticks/frame
                     uint64 CyclesElapsed = EndCycleCounts - LastCycleCounts;
                     //NOTE: It based on the var type to decide what kind of the substraction to do
+                    real32 ElapsedCounter =                       (real32)((real32)(EndCounter.QuadPart) -                             (real32)(LastCounter.QuadPart));
 
-                    // Time elapsed of one cycle/frame in 1/000000 s
-                    real32 ElapsedCounter = (real32)((real32)(EndCounter.QuadPart) - (real32)(LastCounter.QuadPart));
-                    real32 McPerFrame = (real32)((real32)CyclesElapsed/(1000.f * 1000.f));
+                    real32 lastFrame;
+                    real32 ElapsedCounter_1 =                        (real32)((real32)(EndCounter.QuadPart)) - lastFrame;
+                                                                                                       lastFrame = (real32)(EndCounter.QuadPart);
+                                 // Time elapsed of one cycle/frame in 1/000000
+                                 // s
+                                                                                                       WaitTimeCounter = (float)ElapsedCounter_1;
+
+                                 real32 McPerFrame = (real32)((real32)CyclesElapsed/(1000.f * 1000.f));
                     // Time elapsed of one cycle/frame in second
                     //real32 MsPerFrame = (real32)((1000 * (real32)ElapsedCounter) / (real32)PerfCountFrequency);
                     real32 MsPerFrame = (real32)((1000  * (real32)ElapsedCounter) / (real32)CyclesElapsed);
