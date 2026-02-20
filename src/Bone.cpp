@@ -14,26 +14,26 @@ int Bone::GetPositionIndex(float animationTime){
         if(animationTime < m_Positions[index + 1].timestamp){
             return index;
         }
-        assert(0);
     }
+        assert(0);
 }
 
 int Bone::GetRotationIndex(float animationTime){
     for(int index = 0; index < mNumRotations - 1; index++){
-        if(animationTime < m_Rotations[index + 1].timestamp){
+        if(animationTime < m_Rotations[index + 1].timestamp)
             return index;
-        }
-        assert(0);
     }
-}
+    assert(0);
+    //This one track whether the index is invalid or not!!!
+    }
 
 int Bone::GetScalingIndex(float animationTime){
     for(int index = 0; index < mNumScalings - 1; index++){
         if(animationTime < m_KeyScales[index + 1].timestamp){
             return index;
         }
-        assert(0);
     }
+        assert(0);
 }
 
 void Bone::Update(float animationTime){
@@ -46,6 +46,7 @@ void Bone::Update(float animationTime){
 
 // Get normalized value for Lerp and Slerp 
 float GetScaleFactor(float animationTime, float lastkeyTime, float nextkeyTime){
+
     float scaleFactor = 0.0f;
     float midWayLength = animationTime - lastkeyTime;
     float timeDiff = nextkeyTime - lastkeyTime;
@@ -99,6 +100,7 @@ glm::mat4 Bone::InterpolateRotation(float animationTime){
         glm::toMat4(rotation);
     }
 
+    // NOTE: things were tracked to go wrong from here
     int pt0index = GetRotationIndex(animationTime);
     int pt1index = pt0index + 1;
     float scaleFactor = GetScaleFactor(animationTime, m_Rotations[pt0index].timestamp, m_Rotations[pt1index].timestamp);;

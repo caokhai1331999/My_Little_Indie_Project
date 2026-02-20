@@ -836,7 +836,7 @@ as an alternative of wglgetprocaddress
 
 ---------------- Wed, 18 Feb 26: 11:54AM
 
-time to create jpg
+time to create jpg header
 
 ---------------- Fri, 20 Feb 26: 12:00AM
 
@@ -844,3 +844,11 @@ seemed like after updating gpu driver thing worked smoother
 
 especially the wglgetprocaddress can now call out the glgetstring function
 pointer
+
+---------------- Fri, 20 Feb 26: 10:12AM
+
+NOTE: The pt0index is -1 which is none exist in the Bone rotation interpolation
+function.
+
+Just like I wonder myself why put assert 0 into the loop. Turned out I put them
+all wrong right in the beginning

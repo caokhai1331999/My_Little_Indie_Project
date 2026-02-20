@@ -587,7 +587,7 @@ int CALLBACK WinMain
 
                 Model_* backpack = nullptr;
                 backpack = new Model_();
-                std::string backpack_path = "./media/backpack/source/Survival_BackPack_2.fbx";
+                std::string backpack_path = "./backpack.obj";
                 loadModel_(backpack, backpack_path);
 
                 //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
@@ -842,9 +842,14 @@ int CALLBACK WinMain
                     //setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Model);
                     //glBindVertexArray(ScreenBuffer.glData.VAOs);
                     //glDrawArrays(GL_TRIANGLES, 0, 36);
-                
+
+                    // NOTE: Thing went wrong inside this function
+                    // whether the waittimecounter or the function itself
+                    // produce bugs
+
+                    animator->updateAnimationTime(WaitTimeCounter);
+
                     if(WaitTimeCounter >= 16.67f){
-                        //animator->updateAnimationTime(WaitTimeCounter);
                         //else {
                         //ViewRotateCount++;
                         //float CamX = sin(ViewRotateCount)*10.0f;
