@@ -852,3 +852,18 @@ function.
 
 Just like I wonder myself why put assert 0 into the loop. Turned out I put them
 all wrong right in the beginning
+
+---------------- Mon, 23 Feb 26: 10:07AM
+
+NOTE: I put the animation time in micro second in function which just demand
+for second the whole time
+
+I's realized manually calculate realtime is buggy. I need to fix that. But
+before then I have to used constant value
+
+---------------- Mon, 23 Feb 26: 02:34PM
+
+Actually, the data that caused bug is animationTime
+NOTE: The culprit of animation bug is frame time miscalculation. Got to focus on
+this. By the way the shader of animating model is buggy somewhere causing NULL
+representaion.

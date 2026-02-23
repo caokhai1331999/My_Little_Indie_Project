@@ -23,7 +23,6 @@ int Bone::GetRotationIndex(float animationTime){
         if(animationTime < m_Rotations[index + 1].timestamp)
             return index;
     }
-    assert(0);
     //This one track whether the index is invalid or not!!!
     }
 
@@ -95,6 +94,7 @@ glm::mat4 Bone::InterpolateScaling(float animationTime){
 // Figure out which Scale key to interpolation b/w interpolate and return the
 // final matrix
 glm::mat4 Bone::InterpolateRotation(float animationTime){
+
     if(mNumRotations == 1){
         auto rotation = m_Rotations[0].Orientation;
         glm::toMat4(rotation);
@@ -102,6 +102,11 @@ glm::mat4 Bone::InterpolateRotation(float animationTime){
 
     // NOTE: things were tracked to go wrong from here
     int pt0index = GetRotationIndex(animationTime);
+
+    //if (pt0index < 0) {
+        //assert(0);
+    //};
+
     int pt1index = pt0index + 1;
     float scaleFactor = GetScaleFactor(animationTime, m_Rotations[pt0index].timestamp, m_Rotations[pt1index].timestamp);;
 

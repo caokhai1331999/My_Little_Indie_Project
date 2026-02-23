@@ -376,12 +376,24 @@ int CALLBACK WinMain
  PSTR cmdline,
  int cmdshow)
 {
+// Ticks per second/microS
   LARGE_INTEGER PerfCountFrequencyResult;
   QueryPerformanceCounter(&PerfCountFrequencyResult);
   // NOTE: Actually, this the counts per second
   // TODO: Try to find out why the PerfCountFrequency is too large.
   // NOTE: This one count is for counting the frame
   int64 PerfCountFrequency = (int64)(PerfCountFrequencyResult.QuadPart);
+
+  LARGE_INTEGER LastCounter = {};
+  LARGE_INTEGER EndCounter = {};
+
+  uint64 LastCycleCounts = 0;
+  uint64 EndCycleCounts = 0;
+
+  float TimeCounter = 0.0f;
+  float WaitTimeCounter = 0.0f;
+  QueryPerformanceCounter(&LastCounter);
+
   win32LoadXInput();
   WNDCLASSEXA WindowClass = {};
   WindowClass.cbSize = sizeof(WNDCLASSEXA);
@@ -391,7 +403,6 @@ int CALLBACK WinMain
   WindowClass.hInstance = Instance;
   WindowClass.lpszClassName = "First Game Window Class";
   Win32ResizeDIBSection(&BackBuffer, Dimens.Height, Dimens.Width);
-
   // NOTE: I forgot to init window
   if (RegisterClassExA(&WindowClass)) {
 
@@ -442,8 +453,10 @@ int CALLBACK WinMain
           if(game_memory.TransientStorage && game_memory.PermanentStorage){
             debug_read_file_result result2;
             debug_read_file_result result;
-            //BMPContent = new imagee_content;
-            //BMPContent = DEBUGReadBMP("Harry_and_Accomplices_rescaled.bmp", &result);
+            // BMPContent = new imagee_content;
+            // BMPContent = DEBUGReadBMP("Harry_and_Accomplices_rescaled.bmp",
+            // &result);
+            //  =============================================
             BMPContent = DEBUGReadBMP("adventure_.jpg", &result);
             // printf("About to read image\n");
             //  NOTE: ???? Why when I change to different bmp image it crashed
@@ -457,21 +470,23 @@ int CALLBACK WinMain
             // Randomize cube direction
             std::srand(std::time(0));
             float direction = 0.0f;
-            for (int x = 0; x < 100; x++) {
-              direction = ((std::rand() % 3) * 1.0f);
-              fluxY[x + 100] = direction;
-              printf("cube index %d Y: %f, with direction %f %s\n", x, fluxY[x],
-                     fluxY[x + 100],
-                     fluxY[x + 100] == UPP_     ? "UP"
-                     : fluxY[x + 100] == DOWNN_ ? "DOWNN"
-                                                : "ROLL");
-            }
+
+            //for (int x = 0; x < 100; x++) {
+              //direction = ((std::rand() % 3) * 1.0f);
+              //fluxY[x + 100] = direction;
+              //printf("cube index %d Y: %f, with direction %f %s\n", x, fluxY[x],
+                     //fluxY[x + 100],
+                     //fluxY[x + 100] == UPP_     ? "UP"
+                     //: fluxY[x + 100] == DOWNN_ ? "DOWNN"
+                                                //: "ROLL");
+            //}
                 
 // Cause the ScreenData will be deleted out of the loop so
                 // We have to assign address of memory and glData to
                 //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
                 //RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
                 InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
+
                 glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
                 // Basic shader
                 std::string shader_name = "basic brush";
@@ -604,16 +619,11 @@ int CALLBACK WinMain
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
                 printf("vertex array :%d\n", ScreenBuffer.glData.VAOs);
 
-                // =============================================
-                LARGE_INTEGER LastCounter;
-                QueryPerformanceCounter(&LastCounter);
-                uint64 LastCycleCounts;
 
                 Game_Input Input[2] = {};
                 Game_Input* OldInput = &Input[0];
                 Game_Input* NewInput = &Input[1];
 
-                LastCycleCounts = __rdtsc();
 
                 win32_Sound_OutPut SoundOutPut = {};
                 Game_Sound_OutPut SoundBuffer = {};
@@ -625,11 +635,11 @@ int CALLBACK WinMain
                 int MaxControllerCount = XUSER_MAX_COUNT;
 /*
   Init here
+
   NOTE: Why InitOpenGL only work while in window loop
   May be this is related to Window and DC that hasn't been
   initialized yet
 */            
-                WaitTimeCounter = 0.0f;
                 float ChangeAxisCounter = 0.0f;
                 int64 ViewRotateCount = 0;
 
@@ -693,7 +703,36 @@ int CALLBACK WinMain
                 useProgram(ScreenBuffer.glData.ProgramIDs[0]);
 
                 while(GlobalRunning) {
-                    MSG Message;
+                    LastCycleCounts = (LastCycleCounts==0)?__rdtsc():EndCycleCounts;
+                  // Number of ticks/frame
+                    float TicksPerFrame = (EndCycleCounts>LastCycleCounts)?(EndCycleCounts - LastCycleCounts):0.0f;
+                    // NOTE: It based on the var type to decide what kind of the
+                    // substraction to do
+
+                    //ticks/per 1/10^6 second
+                    real32 TicksPerMicroS =                      (((EndCounter.QuadPart - LastCounter.QuadPart)>0.0f)&&(EndCounter.QuadPart!=0.0f)&&(LastCounter.QuadPart!=0.0f))?((real32)((real32)(EndCounter.QuadPart) - (real32)(LastCounter.QuadPart))):0.0f;
+
+                    real32 TicksPerS = 0.0f;
+                    TicksPerS = (TicksPerMicroS > 1000000.0f)?(TicksPerMicroS/1000000.0f):0.0f;
+
+                    real32 lastFrame;
+                    real32 endFrame;
+
+                    lastFrame = (real32)(EndCounter.QuadPart);
+                    // Time elapsed of one cycle/frame in 1/000000
+                    // s
+
+                    real32 MsPerFrame = (real32)((real32)TicksPerMicroS /
+                                                 (1000.f * TicksPerFrame));
+                    // Time elapsed of one cycle/frame in second
+                    real32 FramePerMicroSecond = (real32)((1000  * (real32)TicksPerFrame) / (real32)TicksPerMicroS);
+
+                    //TimeCounter += (TicksPerS > TicksPerFrame)?(float)((TicksPerS/TicksPerFrame)):0.0f;
+                    float deltaTime = (float)(1/60);
+                    real32 FPS =                        (real32)((real32)PerfCountFrequency/(real32)TicksPerFrame);
+
+
+                  MSG Message;
                     //NOTE: This is where receiving the message to change
                     // for any change in window
                     //
@@ -759,13 +798,7 @@ int CALLBACK WinMain
                     // We define that through setInt
                     //Why the &ScreenBuffer data doesn't show on the direct screen
 
-                    LARGE_INTEGER EndCounter;
-                    //In 1us(1/1000000)
-                    QueryPerformanceCounter(&EndCounter);
 
-                    // Frame(cycles)
-                    uint64 EndCycleCounts;
-                    EndCycleCounts = __rdtsc();
  
                     //__rdtsc() is an intrinsict (the one which looked like a function call
                     //but it actually a hint to the compiler to a specific dissembly language intstruction)
@@ -777,25 +810,6 @@ int CALLBACK WinMain
                   D : Data
                 
 */                
-
-                    // Number of ticks/frame
-                    uint64 CyclesElapsed = EndCycleCounts - LastCycleCounts;
-                    //NOTE: It based on the var type to decide what kind of the substraction to do
-                    real32 ElapsedCounter =                       (real32)((real32)(EndCounter.QuadPart) -                             (real32)(LastCounter.QuadPart));
-
-                    real32 lastFrame;
-                    real32 ElapsedCounter_1 =                        (real32)((real32)(EndCounter.QuadPart)) - lastFrame;
-                                                                                                       lastFrame = (real32)(EndCounter.QuadPart);
-                                 // Time elapsed of one cycle/frame in 1/000000
-                                 // s
-                                                                                                       WaitTimeCounter = (float)ElapsedCounter_1;
-
-                                 real32 McPerFrame = (real32)((real32)CyclesElapsed/(1000.f * 1000.f));
-                    // Time elapsed of one cycle/frame in second
-                    //real32 MsPerFrame = (real32)((1000 * (real32)ElapsedCounter) / (real32)PerfCountFrequency);
-                    real32 MsPerFrame = (real32)((1000  * (real32)ElapsedCounter) / (real32)CyclesElapsed);
-                    real32 FPS = (real32)((real32)PerfCountFrequency/(real32)ElapsedCounter);
-
 #if 0                
                     char Buffer[256];
                     //NOTE: The '%' is to decide the format of the next thing to print
@@ -806,14 +820,15 @@ int CALLBACK WinMain
 
                     int ChosenAxis = 0;
 
-                    if(!RatioCalculated){
-                        printf("Ms per frame :%f \n", MsPerFrame);
-                        DelayedRatio = MsPerFrame/16.67f;
-                        printf("Delay Ratio: %f\n", DelayedRatio);
-                        BackBuffer.camera.speed = (1.5f * DelayedRatio);                
-                        printf("camera speed: %f\n", BackBuffer.camera.speed);
-                        RatioCalculated = true;
-                    }
+                    //Ratio is based on miscalculated Msperframe
+                    //if(!RatioCalculated){
+                        //printf("Ms per frame :%f \n", MsPerFrame);
+                        //DelayedRatio = MsPerFrame/16.67f;
+                        //printf("Delay Ratio: %f\n", DelayedRatio);
+                        //BackBuffer.camera.speed = (1.5f * DelayedRatio);                
+                        //printf("camera speed: %f\n", BackBuffer.camera.speed);
+                        //RatioCalculated = true;
+                    //}
 
                     // Wait to 17 milli s perframe for model to rotate
 
@@ -852,9 +867,13 @@ int CALLBACK WinMain
                     // NOTE: Thing went wrong inside this function
                     // whether the waittimecounter or the function itself
                     // produce bugs
-
-                    animator->updateAnimationTime(WaitTimeCounter);
-
+                    if (first_size) {
+                        printf("counter: %f\n", WaitTimeCounter);
+                    }
+                    if (TimeCounter > 0.0f) {
+                        animator->updateAnimationTime(deltaTime);
+                    }
+                    WaitTimeCounter += deltaTime;
                     if(WaitTimeCounter >= 16.67f){
                         //else {
                         //ViewRotateCount++;
@@ -896,11 +915,12 @@ int CALLBACK WinMain
                         basic_cube_core = glm::rotate(basic_cube_core, glm::radians(10.0f) * (float)BackBuffer.camera.speed, randomRotateAxis);                        
                         
                         WaitTimeCounter = 0.0f;
-                    } else {
-                        WaitTimeCounter += MsPerFrame;
-                        //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
                     }
-
+                    //else {
+                        //WaitTimeCounter += MsPerFrame;
+                        //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
+                    //}
+//
                     //RENDER =====================================
                     basic_shader_->use();
                     glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
@@ -946,18 +966,23 @@ int CALLBACK WinMain
                     brushID = animating_shader_->GetProgramID();
                     DDraw(dancing_vampire, &brushID);                    
                     
-                    LastCounter = EndCounter;
-                    LastCycleCounts = EndCycleCounts;
-/*
-  MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per register 
-  MULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register  
-*/
                     Game_Input* Temp = NewInput;
                     NewInput = OldInput;  //???? still don't understand
                     OldInput = Temp;
                     SwapBuffers(DeviceContext);
                     ReleaseDC(Window, DeviceContext);
-                }
+
+                    endFrame = EndCycleCounts;
+                    EndCycleCounts = __rdtsc();
+
+                    /*
+MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per register
+MULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register
+*/
+
+                    LastCounter = EndCounter;
+                    QueryPerformanceCounter(&EndCounter);
+                    }
             }                
             glDeleteVertexArrays(1, &BackBuffer.glData.VAOs);
             glDeleteBuffers(1, &BackBuffer.glData.VBO);
@@ -977,7 +1002,7 @@ int CALLBACK WinMain
                 ErrorExit();
             }
 
-        }
+            }
     } else {
         //TODO: Logging
         DWORD errorCode = GetLastError();
