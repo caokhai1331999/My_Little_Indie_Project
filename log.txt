@@ -877,4 +877,7 @@ million) and put the tickcount var initializing line
 inside the running loop
 
 REMEMBER! : Type difference is the main underlying issue I usually came across
-actually I used the wrong performance frequency to get count in 1second
+
+NOTE: Turn out I used the wrong performance frequency to get count in 1second
+we did it
+

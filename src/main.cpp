@@ -404,6 +404,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
   int64 FPS = 0;
   // Time elapsed of one cycle/frame in second
 
+  bool RatioCalculated = false;
+  float DelayedRatio = 0.0f;
+
   win32LoadXInput();
   WNDCLASSEXA WindowClass = {};
   WindowClass.cbSize = sizeof(WNDCLASSEXA);
@@ -427,7 +430,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
       OpenConsole();
       int displayCount = ShowCursor(true);
       printf("display count: %d\n", displayCount);
-      printf("counter per 1s: %d\n",  PerfCountFrequency);
+      printf("counter per 1s: %I64d\n",  PerfCountFrequency);
 
       if (!GlobalRunning) {
         GlobalRunning = true;
@@ -654,8 +657,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 float ChangeAxisCounter = 0.0f;
                 int64 ViewRotateCount = 0;
 
-                bool RatioCalculated = false;
-                float DelayedRatio = 0.0f;                
                 //Window = SetCapture(Window);
 
                 useProgram(ScreenBuffer.glData.ProgramIDs[1]);
@@ -715,30 +716,16 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 QueryPerformanceCounter(&LastCounter);
                 while (GlobalRunning) {
 
-                  if (first_announce) {
-                      LastCycleCounts = __rdtsc();
-                  } else {
+                  //if (first_announce) {
+                      //LastCycleCounts = __rdtsc();
+                  //} else {
                     // NOTE: Why this stay the same over and equal to zero the
                     // the next 8 frames
                     // This one is buggy somehow
-                    TicksPerFrame = EndCycleCounts - LastCycleCounts;
-                  }
+                    //TicksPerFrame = EndCycleCounts - LastCycleCounts;
+                  //}
 
                     //printf("Count from start of frame: %I64d\n",LastCycleCounts);
-
-                    // Number of ticks/frame
-                    // NOTE: It based on the var type to decide what kind of the
-                    // substraction to do
-
-                    //ticks/per 1/10^6 second
-
-                    // Time elapsed of one cycle/frame in 1/000000
-                    // s
-
-/*                  if ((real32)(LastCounter.QuadPart) <
-                      (real32)(EndCounter.QuadPart)) {
-
-                  //}
 
                   MSG Message;
                     //NOTE: This is where receiving the message to change
@@ -758,11 +745,12 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         MaxControllerCount = ArrayCount(Input->Controller);   
                     }
                     TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent);
-                    //if(TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent)){
-                    //printf("Mouse event is being tracked\n");
-                    //} else {
-                    //printf("Can not track Mouse event\n");                
-                    //};                
+
+                    if(TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent)){
+                    printf("Mouse event is being tracked\n");
+                    } else {
+                    printf("Can not track Mouse event\n");                
+                    }
 
                     //UPDATE
                     // ================================================================
@@ -818,24 +806,24 @@ LARGE_INTEGER PerfCountFrequencyResult;
                   D : Data
                 
 */
-//#if DISPLAY_TIME                
+#if DISPLAY_TIME                
                     //char Buffer[256];
                     // NOTE: The '%' is to decide the format of the next thing
                     // to print for example: %d is the 32 bit
                     //sprintf(Buffer, "%f Miliseconds/Frame, %f FPS, %f Ms/f \n ",
                             //MsPerFrame, FPS, MsPerFrame);
                     //OutputDebugStringA(Buffer);
-//#endif                
+#endif                
 
                     int ChosenAxis = 0;
 
                     //Ratio is based on miscalculated Msperframe
-                    if(!RatioCalculated){
-                        DelayedRatio = (float)((float)MsPerFrame / (float)16.67f);
-                        printf("Delay Ratio: %f\n", DelayedRatio);
+                    if (RatioCalculated) {
+                        DelayedRatio = (float)(((float)MsPerFrame)/ 16.67f);
+                        printf("Delay Ratio: %f, msPerframe: %I64d\n", DelayedRatio, MsPerFrame);
                         BackBuffer.camera.speed = (1.5f * DelayedRatio);                
                         printf("camera speed: %f\n", BackBuffer.camera.speed);
-                        RatioCalculated = true;
+                        RatioCalculated = false;
                     }
 
                     // Wait to 17 milli s perframe for model to rotate
@@ -878,10 +866,10 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     if (first_size) {
                         printf("counter: %f\n", WaitTimeCounter);
                     }
-                    if (TimeCounter > 0.0f) {
-                        animator->updateAnimationTime((real32)(MsPerFrame * 1000));
+                    if (MsPerFrame > 0) {
+                      float updateTime = (float)((float)(MsPerFrame)/ 1000);
+                      //animator->updateAnimationTime(updateTime);
                     }
-                    WaitTimeCounter += MsPerFrame;
                     if(WaitTimeCounter >= 16.67f){
                         //else {
                         //ViewRotateCount++;
@@ -923,11 +911,10 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         basic_cube_core = glm::rotate(basic_cube_core, glm::radians(10.0f) * (float)BackBuffer.camera.speed, randomRotateAxis);                        
                         
                         WaitTimeCounter = 0.0f;
-                    }
-                    //else {
-                        //WaitTimeCounter += MsPerFrame;
+                    } else {
+                        WaitTimeCounter += MsPerFrame;
                         //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
-                    //}
+                    }
 //
                     //RENDER =====================================
                     basic_shader_->use();
@@ -977,15 +964,12 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     ReleaseDC(Window, DeviceContext);
 
                     //real32 endFrame = EndCycleCounts;
-                    LastCycleCounts = EndCycleCounts;
-                    EndCycleCounts = __rdtsc();
+                    //LastCycleCounts = EndCycleCounts;
+                    //EndCycleCounts = __rdtsc();
                     //printf("Count by the end of frame: %I64d\n", EndCycleCounts);
                     // Why this produce same result
 //Two different approaching ways
 
-                    if (!first_announce) {
-                        LastCounter = EndCounter;
-                    }
                     
                       if (!QueryPerformanceCounter(&EndCounter)) {
                         printf("Failed to call performancecounter function\n");
@@ -997,16 +981,25 @@ LARGE_INTEGER PerfCountFrequencyResult;
                             (int64)(EndCounter.QuadPart - LastCounter.QuadPart);
                         MsPerFrame =
                             ((1000 * CountsPerFrame) / PerfCountFrequency);
+                        if (!RatioCalculated) {
+                            RatioCalculated = true;
+                        }
                         SPerFrame = MsPerFrame / 1000;
                         // deltaTime = (float)(1 / 60);
-                        FPS = (real32)(1000) / MsPerFrame;
+                        FPS = 1000 / MsPerFrame;
+
+                        LastCounter = EndCounter;
                       }
 
 
                     if (first_announce) {
                        first_announce = false;
                       }
-                    //printf("Ticks per frame: %I64d,[LastFrameCount: %f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",TicksPerFrame, (real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame, MsPerFrame, FPS);
+                    char Buffers[256];
+                    //sprintf(Buffers,
+                            //"[LastFrameCount: %f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame,MsPerFrame, FPS);
+                    //printf("[LastFrameCount:%f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame,MsPerFrame, FPS);
+                    //OutputDebugStringA(Buffers);
                     }
           }
 
