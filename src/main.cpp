@@ -10,6 +10,7 @@
 #include "SoundMaker.h"
 #include "Tile.h"
 #include "animator.h"
+#include "handmade.h"
 
 bool32 first_size = true;
 bool32 first_announce = true;
@@ -377,12 +378,14 @@ int CALLBACK WinMain
  int cmdshow)
 {
 // Ticks per second/microS
-  LARGE_INTEGER PerfCountFrequencyResult;
-  QueryPerformanceCounter(&PerfCountFrequencyResult);
+LARGE_INTEGER PerfCountFrequencyResult;
+//We have one standard var here
+  QueryPerformanceFrequency(&PerfCountFrequencyResult);
   // NOTE: Actually, this the counts per second
   // TODO: Try to find out why the PerfCountFrequency is too large.
   // NOTE: This one count is for counting the frame
   int64 PerfCountFrequency = (int64)(PerfCountFrequencyResult.QuadPart);
+  // This one is how many count per Second
 
   LARGE_INTEGER LastCounter = {};
   LARGE_INTEGER EndCounter = {};
@@ -392,7 +395,14 @@ int CALLBACK WinMain
 
   float TimeCounter = 0.0f;
   float WaitTimeCounter = 0.0f;
-  QueryPerformanceCounter(&LastCounter);
+
+  uint64 TicksPerFrame = 0;
+  int64 TicksPerMicroS = 0;
+  int64 CountsPerFrame = 0;
+  int64 MsPerFrame = 0;
+  int64 SPerFrame = 0;
+  int64 FPS = 0;
+  // Time elapsed of one cycle/frame in second
 
   win32LoadXInput();
   WNDCLASSEXA WindowClass = {};
@@ -417,6 +427,7 @@ int CALLBACK WinMain
       OpenConsole();
       int displayCount = ShowCursor(true);
       printf("display count: %d\n", displayCount);
+      printf("counter per 1s: %d\n",  PerfCountFrequency);
 
       if (!GlobalRunning) {
         GlobalRunning = true;
@@ -701,36 +712,33 @@ int CALLBACK WinMain
                  //model_shader_->setFloat("pointLights[3].quadratic", 0.032f);
 
                 useProgram(ScreenBuffer.glData.ProgramIDs[0]);
+                QueryPerformanceCounter(&LastCounter);
+                while (GlobalRunning) {
 
-                while(GlobalRunning) {
-                    LastCycleCounts = (LastCycleCounts==0)?__rdtsc():EndCycleCounts;
-                  // Number of ticks/frame
-                    float TicksPerFrame = (EndCycleCounts>LastCycleCounts)?(EndCycleCounts - LastCycleCounts):0.0f;
+                  if (first_announce) {
+                      LastCycleCounts = __rdtsc();
+                  } else {
+                    // NOTE: Why this stay the same over and equal to zero the
+                    // the next 8 frames
+                    // This one is buggy somehow
+                    TicksPerFrame = EndCycleCounts - LastCycleCounts;
+                  }
+
+                    //printf("Count from start of frame: %I64d\n",LastCycleCounts);
+
+                    // Number of ticks/frame
                     // NOTE: It based on the var type to decide what kind of the
                     // substraction to do
 
                     //ticks/per 1/10^6 second
-                    real32 TicksPerMicroS =                      (((EndCounter.QuadPart - LastCounter.QuadPart)>0.0f)&&(EndCounter.QuadPart!=0.0f)&&(LastCounter.QuadPart!=0.0f))?((real32)((real32)(EndCounter.QuadPart) - (real32)(LastCounter.QuadPart))):0.0f;
 
-                    real32 TicksPerS = 0.0f;
-                    TicksPerS = (TicksPerMicroS > 1000000.0f)?(TicksPerMicroS/1000000.0f):0.0f;
-
-                    real32 lastFrame;
-                    real32 endFrame;
-
-                    lastFrame = (real32)(EndCounter.QuadPart);
                     // Time elapsed of one cycle/frame in 1/000000
                     // s
 
-                    real32 MsPerFrame = (real32)((real32)TicksPerMicroS /
-                                                 (1000.f * TicksPerFrame));
-                    // Time elapsed of one cycle/frame in second
-                    real32 FramePerMicroSecond = (real32)((1000  * (real32)TicksPerFrame) / (real32)TicksPerMicroS);
+/*                  if ((real32)(LastCounter.QuadPart) <
+                      (real32)(EndCounter.QuadPart)) {
 
-                    //TimeCounter += (TicksPerS > TicksPerFrame)?(float)((TicksPerS/TicksPerFrame)):0.0f;
-                    float deltaTime = (float)(1/60);
-                    real32 FPS =                        (real32)((real32)PerfCountFrequency/(real32)TicksPerFrame);
-
+                  //}
 
                   MSG Message;
                     //NOTE: This is where receiving the message to change
@@ -809,26 +817,26 @@ int CALLBACK WinMain
                   M : Multiple
                   D : Data
                 
-*/                
-#if 0                
-                    char Buffer[256];
-                    //NOTE: The '%' is to decide the format of the next thing to print
-                    for example: %d is the 32 bit integer
-                                      sprintf(Buffer, "%f Miliseconds/Frame, %f FPS, %f Mc/f \n ", MsPerFrame, FPS, MsPerFrame);
-                    OutputDebugStringA(Buffer);
-#endif                
+*/
+//#if DISPLAY_TIME                
+                    //char Buffer[256];
+                    // NOTE: The '%' is to decide the format of the next thing
+                    // to print for example: %d is the 32 bit
+                    //sprintf(Buffer, "%f Miliseconds/Frame, %f FPS, %f Ms/f \n ",
+                            //MsPerFrame, FPS, MsPerFrame);
+                    //OutputDebugStringA(Buffer);
+//#endif                
 
                     int ChosenAxis = 0;
 
                     //Ratio is based on miscalculated Msperframe
-                    //if(!RatioCalculated){
-                        //printf("Ms per frame :%f \n", MsPerFrame);
-                        //DelayedRatio = MsPerFrame/16.67f;
-                        //printf("Delay Ratio: %f\n", DelayedRatio);
-                        //BackBuffer.camera.speed = (1.5f * DelayedRatio);                
-                        //printf("camera speed: %f\n", BackBuffer.camera.speed);
-                        //RatioCalculated = true;
-                    //}
+                    if(!RatioCalculated){
+                        DelayedRatio = (float)((float)MsPerFrame / (float)16.67f);
+                        printf("Delay Ratio: %f\n", DelayedRatio);
+                        BackBuffer.camera.speed = (1.5f * DelayedRatio);                
+                        printf("camera speed: %f\n", BackBuffer.camera.speed);
+                        RatioCalculated = true;
+                    }
 
                     // Wait to 17 milli s perframe for model to rotate
 
@@ -871,9 +879,9 @@ int CALLBACK WinMain
                         printf("counter: %f\n", WaitTimeCounter);
                     }
                     if (TimeCounter > 0.0f) {
-                        animator->updateAnimationTime(deltaTime);
+                        animator->updateAnimationTime((real32)(MsPerFrame * 1000));
                     }
-                    WaitTimeCounter += deltaTime;
+                    WaitTimeCounter += MsPerFrame;
                     if(WaitTimeCounter >= 16.67f){
                         //else {
                         //ViewRotateCount++;
@@ -957,11 +965,7 @@ int CALLBACK WinMain
                           printf("finalBoneMatrices[boneIds[ %d ]]", (int)i);
                         }
                       };
-                      if (first_announce) {
-                        first_announce = false;
-                      };
                     }
-
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
                     brushID = animating_shader_->GetProgramID();
                     DDraw(dancing_vampire, &brushID);                    
@@ -972,18 +976,44 @@ int CALLBACK WinMain
                     SwapBuffers(DeviceContext);
                     ReleaseDC(Window, DeviceContext);
 
-                    endFrame = EndCycleCounts;
+                    //real32 endFrame = EndCycleCounts;
+                    LastCycleCounts = EndCycleCounts;
                     EndCycleCounts = __rdtsc();
+                    //printf("Count by the end of frame: %I64d\n", EndCycleCounts);
+                    // Why this produce same result
+//Two different approaching ways
 
-                    /*
-MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per register
-MULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register
+                    if (!first_announce) {
+                        LastCounter = EndCounter;
+                    }
+                    
+                      if (!QueryPerformanceCounter(&EndCounter)) {
+                        printf("Failed to call performancecounter function\n");
+                      };
+
+                      if (EndCounter.QuadPart > LastCounter.QuadPart) {
+                        // We got how many count per frame
+                        CountsPerFrame =
+                            (int64)(EndCounter.QuadPart - LastCounter.QuadPart);
+                        MsPerFrame =
+                            ((1000 * CountsPerFrame) / PerfCountFrequency);
+                        SPerFrame = MsPerFrame / 1000;
+                        // deltaTime = (float)(1 / 60);
+                        FPS = (real32)(1000) / MsPerFrame;
+                      }
+
+
+                    if (first_announce) {
+                       first_announce = false;
+                      }
+                    //printf("Ticks per frame: %I64d,[LastFrameCount: %f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",TicksPerFrame, (real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame, MsPerFrame, FPS);
+                    }
+          }
+
+/*
+MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per registerMULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register
 */
 
-                    LastCounter = EndCounter;
-                    QueryPerformanceCounter(&EndCounter);
-                    }
-            }                
             glDeleteVertexArrays(1, &BackBuffer.glData.VAOs);
             glDeleteBuffers(1, &BackBuffer.glData.VBO);
         }
@@ -1001,8 +1031,7 @@ MULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register
             if (!GetProcessId(NULL)){
                 ErrorExit();
             }
-
-            }
+        }
     } else {
         //TODO: Logging
         DWORD errorCode = GetLastError();

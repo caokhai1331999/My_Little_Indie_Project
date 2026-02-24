@@ -285,7 +285,7 @@ Got to delve more into that
 ---------------- Sun, 07 Sep 25: 08:41PM
 
 By the way How to draw out position of model
-Why there was a glitch at camera moving. The time counter somewhat not working
+Why there was a glitch at camera moving. The timecounter somewhat not working
 as I expect
 
 ---------------- Wed, 10 Sep 25: 10:15PM
@@ -867,3 +867,14 @@ Actually, the data that caused bug is animationTime
 NOTE: The culprit of animation bug is frame time miscalculation. Got to focus on
 this. By the way the shader of animating model is buggy somewhere causing NULL
 representaion.
+
+---------------- Tue, 24 Feb 26: 10:28AM
+
+basic mistake put the count tracking line out of real-time window bracket
+
+Actually I calculated it wrong (should be tickperS equal to tickerpermicroS * 1
+million) and put the tickcount var initializing line
+inside the running loop
+
+REMEMBER! : Type difference is the main underlying issue I usually came across
+actually I used the wrong performance frequency to get count in 1second
