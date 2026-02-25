@@ -616,7 +616,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                 Model_* backpack = nullptr;
                 backpack = new Model_();
-                std::string backpack_path = "./backpack.obj";
+                std::string backpack_path = "./media/backpack.obj";
                 loadModel_(backpack, backpack_path);
 
                 //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
