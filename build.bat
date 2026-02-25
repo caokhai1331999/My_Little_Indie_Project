@@ -5,7 +5,7 @@ pushd build
 del .\src\*.obj
 del *.pdb > NUL 2> NUL
 
-set DIRECTIVES_FLAG=/DDEBUG=1 /DINTERNAL=1 /DON_LITTLE_BEAST=0
+set DIRECTIVES_FLAG=/DDEBUG=1 /DINTERNAL=1 /DON_LITTLE_BEAST=0 /DDISPLAY_TIME=1
 set COMPILE_FLAG=/FC /Zi /EHsc
 set LIB_= strmiids.lib uuid.lib Kernel32.lib user32.lib gdi32.lib Opengl32.lib assimp-vc143-mtd.lib
 set _include=..\include
