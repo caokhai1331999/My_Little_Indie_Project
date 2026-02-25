@@ -20,30 +20,8 @@
 class Animation{
 public:
     Animation() = default;
-
-    Animation(char* animationPath = nullptr, Model_* model = nullptr){
-      // assert throw out the error when 0 is the value
-        m_Bones.reserve(100);
-        m_Bone_InfoMap.reserve(100);;
-        
-        Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
-        // Still don't understand this part
-        // Now I understand this: This line check whether one of these two
-        // the scene->mRootNode is NULL or not
-        assert(scene && scene->mRootNode);
-
-        // Bone construct based on scene here
-        auto animation = scene->mAnimations[0];
-        m_Duration = animation->mDuration;
-        m_TicksPerSecond = animation->mTicksPerSecond;
-        ReadHierarchyData(m_RootNode, scene->mRootNode);
-        ReadMissingBone(animation, model);
-        };
-
+    Animation(char* animationPath = nullptr, Model_* model = nullptr);
     ~Animation(){};
-
-
     
     inline float GetTicksPerSecond(){return m_TicksPerSecond;};
     inline float GetDuration(){return m_Duration;};

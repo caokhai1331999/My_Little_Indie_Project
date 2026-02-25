@@ -881,3 +881,27 @@ REMEMBER! : Type difference is the main underlying issue I usually came across
 NOTE: Turn out I used the wrong performance frequency to get count in 1second
 we did it
 
+
+---------------- Wed, 25 Feb 26: 10:15AM
+
+Today I will do side quest. That is write a function and customize build code
+for hot loading dll
+
+What I will do everytime I need to hot loading any function
+
+. Set: extern "C" __declspec(dllexport) int __cdecl functionName(in source file) if I want to export anyfunction
+name from (Set up)
+. using export: funcName in build code (Set up)
+. Then call out the name of function by loadlibrary and __cdecl* (function
+pointer) then assign it to get ProcAddress(HMODUL libName, function name)
+
+ex:
+ 1. in source file : extern "C" __declspec(dllexport) int __cdecl funcName ()
+ 2. in build code : call /LD and EXPORT/: funcName or use comment
+ 
+ 3. in source file that will be compile into exe : call out HMODULE = loadLibraryA(dllName
+) and __cdecl*functionName = getprocaddress(functionName)
+     ** DO this recursively after a specific time-interval
+Then we can call 
+
+NOTE: Focus on files that is being worked on or need to be fixed

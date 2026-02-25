@@ -248,3 +248,17 @@ void* GetAnyGLFuncAddress(const char* name)
     return p;
     //May be the wglgetprocaddress doesn't on pc case work I have to use getprocaddress instead
 }
+
+void* LoadFunctionFromDLL(const char *DLLName,
+                         const char *FuncName) {
+    // Create function pointer that needed hot loading for debug
+  // LoadDLL
+  // Load function address
+  // free DLL
+    HMODULE  LoadedLib;
+    
+
+    LoadedLib = LoadLibraryA(DLLName);
+    void* function;
+
+};
