@@ -9,11 +9,13 @@
 #include <cstdlib>
 #include "SoundMaker.h"
 #include "Tile.h"
-#include "animator.h"
+//#include "animator.h"
 #include "handmade.h"
 
 bool32 first_size = true;
 bool32 first_announce = true;
+
+
 
 LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
                                     LPARAM Lparam) {
@@ -626,6 +628,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 dancing_vampire = new Model_();
                 std::string dancing_vampire_path = "./media/dancing_vampire.dae";
                 loadModel_(dancing_vampire, dancing_vampire_path);
+
                 Animation* danceAnimation = new Animation((char*)dancing_vampire_path.c_str(), dancing_vampire);
                 Animator *animator = new Animator(danceAnimation);
 

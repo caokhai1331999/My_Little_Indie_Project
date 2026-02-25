@@ -249,6 +249,7 @@ void ProcessXinputDigitalButton(DWORD XInputButtonState ,Game_Button_State* OldS
 void ProcessInput(int maxControllerCount, Game_Input* OldInput, Game_Input* NewInput);
 
 void* GetAnyGLFuncAddress(const char* name);
+void LoadFunctionFromDLL(const char* DLLName = nullptr, const char* FuncName = nullptr);
 
 #define HANDMADE_H
 #endif

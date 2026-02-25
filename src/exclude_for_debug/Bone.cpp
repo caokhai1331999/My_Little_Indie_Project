@@ -34,7 +34,7 @@ int Bone::GetScalingIndex(float animationTime){
     }
         assert(0);
 }
-
+#pragma comment(linker, "/export:BoneUpdate=?Update@Bone@@QEAAXM@Z")
 void Bone::Update(float animationTime){
     glm::mat4 Translation = InterpolatePosition(animationTime);
     glm::mat4 Rotation = InterpolateRotation(animationTime);
