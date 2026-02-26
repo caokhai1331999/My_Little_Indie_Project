@@ -9,13 +9,20 @@
 #include <cstdlib>
 #include "SoundMaker.h"
 #include "Tile.h"
-//#include "animator.h"
+#include "exclude_for_debug\animator.h"
 #include "handmade.h"
+
+// structure of function type return type of original function (*) (argument type)
+typedef (Animation*) (* AniClassSpawner) (char *, Model_ *);
+typedef (void) (* AniClassSlainer) (char *, Model_ *);
+
+
+typedef (Animator*) (* AniUserClassSpawner) (Animation*);
+typedef (void) (* AniUserClassSlayer) (Animation*);
+typedef (void) (* AniTimeUpdater) (Animator*, float);
 
 bool32 first_size = true;
 bool32 first_announce = true;
-
-
 
 LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
                                     LPARAM Lparam) {
@@ -629,7 +636,27 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 std::string dancing_vampire_path = "./media/dancing_vampire.dae";
                 loadModel_(dancing_vampire, dancing_vampire_path);
 
-                Animation* danceAnimation = new Animation((char*)dancing_vampire_path.c_str(), dancing_vampire);
+                AniClassSpawner CreateAniClass;
+                AniClassSlainer KillAniClass;
+
+                AniUserClassSpawner AnimatorClassSpawn;
+                AniUserClassSlayer AnimatorClassSlay;
+                AniTimeUpdater AniUpdater;
+
+                if(reloadCount > 5){
+                    HMODULE AniLib = LoadLibraryA("skeletalAni32.dll");
+                    // Animation
+                    if(AniLib != NULL){
+                        AniClassCreate = (CreateAniClass)GetProcAddress(AniLib, "CreateAniclass")
+                            KillAniClass = (AniClassSlainer)GetProcAddress(AniLib, "DestroyAniClass");
+
+                        AnimatorClassSpawn = (AniUserClassSpawner)GetProcAddress(AniLib, "CreateAnimatorClass");
+                        AniUserClassSlayer = (AniUserClassSlayer)GetProcAddress(AniLib, "DestroyAnimatorClass");
+                        AnimatorClassSpawn = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTimee");
+                        }                    
+                    }
+                
+                Animation* danceAnimation = AniClassCreator((char*)dancing_vampire_path.c_str(), dancing_vampire);
                 Animator *animator = new Animator(danceAnimation);
 
 //modell->Texturedirectory = texpath.substr(0, path.find_last_of('/'));
