@@ -11,14 +11,20 @@ set LIB_= strmiids.lib uuid.lib Kernel32.lib user32.lib gdi32.lib Opengl32.lib a
 set _include=..\include
 set glad_src=..\include\glad
 rem set PDB_name=
-rem set dll_name=win32.dll
+
+rem Remember exclude out the src files that is used to build dll while building exe
+set src_files_for_dll=..\src\exclude_for_debug\*.c*
+set _include_for_dll=..\include\exclude_for_debug
+set dll_name=skeletalAni32.dll
+set EXPORT_=
+
 set GLFW_INCLUDE_DIR="C:\Users\klove\Downloads\External_Libraries\glfw\glfw-3.4.bin.WIN64\include"
 
 set ASSIMP_DIR="C:\Users\klove\Documents\repos\GLFW2\Vulkan_Learning_Project\assimp\include"
 
 set ASSIMP_LIB="C:\Users\klove\Documents\repos\GLFW2\Vulkan_Learning_Project\assimp\lib\debug"
 
-set FILES=..\src\*.c*
+set FILES_FOR_EXE=..\src\*.c*
 rem ..\SoundMaker.cpp  ..\GUIDs.cpp
 rem Mmdevapi.dll Audioses.dll /VERBOSE:LIB 
 rem remember to add these to use address sanitizer /EHsc /fsanitize=address
@@ -29,10 +35,9 @@ rem  )
 
 rem Let alone the hot Loading code later
 
-rem cl /LD ..\win32Game.cpp ..\main.cpp %COMPILE_FLAG% %DIRECTIVES_FLAG%  -I%_include% -I%glad_src% -link %LIB_% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /PDB:%PDB_name% %EXPORT_% /DEBUG/OUT:%dll_name%
+cl /D_USRDLL /D_WINDLL /LD %DIRECTIVES_FLAG% %src_files_for_dll% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% /LIBPATH:%ASSIMP_LIB% -DEBUG /FORCE:MULTIPLE /IGNORE:4006 /OUT:%dll_name%
 
-cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% /LIBPATH:%ASSIMP_LIB% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006
-/subsystem:consolew
+rem cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% /LIBPATH:%ASSIMP_LIB% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /subsystem:consolew
 rem if %ERRORLEVEL% EQU 0 (
 rem    @echo Announce: " compilation succeeded (^ w ^) "
 rem ) else (
