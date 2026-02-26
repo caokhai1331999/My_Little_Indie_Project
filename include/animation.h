@@ -1,5 +1,3 @@
-#include <concurrencysal.h>
-#include <unordered_map>
 #if !defined(ANIMATION_H)
 /* ========================================================================
    $File: $

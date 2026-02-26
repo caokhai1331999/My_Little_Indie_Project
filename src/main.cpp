@@ -9,7 +9,6 @@
 #include <cstdlib>
 #include "SoundMaker.h"
 #include "Tile.h"
-#include "exclude_for_debug\animator.h"
 #include "handmade.h"
 
 // structure of function type return type of original function (*) (argument type)
@@ -647,7 +646,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     HMODULE AniLib = LoadLibraryA("skeletalAni32.dll");
                     // Animation
                     if(AniLib != NULL){
-                        AniClassCreate = (CreateAniClass)GetProcAddress(AniLib, "CreateAniclass")
+                        AniClassCreate = (AniClassSpawner)GetProcAddress(AniLib, "CreateAniclass")
                             KillAniClass = (AniClassSlainer)GetProcAddress(AniLib, "DestroyAniClass");
 
                         AnimatorClassSpawn = (AniUserClassSpawner)GetProcAddress(AniLib, "CreateAnimatorClass");
@@ -657,7 +656,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     }
                 
                 Animation* danceAnimation = AniClassCreator((char*)dancing_vampire_path.c_str(), dancing_vampire);
-                Animator *animator = new Animator(danceAnimation);
+                Animator *animator = AniUserClassSpawn(danceAnimation);
 
 //modell->Texturedirectory = texpath.substr(0, path.find_last_of('/'));
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
