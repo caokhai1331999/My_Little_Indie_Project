@@ -250,15 +250,18 @@ void* GetAnyGLFuncAddress(const char* name)
 }
 
 void* LoadFunctionFromDLL(const char *DLLName,
-                         const char *FuncName) {
+                          const char *FuncName) {
     // Create function pointer that needed hot loading for debug
   // LoadDLL
   // Load function address
   // free DLL
     HMODULE  LoadedLib;
-    
-
-    LoadedLib = LoadLibraryA(DLLName);
     void* function;
+    LoadedLib = LoadLibraryA(DLLName);
+    if(LoadedLib != NULL){
+        function = (void*)GetProcAddress(LoadedLib, FuncName);
+    }
+    return function;    
+//Then turn the void* type to any function type using static converter
 
 };

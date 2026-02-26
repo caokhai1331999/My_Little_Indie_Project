@@ -1,3 +1,4 @@
+#include <concurrencysal.h>
 #include <unordered_map>
 #if !defined(ANIMATION_H)
 /* ========================================================================
@@ -16,7 +17,7 @@
 #include "C_Mesh.h"
 #include "Bone.h"
 #include "C_Model.h"
-
+//extern "C" __declspec(dllexport)
 class Animation{
 public:
     Animation() = default;
@@ -40,12 +41,26 @@ public:
     void ReadMissingBone(const aiAnimation* animation, Model_* model);
     void ReadHierarchyData(AssimpNodeData& dest, const aiNode* src);
     AssimpNodeData* getRootNode(){return &m_RootNode;};
-private:
+
+
+    private:
     float m_Duration;
     int m_TicksPerSecond;
     AssimpNodeData m_RootNode;
     std::vector<Bone> m_Bones;
     std::unordered_map<std::string, Bone_Info> m_Bone_InfoMap;
 };
+
+// Class wrapper
+extern "C" __declspec(dllexport) Animation* CreateAniClass(char *animationPath,
+                                                           Model_ *model) {
+    Animation* newAni = new Animation(animationPath, model);
+    return newAni;
+};
+
+extern "C" __declspec(dllexport) void DestroyAniClass(Animation *ani) {
+    delete ani;
+}
+
 #define ANIMATION_H
 #endif
