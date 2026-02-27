@@ -10,6 +10,7 @@
 
 //extern "C" __declspec(dllexport)
 //#pragma comment(linker, "/export:Animation=??0Animation@@QEAA@PEADPEAVModel_@@@Z")
+
 Animation::Animation(char* animationPath, Model_* model){
       // assert throw out the error when 0 is the value
         m_Bones.reserve(100);

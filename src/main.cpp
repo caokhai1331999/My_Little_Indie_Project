@@ -9,16 +9,8 @@
 #include <cstdlib>
 #include "SoundMaker.h"
 #include "Tile.h"
-#include "handmade.h"
-
-// structure of function type return type of original function (*) (argument type)
-typedef (Animation*) (* AniClassSpawner) (char *, Model_ *);
-typedef (void) (* AniClassSlainer) (char *, Model_ *);
-
-
-typedef (Animator*) (* AniUserClassSpawner) (Animation*);
-typedef (void) (* AniUserClassSlayer) (Animation*);
-typedef (void) (* AniTimeUpdater) (Animator*, float);
+//#include "handmade.h"
+#include "animator.h"
 
 bool32 first_size = true;
 bool32 first_announce = true;
@@ -425,6 +417,17 @@ LARGE_INTEGER PerfCountFrequencyResult;
   WindowClass.lpszClassName = "First Game Window Class";
   Win32ResizeDIBSection(&BackBuffer, Dimens.Height, Dimens.Width);
   // NOTE: I forgot to init window
+
+  AniClassSpawner CreateAnimation;
+  AniClassSlainer KillAninmation;
+
+  AniUserClassSpawner SpawnAnimator;
+  AniUserClassSlayer SlayAnimator;
+  AniTimeUpdater AniUpdate;
+
+  Animation *danceAnimation;
+  Animator *animator;
+
   if (RegisterClassExA(&WindowClass)) {
 
     Window = CreateWindowExA(
@@ -635,28 +638,22 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 std::string dancing_vampire_path = "./media/dancing_vampire.dae";
                 loadModel_(dancing_vampire, dancing_vampire_path);
 
-                AniClassSpawner CreateAniClass;
-                AniClassSlainer KillAniClass;
-
-                AniUserClassSpawner AnimatorClassSpawn;
-                AniUserClassSlayer AnimatorClassSlay;
-                AniTimeUpdater AniUpdater;
-
-                if(reloadCount > 5){
+                if(WaitTimeCounter > 16.67f || first_announce){
                     HMODULE AniLib = LoadLibraryA("skeletalAni32.dll");
                     // Animation
                     if(AniLib != NULL){
-                        AniClassCreate = (AniClassSpawner)GetProcAddress(AniLib, "CreateAniclass")
-                            KillAniClass = (AniClassSlainer)GetProcAddress(AniLib, "DestroyAniClass");
+                        CreateAnimation = (AniClassSpawner)GetProcAddress(AniLib, "CreateAniclass");
+                        KillAninmation = (AniClassSlainer)GetProcAddress(AniLib, "DestroyAniClass");
 
-                        AnimatorClassSpawn = (AniUserClassSpawner)GetProcAddress(AniLib, "CreateAnimatorClass");
-                        AniUserClassSlayer = (AniUserClassSlayer)GetProcAddress(AniLib, "DestroyAnimatorClass");
-                        AnimatorClassSpawn = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTimee");
+                        SpawnAnimator = (AniUserClassSpawner)GetProcAddress(AniLib, "CreateAnimatorClass");
+                        SlayAnimator = (AniUserClassSlayer)GetProcAddress(AniLib, "DestroyAnimatorClass");
+                        AniUpdate = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTimee");
                         }                    
                     }
-                
-                Animation* danceAnimation = AniClassCreator((char*)dancing_vampire_path.c_str(), dancing_vampire);
-                Animator *animator = AniUserClassSpawn(danceAnimation);
+
+                danceAnimation = CreateAnimation((char*)dancing_vampire_path.c_str(), dancing_vampire);
+
+                animator = SpawnAnimator(danceAnimation);
 
 //modell->Texturedirectory = texpath.substr(0, path.find_last_of('/'));
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
@@ -897,9 +894,15 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     }
                     if (MsPerFrame > 0) {
                       float updateTime = (float)((float)(MsPerFrame)/ 1000);
-                      //animator->updateAnimationTime(updateTime);
+                      AniUpdate(animator,updateTime);
                     }
-                    if(WaitTimeCounter >= 16.67f){
+
+                    if(WaitTimeCounter >= 16.67f){                        
+                        WaitTimeCounter = 0.0f;
+                    } else {
+                        WaitTimeCounter += MsPerFrame;
+                        //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
+                    }
                         //else {
                         //ViewRotateCount++;
                         //float CamX = sin(ViewRotateCount)*10.0f;
@@ -937,14 +940,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         } else {
                             ChangeAxisCounter += WaitTimeCounter;
                         }
+
                         basic_cube_core = glm::rotate(basic_cube_core, glm::radians(10.0f) * (float)BackBuffer.camera.speed, randomRotateAxis);                        
-                        
-                        WaitTimeCounter = 0.0f;
-                    } else {
-                        WaitTimeCounter += MsPerFrame;
-                        //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
-                    }
-//
+
                     //RENDER =====================================
                     basic_shader_->use();
                     glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
@@ -1035,7 +1033,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
 /*
 MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per registerMULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register
 */
-
+          SlayAnimator(animator);
+          KillAninmation(danceAnimation);
+          
             glDeleteVertexArrays(1, &BackBuffer.glData.VAOs);
             glDeleteBuffers(1, &BackBuffer.glData.VBO);
         }

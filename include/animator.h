@@ -9,8 +9,14 @@
 
 #include "animation.h"
 
-class Animator{
+// structure of function type return type of original function (*) (argument type)
+//typedef Animation* (* Animationn) (char*, class Model_*);
+typedef Animation* (* AniClassSpawner) (char *, Model_ *);
+typedef void (* AniClassSlainer) (Animation* );
 
+
+
+class Animator{
 public:
     Animator(Animation *animation = nullptr):m_currentAnimation(animation) {
       m_currentTime = 0.0f;
@@ -35,6 +41,8 @@ private:
     float m_deltaTime;
 };
 
+typedef Animator* (* AniUserClassSpawner) (Animation*);
+
 // Class wrapper
 extern "C" __declspec(dllexport) Animator *CreateAnimatorClass(Animation *animation) {
   Animator *newAnimator = new Animator(animation);
@@ -49,5 +57,9 @@ extern "C" __declspec(dllexport) void updateAnimationTimee(Animator *ani, float 
     ani->updateAnimationTime(dt);
 }
 
+typedef void (* AniUserClassSlayer) (Animator*);
+typedef void (* AniTimeUpdater) (Animator*, float);
+
 #define ANIMATOR_H
 #endif
+

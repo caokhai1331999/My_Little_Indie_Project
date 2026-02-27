@@ -905,3 +905,9 @@ ex:
 Then we can call 
 
 NOTE: Focus on files that is being worked on or need to be fixed
+
+---------------- Fri, 27 Feb 26: 10:51AM
+
+NOTE: Just learn something new. the exe just load code from dll compiled from
+implement files(c or cpp). The header (or declaration) must be visible to both
+dll and exe files !!

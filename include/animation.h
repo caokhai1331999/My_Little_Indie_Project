@@ -18,7 +18,7 @@
 //extern "C" __declspec(dllexport)
 class Animation{
 public:
-    Animation() = default;
+    //Animation() = default;
     Animation(char* animationPath = nullptr, Model_* model = nullptr);
     ~Animation(){};
     
@@ -48,6 +48,7 @@ public:
     std::vector<Bone> m_Bones;
     std::unordered_map<std::string, Bone_Info> m_Bone_InfoMap;
 };
+
 
 // Class wrapper
 extern "C" __declspec(dllexport) Animation* CreateAniClass(char *animationPath,
