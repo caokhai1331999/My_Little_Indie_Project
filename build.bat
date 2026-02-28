@@ -34,7 +34,7 @@ rem  )
 
 rem Let alone the hot Loading code later
 
-rem cl /D_USRDLL /D_WINDLL /LD %DIRECTIVES_FLAG% %src_files_for_dll% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% /LIBPATH:%ASSIMP_LIB% -DEBUG /FORCE:MULTIPLE /IGNORE:4006 /OUT:%dll_name%
+cl /D_USRDLL /D_WINDLL /LD %DIRECTIVES_FLAG% %src_files_for_dll% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% /LIBPATH:%ASSIMP_LIB% -DEBUG /FORCE:MULTIPLE /IGNORE:4006 /OUT:%dll_name%
 
 cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES_FOR_EXE% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% animation.lib /LIBPATH:%ASSIMP_LIB% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /ENTRY:WinMainCRTStartup /subsystem:console
 rem if %ERRORLEVEL% EQU 0 (

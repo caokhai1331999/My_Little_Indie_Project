@@ -15,7 +15,7 @@
 #include "C_Mesh.h"
 #include "Bone.h"
 #include "C_Model.h"
-//extern "C" __declspec(dllexport)
+
 class Animation{
 public:
     //Animation() = default;
@@ -49,17 +49,13 @@ public:
     std::unordered_map<std::string, Bone_Info> m_Bone_InfoMap;
 };
 
-
 // Class wrapper
-extern "C" __declspec(dllexport) Animation* CreateAniClass(char *animationPath,
-                                                           Model_ *model) {
-    Animation* newAni = new Animation(animationPath, model);
-    return newAni;
-};
+extern "C" __declspec(dllexport) Animation* __cdecl CreateAniClass(char *animationPath, Model_ *model);
+extern "C" __declspec(dllexport) void __cdecl DestroysAniClass(Animation *ani);
 
-extern "C" __declspec(dllexport) void DestroyAniClass(Animation *ani) {
-    delete ani;
-}
+typedef Animation* (__cdecl *AniClassSpawner) (char *, Model_ *);
+typedef void (__cdecl *AniClassSlainer) (Animation* );
 
 #define ANIMATION_H
 #endif
+

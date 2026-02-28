@@ -11,26 +11,26 @@
 //extern "C" __declspec(dllexport)
 //#pragma comment(linker, "/export:Animation=??0Animation@@QEAA@PEADPEAVModel_@@@Z")
 
-Animation::Animation(char* animationPath, Model_* model){
-      // assert throw out the error when 0 is the value
-        m_Bones.reserve(100);
-        m_Bone_InfoMap.reserve(100);;
-        
-        Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
-        // Still don't understand this part
-        // Now I understand this: This line check whether one of these two
-        // the scene->mRootNode is NULL or not
-        assert(scene && scene->mRootNode);
+Animation::Animation(char *animationPath, Model_ *model) {
+  // assert throw out the error when 0 is the value
+  m_Bones.reserve(100);
+  m_Bone_InfoMap.reserve(100);
 
-        // Bone construct based on scene here
-        auto animation = scene->mAnimations[0];
-        m_Duration = animation->mDuration;
-        m_TicksPerSecond = animation->mTicksPerSecond;
-        ReadHierarchyData(m_RootNode, scene->mRootNode);
-        ReadMissingBone(animation, model);
-        };
+  Assimp::Importer importer;
+  const aiScene *scene =
+      importer.ReadFile(animationPath, aiProcess_Triangulate);
+  // Still don't understand this part
+  // Now I understand this: This line check whether one of these two
+  // the scene->mRootNode is NULL or not
+  assert(scene && scene->mRootNode);
 
+  // Bone construct based on scene here
+  auto animation = scene->mAnimations[0];
+  m_Duration = animation->mDuration;
+  m_TicksPerSecond = animation->mTicksPerSecond;
+  ReadHierarchyData(m_RootNode, scene->mRootNode);
+  ReadMissingBone(animation, model);
+};
 
 Bone* Animation::FindBone(const std::string& name){
   auto iter = find_if(m_Bones.begin(), m_Bones.end(),
@@ -87,3 +87,10 @@ void Animation::ReadHierarchyData(AssimpNodeData& dest, const aiNode* src){
     };
 };
 
+Animation* __cdecl CreateAniClass(char *animationPath, Model_ *model) {
+    return new Animation(animationPath, model);
+};
+
+void __cdecl DestroysAniClass(Animation *ani) {
+    delete ani;
+}

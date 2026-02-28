@@ -425,8 +425,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
   AniUserClassSlayer SlayAnimator;
   AniTimeUpdater AniUpdate;
 
-  Animation *danceAnimation;
-  Animator *animator;
+  Animation* danceAnimation;
+  Animator* animator;
 
   if (RegisterClassExA(&WindowClass)) {
 
@@ -642,14 +642,15 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     HMODULE AniLib = LoadLibraryA("skeletalAni32.dll");
                     // Animation
                     if(AniLib != NULL){
-                        CreateAnimation = (AniClassSpawner)GetProcAddress(AniLib, "CreateAniclass");
-                        KillAninmation = (AniClassSlainer)GetProcAddress(AniLib, "DestroyAniClass");
+                        CreateAnimation = (AniClassSpawner)GetProcAddress(AniLib, "CreateAniClass");
+                        KillAninmation = (AniClassSlainer)GetProcAddress(AniLib, "DestroysAniClass");
 
                         SpawnAnimator = (AniUserClassSpawner)GetProcAddress(AniLib, "CreateAnimatorClass");
                         SlayAnimator = (AniUserClassSlayer)GetProcAddress(AniLib, "DestroyAnimatorClass");
+
                         AniUpdate = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTimee");
-                        }                    
                     }
+                   }
 
                 danceAnimation = CreateAnimation((char*)dancing_vampire_path.c_str(), dancing_vampire);
 

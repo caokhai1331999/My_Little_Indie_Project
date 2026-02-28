@@ -911,3 +911,28 @@ NOTE: Focus on files that is being worked on or need to be fixed
 NOTE: Just learn something new. the exe just load code from dll compiled from
 implement files(c or cpp). The header (or declaration) must be visible to both
 dll and exe files !!
+
+---------------- Sat, 28 Feb 26: 09:56AM
+
+NOTE: I found out the the unresolved external bug cause: I didn't put the
+function/constructor implementation inside the linked header but the source
+
+By the way, the typedef keyword won't work on C++ class constructor. I have to
+use the using keyword instead.
+
+Just learnt new thing: I have to use alias produced by typedef or using to avoid
+compiler asking for the direct definition(which actually only lied in the source
+code of the dll) - alpha_
+
+still can not get the class member out
+
+why the animation construction called provoked unresovled symbols but not the
+animator
+
+So new trick emerge, I move the visible function emplementation part to cpp all
+the unresovled symbols disappeared - LINKED alpha_
+
+why the exe couldn't find out the function definition
+
+NOTE: Turned out I called wrong name the whole time so the getprocaddress
+produce null ptr

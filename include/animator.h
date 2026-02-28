@@ -11,10 +11,6 @@
 
 // structure of function type return type of original function (*) (argument type)
 //typedef Animation* (* Animationn) (char*, class Model_*);
-typedef Animation* (* AniClassSpawner) (char *, Model_ *);
-typedef void (* AniClassSlainer) (Animation* );
-
-
 
 class Animator{
 public:
@@ -41,24 +37,15 @@ private:
     float m_deltaTime;
 };
 
-typedef Animator* (* AniUserClassSpawner) (Animation*);
 
 // Class wrapper
-extern "C" __declspec(dllexport) Animator *CreateAnimatorClass(Animation *animation) {
-  Animator *newAnimator = new Animator(animation);
-  return newAnimator;
-};
+extern "C" __declspec(dllexport) Animator* __cdecl CreateAnimatorClass(Animation *animation);
+extern "C" __declspec(dllexport) void __cdecl DestroyAnimatorClass(Animator *ani);
+extern "C" __declspec(dllexport) void __cdecl updateAnimationTimee(Animator *ani, float dt);
 
-extern "C" __declspec(dllexport) void DestroyAnimatorClass(Animator *ani) {
-    delete ani;
-}
-
-extern "C" __declspec(dllexport) void updateAnimationTimee(Animator *ani, float dt) {
-    ani->updateAnimationTime(dt);
-}
-
-typedef void (* AniUserClassSlayer) (Animator*);
-typedef void (* AniTimeUpdater) (Animator*, float);
+typedef Animator* (__cdecl *AniUserClassSpawner) (Animation*);
+typedef void (__cdecl *AniUserClassSlayer) (Animator*);
+typedef void (__cdecl *AniTimeUpdater) (Animator*, float);
 
 #define ANIMATOR_H
 #endif

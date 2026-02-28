@@ -52,3 +52,14 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
     }
 };
 
+Animator* __cdecl CreateAnimatorClass(Animation *animation) {
+  return new Animator(animation);
+};
+
+void __cdecl DestroyAnimatorClass(Animator *ani) {
+    delete ani;
+}
+
+void __cdecl updateAnimationTimee(Animator *ani, float dt) {
+    ani->updateAnimationTime(dt);
+}
