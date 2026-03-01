@@ -437,6 +437,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
   AniUserClassSpawner SpawnAnimator;
   AniUserClassSlayer SlayAnimator;
   AniTimeUpdater AniUpdate;
+  AniTimeUpdater AniUpdate_;
 
   Animation* danceAnimation;
   Animator* animator;
@@ -651,13 +652,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 std::string dancing_vampire_path = "./media/dancing_vampire.dae";
                 loadModel_(dancing_vampire, dancing_vampire_path);
 
-                if(WaitTimeCounter > 16.0f || first_announce){
                   if (CopyFile("skeletalAni32.dll", "skeletalAni32_copy.dll",
                                 false))
-                      {
-                          if(AniLib != NULL){FreeLibrary(AniLib);}
-                          AniLib = LoadLibraryA("skeletalAni32_copy.dll");
-                              }
+                  {
+                    AniLib = LoadLibraryA("skeletalAni32_copy.dll");
+                  }
                     // Animation
                     if(AniLib != NULL){
                         CreateAnimation = (AniClassSpawner)GetProcAddress(AniLib, "CreateAniClass");
@@ -668,9 +667,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                         AniUpdate = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTimee");
                         Load_Lib = false;
-                    }
-                   }
-
+                    }                        
 //modell->Texturedirectory = texpath.substr(0, path.find_last_of('/'));
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
                 printf("vertex array :%d\n", ScreenBuffer.glData.VAOs);
@@ -794,7 +791,34 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //} else {
                     //printf("Can not track Mouse event\n");                
                     //}
+                    if (Load_Lib) {
+                        if (CopyFile("skeletalAni32.dll",
+                                     "skeletalAni32_copy.dll", false)) {
+                            printf("Succeed copy dll file\n");
+                            if (AniLib != NULL && !first_announce) {
+                                FreeLibrary(AniLib);
+                            }
+                            AniLib = LoadLibraryA("skeletalAni32_copy.dll");
+                        }
+                        // Animation
+                        if (AniLib != NULL) {
+                            printf("Succeed load code from dll\n");
+                            KillAninmation = (AniClassSlainer)GetProcAddress(
+                                AniLib, "DestroysAniClass");
 
+                            SlayAnimator = (AniUserClassSlayer)GetProcAddress(
+                                AniLib, "DestroyAnimatorClass");
+
+                            AniUpdate_ = (AniTimeUpdater)GetProcAddress(
+                                AniLib, "updateAnimationTimee");
+
+                            if(KillAninmation && AniUpdate && SlayAnimator){
+                                printf("Succeed fetch function pointer\n");
+                                AniUpdate = AniUpdate_;
+                                }
+                        }
+                            Load_Lib = false;
+                    }
                     //UPDATE
                     // ================================================================
                     // NOTE: Sounding Part
@@ -864,7 +888,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     if (RatioCalculated) {
                         DelayedRatio = (float)(((float)MsPerFrame)/ 16.67f);
                         //printf("Delay Ratio: %f, msPerframe: %I64d\n", DelayedRatio, MsPerFrame);
-                        BackBuffer.camera.speed = (1.5f * DelayedRatio);                
+                        DelayedRatio>0.0f?BackBuffer.camera.speed = (1.5f * DelayedRatio):BackBuffer.camera.speed = 1.5;                
                         //printf("camera speed: %f\n", BackBuffer.camera.speed);
                         RatioCalculated = false;
                     }
@@ -911,7 +935,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     }
                     if (MsPerFrame > 0) {
                       float updateTime = (float)((float)(MsPerFrame)/ 1000);
-                      //AniUpdate(animator,updateTime);
+                      AniUpdate(animator,updateTime);
                     }
 
                     if(WaitTimeCounter >= 16.67f){                        
@@ -985,19 +1009,19 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     animating_shader_->setMat4( "model", dancing_vampire_core);
                     animating_shader_->setMat4( "projection", Projection);
                     animating_shader_->setMat4( "view", BackBuffer.camera.view);
-                    std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
-                    if (Transform->size() > 1) {
-                      for (int i = 0; i < Transform->size(); i++) {
-                        animating_shader_->setMat4(
-                            "finalBoneMatrices[boneIds[" + std::to_string(i) +
-                                "]]",
-                            (*Transform)[i]);
-                        if (first_announce) {
-                          printf("finalBoneMatrices[boneIds[ %d ]]", (int)i);
-                        }
-                      };
-                    }
-                    glBindVertexArray(ScreenBuffer.glData.VAOs);
+                    //std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
+                    //if (Transform->size() > 1) {
+                      //for (int i = 0; i < Transform->size(); i++) {
+                        //animating_shader_->setMat4(
+                            //"finalBoneMatrices[boneIds[" + std::to_string(i) +
+                                //"]]",
+                            //(*Transform)[i]);
+                        //if (first_announce) {
+                          //printf("finalBoneMatrices[boneIds[ %d ]]", (int)i);
+                        //}
+                      //};
+                    //}
+                    //glBindVertexArray(ScreenBuffer.glData.VAOs);
                     brushID = animating_shader_->GetProgramID();
                     DDraw(dancing_vampire, &brushID);                    
                     
@@ -1025,12 +1049,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
                             (int64)(EndCounter.QuadPart - LastCounter.QuadPart);
                         MsPerFrame =
                             ((1000 * CountsPerFrame) / PerfCountFrequency);
-                        if (!RatioCalculated) {
-                            RatioCalculated = true;
+                        if (MsPerFrame > 0.0f) {
+                            //SPerFrame = MsPerFrame / 1000;
+                            // deltaTime = (float)(1 / 60);
+                            FPS = 1000 / MsPerFrame;
                         }
-                        SPerFrame = MsPerFrame / 1000;
-                        // deltaTime = (float)(1 / 60);
-                        FPS = 1000 / MsPerFrame;
 
                         LastCounter = EndCounter;
                       }

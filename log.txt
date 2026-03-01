@@ -943,3 +943,8 @@ what could go wrong: animatorUpdate -> bonematricesCal-> bone.update()->pos,
 scale, rota interpolation
 
 release dll cause exe lost its location
+
+---------------- Sun, 01 Mar 26: 10:17PM
+
+seem like we don't need to reassign the function pointer(it violate the memory
+address actually). just reload the dll.

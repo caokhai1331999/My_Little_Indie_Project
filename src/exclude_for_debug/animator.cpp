@@ -9,14 +9,15 @@
 #include <unordered_map>
 
 void Animator::updateAnimationTime(float dt){
-    m_deltaTime = dt;
-    if(m_currentAnimation){
-        m_currentTime += m_deltaTime;
-        m_currentTime = fmod(m_currentTime, m_currentAnimation->GetDuration());
-        // calculate bone transform here;
+    //m_deltaTime = dt;
+    //if(m_currentAnimation){
+        //m_currentTime += m_deltaTime;
+        //m_currentTime = fmod(m_currentTime, m_currentAnimation->GetDuration());
+        //// calculate bone transform here;
         glm::mat4 parentTransform = glm::mat4(1.0f);
-        calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
-        };
+        //printf("code changed now\n");
+        //calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
+        //};
 };
 
 void Animator::playAnimation(Animation* pAnimation){
@@ -61,5 +62,7 @@ void __cdecl DestroyAnimatorClass(Animator *ani) {
 }
 
 void __cdecl updateAnimationTimee(Animator *ani, float dt) {
-    ani->updateAnimationTime(dt);
+    printf("code changed now\n");
+  ani->updateAnimationTime(dt);
 }
+
