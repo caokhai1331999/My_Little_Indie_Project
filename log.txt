@@ -936,3 +936,10 @@ why the exe couldn't find out the function definition
 
 NOTE: Turned out I called wrong name the whole time so the getprocaddress
 produce null ptr
+
+---------------- Sun, 01 Mar 26: 09:32AM
+
+what could go wrong: animatorUpdate -> bonematricesCal-> bone.update()->pos,
+scale, rota interpolation
+
+release dll cause exe lost its location

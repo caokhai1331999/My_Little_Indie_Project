@@ -14,6 +14,7 @@
 
 bool32 first_size = true;
 bool32 first_announce = true;
+bool32 Load_Lib = false;
 
 LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
                                     LPARAM Lparam) {
@@ -83,6 +84,17 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
         // OutputDebugStringA(" Was Down");
         // }
         printf("LEFT is HIT\n");
+      }
+
+      else if (vkCode == 'L') {
+        // XOffset -= 10;
+        OutputDebugStringA("L Button :");
+        // if(WasDown) {
+        if (!Load_Lib)
+            Load_Lib = true;
+        // OutputDebugStringA(" Was Down");
+        // }
+        printf("L is HIT\n");
       }
 
       else if (vkCode == 'D') {
@@ -417,7 +429,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
   WindowClass.lpszClassName = "First Game Window Class";
   Win32ResizeDIBSection(&BackBuffer, Dimens.Height, Dimens.Width);
   // NOTE: I forgot to init window
-
+  HMODULE AniLib;
+  
   AniClassSpawner CreateAnimation;
   AniClassSlainer KillAninmation;
 
@@ -482,7 +495,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
             // BMPContent = DEBUGReadBMP("Harry_and_Accomplices_rescaled.bmp",
             // &result);
             //  =============================================
-            BMPContent = DEBUGReadBMP("adventure_.jpg", &result);
+            //BMPContent = DEBUGReadBMP("adventure_.jpg", &result);
             // printf("About to read image\n");
             //  NOTE: ???? Why when I change to different bmp image it crashed
             // byte order: AA BB GG RR bottom up
@@ -638,8 +651,13 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 std::string dancing_vampire_path = "./media/dancing_vampire.dae";
                 loadModel_(dancing_vampire, dancing_vampire_path);
 
-                if(WaitTimeCounter > 16.67f || first_announce){
-                    HMODULE AniLib = LoadLibraryA("skeletalAni32.dll");
+                if(WaitTimeCounter > 16.0f || first_announce){
+                  if (CopyFile("skeletalAni32.dll", "skeletalAni32_copy.dll",
+                                false))
+                      {
+                          if(AniLib != NULL){FreeLibrary(AniLib);}
+                          AniLib = LoadLibraryA("skeletalAni32_copy.dll");
+                              }
                     // Animation
                     if(AniLib != NULL){
                         CreateAnimation = (AniClassSpawner)GetProcAddress(AniLib, "CreateAniClass");
@@ -649,12 +667,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         SlayAnimator = (AniUserClassSlayer)GetProcAddress(AniLib, "DestroyAnimatorClass");
 
                         AniUpdate = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTimee");
+                        Load_Lib = false;
                     }
                    }
-
-                danceAnimation = CreateAnimation((char*)dancing_vampire_path.c_str(), dancing_vampire);
-
-                animator = SpawnAnimator(danceAnimation);
 
 //modell->Texturedirectory = texpath.substr(0, path.find_last_of('/'));
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
@@ -741,6 +756,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                 useProgram(ScreenBuffer.glData.ProgramIDs[0]);
                 QueryPerformanceCounter(&LastCounter);
+
                 while (GlobalRunning) {
 
                   //if (first_announce) {
@@ -773,11 +789,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     }
                     TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent);
 
-                    if(TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent)){
-                    printf("Mouse event is being tracked\n");
-                    } else {
-                    printf("Can not track Mouse event\n");                
-                    }
+                    //if(TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent)){
+                    //printf("Mouse event is being tracked\n");
+                    //} else {
+                    //printf("Can not track Mouse event\n");                
+                    //}
 
                     //UPDATE
                     // ================================================================
@@ -847,9 +863,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //Ratio is based on miscalculated Msperframe
                     if (RatioCalculated) {
                         DelayedRatio = (float)(((float)MsPerFrame)/ 16.67f);
-                        printf("Delay Ratio: %f, msPerframe: %I64d\n", DelayedRatio, MsPerFrame);
+                        //printf("Delay Ratio: %f, msPerframe: %I64d\n", DelayedRatio, MsPerFrame);
                         BackBuffer.camera.speed = (1.5f * DelayedRatio);                
-                        printf("camera speed: %f\n", BackBuffer.camera.speed);
+                        //printf("camera speed: %f\n", BackBuffer.camera.speed);
                         RatioCalculated = false;
                     }
 
@@ -895,7 +911,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     }
                     if (MsPerFrame > 0) {
                       float updateTime = (float)((float)(MsPerFrame)/ 1000);
-                      AniUpdate(animator,updateTime);
+                      //AniUpdate(animator,updateTime);
                     }
 
                     if(WaitTimeCounter >= 16.67f){                        

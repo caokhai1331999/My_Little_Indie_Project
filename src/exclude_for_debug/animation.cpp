@@ -9,8 +9,7 @@
 #include "animation.h"
 
 //extern "C" __declspec(dllexport)
-//#pragma comment(linker, "/export:Animation=??0Animation@@QEAA@PEADPEAVModel_@@@Z")
-
+#pragma comment(linker, "/export:Animation=??0Animation@@QEAA@PEADPEAVModel_@@@Z")
 Animation::Animation(char *animationPath, Model_ *model) {
   // assert throw out the error when 0 is the value
   m_Bones.reserve(100);
@@ -31,6 +30,7 @@ Animation::Animation(char *animationPath, Model_ *model) {
   ReadHierarchyData(m_RootNode, scene->mRootNode);
   ReadMissingBone(animation, model);
 };
+
 
 Bone* Animation::FindBone(const std::string& name){
   auto iter = find_if(m_Bones.begin(), m_Bones.end(),
@@ -67,7 +67,8 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
             (boneCount)++;
         }
         m_Bones.push_back(Bone(channel->mNodeName.data, (*boneInfoMap)[channel->mNodeName.data].id, channel));
-    }
+        printf("Add bone data to animation class\n");
+        }
     m_Bone_InfoMap = (*boneInfoMap);
 };
 
