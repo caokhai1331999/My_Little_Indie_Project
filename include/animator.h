@@ -39,14 +39,19 @@ private:
 
 
 // Class wrapper
-extern "C" __declspec(dllexport) Animator* __cdecl CreateAnimatorClass(Animation *animation);
-extern "C" __declspec(dllexport) void __cdecl DestroyAnimatorClass(Animator *ani);
+extern "C" __declspec(dllexport) Animator* CreateAnimatorClass(Animation *animation);
+extern "C" __declspec(dllexport) void DestroyAnimatorClass(Animator *ani);
 extern "C" __declspec(dllexport) void updateAnimationTime_(Animator *ani, float dt);
 
 typedef Animator* (__cdecl *AniUserClassSpawner) (Animation*);
 typedef void (__cdecl *AniUserClassSlayer) (Animator*);
 typedef void (__cdecl *AniTimeUpdater) (Animator*, float);
 
+/*
+#pragma comment(linker, "/export:CreateAnimatorClass")
+#pragma comment(linker, "/export:DestroyAnimatorClass")
+#pragma comment(linker, "/export:updateAnimationTime_")
+*/
 #define ANIMATOR_H
 #endif
 

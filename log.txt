@@ -953,6 +953,13 @@ address actually). just reload the dll.
 
 got to understand why there is access violation error happen. (frequent reasons)
 understand memoryflow
+
 NOTE: IT WORKED. Still don't know why
 may be I didn't freeLib before load it again cause if I don't free the dll. I
 can't overwrite it by copyfile function
+
+Or I don't use __cdecl in wrapper declaration
+
+NOTE: Found out, actually it's not just about the dll file, the exe also lock
+the pdb file(we can't remove it when it recompile). which caused the unchanged code content. -> compile differently named
+pdb file(with time stamp) solved this. 

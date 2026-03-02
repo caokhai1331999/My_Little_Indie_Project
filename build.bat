@@ -5,6 +5,21 @@ pushd build
 del .\src\*.obj
 rem del *.pdb > NUL 2> NUL
 
+set hr=%time:~0,2%
+set hr=%hr: =0%
+set min=%time:~3,2%
+set min=%min: =0%
+set sec=%time:~6,2%
+set sec=%sec: =0%
+
+set dd=%date:~-4,4%
+set dd=%dd: =0%
+set mm=%date:~-10,2%
+set mm=%mm: =0%
+set yr=%date:~-7,2%
+set yr=%yr: =0%
+
+
 set DIRECTIVES_FLAG=/DDEBUG=1 /DINTERNAL=1 /DON_LITTLE_BEAST=0 /DDISPLAY_TIME=1
 set COMPILE_FLAG=/FC /Zi /EHsc
 set LIB_= strmiids.lib uuid.lib Kernel32.lib user32.lib gdi32.lib Opengl32.lib assimp-vc143-mtd.lib
@@ -15,6 +30,7 @@ rem set PDB_name=
 rem Remember exclude out the src files that is used to build dll while building exe
 set src_files_for_dll=..\src\exclude_for_debug\*.c*
 set dll_name=skeletalAni32
+set dll_name_with_time=%dll_name%_%hr%-%min%-%sec%_%dd%-%mm%-%yr%
 set EXPORT_=
 
 set GLFW_INCLUDE_DIR="C:\Users\klove\Downloads\External_Libraries\glfw\glfw-3.4.bin.WIN64\include"
@@ -35,7 +51,7 @@ rem  )
 rem Let alone the hot Loading code later
 
 del %dll_name%.pdb
-cl /D_USRDLL /D_WINDLL /Fd%dll_name%.pdb /LD %DIRECTIVES_FLAG% %src_files_for_dll% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% /LIBPATH:%ASSIMP_LIB% -DEBUG /FORCE:MULTIPLE /IGNORE:4006 /OUT:%dll_name%.dll
+cl /D_USRDLL /D_WINDLL /Fd%dll_name_with_time%.pdb /LD %DIRECTIVES_FLAG% %src_files_for_dll% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% /LIBPATH:%ASSIMP_LIB% -DEBUG /FORCE:MULTIPLE /IGNORE:4006 /OUT:%dll_name%.dll
 
 rem ren %dll_name%.pdb %dll_name%.txt
 rem del *.pdb

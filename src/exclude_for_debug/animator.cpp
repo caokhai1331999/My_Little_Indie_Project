@@ -15,7 +15,7 @@ void Animator::updateAnimationTime(float dt){
         //m_currentTime = fmod(m_currentTime, m_currentAnimation->GetDuration());
         //// calculate bone transform here;
         glm::mat4 parentTransform = glm::mat4(1.0f);
-        //printf("code changed now\n");
+        //printf("code changed now then\n");
         //calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
         //};
 };
@@ -53,11 +53,11 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
     }
 };
 
-Animator* __cdecl CreateAnimatorClass(Animation *animation) {
+Animator* CreateAnimatorClass(Animation *animation) {
   return new Animator(animation);
 };
 
-void __cdecl DestroyAnimatorClass(Animator *ani) {
+void DestroyAnimatorClass(Animator *ani) {
     delete ani;
 }
 

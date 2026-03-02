@@ -431,17 +431,17 @@ LARGE_INTEGER PerfCountFrequencyResult;
   // NOTE: I forgot to init window
   HMODULE AniLib;
   
-  AniClassSpawner CreateAnimation;
-  AniClassSlainer KillAninmation;
+  AniClassSpawner CreateAnimation = NULL;
+  AniClassSlainer KillAninmation = NULL;
 
-  AniUserClassSpawner SpawnAnimator;
-  AniUserClassSlayer SlayAnimator;
-  AniTimeUpdater AniUpdate;
+  AniUserClassSpawner SpawnAnimator = NULL;
+  AniUserClassSlayer SlayAnimator = NULL;
+  AniTimeUpdater AniUpdate = NULL;
   //AniTimeUpdater AniUpdate_;
 
-  Animation* danceAnimation;
-  Animator* animator;
-
+  Animation* danceAnimation = nullptr;
+  Animator* animator = nullptr;
+  int delay_count = 0;
   if (RegisterClassExA(&WindowClass)) {
 
     Window = CreateWindowExA(
@@ -794,39 +794,40 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //printf("Can not track Mouse event\n");                
                     //}
                     if (Load_Lib) {
-                        if (AniLib != NULL) {
-                            if (FreeLibrary(AniLib)) {
-                                printf("Succeed free current lib\n");
-                            } else {
-                                printf("fail to free current lib %s\n",GetLastError());
-                                }
-                        }
-
+                      if (AniLib != NULL) {
+                        // if (FreeLibrary(AniLib)) {
+                        // printf("Succeed free current lib\n");
+                        //} else {
+                        // printf("fail to free current lib
+                        // %s\n",GetLastError());
+                        //}
+                        FreeLibrary(AniLib);
                         if (CopyFile("skeletalAni32.dll",
                                      "skeletalAni32_copy.dll", false)) {
 
-                            printf("Succeed copy dll file\n");
-                            AniLib = LoadLibraryA("skeletalAni32_copy.dll");
+                          // printf("Succeed copy dll file\n");
+                          AniLib = LoadLibraryA("skeletalAni32_copy.dll");
                         }
                         // Animation
                         if (AniLib != NULL) {
-                            printf("Succeed load code from dll\n");
-                            KillAninmation = (AniClassSlainer)GetProcAddress(
-                                AniLib, "DestroysAniClass");
+                          //printf("Succeed load code from dll\n");
+                          KillAninmation = (AniClassSlainer)GetProcAddress(
+                              AniLib, "DestroysAniClass");
 
-                            SlayAnimator = (AniUserClassSlayer)GetProcAddress(
-                                AniLib, "DestroyAnimatorClass");
+                          SlayAnimator = (AniUserClassSlayer)GetProcAddress(
+                              AniLib, "DestroyAnimatorClass");
 
-                            AniUpdate = (AniTimeUpdater)GetProcAddress(
-                                AniLib, "updateAnimationTime_");
-
-                            if(KillAninmation && AniUpdate && SlayAnimator){
-                                printf("Succeed fetch function pointer\n");
-                                //AniUpdate = AniUpdate_;
-                                }
+                          AniUpdate = (AniTimeUpdater)GetProcAddress(
+                              AniLib, "updateAnimationTime_");
                         }
-                            Load_Lib = false;
+                        Load_Lib?Load_Lib = false:(delay_count = 0);
+                        }
+                    } else {
+                        if(!(delay_count > 100)){
+                            delay_count++;
+                          }
                     }
+
                     //UPDATE
                     // ================================================================
                     // NOTE: Sounding Part
