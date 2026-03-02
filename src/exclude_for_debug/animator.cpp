@@ -15,7 +15,7 @@ void Animator::updateAnimationTime(float dt){
         //m_currentTime = fmod(m_currentTime, m_currentAnimation->GetDuration());
         //// calculate bone transform here;
         glm::mat4 parentTransform = glm::mat4(1.0f);
-        //printf("code changed now then\n");
+        printf("test to see code changed once again\n");
         //calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
         //};
 };

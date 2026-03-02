@@ -30,8 +30,8 @@ rem set PDB_name=
 rem Remember exclude out the src files that is used to build dll while building exe
 set src_files_for_dll=..\src\exclude_for_debug\*.c*
 set dll_name=skeletalAni32
-set dll_name_with_time=%dll_name%_%hr%-%min%-%sec%_%dd%-%mm%-%yr%
-set EXPORT_=
+set dll_name_with_time_=%dll_name%__%hr%-%min%-%sec%__%dd%-%mm%-%yr%
+rem set EXPORT_=
 
 set GLFW_INCLUDE_DIR="C:\Users\klove\Downloads\External_Libraries\glfw\glfw-3.4.bin.WIN64\include"
 
@@ -49,14 +49,12 @@ rem     cl /FC /Zi -Fe:"win32Game" %%f -I%INCLUDE_% -link %LIB_% -DEBUG /FORCE:M
 rem  )
 
 rem Let alone the hot Loading code later
+rem /D_USRDLL /D_WINDLL
+del skeletalAni32__*
+cl /D_USRDLL /D_WINDLL /LD /FD %DIRECTIVES_FLAG% %src_files_for_dll% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link /PDB:%dll_name_with_time_%.pdb %LIB_% /LIBPATH:%ASSIMP_LIB% /DEBUG /FORCE:MULTIPLE /IGNORE:4006 /OUT:%dll_name%.dll
 
-del %dll_name%.pdb
-cl /D_USRDLL /D_WINDLL /Fd%dll_name_with_time%.pdb /LD %DIRECTIVES_FLAG% %src_files_for_dll% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% /LIBPATH:%ASSIMP_LIB% -DEBUG /FORCE:MULTIPLE /IGNORE:4006 /OUT:%dll_name%.dll
-
-rem ren %dll_name%.pdb %dll_name%.txt
-rem del *.pdb
-rem ren %dll_name%.txt %dll_name%.pdb
-rem cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES_FOR_EXE% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% animation.lib /LIBPATH:%ASSIMP_LIB% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /ENTRY:WinMainCRTStartup /subsystem:console
+rem del win32Game.pdb
+rem cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES_FOR_EXE% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% /LIBPATH:%ASSIMP_LIB% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /ENTRY:WinMainCRTStartup /subsystem:console
 
 rem if %ERRORLEVEL% EQU 0 (
 rem    @echo Announce: " compilation succeeded (^ w ^) "

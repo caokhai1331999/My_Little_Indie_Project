@@ -90,8 +90,9 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
         // XOffset -= 10;
         OutputDebugStringA("L Button :");
         // if(WasDown) {
-        if (!Load_Lib)
+        if (!Load_Lib) {
             Load_Lib = true;
+        }
         // OutputDebugStringA(" Was Down");
         // }
         printf("L is HIT\n");
@@ -822,11 +823,12 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         }
                         Load_Lib?Load_Lib = false:(delay_count = 0);
                         }
-                    } else {
-                        if(!(delay_count > 100)){
-                            delay_count++;
-                          }
                     }
+                    //else {
+                        //if(!(delay_count > 100)){
+                            //delay_count++;
+                          //}
+                    //}
 
                     //UPDATE
                     // ================================================================
