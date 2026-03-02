@@ -792,12 +792,19 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //printf("Can not track Mouse event\n");                
                     //}
                     if (Load_Lib) {
+
+                        if (AniLib != NULL && !first_announce) {
+                            if (FreeLibrary(AniLib)) {
+                                printf("Succeed free current lib\n");
+                            } else {
+                                printf("fail to free current lib %s\n",GetLastError());
+                                }
+                        }
+
                         if (CopyFile("skeletalAni32.dll",
                                      "skeletalAni32_copy.dll", false)) {
+
                             printf("Succeed copy dll file\n");
-                            if (AniLib != NULL && !first_announce) {
-                                FreeLibrary(AniLib);
-                            }
                             AniLib = LoadLibraryA("skeletalAni32_copy.dll");
                         }
                         // Animation
