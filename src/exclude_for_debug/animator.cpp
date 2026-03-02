@@ -61,8 +61,7 @@ void __cdecl DestroyAnimatorClass(Animator *ani) {
     delete ani;
 }
 
-void __cdecl updateAnimationTimee(Animator *ani, float dt) {
-    printf("code changed now\n");
+void updateAnimationTime_(Animator *ani, float dt) {
   ani->updateAnimationTime(dt);
 }
 

@@ -437,7 +437,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
   AniUserClassSpawner SpawnAnimator;
   AniUserClassSlayer SlayAnimator;
   AniTimeUpdater AniUpdate;
-  AniTimeUpdater AniUpdate_;
+  //AniTimeUpdater AniUpdate_;
 
   Animation* danceAnimation;
   Animator* animator;
@@ -657,7 +657,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                   {
                     AniLib = LoadLibraryA("skeletalAni32_copy.dll");
                   }
-                    // Animation
+                  //
+
+                // Animation
                     if(AniLib != NULL){
                         CreateAnimation = (AniClassSpawner)GetProcAddress(AniLib, "CreateAniClass");
                         KillAninmation = (AniClassSlainer)GetProcAddress(AniLib, "DestroysAniClass");
@@ -665,8 +667,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         SpawnAnimator = (AniUserClassSpawner)GetProcAddress(AniLib, "CreateAnimatorClass");
                         SlayAnimator = (AniUserClassSlayer)GetProcAddress(AniLib, "DestroyAnimatorClass");
 
-                        AniUpdate = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTimee");
-                        Load_Lib = false;
+                        AniUpdate = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTime_");
+                        //Load_Lib = false;
                     }                        
 //modell->Texturedirectory = texpath.substr(0, path.find_last_of('/'));
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
@@ -792,8 +794,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //printf("Can not track Mouse event\n");                
                     //}
                     if (Load_Lib) {
-
-                        if (AniLib != NULL && !first_announce) {
+                        if (AniLib != NULL) {
                             if (FreeLibrary(AniLib)) {
                                 printf("Succeed free current lib\n");
                             } else {
@@ -816,12 +817,12 @@ LARGE_INTEGER PerfCountFrequencyResult;
                             SlayAnimator = (AniUserClassSlayer)GetProcAddress(
                                 AniLib, "DestroyAnimatorClass");
 
-                            AniUpdate_ = (AniTimeUpdater)GetProcAddress(
-                                AniLib, "updateAnimationTimee");
+                            AniUpdate = (AniTimeUpdater)GetProcAddress(
+                                AniLib, "updateAnimationTime_");
 
                             if(KillAninmation && AniUpdate && SlayAnimator){
                                 printf("Succeed fetch function pointer\n");
-                                AniUpdate = AniUpdate_;
+                                //AniUpdate = AniUpdate_;
                                 }
                         }
                             Load_Lib = false;
