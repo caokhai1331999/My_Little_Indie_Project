@@ -12,7 +12,7 @@
 // structure of function type return type of original function (*) (argument type)
 //typedef Animation* (* Animationn) (char*, class Model_*);
 
-class Animator{
+class  Animator{
 public:
     Animator(Animation *animation = nullptr):m_currentAnimation(animation) {
       m_currentTime = 0.0f;
@@ -23,6 +23,12 @@ public:
         m_currentAnimation = nullptr;
         };
 
+        // Getters
+
+        // Setters
+    void SetDeltaTime(float Time);
+    void AddDeltaTime(float Time);
+        
     void updateAnimationTime(float dt);
     void playAnimation(Animation* pAnimation);
     void calculateBoneTransform(const AssimpNodeData* node, glm::mat4* parentTransform);
@@ -30,13 +36,12 @@ public:
     std::vector<glm::mat4>*getFinalBoneMatrices(){return &finalBoneMatrices;};
 
 private:
-    std::vector<glm::mat4>finalBoneMatrices;
     //Current Animation
+    std::vector<glm::mat4>finalBoneMatrices;
     Animation* m_currentAnimation;
     float m_currentTime;
     float m_deltaTime;
 };
-
 
 // Class wrapper
 extern "C" __declspec(dllexport) Animator* CreateAnimatorClass(Animation *animation);

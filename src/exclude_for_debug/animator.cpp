@@ -5,19 +5,19 @@
    $Creator: Cao Khai(Casey Muratori's disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
-#include "animator.h"
 #include <unordered_map>
+#include "animator.h"
 
 void Animator::updateAnimationTime(float dt){
-    //m_deltaTime = dt;
-    //if(m_currentAnimation){
-        //m_currentTime += m_deltaTime;
-        //m_currentTime = fmod(m_currentTime, m_currentAnimation->GetDuration());
+    m_deltaTime = dt;
+    if(m_currentAnimation){
+        m_currentTime += m_deltaTime;
+        m_currentTime = fmod(m_currentTime, m_currentAnimation->GetDuration());
         //// calculate bone transform here;
         glm::mat4 parentTransform = glm::mat4(1.0f);
-        printf("test to see code changed once again\n");
-        //calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
-        //};
+        //printf("test to see code changed once again\n");
+        calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
+        };
 };
 
 void Animator::playAnimation(Animation* pAnimation){

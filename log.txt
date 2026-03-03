@@ -965,3 +965,7 @@ pdb file(with time stamp) solved this.
 
 SOLVED! for now, Manually hit Load lib after compile new dll and pcb and delete
 old one(which containing old code) can actually hot load its code into exe file
+
+---------------- Tue, 03 Mar 26: 10:57AM
+NOTE: forgot to add /Zi in build dll build command and animation.lib in exe
+build command cause lacking symbols in debug state

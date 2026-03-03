@@ -19,7 +19,7 @@
 class Animation{
 public:
     //Animation() = default;
-    Animation(char* animationPath = nullptr, Model_* model = nullptr);
+    Animation(const char* animationPath = nullptr, Model_* model = nullptr);
     ~Animation(){};
     
     inline float GetTicksPerSecond(){return m_TicksPerSecond;};
@@ -50,7 +50,7 @@ public:
 };
 
 // Class wrapper
-extern "C" __declspec(dllexport) Animation* __cdecl CreateAniClass(char *animationPath, Model_ *model);
+extern "C" __declspec(dllexport) Animation* __cdecl CreateAniClass(const char* animationPath, Model_ *model);
 extern "C" __declspec(dllexport) void __cdecl DestroysAniClass(Animation *ani);
 
 typedef Animation* (__cdecl *AniClassSpawner) (char *, Model_ *);

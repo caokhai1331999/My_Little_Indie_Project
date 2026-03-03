@@ -670,11 +670,16 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                         AniUpdate = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTime_");
                         //Load_Lib = false;
-                    }                        
+                    }
+
+                    danceAnimation = CreateAnimation((char* )dancing_vampire_path.c_str(), dancing_vampire);
+                    animator = SpawnAnimator(danceAnimation);
+                    
 //modell->Texturedirectory = texpath.substr(0, path.find_last_of('/'));
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
                 printf("vertex array :%d\n", ScreenBuffer.glData.VAOs);
 
+                
 
                 Game_Input Input[2] = {};
                 Game_Input* OldInput = &Input[0];

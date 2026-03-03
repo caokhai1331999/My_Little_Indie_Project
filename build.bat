@@ -12,13 +12,12 @@ set min=%min: =0%
 set sec=%time:~6,2%
 set sec=%sec: =0%
 
-set dd=%date:~-4,4%
+set dd=%date:~-7,2%
 set dd=%dd: =0%
 set mm=%date:~-10,2%
 set mm=%mm: =0%
-set yr=%date:~-7,2%
+set yr=%date:~-4,4%
 set yr=%yr: =0%
-
 
 set DIRECTIVES_FLAG=/DDEBUG=1 /DINTERNAL=1 /DON_LITTLE_BEAST=0 /DDISPLAY_TIME=1
 set COMPILE_FLAG=/FC /Zi /EHsc
@@ -30,7 +29,6 @@ rem set PDB_name=
 rem Remember exclude out the src files that is used to build dll while building exe
 set src_files_for_dll=..\src\exclude_for_debug\*.c*
 set dll_name=skeletalAni32
-set dll_name_with_time_=%dll_name%__%hr%-%min%-%sec%__%dd%-%mm%-%yr%
 rem set EXPORT_=
 
 set GLFW_INCLUDE_DIR="C:\Users\klove\Downloads\External_Libraries\glfw\glfw-3.4.bin.WIN64\include"
@@ -49,12 +47,13 @@ rem     cl /FC /Zi -Fe:"win32Game" %%f -I%INCLUDE_% -link %LIB_% -DEBUG /FORCE:M
 rem  )
 
 rem Let alone the hot Loading code later
-rem /D_USRDLL /D_WINDLL
-del skeletalAni32__*
-cl /D_USRDLL /D_WINDLL /LD /FD %DIRECTIVES_FLAG% %src_files_for_dll% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link /PDB:%dll_name_with_time_%.pdb %LIB_% /LIBPATH:%ASSIMP_LIB% /DEBUG /FORCE:MULTIPLE /IGNORE:4006 /OUT:%dll_name%.dll
-
+rem delete pre-pdb files
+del skeletalAni32__* animation.exp
+set dll_name_with_time_=%dll_name%__%hr%_%min%_%sec%__%dd%-%mm%-%yr%
+cl /D_USRDLL /D_WINDLL /LD /Zi /FD %DIRECTIVES_FLAG% %src_files_for_dll% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link /PDB:%dll_name_with_time_%.pdb %LIB_% /LIBPATH:%ASSIMP_LIB% /FORCE:MULTIPLE /IGNORE:4006 /OUT:%dll_name%.dll
+ 
 rem del win32Game.pdb
-rem cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES_FOR_EXE% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% /LIBPATH:%ASSIMP_LIB% -DEBUG /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /ENTRY:WinMainCRTStartup /subsystem:console
+rem cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES_FOR_EXE% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% animation.lib /LIBPATH:%ASSIMP_LIB% /PDB:win32Game.pdb /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /ENTRY:WinMainCRTStartup /subsystem:console
 
 rem if %ERRORLEVEL% EQU 0 (
 rem    @echo Announce: " compilation succeeded (^ w ^) "
