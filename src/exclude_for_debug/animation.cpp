@@ -68,7 +68,7 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
             (boneCount)++;
         }
         m_Bones.push_back(Bone(channel->mNodeName.data, (*boneInfoMap)[channel->mNodeName.data].id, channel));
-        printf("Add bone data to animation container\n");
+        //printf("Add bone data to animation container\n");
         }
     m_Bone_InfoMap = (*boneInfoMap);
 };
@@ -89,7 +89,7 @@ void Animation::ReadHierarchyData(AssimpNodeData& dest, const aiNode* src){
     };
 };
 
-Animation* __cdecl CreateAniClass(char *animationPath, Model_ *model) {
+Animation* __cdecl CreateAniClass(const char *animationPath, Model_ *model) {
     return new Animation(animationPath, model);
 };
 

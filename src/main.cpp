@@ -15,6 +15,7 @@
 bool32 first_size = true;
 bool32 first_announce = true;
 bool32 Load_Lib = false;
+bool32 showMsPF = false;
 
 LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
                                     LPARAM Lparam) {
@@ -117,7 +118,16 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
       else if (vkCode == VK_SHIFT) {
         BackBuffer.camera.Position -=
             BackBuffer.camera.Up * BackBuffer.camera.speed;
-        printf("Shift is HIT\n");
+        printf("Left Shift is HIT\n");
+        // XOffset += 10;
+      }
+
+      else if (vkCode == VK_CONTROL) {
+
+        if (!showMsPF) {
+            showMsPF = true;
+        }
+        printf("Right Shift is HIT\n");
         // XOffset += 10;
       }
 
@@ -826,14 +836,13 @@ LARGE_INTEGER PerfCountFrequencyResult;
                           AniUpdate = (AniTimeUpdater)GetProcAddress(
                               AniLib, "updateAnimationTime_");
                         }
-                        Load_Lib?Load_Lib = false:(delay_count = 0);
+
+                        if (Load_Lib) {
+                          Load_Lib = false;
+                        }
+
                         }
                     }
-                    //else {
-                        //if(!(delay_count > 100)){
-                            //delay_count++;
-                          //}
-                    //}
 
                     //UPDATE
                     // ================================================================
@@ -1065,6 +1074,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                             (int64)(EndCounter.QuadPart - LastCounter.QuadPart);
                         MsPerFrame =
                             ((1000 * CountsPerFrame) / PerfCountFrequency);
+
                         if (MsPerFrame > 0.0f) {
                             //SPerFrame = MsPerFrame / 1000;
                             // deltaTime = (float)(1 / 60);
@@ -1072,7 +1082,17 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         }
 
                         LastCounter = EndCounter;
-                      }
+
+                        if (showMsPF) {
+                          printf("[LastFrameCount:%f,EndFrameCount:%f, "
+                                 "CounterPerFrame : %I64d], MiliS per frame: "
+                                 "%I64d, real FPS: %I64d \n",
+                                 (real32)LastCounter.QuadPart,
+                                 (real32)EndCounter.QuadPart, CountsPerFrame,
+                                 MsPerFrame, FPS);
+                          showMsPF = false;
+                        };
+                        }
 
 
                     if (first_announce) {
@@ -1081,7 +1101,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     char Buffers[256];
                     //sprintf(Buffers,
                             //"[LastFrameCount: %f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame,MsPerFrame, FPS);
-                    //printf("[LastFrameCount:%f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame,MsPerFrame, FPS);
+                    //printf("[LastFrameCount:%f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame, MsPerFrame, FPS);
                     //OutputDebugStringA(Buffers);
                     }
           }

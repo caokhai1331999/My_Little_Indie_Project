@@ -969,3 +969,8 @@ old one(which containing old code) can actually hot load its code into exe file
 ---------------- Tue, 03 Mar 26: 10:57AM
 NOTE: forgot to add /Zi in build dll build command and animation.lib in exe
 build command cause lacking symbols in debug state
+
+---------------- Wed, 04 Mar 26: 11:49AM
+
+Maybe the time interval in the exe is too fast for so it grab and read .lib and
+.dll file while before compiler compile them which cause crash

@@ -53,7 +53,7 @@ public:
 extern "C" __declspec(dllexport) Animation* __cdecl CreateAniClass(const char* animationPath, Model_ *model);
 extern "C" __declspec(dllexport) void __cdecl DestroysAniClass(Animation *ani);
 
-typedef Animation* (__cdecl *AniClassSpawner) (char *, Model_ *);
+typedef Animation* (__cdecl *AniClassSpawner) (const char *, Model_ *);
 typedef void (__cdecl *AniClassSlainer) (Animation* );
 
 #define ANIMATION_H

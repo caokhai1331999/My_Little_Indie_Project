@@ -5,8 +5,11 @@
    $Creator: Cao Khai(Casey Muratori's disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
+#include <iostream>
 #include <unordered_map>
 #include "animator.h"
+
+bool32 showbefore = false;
 
 void Animator::updateAnimationTime(float dt){
     m_deltaTime = dt;
@@ -16,8 +19,10 @@ void Animator::updateAnimationTime(float dt){
         //// calculate bone transform here;
         glm::mat4 parentTransform = glm::mat4(1.0f);
         //printf("test to see code changed once again\n");
+//BUGs here//============================================
         calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
-        };
+    };
+//============================================
 };
 
 void Animator::playAnimation(Animation* pAnimation){
@@ -45,12 +50,21 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
         int index =(*boneInfoMap)[nodeName].id;
         glm::mat4 offset = (*boneInfoMap)[nodeName].offset;
         finalBoneMatrices[index] = globalTransform * offset;
-    }
 
-    for(int i = 0; i < node->children.size(); i++){
-        // Global Transform now is used as parent transform
-        Animator::calculateBoneTransform(&node->children[i], &globalTransform);
-    }
+        }
+
+        //if (!showbefore) {
+          std::cout << "finalBoneMatrix at index 0 "
+                    << glm::to_string(finalBoneMatrices[0])
+                    << std::endl;
+          //showbefore = true;
+          //}
+          // NOTE: can not print out finalbonematrices
+          
+          // Global Transform now is used as parent transform
+    //for(int i = 0; i < node->children.size(); i++){
+        //Animator::calculateBoneTransform(&node->children[i], &globalTransform);
+    //}
 };
 
 Animator* CreateAnimatorClass(Animation *animation) {
