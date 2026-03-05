@@ -22,8 +22,8 @@ using namespace std;
 
 static const float TILE_Z = 1.2f;
 static const float TILE_X = 1.2f;
-float fluxY[200] = {};
 static const int8_t TOTAL_TILE_NUMBER = 50;
+float fluxY[200] = {};
 
 // NOTE: 1st assign object postion by translate
 //       2nd assign right VAOS for different flat cube shapes
@@ -34,6 +34,11 @@ static const int8_t TOTAL_TILE_NUMBER = 50;
 //const TileIndices[] = {
     //
 //};
+
+struct rollCubeInfo{
+    int index_;
+    int axisIndex_;
+};
 
 struct Tile{
     glm::vec3 position = {};
@@ -51,7 +56,7 @@ struct Tile{
 };
 
 Tile* LoadTileMap();
-void drawTile(unsigned int VaoID = 0, unsigned int shaderID = 0, float speed = 1.0, float* updatedDegree = nullptr);
+void drawTile(unsigned int VaoID = 0, unsigned int shaderID = 0, float speed = 1.0, float* updatedDegree = nullptr, bool32 changeAxis = false, std::vector<rollCubeInfo>* rollCubemap = nullptr);
 
 #define TILE_H
 #endif

@@ -26,10 +26,11 @@ public:
         // Getters
 
         // Setters
-    void SetDeltaTime(float Time);
-    void AddDeltaTime(float Time);
-        
-    void updateAnimationTime(float dt);
+    void SetDeltaTime(real64 Time);
+    void AddDeltaTime(real64 Time);
+
+    void updateAnimationTime(real64 dt);
+
     void playAnimation(Animation* pAnimation);
     void calculateBoneTransform(const AssimpNodeData* node, glm::mat4* parentTransform);
 
@@ -39,18 +40,18 @@ private:
     //Current Animation
     std::vector<glm::mat4>finalBoneMatrices;
     Animation* m_currentAnimation;
-    float m_currentTime;
-    float m_deltaTime;
+    real64 m_currentTime;
+    real64 m_deltaTime;
 };
 
 // Class wrapper
 extern "C" __declspec(dllexport) Animator* CreateAnimatorClass(Animation *animation);
 extern "C" __declspec(dllexport) void DestroyAnimatorClass(Animator *ani);
-extern "C" __declspec(dllexport) void updateAnimationTime_(Animator *ani, float dt);
+extern "C" __declspec(dllexport) void updateAnimationTime_(Animator *ani, real64 dt);
 
 typedef Animator* (__cdecl *AniUserClassSpawner) (Animation*);
 typedef void (__cdecl *AniUserClassSlayer) (Animator*);
-typedef void (__cdecl *AniTimeUpdater) (Animator*, float);
+typedef void (__cdecl *AniTimeUpdater) (Animator*, real64);
 
 /*
 #pragma comment(linker, "/export:CreateAnimatorClass")

@@ -7,18 +7,6 @@
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
 
-/*For Bone*/
-#include <list>
-#include <sstream>
-#include <map>
-#include <vector>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/quaternion.hpp>
-
-#define GLM_ENABLE_EXPERIMENTAL
-
 #include <assimp_glm_helpers.h>
 
 #include "C_Model.h"

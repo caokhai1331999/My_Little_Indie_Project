@@ -11,16 +11,16 @@
 
 bool32 showbefore = false;
 
-void Animator::updateAnimationTime(float dt){
+void Animator::updateAnimationTime(real64 dt){
     m_deltaTime = dt;
     if(m_currentAnimation){
         m_currentTime += m_deltaTime;
-        m_currentTime = fmod(m_currentTime, m_currentAnimation->GetDuration());
+        m_currentTime = fmod((float)m_currentTime, m_currentAnimation->GetDuration());
         //// calculate bone transform here;
         glm::mat4 parentTransform = glm::mat4(1.0f);
         //printf("test to see code changed once again\n");
 //BUGs here//============================================
-        calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
+        //calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
     };
 //============================================
 };
@@ -75,7 +75,7 @@ void DestroyAnimatorClass(Animator *ani) {
     delete ani;
 }
 
-void updateAnimationTime_(Animator *ani, float dt) {
+void updateAnimationTime_(Animator *ani, real64 dt) {
   ani->updateAnimationTime(dt);
 }
 

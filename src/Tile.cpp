@@ -8,20 +8,24 @@
 #include "Tile.h"
 
 Tile* LoadTileMap();
-void drawTile(unsigned int VaoID, unsigned int shaderID, float speed, float* updatedDegree){
+void drawTile(unsigned int VaoID, unsigned int shaderID, float speed, float* updatedDegree, bool32 changeAxis, std::vector<rollCubeInfo>* rollCubemap){
 
     glUseProgram(shaderID);
+
     float MapDimensInX = 10.8f;
     float MapDimensInZ = 10.8f;
+
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 rrmodel = glm::mat4(1.0f);
     glm::mat4 model_ = glm::mat4(1.0f);
     glm::vec3 tempTilePos = glm::vec3(0.0f);
-
     
     int index = 0;
     float z__ = 0.0f;
     float x__ = 0.0f;
+    int Cubeindex = 0;
+
+//NOTE: loop through z dimens then x
     for (float z_ = 0.0; z_ < MapDimensInZ; z_+=TILE_Z){
 //    while(z__ < MapDimensInZ)
 //    {
@@ -31,7 +35,8 @@ void drawTile(unsigned int VaoID, unsigned int shaderID, float speed, float* upd
 //        {
             //printf("x loop index :%d\n", (int)(x_/1.2));
             index = (int)((int)((z_/1.2f) * 10) + (int)(x_/1.2f));
-
+            // NOTE: check the pre-defined moving direction
+            // then update the position of it
             if(fluxY[index + 100] == (float)UPP_){
                 fluxY[index]+=speed*0.01f;
             } else if (fluxY[index + 100] == (float)DOWNN_) {
@@ -63,11 +68,21 @@ void drawTile(unsigned int VaoID, unsigned int shaderID, float speed, float* upd
                 }
 
             }
-            if(fluxY[index+100] == (float)ROLL_)
-            {
+            if (fluxY[index + 100] == (float)ROLL_) {
+
+                if(index == (*rollCubemap)[Cubeindex].index_){
+                    if(changeAxis){
+                        (*rollCubemap)[Cubeindex].axisIndex_ = std::rand()%3;
+                    }
+                }
+
                 rrmodel = glm::translate(model_,tempTilePos);
-                rrmodel = glm::rotate(rrmodel, glm::radians(*updatedDegree) *speed, glm::vec3(0.0f, index%2==0?0.5f:0.0f, index%2!=0?0.4f:0.0f));
+                rrmodel = glm::rotate(rrmodel, glm::radians((*updatedDegree)), randomRotateAxis_((*rollCubemap)[Cubeindex].axisIndex_));
+                //rrmodel = glm::rotate(rrmodel, (*updatedDegree) , randomRotateAxis_((*rollCubemap)[Cubeindex].axisIndex_));
+
                 setMat4(shaderID, "model", rrmodel);
+
+                Cubeindex++;
             } else {
                 model = glm::translate(model_, tempTilePos); 
                 setMat4(shaderID, "model", model);

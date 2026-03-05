@@ -122,6 +122,18 @@ global_variable x_input_set_state* XinputSetState_  = XinputSetStateStub;
 
 // ==================================================================
 
+/*For Bone*/
+#include <list>
+#include <sstream>
+#include <map>
+#include <vector>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+
+#define GLM_ENABLE_EXPERIMENTAL
+
 typedef struct debug_read_file_result{
     uint32 Size;
     void* Content;
@@ -250,6 +262,8 @@ void ProcessInput(int maxControllerCount, Game_Input* OldInput, Game_Input* NewI
 
 void* GetAnyGLFuncAddress(const char* name);
 void* LoadFunctionFromDLL(const char* DLLName = nullptr, const char* FuncName = nullptr);
+
+glm::vec3 randomRotateAxis_(int rollIndex);
 
 #define HANDMADE_H
 #endif

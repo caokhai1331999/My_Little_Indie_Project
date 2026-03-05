@@ -86,7 +86,7 @@ struct Camera{
     // Options
     float fov;
     float sentivity;
-    float speed;
+    real64 speed;
 
     MouseInfo mouse;
 

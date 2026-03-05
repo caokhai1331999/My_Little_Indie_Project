@@ -235,6 +235,29 @@ imagee_content* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult)
      return result;
 }
 
+glm::vec3 randomRotateAxis_(int rollIndex) {
+    std::srand(std::time(0));
+    glm::vec3 randomRotateAxis = glm::vec3(0.0f);
+  switch (rollIndex) {
+  case 0:
+    randomRotateAxis = glm::vec3(0.4f * (float)(std::rand() * 2), 0.4f * (float)(std::rand() * 2), 0.0f);
+    break;
+  case 1:
+    randomRotateAxis = glm::vec3(0.4f * (float)(std::rand() * 2.0f), 0.0f, 0.4f * (float)(std::rand() * 2.0f));
+    break;
+  case 2:
+    randomRotateAxis =
+        glm::vec3(0.0f, 0.4f * (float)(std::rand() * 2.0f), 0.4f * (float)(std::rand() * 2.0f));
+    break;
+  default:
+    randomRotateAxis = glm::vec3(0.4f * (float)(std::rand() * 2),
+                                 0.4f * (float)(std::rand() * 2),
+                                 0.4f * (float)(std::rand() * 2));
+    break;
+  };
+  return randomRotateAxis;
+}
+
 // NOTE: Why this function can replace the wglGetProcaddress
 void* GetAnyGLFuncAddress(const char* name)
 {

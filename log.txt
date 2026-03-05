@@ -974,3 +974,20 @@ build command cause lacking symbols in debug state
 
 Maybe the time interval in the exe is too fast for so it grab and read .lib and
 .dll file while before compiler compile them which cause crash
+
+---------------- Thu, 05 Mar 26: 12:00PM
+
+NOTE: Things is the float can not capture value less than 1.0f of division so I
+have to use double type (real64)
+
+Still not find out why the index of bone data is -1
+but fix the delayed ratio issues
+fix the random rotating cube garbage data. (forgot to initialize it)
+
+REMEMBER! : Still not figure out main issues underlying cause
+
+NULL bone index in pos/scale/rot array
+Blunder from me. I forgot that the threshold shouldn't be multiply by camera
+speed
+and the reason why the glitch emerge is the update rotate degree is less than
+the previous one which is never allowed

@@ -61,7 +61,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
         // State.BlueOffset+= 10;
         BackBuffer.camera.Position +=
             glm::normalize(BackBuffer.camera.Direction) *
-            BackBuffer.camera.speed;
+            (float)BackBuffer.camera.speed;
         printf("Up is HIT\n");
       }
 
@@ -69,7 +69,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
         State.GreenOffset += 10;
         BackBuffer.camera.Position -=
             glm::normalize(BackBuffer.camera.Direction) *
-            BackBuffer.camera.speed;
+            (float)BackBuffer.camera.speed;
         printf("Down is HIT\n");
       }
 
@@ -81,7 +81,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
         BackBuffer.camera.Position -=
             glm::normalize(
                 glm::cross(BackBuffer.camera.Direction, BackBuffer.camera.Up)) *
-            BackBuffer.camera.speed;
+            (float)BackBuffer.camera.speed;
         // OutputDebugStringA(" Was Down");
         // }
         printf("LEFT is HIT\n");
@@ -103,21 +103,21 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
         BackBuffer.camera.Position +=
             glm::normalize(
                 glm::cross(BackBuffer.camera.Direction, BackBuffer.camera.Up)) *
-            BackBuffer.camera.speed;
+            (float)BackBuffer.camera.speed;
         printf("Right is HIT\n");
         // XOffset += 10;
       }
 
       else if (vkCode == VK_SPACE) {
         BackBuffer.camera.Position +=
-            BackBuffer.camera.Up * BackBuffer.camera.speed;
+            BackBuffer.camera.Up * (float)BackBuffer.camera.speed;
         printf("Space is HIT\n");
         // XOffset += 10;
       }
 
       else if (vkCode == VK_SHIFT) {
         BackBuffer.camera.Position -=
-            BackBuffer.camera.Up * BackBuffer.camera.speed;
+            BackBuffer.camera.Up * (float)BackBuffer.camera.speed;
         printf("Left Shift is HIT\n");
         // XOffset += 10;
       }
@@ -422,14 +422,15 @@ LARGE_INTEGER PerfCountFrequencyResult;
   uint64 TicksPerFrame = 0;
   int64 TicksPerMicroS = 0;
   int64 CountsPerFrame = 0;
-  int64 MsPerFrame = 0;
+  real64 MsPerFrame = 0.0f;
   int64 SPerFrame = 0;
   int64 FPS = 0;
   // Time elapsed of one cycle/frame in second
 
   bool RatioCalculated = false;
-  float DelayedRatio = 0.0f;
-
+  real64 DelayedRatio = 0.0f;
+  real64 StandardMSperFrame = 16.67f;
+  
   win32LoadXInput();
   WNDCLASSEXA WindowClass = {};
   WindowClass.cbSize = sizeof(WNDCLASSEXA);
@@ -490,6 +491,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
             //=======================================================
             std::srand(std::time(NULL));
+
+            glm::vec3 randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2));
+
             Game_Memory game_memory = {};
             game_memory.PermanentStorageSize = Megabytes(128);
             game_memory.TransientStorageSize = Megabytes((uint64)6);
@@ -519,17 +523,22 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
             // Randomize cube direction
             std::srand(std::time(0));
+
+            std::vector<rollCubeInfo>rollCubeMap;
             float direction = 0.0f;
 
-            //for (int x = 0; x < 100; x++) {
-              //direction = ((std::rand() % 3) * 1.0f);
-              //fluxY[x + 100] = direction;
-              //printf("cube index %d Y: %f, with direction %f %s\n", x, fluxY[x],
-                     //fluxY[x + 100],
-                     //fluxY[x + 100] == UPP_     ? "UP"
-                     //: fluxY[x + 100] == DOWNN_ ? "DOWNN"
-                                                //: "ROLL");
-            //}
+            for (int x = 0; x < 100; x++) {
+              direction = ((std::rand() % 3) * 1.0f);
+              fluxY[x + 100] = direction;
+              if ((float)fluxY[x + 100] == (float)ROLL_) {
+                  rollCubeMap.push_back({x, std::rand() % 3});
+                }
+              printf("cube index %d Y: %f, with direction %f %s\n", x, fluxY[x],
+                     fluxY[x + 100],
+                     fluxY[x + 100] == UPP_     ? "UP"
+                     : fluxY[x + 100] == DOWNN_ ? "DOWNN"
+                                                : "ROLL");
+            }
                 
 // Cause the ScreenData will be deleted out of the loop so
                 // We have to assign address of memory and glData to
@@ -554,7 +563,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 copyBufferData(&BackBuffer, &ScreenBuffer);
                 //????
                 //glm::mat4 View = glm::mat4(1.0f);
-                float UpdatedAngle = 0.0f;
+                real32 UpdatedAngle = 0.0f;
+                real32 updateDegreeInPi = 0.0f;
+                float threshHold = glm::radians((float)360.0f);
 
                 glm::mat4 basic_cube_core = glm::mat4(1.0f);
                 glm::mat4 backpack_core = glm::mat4(1.0f);
@@ -910,13 +921,12 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     int ChosenAxis = 0;
 
                     //Ratio is based on miscalculated Msperframe
-                    if (RatioCalculated) {
-                        DelayedRatio = (float)(((float)MsPerFrame)/ 16.67f);
-                        //printf("Delay Ratio: %f, msPerframe: %I64d\n", DelayedRatio, MsPerFrame);
-                        DelayedRatio>0.0f?BackBuffer.camera.speed = (1.5f * DelayedRatio):BackBuffer.camera.speed = 1.5;                
-                        //printf("camera speed: %f\n", BackBuffer.camera.speed);
-                        RatioCalculated = false;
-                    }
+                    //if (RatioCalculated) {
+                     DelayedRatio =
+                         (real64)(MsPerFrame/StandardMSperFrame);
+                        DelayedRatio>0.0f?BackBuffer.camera.speed = (2.5f * DelayedRatio):BackBuffer.camera.speed = (2.5f  * 0.17f);                
+                        //RatioCalculated = false;
+                    //}
 
                     // Wait to 17 milli s perframe for model to rotate
 
@@ -943,9 +953,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     model_shader_->use();
                     model_shader_->setMat4("view", BackBuffer.camera.view);
 
-                    
-                    glm::vec3 randomRotateAxis = glm::vec3(0.4f* DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2),0.4f*DelayedRatio*(float)(std::rand()*2));
-
                     // Start to add some basic lighting to the model
                     useProgram(ScreenBuffer.glData.ProgramIDs[1]);
                     //setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Model);
@@ -958,15 +965,15 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     if (first_size) {
                         printf("counter: %f\n", WaitTimeCounter);
                     }
-                    if (MsPerFrame > 0) {
-                      float updateTime = (float)((float)(MsPerFrame)/ 1000);
+                    if (MsPerFrame > 0.0f) {
+                        real64 updateTime = (real64)(MsPerFrame/ (real64)1000.0f);
                       AniUpdate(animator,updateTime);
                     }
-
+                    bool TimeToChangeAxis = false;
                     if(WaitTimeCounter >= 16.67f){                        
                         WaitTimeCounter = 0.0f;
                     } else {
-                        WaitTimeCounter += MsPerFrame;
+                        WaitTimeCounter += (float)MsPerFrame;
                         //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
                     }
                         //else {
@@ -979,48 +986,55 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         // Update animation
 
                         //Set vectices and color for plane
-                        UpdatedAngle += 5.0f;
-                        //printf("updated angle :%f\n", UpdatedAngle);
-                        if(UpdatedAngle*(float)BackBuffer.camera.speed > 360.0f){
-                            UpdatedAngle -= 360.0f/(float)BackBuffer.camera.speed;
+
+
+                        updateDegreeInPi += 0.087f * DelayedRatio;                        
+                        UpdatedAngle += 10.0f * DelayedRatio;
+
+                        if(UpdatedAngle > 360.0f){
+                            UpdatedAngle -= 360.0f;
+                        };
+                        
+                        if(updateDegreeInPi > threshHold){
+                            updateDegreeInPi -= threshHold;
                         };
 
                         if(ChangeAxisCounter >= 1000.0f){
-                            ChosenAxis = std::rand()*2;
-                            switch(ChosenAxis){
-                                case 0:
-                                    randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2), 0, 0);
-                                    break;
-                                case 1:
-                                    randomRotateAxis = glm::vec3(0, 0.4f*(float)(std::rand()*2), 0);
-                                    break;
-                                case 2:
-                                    randomRotateAxis = glm::vec3(0, 0, 0.4f* (float)(std::rand()*2));
-                                    break;
-                                default:
-                                    randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2));
-                                    break;
-                            };
+                            int axisIndex = std::rand()%3;
+                            randomRotateAxis = randomRotateAxis_(axisIndex);
                             ChangeAxisCounter = 0.0f;
-                            //printf("ChangeAxisCounter: %f\n", WaitTimeCounter);            
+                            //printf("ChangeAxisCounter: %f\n", WaitTimeCounter);
+                            //
+                            if(!TimeToChangeAxis){
+                                TimeToChangeAxis = true;
+                            }
                         } else {
                             ChangeAxisCounter += WaitTimeCounter;
                         }
 
-                        basic_cube_core = glm::rotate(basic_cube_core, glm::radians(10.0f) * (float)BackBuffer.camera.speed, randomRotateAxis);                        
+                        
+                        //BUGGY
+                        basic_cube_core = glm::rotate(basic_cube_core, glm::radians(10.0f) * (float)DelayedRatio, randomRotateAxis);
 
                     //RENDER =====================================
                     basic_shader_->use();
                     glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
                     basic_shader_->setMat4("model", Plane);
+                    //why it only show half the plane
                     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-                    basic_shader_->setMat4("model", basic_cube_core);
+                    basic_shader_->use();
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
+                    basic_shader_->setMat4("model", basic_cube_core);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
-                    drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], BackBuffer.camera.speed, &UpdatedAngle);
+                    drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], DelayedRatio, &UpdatedAngle, TimeToChangeAxis, &rollCubeMap);
+                    //drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], DelayedRatio, &updateDegreeInPi, TimeToChangeAxis, &rollCubeMap);
+
+                    if(TimeToChangeAxis){
+                        TimeToChangeAxis = false;
+                    }
 
                     //Draw the backpack
                     model_shader_->use();
@@ -1073,12 +1087,12 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         CountsPerFrame =
                             (int64)(EndCounter.QuadPart - LastCounter.QuadPart);
                         MsPerFrame =
-                            ((1000 * CountsPerFrame) / PerfCountFrequency);
+                            (real64)((1000.0f * (real64)CountsPerFrame) / (real64)PerfCountFrequency);
 
                         if (MsPerFrame > 0.0f) {
                             //SPerFrame = MsPerFrame / 1000;
                             // deltaTime = (float)(1 / 60);
-                            FPS = 1000 / MsPerFrame;
+                            FPS = (real64)(1000.0f / MsPerFrame);
                         }
 
                         LastCounter = EndCounter;
@@ -1086,10 +1100,17 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         if (showMsPF) {
                           printf("[LastFrameCount:%f,EndFrameCount:%f, "
                                  "CounterPerFrame : %I64d], MiliS per frame: "
-                                 "%I64d, real FPS: %I64d \n",
+                                 "%f, real FPS: %I64d \n",
                                  (real32)LastCounter.QuadPart,
                                  (real32)EndCounter.QuadPart, CountsPerFrame,
                                  MsPerFrame, FPS);
+                          printf("Delay Ratio: %f, msPerframe: %f\n",
+                                 DelayedRatio, MsPerFrame);
+                          printf("WaitTimeCounter: %f, Axis changing counter: %f\n", WaitTimeCounter, ChangeAxisCounter);
+
+                          printf("updated angle :%f\n", UpdatedAngle);
+                          std::cout<<"Center Cube Matrix is: "<<glm::to_string(basic_cube_core)<<std::endl;
+                          std::cout<<"Current rotating axis is: "<<glm::to_string(randomRotateAxis)<<std::endl;
                           showMsPF = false;
                         };
                         }
