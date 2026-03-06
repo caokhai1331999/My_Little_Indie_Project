@@ -962,13 +962,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     // NOTE: Thing went wrong inside this function
                     // whether the waittimecounter or the function itself
                     // produce bugs
+                    real64 updateTime;                    
                     if (first_size) {
                         printf("counter: %f\n", WaitTimeCounter);
                     }
-                    if (MsPerFrame > 0.0f) {
-                        real64 updateTime = (real64)(MsPerFrame/ (real64)1000.0f);
-                      AniUpdate(animator,updateTime);
-                    }
+
                     bool TimeToChangeAxis = false;
                     if(WaitTimeCounter >= 16.67f){                        
                         WaitTimeCounter = 0.0f;
@@ -1088,11 +1086,15 @@ LARGE_INTEGER PerfCountFrequencyResult;
                             (int64)(EndCounter.QuadPart - LastCounter.QuadPart);
                         MsPerFrame =
                             (real64)((1000.0f * (real64)CountsPerFrame) / (real64)PerfCountFrequency);
-
+                        updateTime = (real64)MsPerFrame/1000.0f;
                         if (MsPerFrame > 0.0f) {
                             //SPerFrame = MsPerFrame / 1000;
                             // deltaTime = (float)(1 / 60);
                             FPS = (real64)(1000.0f / MsPerFrame);
+                        }
+
+                        if (updateTime > 0.0f) {
+                            AniUpdate(animator,updateTime);
                         }
 
                         LastCounter = EndCounter;
@@ -1104,8 +1106,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                  (real32)LastCounter.QuadPart,
                                  (real32)EndCounter.QuadPart, CountsPerFrame,
                                  MsPerFrame, FPS);
-                          printf("Delay Ratio: %f, msPerframe: %f\n",
-                                 DelayedRatio, MsPerFrame);
+                          printf("Delay Ratio: %f, msPerframe: %f, SPF: %f\n",
+                                 DelayedRatio, MsPerFrame, updateTime);
                           printf("WaitTimeCounter: %f, Axis changing counter: %f\n", WaitTimeCounter, ChangeAxisCounter);
 
                           printf("updated angle :%f\n", UpdatedAngle);

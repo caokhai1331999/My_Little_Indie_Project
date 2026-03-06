@@ -26,10 +26,9 @@ struct KeyScale{
     float timestamp;
 };
 
-
 struct AssimpNodeData{
     glm::mat4 transformation;
-    string name;
+    std::string name;
     std::vector<AssimpNodeData>children;
 };
 

@@ -20,7 +20,7 @@ void Animator::updateAnimationTime(real64 dt){
         glm::mat4 parentTransform = glm::mat4(1.0f);
         //printf("test to see code changed once again\n");
 //BUGs here//============================================
-        //calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
+        calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
     };
 //============================================
 };
@@ -35,6 +35,7 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
     const std::string& nodeName = node->name;
     glm::mat4 nodeTransform = node->transformation;
 
+    //FIND BONE PRODUCE NULL ptr
     Bone* bone = m_currentAnimation->FindBone(nodeName);
 
     if(bone){
@@ -46,13 +47,13 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
     //Find missing bones and do the same
     std::unordered_map<std::string, Bone_Info>* boneInfoMap = m_currentAnimation->GetBoneIDMap();
 //WORKING====
+// BUG HERE =================================================
     if((*boneInfoMap).find(nodeName) != (*boneInfoMap).end()){
         int index =(*boneInfoMap)[nodeName].id;
         glm::mat4 offset = (*boneInfoMap)[nodeName].offset;
         finalBoneMatrices[index] = globalTransform * offset;
-
         }
-
+// BUG HERE =================================================
         //if (!showbefore) {
           std::cout << "finalBoneMatrix at index 0 "
                     << glm::to_string(finalBoneMatrices[0])

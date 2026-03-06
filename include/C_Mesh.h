@@ -59,7 +59,6 @@ struct Vertex {
 struct Bone_Info{
     // ID
     unsigned int id;
-
     /*offset matrix which transform vertex from model space to bone space*/
     glm::mat4 offset;
 };

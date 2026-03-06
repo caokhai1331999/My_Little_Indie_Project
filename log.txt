@@ -991,3 +991,19 @@ Blunder from me. I forgot that the threshold shouldn't be multiply by camera
 speed
 and the reason why the glitch emerge is the update rotate degree is less than
 the previous one which is never allowed
+
+---------------- Fri, 06 Mar 26: 11:10AM
+
+Get into main matter : fix animation, starting with the update bone matrices,
+thing went wrong from the pos/scale/rotat index fetching
+
+NOTE: As a side quest, Check which built files was lacked in exe folder on the
+little beast side. Which caused the app behaved unexpectedly weird
+
+The first findbone function triggered produce nullptr
+but the boneInfoMap was fetched seamlessly
+
+The int index =(*boneInfoMap)[nodeName].id; end with access violation
+
+which is uninitialzation
+the 1st name is RootNode which is nowhere to be found in boneInfoMap. ????

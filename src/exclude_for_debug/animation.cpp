@@ -1,4 +1,3 @@
-
 /* ========================================================================
    $File: $
    $Date: $
@@ -28,6 +27,7 @@ Animation::Animation(const char* animationPath, Model_ *model) {
   auto animation = scene->mAnimations[0];
   m_Duration = animation->mDuration;
   m_TicksPerSecond = animation->mTicksPerSecond;
+
   ReadHierarchyData(m_RootNode, scene->mRootNode);
   ReadMissingBone(animation, model);
 };
