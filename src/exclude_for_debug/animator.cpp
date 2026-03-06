@@ -20,7 +20,7 @@ void Animator::updateAnimationTime(real64 dt){
         glm::mat4 parentTransform = glm::mat4(1.0f);
         //printf("test to see code changed once again\n");
 //BUGs here//============================================
-        calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
+        //calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
     };
 //============================================
 };

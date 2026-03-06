@@ -1007,3 +1007,9 @@ The int index =(*boneInfoMap)[nodeName].id; end with access violation
 
 which is uninitialzation
 the 1st name is RootNode which is nowhere to be found in boneInfoMap. ????
+
+---------------- Fri, 06 Mar 26: 05:32PM
+
+Side Quest completed: actually I forgot to include glad_src in build
+command. which caused the wglGetprocaddress failed to load pointer -> weird
+OpenGL behavior(lack of function IMO)
