@@ -41,7 +41,7 @@ public:
     AssimpNodeData* getRootNode(){return &m_RootNode;};
 
 
-    private:
+private:
     float m_Duration;
     int m_TicksPerSecond;
     AssimpNodeData m_RootNode;

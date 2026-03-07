@@ -62,7 +62,9 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
         BackBuffer.camera.Position +=
             glm::normalize(BackBuffer.camera.Direction) *
             (float)BackBuffer.camera.speed;
-        printf("Up is HIT\n");
+        if (!WasDown) {
+            printf("Up is HIT\n");
+        }
       }
 
       else if (vkCode == 'S') {
@@ -70,7 +72,9 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
         BackBuffer.camera.Position -=
             glm::normalize(BackBuffer.camera.Direction) *
             (float)BackBuffer.camera.speed;
-        printf("Down is HIT\n");
+        if (!WasDown) {
+            printf("Down is HIT\n");
+        }
       }
 
       else if (vkCode == 'A') {
@@ -84,7 +88,9 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
             (float)BackBuffer.camera.speed;
         // OutputDebugStringA(" Was Down");
         // }
-        printf("LEFT is HIT\n");
+        if (!WasDown) {
+            printf("LEFT is HIT\n");
+        }
       }
 
       else if (vkCode == 'L') {
@@ -96,7 +102,9 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
         }
         // OutputDebugStringA(" Was Down");
         // }
-        printf("L is HIT\n");
+        if (!WasDown) {
+            printf("L is HIT\n");
+        }
       }
 
       else if (vkCode == 'D') {
@@ -104,21 +112,27 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
             glm::normalize(
                 glm::cross(BackBuffer.camera.Direction, BackBuffer.camera.Up)) *
             (float)BackBuffer.camera.speed;
-        printf("Right is HIT\n");
+        if (!WasDown) {
+            printf("Right is HIT\n");
+        }
         // XOffset += 10;
       }
 
       else if (vkCode == VK_SPACE) {
         BackBuffer.camera.Position +=
             BackBuffer.camera.Up * (float)BackBuffer.camera.speed;
-        printf("Space is HIT\n");
+        if (!WasDown) {
+            printf("Space is HIT\n");
+        }
         // XOffset += 10;
       }
 
       else if (vkCode == VK_SHIFT) {
         BackBuffer.camera.Position -=
             BackBuffer.camera.Up * (float)BackBuffer.camera.speed;
-        printf("Left Shift is HIT\n");
+        if (!WasDown) {
+            printf("Left Shift is HIT\n");
+        }
         // XOffset += 10;
       }
 
@@ -132,7 +146,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
       }
 
       else if (vkCode == VK_BACK) {
-        BackBuffer.camera.Direction =
+       BackBuffer.camera.Direction =
             glm::vec3(-4.0f, 4.0f, 0.0f) - BackBuffer.camera.Position;
 
         BackBuffer.camera.mouse.LastX = BackBuffer.camera.mouse.xPos;

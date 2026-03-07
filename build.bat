@@ -2,9 +2,6 @@
 mkdir build
 pushd build
 
-rem del .\src\*.obj
-rem del *.pdb > NUL 2> NUL
-
 set hr=%time:~0,2%
 set hr=%hr: =0%
 set min=%time:~3,2%
@@ -50,7 +47,8 @@ rem Let alone the hot Loading code later
 rem delete pre-pdb files
 rem=========================================
 
-rem del skeletalAni32__* animation.*
+rem del animation.obj animator.obj Bone.obj
+rem del skeletalAni32__* animation.exp animation.lib
 rem set dll_name_with_time_=%dll_name%__%hr%_%min%_%sec%__%dd%-%mm%-%yr%
 rem cl /D_USRDLL /D_WINDLL /LD /Zi /EHsc /FD %DIRECTIVES_FLAG% %src_files_for_dll% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link /PDB:%dll_name_with_time_%.pdb %LIB_% /LIBPATH:%ASSIMP_LIB% /FORCE:MULTIPLE /IGNORE:4006 /OUT:%dll_name%.dll
 
@@ -58,6 +56,7 @@ rem=========================================
 
 rem ====================================== 
 
+del B_shader.obj Camera.obj C_Mesh.obj C_Model.obj handmade.obj main.obj SoundMaker.obj testOpenGL.obj Tile.obj win32Game.obj
 del win32Game.pdb
 cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES_FOR_EXE% -I%_include% -I%glad_src% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% animation.lib /LIBPATH:%ASSIMP_LIB% /PDB:win32Game.pdb /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /ENTRY:WinMainCRTStartup /subsystem:console
 

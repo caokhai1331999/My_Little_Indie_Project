@@ -1013,3 +1013,6 @@ the 1st name is RootNode which is nowhere to be found in boneInfoMap. ????
 Side Quest completed: actually I forgot to include glad_src in build
 command. which caused the wglGetprocaddress failed to load pointer -> weird
 OpenGL behavior(lack of function IMO)
+
+---------------- Sat, 07 Mar 26: 11:32AM
+
