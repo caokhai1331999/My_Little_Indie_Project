@@ -75,7 +75,6 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
 
 void Animation::ReadHierarchyData(AssimpNodeData& dest, const aiNode* src){
     assert(src);
-
     dest.name = src->mName.data;
     dest.transformation = AssimpGLMHelpers::ConvertMatrixToGLMFormat(src->mTransformation);
     dest.children.resize(src->mNumChildren);

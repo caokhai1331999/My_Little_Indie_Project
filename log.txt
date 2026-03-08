@@ -1016,3 +1016,18 @@ OpenGL behavior(lack of function IMO)
 
 ---------------- Sat, 07 Mar 26: 11:32AM
 
+
+---------------- Sun, 08 Mar 26: 02:44PM
+
+NOTE: The bone_info Map is construct by the readmissingbone function
+Time to inspect on it
+
+Actually the rootNode init name has no bone information.
+The real bug is the memory violation occurred inside the find() function. which
+is probably a typo issue
+
+This is not a typo. The pointer did call the function
+Thing is there is no bone name called rootNode
+
+NOTE: Got some progress: We have the finalBoneMatrices garbage data here. Must
+be wrong somewhere

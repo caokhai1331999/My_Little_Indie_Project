@@ -45,6 +45,8 @@ private:
     float m_Duration;
     int m_TicksPerSecond;
     AssimpNodeData m_RootNode;
+    // Bone is a class type while Bone_Info is just a struct contain id and
+    // offset matrix
     std::vector<Bone> m_Bones;
     std::unordered_map<std::string, Bone_Info> m_Bone_InfoMap;
 };
