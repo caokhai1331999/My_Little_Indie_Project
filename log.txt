@@ -1031,3 +1031,12 @@ Thing is there is no bone name called rootNode
 
 NOTE: Got some progress: We have the finalBoneMatrices garbage data here. Must
 be wrong somewhere
+
+---------------- Mon, 09 Mar 26: 12:03PM
+
+First: the m_boneInfo_map create garbage data while updating
+Second: I didn't see part wherein the m_bones update its elements(such a blunder
+if it really is)
+
+In order to test furtherly I have to show the model on app. Which is somehow
+NULL(shader code or the vertex data transfer was buggy somewhere)

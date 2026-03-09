@@ -683,8 +683,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
 
 //NOW THE ANIMATING PART
-                dancing_vampire = new Model_();
                 Model_* dancing_vampire = nullptr;
+                dancing_vampire = new Model_();
                 std::string dancing_vampire_path = "./media/dancing_vampire.dae";
                 loadModel_(dancing_vampire, dancing_vampire_path);
 

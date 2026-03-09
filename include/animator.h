@@ -20,6 +20,7 @@ public:
 
       m_currentAnimation = animation;
       finalBoneMatrices.reserve(100);
+      finalBoneMatrices.resize(100);
       //NOTE: Init finalBoneMatrices first
       for(int i = 0; i < 100; i++);
       finalBoneMatrices.push_back(glm::mat4(1.0f));

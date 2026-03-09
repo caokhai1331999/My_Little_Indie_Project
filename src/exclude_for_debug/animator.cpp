@@ -49,7 +49,7 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
     std::unordered_map<std::string, Bone_Info> *boneInfoMap =
         m_currentAnimation->GetBoneIDMap();
 
-    char Buffer[40];
+    char Buffer[100] = {};
     //std::string offset_content = glm::to_string((*boneInfoMap)["Hips"].offset);
     //sprintf(Buffer, "BoneInfo offset Matrix at Hips is: %s",offset_content.c_str()) ;
      //OutputDebugStringA(Buffer);
@@ -63,22 +63,26 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
         glm::mat4 offset = (*boneInfoMap)[nodeName].offset;
         finalBoneMatrices[index] = globalTransform * offset;
      } else {
-        sprintf(Buffer, "There is no bone called %s\n", nodeName.c_str());
+        sprintf(Buffer, "There is no bone called %s inside the boneInfoMap\n", nodeName.c_str());
         OutputDebugStringA(Buffer);
     }
 // BUG HERE =================================================
         //if (!showbefore) {
-          std::cout << "finalBoneMatrix at index 0 "
-                    << glm::to_string(finalBoneMatrices[0])
-                    << std::endl;
+          //std::cout << "finalBoneMatrix at index 0 "
+                    //<< glm::to_string(finalBoneMatrices[0])
+                    //<< std::endl;
           //showbefore = true;
           //}
           // NOTE: can not print out finalbonematrices
           
            //Global Transform now is used as parent transform
-          for (int i = 0; i < node->children.size(); i++) {
-            Animator::calculateBoneTransform(&node->children[i],
-                                             &globalTransform);
+          if ((int)node->children.size() > 0) {
+            for (int i = 0; i < node->children.size(); i++) {
+              Animator::calculateBoneTransform(&node->children[i],
+                                               &globalTransform);
+            }
+          } else {
+              printf("reach end of children size check\n ");
           }
 };
 

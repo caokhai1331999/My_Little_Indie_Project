@@ -23,8 +23,9 @@ int Bone::GetRotationIndex(float animationTime){
         if(animationTime < m_Rotations[index + 1].timestamp)
             return index;
     }
+        assert(0);
     //This one track whether the index is invalid or not!!!
-    }
+}
 
 int Bone::GetScalingIndex(float animationTime){
     for(int index = 0; index < mNumScalings - 1; index++){
