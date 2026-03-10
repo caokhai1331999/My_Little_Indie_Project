@@ -1040,3 +1040,11 @@ if it really is)
 
 In order to test furtherly I have to show the model on app. Which is somehow
 NULL(shader code or the vertex data transfer was buggy somewhere)
+
+---------------- Tue, 10 Mar 26: 11:07AM
+
+the backpack.mtl is contain texture data I believed
+
+---------------- Tue, 10 Mar 26: 03:42PM
+
+Nothing wrong with the texture code. the exe just lack of texture files

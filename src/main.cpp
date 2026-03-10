@@ -463,7 +463,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
   AniUserClassSpawner SpawnAnimator = NULL;
   AniUserClassSlayer SlayAnimator = NULL;
   AniTimeUpdater AniUpdate = NULL;
-  //AniTimeUpdater AniUpdate_;
+  //setupMeshh setupMesh = NULL;
+  //MDraw Draw = NULL;
+      //AniTimeUpdater AniUpdate_;
 
   Animation* danceAnimation = nullptr;
   Animator* animator = nullptr;
@@ -491,6 +493,30 @@ LARGE_INTEGER PerfCountFrequencyResult;
       int refreshRate = GetDeviceCaps(DeviceContext, VREFRESH);
       ReleaseDC(Window, DeviceContext);
 
+
+      if (CopyFile("skeletalAni32.dll", "skeletalAni32_copy.dll",
+                   false))
+      {
+          AniLib = LoadLibraryA("skeletalAni32_copy.dll");
+      }
+      //
+
+      // Animation
+      if(AniLib != NULL){
+          CreateAnimation = (AniClassSpawner)GetProcAddress(AniLib, "CreateAniClass");
+          KillAninmation = (AniClassSlainer)GetProcAddress(AniLib, "DestroysAniClass");
+
+          SpawnAnimator = (AniUserClassSpawner)GetProcAddress(AniLib, "CreateAnimatorClass");
+          SlayAnimator = (AniUserClassSlayer)GetProcAddress(AniLib, "DestroyAnimatorClass");
+
+          AniUpdate = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTime_");
+
+          //setupMesh = (setupMeshh)GetProcAddress(AniLib, "setupMesh");
+          //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
+          //Load_Lib = false;
+      }
+
+      
       MSG message;
 
       if (refreshRate > 1) {
@@ -559,6 +585,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
                 //RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
                 InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
+
+                GLenum err = glGetError();
+                if (err != GL_NO_ERROR) {
+                    std::cerr << "OpenGL Error: " << err << std::endl;
+                }
 
                 glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
                 // Basic shader
@@ -675,6 +706,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 std::cout<<"Projection mat: "<<glm::to_string(BackBuffer.camera.projection)<<std::endl;                
                 setMat4(ScreenBuffer.glData.ProgramIDs[0], "view", BackBuffer.camera.view);
 
+
+                
                 Model_* backpack = nullptr;
                 backpack = new Model_();
                 std::string backpack_path = "./media/backpack.obj";
@@ -683,29 +716,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
 
 //NOW THE ANIMATING PART
+
                 Model_* dancing_vampire = nullptr;
                 dancing_vampire = new Model_();
                 std::string dancing_vampire_path = "./media/dancing_vampire.dae";
                 loadModel_(dancing_vampire, dancing_vampire_path);
-
-                  if (CopyFile("skeletalAni32.dll", "skeletalAni32_copy.dll",
-                                false))
-                  {
-                    AniLib = LoadLibraryA("skeletalAni32_copy.dll");
-                  }
-                  //
-
-                // Animation
-                    if(AniLib != NULL){
-                        CreateAnimation = (AniClassSpawner)GetProcAddress(AniLib, "CreateAniClass");
-                        KillAninmation = (AniClassSlainer)GetProcAddress(AniLib, "DestroysAniClass");
-
-                        SpawnAnimator = (AniUserClassSpawner)GetProcAddress(AniLib, "CreateAnimatorClass");
-                        SlayAnimator = (AniUserClassSlayer)GetProcAddress(AniLib, "DestroyAnimatorClass");
-
-                        AniUpdate = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTime_");
-                        //Load_Lib = false;
-                    }
 
                     danceAnimation = CreateAnimation((char* )dancing_vampire_path.c_str(), dancing_vampire);
                     animator = SpawnAnimator(danceAnimation);
@@ -860,7 +875,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                           AniUpdate = (AniTimeUpdater)GetProcAddress(
                               AniLib, "updateAnimationTime_");
-                        }
+
+                          //setupMesh =
+                              //(setupMeshh)GetProcAddress(AniLib, "setMesh");
+                          //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
+                          }
 
                         if (Load_Lib) {
                           Load_Lib = false;
