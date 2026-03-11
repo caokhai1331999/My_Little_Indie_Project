@@ -62,7 +62,10 @@ void processNode(Model_* model, aiNode* node, const aiScene* scene){
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         model->meshes.push_back(model->processMesh(model, mesh, scene));
     }
-    // then do the same for each of its children
+
+    
+
+// then do the same for each of its children
     for(unsigned int i = 0; i < node->mNumChildren; i++){
         processNode(model, node->mChildren[i], scene);
     }

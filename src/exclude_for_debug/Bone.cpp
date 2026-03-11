@@ -8,35 +8,35 @@
 #include "Bone.h"
 
 
-int Bone::GetPositionIndex(float animationTime){
+int Bone::GetPositionIndex(real64* animationTime){
     for(int index = 0; index < mNumPositions - 1; index++){
         // why animationTime < m_Positions[index].timestamp
-        if(animationTime < m_Positions[index + 1].timestamp){
+        if(*animationTime < m_Positions[index + 1].timestamp){
             return index;
         }
     }
         assert(0);
 }
 
-int Bone::GetRotationIndex(float animationTime){
+int Bone::GetRotationIndex(real64* animationTime){
     for(int index = 0; index < mNumRotations - 1; index++){
-        if(animationTime < m_Rotations[index + 1].timestamp)
+        if(*animationTime < m_Rotations[index + 1].timestamp)
             return index;
     }
         assert(0);
     //This one track whether the index is invalid or not!!!
 }
 
-int Bone::GetScalingIndex(float animationTime){
+int Bone::GetScalingIndex(real64* animationTime){
     for(int index = 0; index < mNumScalings - 1; index++){
-        if(animationTime < m_KeyScales[index + 1].timestamp){
+        if(*animationTime < m_KeyScales[index + 1].timestamp){
             return index;
         }
     }
         assert(0);
 }
 
-void Bone::Update(float animationTime){
+void Bone::Update(real64* animationTime){
     glm::mat4 Translation = InterpolatePosition(animationTime);
     glm::mat4 Rotation = InterpolateRotation(animationTime);
     glm::mat4 Scaling = InterpolateScaling(animationTime);
@@ -45,11 +45,11 @@ void Bone::Update(float animationTime){
 };
 
 // Get normalized value for Lerp and Slerp 
-float GetScaleFactor(float animationTime, float lastkeyTime, float nextkeyTime){
+float GetScaleFactor(real64* animationTime, float* lastkeyTime, float* nextkeyTime){
 
     float scaleFactor = 0.0f;
-    float midWayLength = animationTime - lastkeyTime;
-    float timeDiff = nextkeyTime - lastkeyTime;
+    float midWayLength = (float)*animationTime - (*lastkeyTime);
+    float timeDiff = (*nextkeyTime) - (*lastkeyTime);
 
     scaleFactor = midWayLength/timeDiff;
 
@@ -58,15 +58,16 @@ float GetScaleFactor(float animationTime, float lastkeyTime, float nextkeyTime){
 
 // Figure out which Position key to interpolation b/w interpolate and return the
 // final matrix
-glm::mat4 Bone::InterpolatePosition(float animationTime){
+glm::mat4 Bone::InterpolatePosition(real64* animationTime){
 
     if(mNumPositions == 1){
         return glm::translate(glm::mat4(1.0f), m_Positions[0].Position);
+    } else if (mNumPositions == 0){
+        return glm::mat4(1.0f);
     }
-    
     int pt0index = GetPositionIndex(animationTime);
     int pt1index = pt0index + 1;
-    float scaleFactor = GetScaleFactor(animationTime, m_Positions[pt0index].timestamp, m_Positions[pt1index].timestamp);
+    float scaleFactor = GetScaleFactor(animationTime, &(m_Positions[pt0index].timestamp), &(m_Positions[pt1index].timestamp));
 
     glm::vec3 finalPosition = glm::mix(m_Positions[pt0index].Position, m_Positions[pt1index].Position, scaleFactor);
 
@@ -77,42 +78,46 @@ glm::mat4 Bone::InterpolatePosition(float animationTime){
 
 // Figure out which Scale key to interpolation b/w interpolate and return the
 // final matrix
-glm::mat4 Bone::InterpolateScaling(float animationTime){
+glm::mat4 Bone::InterpolateScaling(real64* animationTime){
 
     if(mNumScalings == 1){
         return glm::scale(glm::mat4(1.0f), m_KeyScales[0].Scale);
-    }
+    } else if (mNumScalings == 0){
+        return glm::mat4(1.0f);
+    } 
+        int pt0index = GetScalingIndex(animationTime);
+        int pt1index = pt0index + 1;
+        float scaleFactor = GetScaleFactor(animationTime, &(m_KeyScales[pt0index].timestamp), &(m_KeyScales[pt1index].timestamp));
 
-    int pt0index = GetScalingIndex(animationTime);
-    int pt1index = pt0index + 1;
-    float scaleFactor = GetScaleFactor(animationTime, m_KeyScales[pt0index].timestamp, m_KeyScales[pt1index].timestamp);
+        glm::vec3 finalScale = glm::mix(m_KeyScales[pt0index].Scale, m_KeyScales[pt1index].Scale, scaleFactor);
 
-    glm::vec3 finalScale = glm::mix(m_KeyScales[pt0index].Scale, m_KeyScales[pt1index].Scale, scaleFactor);
+        return glm::scale(glm::mat4(1.0f), finalScale);       
 
-    return glm::scale(glm::mat4(1.0f), finalScale);    
 };
 
 // Figure out which Scale key to interpolation b/w interpolate and return the
 // final matrix
-glm::mat4 Bone::InterpolateRotation(float animationTime){
+glm::mat4 Bone::InterpolateRotation(real64* animationTime){
 
     if(mNumRotations == 1){
         auto rotation = m_Rotations[0].Orientation;
-        glm::toMat4(rotation);
-    }
+        return glm::toMat4(rotation);
+    } else if (mNumRotations == 0){
+        return glm::mat4(1.0f);
+    } 
+        // NOTE: things were tracked to go wrong from here
+        int pt0index = GetRotationIndex(animationTime);
 
-    // NOTE: things were tracked to go wrong from here
-    int pt0index = GetRotationIndex(animationTime);
-
-    //if (pt0index < 0) {
+        //if (pt0index < 0) {
         //assert(0);
-    //};
+        //};
 
-    int pt1index = pt0index + 1;
-    float scaleFactor = GetScaleFactor(animationTime, m_Rotations[pt0index].timestamp, m_Rotations[pt1index].timestamp);;
+        int pt1index = pt0index + 1;
+        float scaleFactor = GetScaleFactor(animationTime, &(m_Rotations[pt0index].timestamp), &(m_Rotations[pt1index].timestamp));
 
-    glm::quat finalRotation = glm::slerp(m_Rotations[pt0index].Orientation, m_Rotations[pt1index].Orientation, scaleFactor);
+        glm::quat finalRotation = glm::slerp(m_Rotations[pt0index].Orientation, m_Rotations[pt1index].Orientation, scaleFactor);
 
-    return glm::toMat4(finalRotation);
+        return glm::toMat4(finalRotation);   
+
 };
 

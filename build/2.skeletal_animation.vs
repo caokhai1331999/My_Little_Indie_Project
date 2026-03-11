@@ -45,21 +45,23 @@ void main()
 */
 
 //Second method
- 	 mat4 boneTransform = finalBoneMatrices[boneIds[0]] * weights[0];
- 	 boneTransform += finalBoneMatrices[boneIds[1]] * weights[1];
- 	 boneTransform += finalBoneMatrices[boneIds[2]] * weights[2];
- 	 boneTransform += finalBoneMatrices[boneIds[3]] * weights[3];
+ 	 // mat4 boneTransform = finalBoneMatrices[boneIds[0]] * weights[0];
+ 	 // boneTransform += finalBoneMatrices[boneIds[1]] * weights[1];
+ 	 // boneTransform += finalBoneMatrices[boneIds[2]] * weights[2];
+ 	 // boneTransform += finalBoneMatrices[boneIds[3]] * weights[3];
 
-     //for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
-     	 //if(boneIds[i] == -1)
-	   //continue;
-	 //if(boneIds[i] <= MAX_BONES){
-	   //boneTransform += finalBoneMatrices[boneIds[i]] * weights[i];
-	   //break;
-	 //}
-	 //vec3 localNormal = vec3(finalBoneMatrices[boneIds[i]] * model)* norm; //For What???
-	 //Normal += localNormal;
-       //}
+	 mat4 boneTransform;
+
+	 for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
+     	 if(boneIds[i] == -1)
+	   continue;
+	 if(boneIds[i] <= MAX_BONES){
+	   boneTransform += finalBoneMatrices[boneIds[i]] * weights[i];
+	   break;
+	 }
+	 vec3 localNormal = vec3(finalBoneMatrices[boneIds[i]] * model)* norm; //For What???
+	 Normal += localNormal;
+       }
 
      // local postion, total position, weights,
      vec4 modelPos_after= boneTransform * vec4(-pos, 1.0f);
@@ -69,7 +71,8 @@ void main()
 
      //2nd method
 
-     //FragPos = vec3(model * vec4(pos, 1.0f));
-     gl_Position = projection * view * model * modelPos_after;
-     TexCoords = tex;
+     // gl_Position = projection * view * model * modelPos_after;
+	gl_Position = projection * view * model * vec4(-pos, 1.0f);
+	TexCoords = tex;
+        FragPos = vec3(model * vec4(pos, 1.0f));
 }

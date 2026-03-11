@@ -1048,3 +1048,17 @@ the backpack.mtl is contain texture data I believed
 ---------------- Tue, 10 Mar 26: 03:42PM
 
 Nothing wrong with the texture code. the exe just lack of texture files
+
+---------------- Wed, 11 Mar 26: 12:18PM
+
+Try to guess why the vampire model was just partially shown and is oversize
+NOTE: still the bone update process make error. FIX THAT!!!
+
+UPDATE!! : Bone position, scale and rotation array is NULL. Must be faulty
+initialization
+Find out: The model m_BonesInfoMap is uninitialized(wrong prematured conclusion)
+
+maybe the difference between float and double cause memory garbage
+Cause I saw the animation time turn from legit value to garbage after passing
+
+Why After update bone for a while the bone class produce garbage data????

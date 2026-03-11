@@ -16,6 +16,7 @@ struct Material{
 
    float shininess;
 };
+
 uniform Material material;
 
 void main(){

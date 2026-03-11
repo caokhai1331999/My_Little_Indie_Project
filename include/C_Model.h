@@ -58,6 +58,5 @@ vector <Texture>loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
 void SetVertexBoneDataToDefault(Vertex* vertex);
 
 void Draw(Mesh* mesh = nullptr, GLuint* programID = nullptr);
-
 void DDraw(Model_* model = nullptr, GLuint* programID = nullptr);
 #endif
