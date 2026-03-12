@@ -29,50 +29,75 @@ void main()
 // This is to create a world space coor of fragment
 
    vec4 totalPosition = vec4(0.0f);
-
+   vec3 localNormal;
 /*
      for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
      	 if(boneIds[i] == -1)
 	   continue;
 	 if(boneIds[i] >= MAX_BONES){
-	   totalPosition = vec4(Pos, 1.0f);
+	   totalPosition = vec4(pos, 1.0f);
 	   break;
 	 }
          vec4 localPosition = finalBoneMatrices[boneIds[i]]*vec4(pos,1.0f);
-	 totalPostion += localPosition * weights[i];
-	 vec3 localNormal = mat3(finalBoneMatrices[boneIds[i]]) * norm;
-       }
-*/
-
-//Second method
- 	 // mat4 boneTransform = finalBoneMatrices[boneIds[0]] * weights[0];
- 	 // boneTransform += finalBoneMatrices[boneIds[1]] * weights[1];
- 	 // boneTransform += finalBoneMatrices[boneIds[2]] * weights[2];
- 	 // boneTransform += finalBoneMatrices[boneIds[3]] * weights[3];
-
-	 mat4 boneTransform;
-
-	 for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
-     	 if(boneIds[i] == -1)
-	   continue;
-	 if(boneIds[i] <= MAX_BONES){
-	   boneTransform += finalBoneMatrices[boneIds[i]] * weights[i];
-	   break;
-	 }
-	 vec3 localNormal = vec3(finalBoneMatrices[boneIds[i]] * model)* norm; //For What???
+	 totalPosition += localPosition * weights[i];
+	 localNormal = mat3(finalBoneMatrices[boneIds[i]]) * norm;
 	 Normal += localNormal;
        }
+*/
+	 // vec3 localNormal = vec3(finalBoneMatrices[boneIds[0]] * model)* norm; 
+	 // localNormal += vec3(finalBoneMatrices[boneIds[1]] * model)* norm; 
+	 // localNormal += vec3(finalBoneMatrices[boneIds[2]] * model)* norm; 
+	 // localNormal += vec3(finalBoneMatrices[boneIds[3]] * model)* norm; 
+
+	 // mat4 boneTransform;
+
+	 // for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
+     	 // if(boneIds[i] == -1)
+	 //   continue;
+	 // if(boneIds[i] <= MAX_BONES){
+	 //   boneTransform += finalBoneMatrices[boneIds[i]] * weights[i];
+	 //   break;
+	 // }
+
+	 // vec3 localNormal = vec3(finalBoneMatrices[boneIds[i]] * model)* norm;
+	 //For What???
+       // }
+//Second method
+ 	 mat4 boneTransform = finalBoneMatrices[boneIds[0]] * weights[0];
+ 	 boneTransform += finalBoneMatrices[boneIds[1]] * weights[1];
+ 	 boneTransform += finalBoneMatrices[boneIds[2]] * weights[2];
+ 	 boneTransform += finalBoneMatrices[boneIds[3]] * weights[3];
+
+	 // mat3 normalMatrix = transpose(inverse(mat3(boneTransform)));
+	 // vec3 T = normalize(normalMatrix * tangent);
+	 // vec3 B = normalize(normalMatrix * bitangent);
+	 // vec3 N = normalize(normalMatrix * norm);
+
+         vec4 localPosition = finalBoneMatrices[boneIds[0]]*vec4(pos,1.0f);
+	 totalPosition += localPosition * weights[0];
+	 Normal = mat3(finalBoneMatrices[boneIds[0]]) * norm;
+
+         localPosition = finalBoneMatrices[boneIds[1]]*vec4(pos,1.0f);
+	 totalPosition += localPosition * weights[1];
+	 Normal += mat3(finalBoneMatrices[boneIds[1]]) * norm;
+
+	 localPosition = finalBoneMatrices[boneIds[2]]*vec4(pos,1.0f);
+	 totalPosition += localPosition * weights[2];
+	 Normal += mat3(finalBoneMatrices[boneIds[2]]) * norm;
+
+	 localPosition = finalBoneMatrices[boneIds[3]]*vec4(pos,1.0f);
+	 totalPosition += localPosition * weights[3];
+	 Normal += mat3(finalBoneMatrices[boneIds[3]]) * norm;
 
      // local postion, total position, weights,
-     vec4 modelPos_after= boneTransform * vec4(-pos, 1.0f);
-     //mat4 view_after = model * modelPos_after;
+     // vec4 modelPos_after= boneTransform * vec4(-pos, 1.0f);
 
+     //mat4 view_after = model * modelPos_after;
      //gl_Position = World_after_transform * viewModel;
 
      //2nd method
-
      // gl_Position = projection * view * model * modelPos_after;
-	gl_Position = projection * view * model * vec4(-pos, 1.0f);
+	gl_Position = projection * view * model * totalPosition;
 	TexCoords = tex;
-        FragPos = vec3(model * vec4(pos, 1.0f));
+        FragPos = vec3(model * totalPosition);
 }

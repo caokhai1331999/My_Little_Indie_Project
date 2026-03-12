@@ -15,7 +15,9 @@ int Bone::GetPositionIndex(real64* animationTime){
             return index;
         }
     }
-        assert(0);
+    printf("mNumPositions is %d and the m_Positions size is %d, animation time %f\n", mNumPositions, (int)m_Positions.size(), *animationTime);
+    // So the assert happen while there is no animationTime less than any timestamp;
+    assert(0);
 }
 
 int Bone::GetRotationIndex(real64* animationTime){

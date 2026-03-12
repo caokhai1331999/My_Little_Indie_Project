@@ -37,7 +37,7 @@ public:
     void SetDeltaTime(real64 Time);
     void AddDeltaTime(real64 Time);
 
-    void updateAnimationTime(real64 dt);
+    void updateAnimationTime(real64* dt);
 
     void playAnimation(Animation* pAnimation);
     void calculateBoneTransform(const AssimpNodeData* node, glm::mat4* parentTransform);
@@ -55,11 +55,13 @@ private:
 // Class wrapper
 extern "C" __declspec(dllexport) Animator* CreateAnimatorClass(Animation *animation);
 extern "C" __declspec(dllexport) void DestroyAnimatorClass(Animator *ani);
-extern "C" __declspec(dllexport) void updateAnimationTime_(Animator *ani, real64 dt);
+extern "C" __declspec(dllexport) void updateAnimationTime_(Animator *ani, real64* dt);
+extern "C" __declspec(dllexport) void PlayAni_(Animator* ani, Animation* animation);
 
 typedef Animator* (__cdecl *AniUserClassSpawner) (Animation*);
 typedef void (__cdecl *AniUserClassSlayer) (Animator*);
-typedef void (__cdecl *AniTimeUpdater) (Animator*, real64);
+typedef void (__cdecl *AniTimeUpdater) (Animator*, real64*);
+typedef void (*PlayAni__)(Animator*, Animation*);
 
 /*
 #pragma comment(linker, "/export:CreateAnimatorClass")

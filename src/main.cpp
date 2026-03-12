@@ -463,6 +463,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
   AniUserClassSpawner SpawnAnimator = NULL;
   AniUserClassSlayer SlayAnimator = NULL;
   AniTimeUpdater AniUpdate = NULL;
+  PlayAni__ PlayAnimation = NULL;
   //setupMeshh setupMesh = NULL;
   //MDraw Draw = NULL;
       //AniTimeUpdater AniUpdate_;
@@ -508,9 +509,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
           SpawnAnimator = (AniUserClassSpawner)GetProcAddress(AniLib, "CreateAnimatorClass");
           SlayAnimator = (AniUserClassSlayer)GetProcAddress(AniLib, "DestroyAnimatorClass");
-
           AniUpdate = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTime_");
-
+          PlayAnimation = (PlayAni__)GetProcAddress(AniLib, "PlayAni_");
           //setupMesh = (setupMeshh)GetProcAddress(AniLib, "setupMesh");
           //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
           //Load_Lib = false;
@@ -876,6 +876,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                           AniUpdate = (AniTimeUpdater)GetProcAddress(
                               AniLib, "updateAnimationTime_");
 
+                          PlayAnimation = (PlayAni__)GetProcAddress(AniLib, "PlayAni_");                          
                           //setupMesh =
                               //(setupMeshh)GetProcAddress(AniLib, "setMesh");
                           //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
@@ -1079,19 +1080,24 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     animating_shader_->setMat4( "model", dancing_vampire_core);
                     animating_shader_->setMat4( "projection", Projection);
                     animating_shader_->setMat4( "view", BackBuffer.camera.view);
-                    //std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
-                    //if (Transform->size() > 1) {
-                      //for (int i = 0; i < Transform->size(); i++) {
-                        //animating_shader_->setMat4(
-                            //"finalBoneMatrices[boneIds[" + std::to_string(i) +
-                                //"]]",
-                            //(*Transform)[i]);
-                        //if (first_announce) {
-                          //printf("finalBoneMatrices[boneIds[ %d ]]", (int)i);
-                        //}
-                      //};
-                    //}
-                    //glBindVertexArray(ScreenBuffer.glData.VAOs);
+
+                    std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
+
+                    if(first_announce){
+                        if (Transform->size() > 1) {
+                            for (int i = 0; i < Transform->size(); i++) {
+                                animating_shader_->setMat4(
+                                    "finalBoneMatrices[boneIds[" + std::to_string(i) +
+                                    "]]",
+                                    (*Transform)[i]);
+                                if (first_announce) {
+                                    printf("finalBoneMatrices[boneIds[ %d ]]: %s\n", (int)i, glm::to_string((*Transform)[i]).c_str());
+                                }
+                            };
+                        }
+                    }
+
+                    glBindVertexArray(ScreenBuffer.glData.VAOs);
                     brushID = animating_shader_->GetProgramID();
                     DDraw(dancing_vampire, &brushID);                    
                     
@@ -1114,25 +1120,26 @@ LARGE_INTEGER PerfCountFrequencyResult;
                       };
 
                       if (EndCounter.QuadPart > LastCounter.QuadPart) {
-                        // We got how many count per frame
-                        CountsPerFrame =
-                            (int64)(EndCounter.QuadPart - LastCounter.QuadPart);
-                        MsPerFrame =
-                            (real64)((1000.0f * (real64)CountsPerFrame) / (real64)PerfCountFrequency);
-                        updateTime = (real64)MsPerFrame/1000.0f;
-                        if (MsPerFrame > 0.0f) {
-                            //SPerFrame = MsPerFrame / 1000;
-                            // deltaTime = (float)(1 / 60);
-                            FPS = (real64)(1000.0f / MsPerFrame);
-                        }
+                          // We got how many count per frame
+                          CountsPerFrame =
+                              (int64)(EndCounter.QuadPart - LastCounter.QuadPart);
+                          MsPerFrame =
+                              (real64)((1000.0f * (real64)CountsPerFrame) / (real64)PerfCountFrequency);
+                          updateTime = ((real64)MsPerFrame/1000.0f)>0.0f?((real64)MsPerFrame/1000.0f):updateTime;
+                          if (MsPerFrame > 0.0f) {
+                              //SPerFrame = MsPerFrame / 1000;
+                              // deltaTime = (float)(1 / 60);
+                              FPS = (real64)(1000.0f / MsPerFrame);
+                          }
+                      }
 
-                        if (updateTime > 0.0f) {
-                            AniUpdate(animator,updateTime);
-                        }
+                      if (updateTime > 0.0f) {
+                            AniUpdate(animator, &updateTime);
+                            PlayAnimation(animator, danceAnimation);
+                      }
 
-                        LastCounter = EndCounter;
 
-                        if (showMsPF) {
+                      if (showMsPF) {
                           printf("[LastFrameCount:%f,EndFrameCount:%f, "
                                  "CounterPerFrame : %I64d], MiliS per frame: "
                                  "%f, real FPS: %I64d \n",
@@ -1147,14 +1154,13 @@ LARGE_INTEGER PerfCountFrequencyResult;
                           std::cout<<"Center Cube Matrix is: "<<glm::to_string(basic_cube_core)<<std::endl;
                           std::cout<<"Current rotating axis is: "<<glm::to_string(randomRotateAxis)<<std::endl;
                           showMsPF = false;
-                        };
-                        }
-
+                      };
+                      LastCounter = EndCounter;
 
                     if (first_announce) {
                        first_announce = false;
                       }
-                    char Buffers[256];
+                    //char Buffers[256];
                     //sprintf(Buffers,
                             //"[LastFrameCount: %f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame,MsPerFrame, FPS);
                     //printf("[LastFrameCount:%f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame, MsPerFrame, FPS);

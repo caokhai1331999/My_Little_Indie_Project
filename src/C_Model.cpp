@@ -124,11 +124,11 @@ Mesh Model_::processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         // Texture is simple a type which recall texture from given path
         if(material != nullptr){
-            vector<Texture> diffuseMaps = loadMaterialTextures(model, material, aiTextureType_DIFFUSE, "material.texture_diffused1", scene);
+            vector<Texture> diffuseMaps = loadMaterialTextures(model, material, aiTextureType_DIFFUSE, "material.texture_diffused", scene);
             textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
             //printf("Loading diffuse texture to mesh\n");
 
-            vector<Texture> specularMaps = loadMaterialTextures(model, material, aiTextureType_SPECULAR, "material.texture_specular1", scene);
+            vector<Texture> specularMaps = loadMaterialTextures(model, material, aiTextureType_SPECULAR, "material.texture_specular", scene);
             textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());    
             //printf("Loading specular texture to mesh\n");
             //Load diffuse and specular map to texture            

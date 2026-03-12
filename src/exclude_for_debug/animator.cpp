@@ -11,10 +11,10 @@
 
 bool32 showbefore = false;
 
-void Animator::updateAnimationTime(real64 dt){
-    m_deltaTime = dt;
+void Animator::updateAnimationTime(real64* dt){
+    real64* m_deltaTime = dt;
     if(m_currentAnimation){
-        m_currentTime += m_deltaTime * m_currentAnimation->GetTicksPerSecond();
+        m_currentTime += (*m_deltaTime) * m_currentAnimation->GetTicksPerSecond();
         m_currentTime = fmod((float)m_currentTime, m_currentAnimation->GetDuration());
         //// calculate bone transform here;
         glm::mat4 parentTransform = glm::mat4(1.0f);
@@ -38,9 +38,10 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
     //FIND BONE PRODUCE NULL ptr
     Bone* bone = m_currentAnimation->FindBone(nodeName);
 
-    if(nodeName.size() > 0){
-        printf("Bone name:%s\n", nodeName.c_str());
-    }
+    //if(nodeName.size() > 0){
+        //printf("Bone name:%s\n", nodeName.c_str());
+    //}
+
     if(bone){
         bone->Update(&m_currentTime);
         nodeTransform = bone->GetLocalTransformation();
@@ -85,8 +86,6 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
               Animator::calculateBoneTransform(&node->children[i],
                                                &globalTransform);
             }
-          } else {
-              printf("reach end of children size check\n ");
           }
 };
 
@@ -98,7 +97,10 @@ void DestroyAnimatorClass(Animator *ani) {
     delete ani;
 }
 
-void updateAnimationTime_(Animator *ani, real64 dt) {
+void updateAnimationTime_(Animator *ani, real64* dt) {
   ani->updateAnimationTime(dt);
 }
 
+void PlayAni_ (Animator* ani, Animation* animation){
+    ani->playAnimation(animation);
+}
