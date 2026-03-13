@@ -42,6 +42,12 @@ public:
     };
 
     void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
+    void SetVertexBoneDataToDefault(Vertex* vertex){
+        for(int i = 0; i < MAX_BONE_WEIGHTS; i++){
+            vertex->m_BoneIDs[i] = -1;
+            vertex->m_mWeights[i] = 0.0f;
+        }
+    };
     void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
     Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene);
     std::string* GetModelDir(){return &directory;};

@@ -1076,6 +1076,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     DDraw(backpack, &brushID);
                     
 // Now Draw the vampire
+
                     animating_shader_->use();
                     animating_shader_->setMat4( "model", dancing_vampire_core);
                     animating_shader_->setMat4( "projection", Projection);
@@ -1087,12 +1088,13 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         if (Transform->size() > 1) {
                             for (int i = 0; i < Transform->size(); i++) {
                                 animating_shader_->setMat4(
-                                    "finalBoneMatrices[boneIds[" + std::to_string(i) +
-                                    "]]",
+                                    "finalBoneMatrices[" + std::to_string(i) +
+                                    "]",
                                     (*Transform)[i]);
-                                if (first_announce) {
-                                    printf("finalBoneMatrices[boneIds[ %d ]]: %s\n", (int)i, glm::to_string((*Transform)[i]).c_str());
-                                }
+                                    // what is boneIds actually;
+                                //if (first_announce) {
+                                    //printf("finalBoneMatrices[boneIds[ %d ]]: %s\n", (int)i, glm::to_string((*Transform)[i]).c_str());
+                                //}
                             };
                         }
                     }

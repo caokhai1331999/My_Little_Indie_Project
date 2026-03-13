@@ -1062,3 +1062,31 @@ maybe the difference between float and double cause memory garbage
 Cause I saw the animation time turn from legit value to garbage after passing
 
 Why After update bone for a while the bone class produce garbage data????
+
+---------------- Fri, 13 Mar 26: 10:59AM
+
+Multitude of issues emerged recently. Bone updates crash everytime I resize the
+window. Beside that,vertex shader receive empty data that
+
+Probably, window size command delay counter per frame
+
+Possible issue is that I calculate the boneTransform matrices wrongly. Or
+further than that copy the data hierarchy from model unproperly
+
+I calculated it mistakenly, only the 100th index bone matrix have the data. The
+other is NULL
+
+Basically, the index inside the finalbonematrices array is the same as the index
+store in the boneInfoMap class array
+
+first bug: BoneCount for id didn't increment(NOPE)
+        
+The offset matrices store in boneInfo array is nearly all NULL which caused
+model dissappear. The data transfer stage likely mismisfunction in on that part
+
+Actually, I never transfer the offset matrix. And turn out I didn't complete
+setting up the mesh for model
+
+The ExtractBoneWeightForVertices which should take the job but didn't take any
+data and never be called once. There are alot of things that need to be done
+here

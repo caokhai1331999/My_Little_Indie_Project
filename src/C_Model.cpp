@@ -52,8 +52,10 @@ void loadModel_(Model_* model, string path){
 // MESH
     for(unsigned int i = 0; i < model->meshes.size(); i++){
         setupMesh(&model->meshes[i]);
+        Model_::ExtractBoneWeightForVertices();
     }
 // MATERIAL Inside mesh
+
 }
 
 void processNode(Model_* model, aiNode* node, const aiScene* scene){
@@ -77,10 +79,11 @@ Mesh Model_::processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
     vector<Texture>textures;
     vector<Vertex>verticles;
 
-    Vertex vertex;
 
     for(unsigned int i = 0; i < mesh->mNumVertices; i++){
-        glm::vec3 vector;
+    Vertex vertex;
+    SetVertexBoneDataToDefault(vertex)
+    glm::vec3 vector;
 
         // Verticle is position
         //vector.x = mesh->mVertices[i].x;
@@ -420,12 +423,14 @@ void Model_::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh*
         //what exactly weights's type is
         auto weights = mesh->mBones[boneIndex]->mWeights;
         int numWeights = mesh->mBones[boneIndex]->mNumWeights;
+
         for(int weightIndex = 0; weightIndex < numWeights; weightIndex++){
             int vertexId = weights[weightIndex].mVertexId;
             float weight = weights[weightIndex].mWeight;
             assert(vertexId <= vertices.size());
             SetVertexBoneData(&vertices[vertexId], boneID, weight);
         }
+
     }
     
     // assert check whether the argument is unequal to 0 or not
