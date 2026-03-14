@@ -71,14 +71,14 @@ struct Texture{
 
 struct Mesh{
     unsigned int VBO, EBO;
-    vector<Vertex> verticles;
+    unsigned int VAO;
+    vector<Vertex> vertices;
     vector<unsigned int> indices;
     vector<Texture> textures;
-    unsigned int VAO;
     // MESH constructor
-    Mesh( vector<Vertex> verticles,
+    Mesh( vector<Vertex> vertices,
           vector<unsigned int> indices,
-          vector<Texture> textures):verticles(verticles), indices(indices), textures(textures)
+          vector<Texture> textures):vertices(vertices), indices(indices), textures(textures)
           {
           }    
 };

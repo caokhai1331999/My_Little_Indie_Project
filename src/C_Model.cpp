@@ -52,7 +52,6 @@ void loadModel_(Model_* model, string path){
 // MESH
     for(unsigned int i = 0; i < model->meshes.size(); i++){
         setupMesh(&model->meshes[i]);
-        Model_::ExtractBoneWeightForVertices();
     }
 // MATERIAL Inside mesh
 
@@ -62,7 +61,8 @@ void processNode(Model_* model, aiNode* node, const aiScene* scene){
     // process all the node'scene meshes (if any)
     for(unsigned int i = 0; i < node->mNumMeshes; i++){
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        model->meshes.push_back(model->processMesh(model, mesh, scene));
+        model->meshes.push_back(model->processMesh(mesh, scene));
+        model->ExtractBoneWeightForVertices(mesh);
     }
 
     
@@ -73,7 +73,7 @@ void processNode(Model_* model, aiNode* node, const aiScene* scene){
     }
 }
 
-Mesh Model_::processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
+Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
 
     vector<unsigned int>indices;
     vector<Texture>textures;
@@ -82,7 +82,7 @@ Mesh Model_::processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
 
     for(unsigned int i = 0; i < mesh->mNumVertices; i++){
     Vertex vertex;
-    SetVertexBoneDataToDefault(vertex)
+    SetVertexBoneDataToDefault(&vertex);
     glm::vec3 vector;
 
         // Verticle is position
@@ -127,11 +127,11 @@ Mesh Model_::processMesh(Model_* model, aiMesh* mesh, const aiScene* scene){
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         // Texture is simple a type which recall texture from given path
         if(material != nullptr){
-            vector<Texture> diffuseMaps = loadMaterialTextures(model, material, aiTextureType_DIFFUSE, "material.texture_diffused", scene);
+            vector<Texture> diffuseMaps = loadMaterialTextures(this, material, aiTextureType_DIFFUSE, "material.texture_diffused", scene);
             textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
             //printf("Loading diffuse texture to mesh\n");
 
-            vector<Texture> specularMaps = loadMaterialTextures(model, material, aiTextureType_SPECULAR, "material.texture_specular", scene);
+            vector<Texture> specularMaps = loadMaterialTextures(this, material, aiTextureType_SPECULAR, "material.texture_specular", scene);
             textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());    
             //printf("Loading specular texture to mesh\n");
             //Load diffuse and specular map to texture            
@@ -398,41 +398,38 @@ void Model_::SetVertexBoneData(Vertex* vertex, int boneID, float weight){
     }
 };
 
-void Model_::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene){
+void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh){
 
-    auto& boneInfoMap = m_BoneInfoMap;
-    int& boneCount = m_BoneCounter;
-
-    for(int boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++){
-        int boneID = -1;
-        //What is mName
-        std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
-        if(m_BoneInfoMap->find(boneName) == m_BoneInfoMap->end()){
-            Bone_Info newboneinfo ;
+    if(mesh->mNumBones > 0)
+    {    for(int boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++){
+            int boneID = -1;
+            //What is mName
+            std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+            if(m_BoneInfoMap->find(boneName) == m_BoneInfoMap->end()){
+                Bone_Info newboneinfo ;
 // On the way of learning here
-            newboneinfo.id = m_BoneCounter;
-            newboneinfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
-            (*m_BoneInfoMap)[boneName] = newboneinfo;
+                newboneinfo.id = this->m_BoneCounter;
+                newboneinfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
+                (*m_BoneInfoMap)[boneName] = newboneinfo;
 
-            boneID = m_BoneCounter;
-            boneCount++;
-        }else{
-            boneID = (*m_BoneInfoMap)[boneName].id;
+                boneID = m_BoneCounter;
+                m_BoneCounter++;
+            }else{
+                boneID = (*m_BoneInfoMap)[boneName].id;
+            }
+            assert(boneID != -1);
+            //what exactly weights's type is
+            auto weights = mesh->mBones[boneIndex]->mWeights;
+            int numWeights = mesh->mBones[boneIndex]->mNumWeights;
+
+            for(int weightIndex = 0; weightIndex < numWeights; weightIndex++){
+                int vertexId = weights[weightIndex].mVertexId;
+                float weight = weights[weightIndex].mWeight;
+                assert(vertexId <= this->meshes[this->meshes.size()-1].vertices.size());            SetVertexBoneData(&(this->meshes[this->meshes.size()-1].vertices[vertexId]), boneID, weight);
+            }
+
         }
-        assert(boneID != -1);
-        //what exactly weights's type is
-        auto weights = mesh->mBones[boneIndex]->mWeights;
-        int numWeights = mesh->mBones[boneIndex]->mNumWeights;
-
-        for(int weightIndex = 0; weightIndex < numWeights; weightIndex++){
-            int vertexId = weights[weightIndex].mVertexId;
-            float weight = weights[weightIndex].mWeight;
-            assert(vertexId <= vertices.size());
-            SetVertexBoneData(&vertices[vertexId], boneID, weight);
-        }
-
     }
-    
     // assert check whether the argument is unequal to 0 or not
     
 };

@@ -1070,39 +1070,12 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                     //Draw the backpack
                     model_shader_->use();
-                    glBindVertexArray(ScreenBuffer.glData.VAOs);
+                    //glBindVertexArray(ScreenBuffer.glData.VAOs);
                     GLuint brushID = model_shader_->GetProgramID();
                     model_shader_->setMat4("model", backpack_core);
                     DDraw(backpack, &brushID);
                     
 // Now Draw the vampire
-
-                    animating_shader_->use();
-                    animating_shader_->setMat4( "model", dancing_vampire_core);
-                    animating_shader_->setMat4( "projection", Projection);
-                    animating_shader_->setMat4( "view", BackBuffer.camera.view);
-
-                    std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
-
-                    if(first_announce){
-                        if (Transform->size() > 1) {
-                            for (int i = 0; i < Transform->size(); i++) {
-                                animating_shader_->setMat4(
-                                    "finalBoneMatrices[" + std::to_string(i) +
-                                    "]",
-                                    (*Transform)[i]);
-                                    // what is boneIds actually;
-                                //if (first_announce) {
-                                    //printf("finalBoneMatrices[boneIds[ %d ]]: %s\n", (int)i, glm::to_string((*Transform)[i]).c_str());
-                                //}
-                            };
-                        }
-                    }
-
-                    glBindVertexArray(ScreenBuffer.glData.VAOs);
-                    brushID = animating_shader_->GetProgramID();
-                    DDraw(dancing_vampire, &brushID);                    
-                    
                     Game_Input* Temp = NewInput;
                     NewInput = OldInput;  //???? still don't understand
                     OldInput = Temp;
@@ -1141,6 +1114,33 @@ LARGE_INTEGER PerfCountFrequencyResult;
                       }
 
 
+                      animating_shader_->use();
+                      animating_shader_->setMat4( "model", dancing_vampire_core);
+                      animating_shader_->setMat4( "projection", Projection);
+                      animating_shader_->setMat4( "view", BackBuffer.camera.view);
+
+                      std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
+
+                      if(first_announce){
+                          if (Transform->size() > 1) {
+                              for (int i = 0; i < Transform->size(); i++) {
+                                  animating_shader_->setMat4(
+                                      "finalBoneMatrices[" + std::to_string(i) +
+                                      "]",
+                                      (*Transform)[i]);
+                                  // what is boneIds actually;
+                                  if (first_announce) {
+                                      printf("finalBoneMatrices[boneIds[ %d ]]: %s\n", (int)i, glm::to_string((*Transform)[i]).c_str());
+                                  }
+                              };
+                          }
+                      }
+
+                      brushID = animating_shader_->GetProgramID();
+                      DDraw(dancing_vampire, &brushID);                    
+                    
+
+                      
                       if (showMsPF) {
                           printf("[LastFrameCount:%f,EndFrameCount:%f, "
                                  "CounterPerFrame : %I64d], MiliS per frame: "

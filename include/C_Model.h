@@ -43,13 +43,13 @@ public:
 
     void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
     void SetVertexBoneDataToDefault(Vertex* vertex){
-        for(int i = 0; i < MAX_BONE_WEIGHTS; i++){
+        for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
             vertex->m_BoneIDs[i] = -1;
-            vertex->m_mWeights[i] = 0.0f;
+            vertex->m_Weights[i] = 0.0f;
         }
     };
-    void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
-    Mesh processMesh(Model_* model, aiMesh* mesh, const aiScene* scene);
+    void ExtractBoneWeightForVertices(const aiMesh* mesh);
+    Mesh processMesh(const aiMesh* mesh, const aiScene* scene);
     std::string* GetModelDir(){return &directory;};
 // About skeletal animation
     std::unordered_map<std::string, Bone_Info>*GetBoneInfoMap(){return m_BoneInfoMap;};
@@ -61,6 +61,7 @@ unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bo
 void loadModel_(Model_*model, string path);
 void processNode(Model_* model, aiNode* node, const aiScene* scene);
 vector <Texture>loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene);
+
 void SetVertexBoneDataToDefault(Vertex* vertex);
 
 void Draw(Mesh* mesh = nullptr, GLuint* programID = nullptr);

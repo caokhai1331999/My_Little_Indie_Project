@@ -16,7 +16,7 @@ void setupMesh(Mesh* mesh){
         glBindVertexArray(mesh->VAO);
         // Load data into vertex buffer
         glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
-        glBufferData(GL_ARRAY_BUFFER, mesh->verticles.size()*sizeof(Vertex), &mesh->verticles[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size()*sizeof(Vertex), &mesh->vertices[0], GL_STATIC_DRAW);
         // Good thing about struct is that their memory is sequential for all its time
         // The effect is that we symply pass a pointer to the struct and it traslate into a glm::vec3
         // again translate to 3/2 float which translate into a byte array 

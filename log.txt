@@ -1090,3 +1090,13 @@ setting up the mesh for model
 The ExtractBoneWeightForVertices which should take the job but didn't take any
 data and never be called once. There are alot of things that need to be done
 here
+
+---------------- Sat, 14 Mar 26: 02:55PM
+
+The update bone matrices did produce seemed okay looking result for me. Now time
+to make the shader read it
+
+---------------- Sat, 14 Mar 26: 03:06PM
+
+How can I know which boneMatrix inside the array matched the one in the boneinfo
+(one with the id)
