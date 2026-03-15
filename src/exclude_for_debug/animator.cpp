@@ -64,6 +64,7 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
     // WORKING====
     // BUG HERE =================================================
     if((*boneInfoMap).find(nodeName) != (*boneInfoMap).end()){
+        //The boneId represent the index of boneInfo in map
         int index = (*boneInfoMap)[nodeName].id;
         glm::mat4 offset = (*boneInfoMap)[nodeName].offset;
         finalBoneMatrices[index] = globalTransform * offset;

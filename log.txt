@@ -1100,3 +1100,8 @@ to make the shader read it
 
 How can I know which boneMatrix inside the array matched the one in the boneinfo
 (one with the id)
+
+---------------- Sun, 15 Mar 26: 11:34AM
+
+What I can do today to trackout where thing went wrong
+Find out the boneIDs means

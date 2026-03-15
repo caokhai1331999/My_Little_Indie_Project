@@ -1074,7 +1074,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     GLuint brushID = model_shader_->GetProgramID();
                     model_shader_->setMat4("model", backpack_core);
                     DDraw(backpack, &brushID);
-                    
+                    DDraw(dancing_vampire, &brushID);                    
 // Now Draw the vampire
                     Game_Input* Temp = NewInput;
                     NewInput = OldInput;  //???? still don't understand
@@ -1115,22 +1115,25 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
 
                       animating_shader_->use();
+
                       animating_shader_->setMat4( "model", dancing_vampire_core);
                       animating_shader_->setMat4( "projection", Projection);
                       animating_shader_->setMat4( "view", BackBuffer.camera.view);
 
+                      std::unordered_map<std::string, Bone_Info>* boneMapClone = danceAnimation->GetBoneIDMap();
                       std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
 
                       if(first_announce){
-                          if (Transform->size() > 1) {
-                              for (int i = 0; i < Transform->size(); i++) {
+                          if (boneMapClone->size() > 1) {
+                              for(const std::pair<std::string, Bone_Info>&bone : (*boneMapClone))
+                              {
                                   animating_shader_->setMat4(
-                                      "finalBoneMatrices[" + std::to_string(i) +
-                                      "]",
-                                      (*Transform)[i]);
+                                      "finalBoneMatrices[boneIds[" + std::to_string(bone.second.id) +
+                                      "]]",
+                                      (*Transform)[bone.second.id]);
                                   // what is boneIds actually;
                                   if (first_announce) {
-                                      printf("finalBoneMatrices[boneIds[ %d ]]: %s\n", (int)i, glm::to_string((*Transform)[i]).c_str());
+                                      printf("finalBoneMatrices[boneIds[%d]]: %s\n", (int)bone.second.id, glm::to_string((*Transform)[bone.second.id]).c_str());
                                   }
                               };
                           }
