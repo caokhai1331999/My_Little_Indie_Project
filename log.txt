@@ -1104,4 +1104,12 @@ How can I know which boneMatrix inside the array matched the one in the boneinfo
 ---------------- Sun, 15 Mar 26: 11:34AM
 
 What I can do today to trackout where thing went wrong
-Find out the boneIDs means
+Find out the boneIDs means (DONE! find out but the issue still insist)
+
+---------------- Mon, 16 Mar 26: 10:28AM
+
+inspect more carefully in the 2.skeleton.vs code
+
+NOTE: what we just know, the fragment shader blend the color of 3 vertices after
+execute all of three vertex shader
+but how we linearly increase these color

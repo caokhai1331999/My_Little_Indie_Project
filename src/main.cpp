@@ -432,6 +432,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
   float TimeCounter = 0.0f;
   float WaitTimeCounter = 0.0f;
+  float ColorOffset = 0.0f;
 
   uint64 TicksPerFrame = 0;
   int64 TicksPerMicroS = 0;
@@ -959,6 +960,10 @@ LARGE_INTEGER PerfCountFrequencyResult;
                      DelayedRatio =
                          (real64)(MsPerFrame/StandardMSperFrame);
                         DelayedRatio>0.0f?BackBuffer.camera.speed = (2.5f * DelayedRatio):BackBuffer.camera.speed = (2.5f  * 0.17f);                
+                        ColorOffset += (float)0.1*DelayedRatio;
+                        if(ColorOffset > 1.0f){
+                            ColorOffset -= 1.0f;  
+                        };
                         //RatioCalculated = false;
                     //}
 
@@ -1055,7 +1060,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //why it only show half the plane
                     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-                    basic_shader_->use();
+                    basic_shader_->setFloat("colorOffset", ColorOffset);
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
                     basic_shader_->setMat4("model", basic_cube_core);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -1115,7 +1120,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
 
                       animating_shader_->use();
-
                       animating_shader_->setMat4( "model", dancing_vampire_core);
                       animating_shader_->setMat4( "projection", Projection);
                       animating_shader_->setMat4( "view", BackBuffer.camera.view);
@@ -1154,6 +1158,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                           printf("Delay Ratio: %f, msPerframe: %f, SPF: %f\n",
                                  DelayedRatio, MsPerFrame, updateTime);
                           printf("WaitTimeCounter: %f, Axis changing counter: %f\n", WaitTimeCounter, ChangeAxisCounter);
+                          printf("ColorOffset is:%f\n", ColorOffset);
 
                           printf("updated angle :%f\n", UpdatedAngle);
                           std::cout<<"Center Cube Matrix is: "<<glm::to_string(basic_cube_core)<<std::endl;

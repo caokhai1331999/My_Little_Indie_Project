@@ -3,11 +3,14 @@
 layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec2 aTextCoord;
+//color per vetex (one point)
 layout(location = 3) in vec3 VertexColor;
 
 out vec2 TextCoord;
 out vec4 FragColorr;
 out vec3 ModelPos;
+
+uniform vec3 insertColor;
 
 uniform mat4 view;
 uniform mat4 model;

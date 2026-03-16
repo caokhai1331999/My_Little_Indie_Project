@@ -1,4 +1,4 @@
-/* ========================================================================
+  /* ========================================================================
    $File: $
    $Date: $
    $Revision: $
@@ -71,6 +71,7 @@ void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Heigh
 }
 
 //void RenderSplendidGradient(Win32_Front_Buffer* OBuffer, imagee_content* BMPContent, int XOffset, int YOffset) {
+
 void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* BMPContent, int XOffset, int YOffset, int ByteCount) {
     // RR GG BB
     // Row is a pointer to every line of bitmapMemory
@@ -121,28 +122,28 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
         DirectRow = ((uint8 *)FBuffer->BitmapMemoryForDirectBlit);
     }
     //Change the image row order upside down
-    uint8* imageRow = (uint8*)BMPContent->ImageContent;
-    uint8* imageRowForDirectBlit = (uint8*)BMPContent->ImageContent;
-// ???? What todo if the image is bigger than the 
-    imageRowForDirectBlit += 4*((BlitHeight - 1) * BlitWidth);
+    //uint8* imageRow = (uint8*)BMPContent->ImageContent;
+    //uint8* imageRowForDirectBlit = (uint8*)BMPContent->ImageContent;
+//// ???? What todo if the image is bigger than the 
+    //imageRowForDirectBlit += 4*((BlitHeight - 1) * BlitWidth);
 
-    for (int32 Y{0}; Y < Height; Y++) {
-        uint32* DirectPixel = (uint32 *)DirectRow;        
-        if(Y == BlitHeight){
-            imageRowForDirectBlit += 4*((BlitHeight - 1) * BlitWidth);            
-        }
-        uint32* imagePixelForDirect = (uint32* )imageRowForDirectBlit;
+    //for (int32 Y{0}; Y < Height; Y++) {
+        //uint32* DirectPixel = (uint32 *)DirectRow;        
+        //if(Y == BlitHeight){
+            //imageRowForDirectBlit += 4*((BlitHeight - 1) * BlitWidth);            
+        //}
+        //uint32* imagePixelForDirect = (uint32* )imageRowForDirectBlit;
 
-        for(int32 X{0}; X < Width; X++) {
+        //for(int32 X{0}; X < Width; X++) {
 
 //NOTE: For Gradient version
-    //for (int Y = 0; Y < OBuffer->BitmapHeight; Y++) {
-        //uint32* Pixel = (uint32 *)Row;
-        //uint32* imagePixel = (uint32* )imageRow;
-        //for(int X = 0; X < OBuffer->BitmapWidth; X++) {
+    for (int Y = 0; Y < OBuffer->BitmapHeight; Y++) {
+        uint32* Pixel = (uint32 *)Row;
+        uint32* imagePixel = (uint32* )imageRow;
+        for(int X = 0; X < OBuffer->BitmapWidth; X++) {
 
-            //uint8 Blue = ( X + XOffset);
-            //uint8 Green = ( Y + YOffset);
+            uint8 Blue = ( X + XOffset);
+            uint8 Green = ( Y + YOffset);
 
             //NOTE: AA RR GG BB()
             // Because I limit the size of Pixels so it can not add Green color to its storage
@@ -160,7 +161,7 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
         // Instead of manually move row pointer every y axis (by add it to the pitch)
         // we just need to reuse the Pixel pointer pass it to row where it was already moved
         // And this is for passing directly to the window (RIGHT)
-        imageRowForDirectBlit-=ImagePitch;
+        //imageRowForDirectBlit-=ImagePitch;
 // For direct blit
         if(OBuffer != NULL){
             DirectRow+=OBuffer->Pitch;
@@ -170,24 +171,24 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
         //NOTE: This incidentally produce right pixel order
     }
 
-    if(!OBuffer->GLImageRendered){    
-    for (int32 Y{0}; Y < Height; Y++) {
-        uint32* Pixel = (uint32 *)Row;
-        uint32* imagePixel = (uint32* )imageRow;
-        for(int32 X{0}; X < Width; X++) {
-            *Pixel++ = *imagePixel++;
-        }
-        // NOTE: This order is for passing to OpenGL
-        imageRow+=ImagePitch;
+    //if(!OBuffer->GLImageRendered){    
+    //for (int32 Y{0}; Y < Height; Y++) {
+        //uint32* Pixel = (uint32 *)Row;
+        //uint32* imagePixel = (uint32* )imageRow;
+        //for(int32 X{0}; X < Width; X++) {
+            //*Pixel++ = *imagePixel++;
+        //}
+        //// NOTE: This order is for passing to OpenGL
+        //imageRow+=ImagePitch;
 //For GL
-        if(OBuffer != NULL){
-            Row+=OBuffer->Pitch;
-        } else {
-            Row+=FBuffer->Pitch;            
-        }
-        //NOTE: This incidentally produce right pixel order
-        OBuffer->GLImageRendered = true;
-    }
+        //if(OBuffer != NULL){
+            //Row+=OBuffer->Pitch;
+        //} else {
+            //Row+=FBuffer->Pitch;            
+        //}
+        ////NOTE: This incidentally produce right pixel order
+        //OBuffer->GLImageRendered = true;
+    //}
     }
 
 }
