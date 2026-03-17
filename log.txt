@@ -1113,3 +1113,10 @@ inspect more carefully in the 2.skeleton.vs code
 NOTE: what we just know, the fragment shader blend the color of 3 vertices after
 execute all of three vertex shader
 but how we linearly increase these color
+
+---------------- Tue, 17 Mar 26: 10:07AM
+
+Just found out while per point the vertex shader execute 3 times, the fragment
+one execute multitude/myriad times
+
+the mesh data's vertices is legit not garbage I have to say

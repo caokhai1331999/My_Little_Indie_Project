@@ -21,7 +21,7 @@ uniform mat4 finalBoneMatrices[MAX_BONES];
 out vec3 Normal;
 out vec3 FragPos;
 out vec2 TexCoords;
-
+//vertex shader run every vertex
 void main()
 {
 //aPos is the vertex position so the Fragment position is

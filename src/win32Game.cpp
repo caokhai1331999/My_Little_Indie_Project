@@ -139,7 +139,7 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
 //NOTE: For Gradient version
     for (int Y = 0; Y < OBuffer->BitmapHeight; Y++) {
         uint32* Pixel = (uint32 *)Row;
-        uint32* imagePixel = (uint32* )imageRow;
+        //uint32* imagePixel = (uint32* )imageRow;
         for(int X = 0; X < OBuffer->BitmapWidth; X++) {
 
             uint8 Blue = ( X + XOffset);
@@ -147,16 +147,16 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
 
             //NOTE: AA RR GG BB()
             // Because I limit the size of Pixels so it can not add Green color to its storage
-            //*Pixel++ = (Green << 8|Blue);
+            *Pixel++ = (Green << 8|Blue);
             // NOTE: How to turn pixels order from bottom up to top down
             // Pixel :
             // ImagePointer :
             // Why Pixel appear in uint8 not uint32
-            if(X >= BlitWidth){
-                *DirectPixel++ = 0xffffffff;
-            } else {
-                *DirectPixel++ = *imagePixelForDirect++;
-            }
+            //if(X >= BlitWidth){
+                //*DirectPixel++ = 0xffffffff;
+            //} else {
+                //*DirectPixel++ = *imagePixelForDirect++;
+            //}
         }
         // Instead of manually move row pointer every y axis (by add it to the pitch)
         // we just need to reuse the Pixel pointer pass it to row where it was already moved
@@ -189,7 +189,7 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
         ////NOTE: This incidentally produce right pixel order
         //OBuffer->GLImageRendered = true;
     //}
-    }
+    //}
 
 }
 
