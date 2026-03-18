@@ -1120,3 +1120,10 @@ Just found out while per point the vertex shader execute 3 times, the fragment
 one execute multitude/myriad times
 
 the mesh data's vertices is legit not garbage I have to say
+
+---------------- Wed, 18 Mar 26: 12:03PM
+
+question is how to know which matched boneIDs to call per vetex shader call
+Seemed like we don't need to worry about these. Boneid different per vertex
+NOTE: just found out the boneIds all is the -1
+which show that right in the read model stage, the data is wrong

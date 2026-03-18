@@ -2,11 +2,11 @@
 set path="W:\misc";%path%
 
 cd misc
-@echo settings          
-@echo ()     ()         
-@echo  (- 3 -)          
-@echo  (@) (@)          
-@echo (@)   (@)
+@echo  Please wait for some settings          
+@echo ()     ()    
+@echo  (- 3 -)     
+@echo  (@) (@)     
+@echo (@)   (@)    
 
 sh.exe shell.sh
 

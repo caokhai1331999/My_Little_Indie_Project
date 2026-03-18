@@ -1079,7 +1079,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     GLuint brushID = model_shader_->GetProgramID();
                     model_shader_->setMat4("model", backpack_core);
                     DDraw(backpack, &brushID);
-                    DDraw(dancing_vampire, &brushID);                    
+                    //DDraw(dancing_vampire, &brushID);                    
 // Now Draw the vampire
                     Game_Input* Temp = NewInput;
                     NewInput = OldInput;  //???? still don't understand
@@ -1127,21 +1127,31 @@ LARGE_INTEGER PerfCountFrequencyResult;
                       std::unordered_map<std::string, Bone_Info>* boneMapClone = danceAnimation->GetBoneIDMap();
                       std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
 
-                      if(first_announce){
+                      //if(first_announce){
+                      int i = 0;
                           if (boneMapClone->size() > 1) {
-                              for(const std::pair<std::string, Bone_Info>&bone : (*boneMapClone))
-                              {
-                                  animating_shader_->setMat4(
-                                      "finalBoneMatrices[boneIds[" + std::to_string(bone.second.id) +
-                                      "]]",
-                                      (*Transform)[bone.second.id]);
+                              //for(const std::pair<std::string, Bone_Info>&bone : (*boneMapClone))
+                              //{
+                                  //animating_shader_->setMat4(
+                                      //"finalBoneMatrices[boneIds[" + std::to_string(bone.second.id) +
+                                      //"]]",
+                                      //(*Transform)[bone.second.id]);
                                   // what is boneIds actually;
+                                  //if (first_announce) {
+                                      //printf("finalBoneMatrices[boneIds[%d]]: %s\n", (int)bone.second.id, glm::to_string((*Transform)[bone.second.id]).c_str());
+                                  //}
+                              //};
+                              for(const glm::mat4&matrix_ : (*Transform)){
+                                  animating_shader_->setMat4(
+                                      "finalBoneMatrices[" + std::to_string(i) +
+                                      "]", matrix_);
+                                  i++;
                                   if (first_announce) {
-                                      printf("finalBoneMatrices[boneIds[%d]]: %s\n", (int)bone.second.id, glm::to_string((*Transform)[bone.second.id]).c_str());
-                                  }
+                                  printf("Bone Matrix index %d is: %s\n", (int)i, glm::to_string(matrix_).c_str());
+                                  };
                               };
                           }
-                      }
+                      //}
 
                       brushID = animating_shader_->GetProgramID();
                       DDraw(dancing_vampire, &brushID);                    

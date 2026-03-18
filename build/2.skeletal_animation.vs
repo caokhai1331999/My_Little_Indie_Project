@@ -91,14 +91,14 @@ void main()
 	 Normal += mat3(finalBoneMatrices[boneids[3]]) * norm;
 
      // local postion, total position, weights,
-     // vec4 modelPos_after= boneTransform * vec4(-pos, 1.0f);
+     vec4 modelPos_after= boneTransform * vec4(-pos, 1.0f);
 
      //mat4 view_after = model * modelPos_after;
      //gl_Position = World_after_transform * viewModel;
 
      //2nd method
      // gl_Position = projection * view * model * modelPos_after;
-	gl_Position = projection * view * model * vec4(-pos, 1.0f);
+	gl_Position = projection * view * model * vec4(pos, 1.0f);
 	//   /window2d space//clip space//world space//local space/
 	TexCoords = tex;
      	// FragPos = vec3(model *vec4(pos, 1.0f));
