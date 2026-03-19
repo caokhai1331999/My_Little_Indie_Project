@@ -25,6 +25,7 @@
 #endif
 
 //#include <GLFW/glfw3.h>
+#include <unordered_map>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -34,6 +35,7 @@
 #include <assimp/postprocess.h>
 
 //#include "camera.h"
+#include "assimp_glm_helpers.h"
 #include "B_shader.h"
 
 
@@ -82,6 +84,15 @@ struct Mesh{
           {
           }    
 };
+
+void SetVertexBoneDataToDefault(Vertex* vertex){
+    for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
+        vertex->m_BoneIDs[i] = -1;
+        vertex->m_Weights[i] = 0.0f;
+    }
+};
+void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
+void ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex>&vertices);
 
 void setupMesh(Mesh* mesh = nullptr);
 

@@ -9,13 +9,10 @@
 
 #define C_MODEL_H
 
-#include <unordered_map>
-
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "assimp_glm_helpers.h"
 #include "C_Mesh.h"
 
 static bool first_diffuse_time = true;
@@ -41,14 +38,7 @@ public:
       m_BoneInfoMap = new std::unordered_map<std::string, Bone_Info>;
     };
 
-    void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
-    void SetVertexBoneDataToDefault(Vertex* vertex){
-        for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
-            vertex->m_BoneIDs[i] = -1;
-            vertex->m_Weights[i] = 0.0f;
-        }
-    };
-    void ExtractBoneWeightForVertices(const aiMesh* mesh);
+
     Mesh processMesh(const aiMesh* mesh, const aiScene* scene);
     std::string* GetModelDir(){return &directory;};
 // About skeletal animation
@@ -62,7 +52,6 @@ void loadModel_(Model_*model, string path);
 void processNode(Model_* model, aiNode* node, const aiScene* scene);
 vector <Texture>loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene);
 
-void SetVertexBoneDataToDefault(Vertex* vertex);
 
 void Draw(Mesh* mesh = nullptr, GLuint* programID = nullptr);
 void DDraw(Model_* model = nullptr, GLuint* programID = nullptr);

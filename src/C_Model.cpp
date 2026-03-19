@@ -62,7 +62,6 @@ void processNode(Model_* model, aiNode* node, const aiScene* scene){
     for(unsigned int i = 0; i < node->mNumMeshes; i++){
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         model->meshes.push_back(model->processMesh(mesh, scene));
-        model->ExtractBoneWeightForVertices(mesh);
     }
 
     
@@ -77,7 +76,7 @@ Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
 
     vector<unsigned int>indices;
     vector<Texture>textures;
-    vector<Vertex>verticles;
+    vector<Vertex>vertices;
 
 
     for(unsigned int i = 0; i < mesh->mNumVertices; i++){
@@ -108,7 +107,7 @@ Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
         } else {
             vertex.TexCoords = glm::vec2(0.0f, 0.0f);
         }
-        verticles.push_back(vertex);
+        vertices.push_back(vertex);
         // Process VERTEX Position, Normal, Texure Coordinates
     }
 
@@ -141,8 +140,8 @@ Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
     //} else {
         //printf("Somehow mesh have no material that means no texture; index: %d\n", mesh->mMaterialIndex);
     //}
-
-        return Mesh(verticles, indices, textures);
+        ExtractBoneWeightForVertices(mesh, vertices);
+        return Mesh(vertices, indices, textures);
 }
 
 vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene){
@@ -376,61 +375,3 @@ unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bo
     
     return textureID;
 }
-
-void SetVertexBoneDataToDefault(Vertex* vertex){
-    for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
-        //NOTE: still don't understand about this ...
-        vertex->m_BoneIDs[i] = -1;
-        vertex->m_Weights[i] = 0.0f;
-    }
-};
-
-
-
-// Bone processing step for skeletal animation
-void Model_::SetVertexBoneData(Vertex* vertex, int boneID, float weight){
-    for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
-        if(vertex->m_BoneIDs[i] > 0){
-            vertex->m_BoneIDs[i] = boneID;
-            vertex->m_Weights[i] = weight;
-            break;
-        }
-    }
-};
-
-void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh){
-
-    if(mesh->mNumBones > 0)
-    {    for(int boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++){
-            int boneID = -1;
-            //What is mName
-            std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
-            if(m_BoneInfoMap->find(boneName) == m_BoneInfoMap->end()){
-                Bone_Info newboneinfo ;
-// On the way of learning here
-                newboneinfo.id = this->m_BoneCounter;
-                newboneinfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
-                (*m_BoneInfoMap)[boneName] = newboneinfo;
-
-                boneID = m_BoneCounter;
-                m_BoneCounter++;
-            }else{
-                boneID = (*m_BoneInfoMap)[boneName].id;
-            }
-            assert(boneID != -1);
-            //what exactly weights's type is
-            auto weights = mesh->mBones[boneIndex]->mWeights;
-            int numWeights = mesh->mBones[boneIndex]->mNumWeights;
-
-            for(int weightIndex = 0; weightIndex < numWeights; weightIndex++){
-                int vertexId = weights[weightIndex].mVertexId;
-                float weight = weights[weightIndex].mWeight;
-                assert(vertexId <= this->meshes[this->meshes.size()-1].vertices.size());            SetVertexBoneData(&(this->meshes[this->meshes.size()-1].vertices[vertexId]), boneID, weight);
-            }
-
-        }
-    }
-    // assert check whether the argument is unequal to 0 or not
-    
-};
-

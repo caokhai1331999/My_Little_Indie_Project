@@ -1127,3 +1127,9 @@ question is how to know which matched boneIDs to call per vetex shader call
 Seemed like we don't need to worry about these. Boneid different per vertex
 NOTE: just found out the boneIds all is the -1
 which show that right in the read model stage, the data is wrong
+
+---------------- Thu, 19 Mar 26: 02:27PM
+
+Actually I didn't transfer mboneIDs to right place(4 per vertex)
+It has to be inside the bone.mesh member
+NOTE: It's time to adjust the extractBoneWeights func

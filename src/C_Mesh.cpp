@@ -7,6 +7,63 @@
    ======================================================================== */
 #include "C_Mesh.h"
 
+// Bone processing step for skeletal animation
+void SetVertexBoneData(Vertex* vertex, int boneID, float weight){
+    for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
+        if(vertex->m_BoneIDs[i] > 0){
+            vertex->m_BoneIDs[i] = boneID;
+            vertex->m_Weights[i] = weight;
+            break;
+        }
+    }
+};
+
+
+
+void ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex>&vertices){
+
+    std::unordered_map<std::string, Bone_Info>* m_BoneInfoMap;
+    m_BoneInfoMap->reserve(100);
+
+    int* m_BoneCounter;
+    *m_BoneCounter = 0;
+    
+    if(mesh->mNumBones > 0)
+    {    for(int boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++){
+            int boneID = -1;
+            //What is mName
+            std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+            if(m_BoneInfoMap->find(boneName) == m_BoneInfoMap->end()){
+                Bone_Info newboneinfo ;
+// On the way of learning here
+                newboneinfo.id = (*m_BoneCounter);
+                newboneinfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
+                (*m_BoneInfoMap)[boneName] = newboneinfo;
+
+                boneID = (*m_BoneCounter);
+                (*m_BoneCounter)++;
+            }else{
+                boneID = (*m_BoneInfoMap)[boneName].id;
+            }
+            assert(boneID != -1);
+            //what exactly weights's type is
+            auto weights = mesh->mBones[boneIndex]->mWeights;
+            int numWeights = mesh->mBones[boneIndex]->mNumWeights;
+
+            for(int weightIndex = 0; weightIndex < numWeights; weightIndex++){
+                int vertexId = weights[weightIndex].mVertexId;
+                float weight = weights[weightIndex].mWeight;
+                assert(vertexId <= vertices.size());
+                SetVertexBoneData(&vertices[vertexId], boneID, weight);
+            }
+
+        }
+    }
+    // assert check whether the argument is unequal to 0 or not
+    
+};
+
+
 void setupMesh(Mesh* mesh){
 
         glGenVertexArrays(1, &mesh->VAO);
