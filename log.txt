@@ -1133,3 +1133,12 @@ which show that right in the read model stage, the data is wrong
 Actually I didn't transfer mboneIDs to right place(4 per vertex)
 It has to be inside the bone.mesh member
 NOTE: It's time to adjust the extractBoneWeights func
+
+---------------- Fri, 20 Mar 26: 10:00AM
+
+by some mysterial mistake the model came out with one mesh. It must be the issue
+Why the mNumMeshes of every scene node is NULL???
+
+Is this because of the assimp::readfile mistake or there is something I don't
+know about loaded files. Because after I used the SplitLargeMeshes. The mMeshes
+vector type's data turn from NULL to garbage data. Such an interesting issue

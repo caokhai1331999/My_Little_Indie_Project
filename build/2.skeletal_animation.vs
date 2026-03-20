@@ -91,7 +91,7 @@ void main()
 	 // Normal += mat3(finalBoneMatrices[boneids[3]]) * norm;
 
      // local postion, total position, weights,
-     vec4 modelPos_after= boneTransform * vec4(-pos, 1.0f);
+     vec4 modelPos_after= totalPosition * vec4(-pos, 1.0f);
 
      //mat4 view_after = model * modelPos_after;
      //gl_Position = World_after_transform * viewModel;

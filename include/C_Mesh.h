@@ -91,9 +91,8 @@ void SetVertexBoneDataToDefault(Vertex* vertex){
         vertex->m_Weights[i] = 0.0f;
     }
 };
-void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
-void ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex>&vertices);
 
+void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
 void setupMesh(Mesh* mesh = nullptr);
 
 #endif

@@ -25,7 +25,10 @@ void loadModel_(Model_* model, string path){
     aiProcess_CalcTangentSpace       |
     aiProcess_Triangulate            |
     aiProcess_JoinIdenticalVertices  |
-    aiProcess_SortByPType);    
+    aiProcess_SortByPType|
+    aiProcess_FindInvalidData|
+    aiProcess_FindInstances|
+    aiProcess_OptimizeMeshes);    
     //texture_file.C_str()="C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
 
     //const char* path_= "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
@@ -140,7 +143,7 @@ Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
     //} else {
         //printf("Somehow mesh have no material that means no texture; index: %d\n", mesh->mMaterialIndex);
     //}
-        ExtractBoneWeightForVertices(mesh, vertices);
+        Model_::ExtractBoneWeightForVertices(mesh, vertices);
         return Mesh(vertices, indices, textures);
 }
 
@@ -228,6 +231,50 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
     //}
     return textures;        
 }
+
+
+void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex>&vertices){
+
+    std::unordered_map<std::string, Bone_Info>* mBoneInfoMap = this->m_BoneInfoMap;
+    int* m_BoneCounter = new int(0);
+    
+    if(mesh->mNumBones > 0)
+    {    for(int boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++){
+            int boneID = -1;
+            //What is mName
+            std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+//If no elements was found!!!
+            if(mBoneInfoMap->find(boneName) == mBoneInfoMap->end()){
+                Bone_Info newboneinfo ;
+// On the way of learning here
+                newboneinfo.id = (*m_BoneCounter);
+                newboneinfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
+                (*mBoneInfoMap)[boneName] = newboneinfo;
+
+                boneID = (*m_BoneCounter);
+                (*m_BoneCounter)++;
+            }else{
+                boneID = (*mBoneInfoMap)[boneName].id;
+            }
+            assert(boneID != -1);
+            //what exactly weights's type is
+            auto weights = mesh->mBones[boneIndex]->mWeights;
+            int numWeights = mesh->mBones[boneIndex]->mNumWeights;
+
+            for(int weightIndex = 0; weightIndex < numWeights; weightIndex++){
+                int vertexId = weights[weightIndex].mVertexId;
+                float weight = weights[weightIndex].mWeight;
+                assert(vertexId <= vertices.size());
+                SetVertexBoneData(&vertices[vertexId], boneID, weight);
+            }
+
+        }
+    }
+    // assert check whether the argument is unequal to 0 or not
+    
+};
+
+
 
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma){
   std::string filename = string(path);

@@ -38,6 +38,7 @@ public:
       m_BoneInfoMap = new std::unordered_map<std::string, Bone_Info>;
     };
 
+    void ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex>&vertices);
 
     Mesh processMesh(const aiMesh* mesh, const aiScene* scene);
     std::string* GetModelDir(){return &directory;};
