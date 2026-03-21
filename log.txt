@@ -1142,3 +1142,15 @@ Why the mNumMeshes of every scene node is NULL???
 Is this because of the assimp::readfile mistake or there is something I don't
 know about loaded files. Because after I used the SplitLargeMeshes. The mMeshes
 vector type's data turn from NULL to garbage data. Such an interesting issue
+
+---------------- Sat, 21 Mar 26: 03:17PM
+
+NOTE: Even when I saw display of the hierarchy structure of the dae file, it
+still get me so confused. why there is no meshes at all
+
+there are only one mesh by default after loading vampire.dae file, but instead
+in that mesh we have alot of faces
+structure : 1 mesh contain multitude of faces and vertices in model
+
+NOTE: Actually, unlike vertices vector, the indices of that big mesh got zero 
+Next: delve into the mesh draw function, try to fill what we lack
