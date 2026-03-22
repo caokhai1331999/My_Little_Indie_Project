@@ -1154,3 +1154,7 @@ structure : 1 mesh contain multitude of faces and vertices in model
 
 NOTE: Actually, unlike vertices vector, the indices of that big mesh got zero 
 Next: delve into the mesh draw function, try to fill what we lack
+
+---------------- Sun, 22 Mar 26: 02:56PM
+
+how to check whether the matched boneids and weitghts will be call every vertex

@@ -1154,9 +1154,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                       //}
 
                       brushID = animating_shader_->GetProgramID();
-                      DDraw(dancing_vampire, &brushID);                    
-                    
-
+                      DDraw(dancing_vampire, &brushID);
                       
                       if (showMsPF) {
                           printf("[LastFrameCount:%f,EndFrameCount:%f, "
