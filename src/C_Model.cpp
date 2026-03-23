@@ -289,7 +289,6 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
     unsigned int textureID;
     glGenTextures(1, &textureID);
     printf("texture file path: %s\n", filename.c_str());
-    printf("Texture ID: %d\n", textureID);
     int width, height, nrComponents;
 
     //stbi_set_flip_vertically_on_load(true);
@@ -309,6 +308,8 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
             else if (nrComponents == 4)
                 format = GL_RGBA;
 
+            glActiveTexture(GL_TEXTURE0+textureID);
+            printf("Texture ID: %d\n", textureID);
             glBindTexture(GL_TEXTURE_2D, textureID);
             glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 

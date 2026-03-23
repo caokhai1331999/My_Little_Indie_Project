@@ -1171,3 +1171,7 @@ Just figure out something. The var set for boneData static location seem wrong
 
 NOTE: I misscalled the backpack texture id instead of 2nd model's one to draw
 vampire model
+
+don't know why when the number = diffuseNr++ (diffuseNr is 0) is equal to 0
+
+maybe the vampire diffuse loaded wrongly

@@ -77,30 +77,35 @@ void Draw(Mesh* mesh, GLuint* progID, bool32 vampire_){
     
         unsigned int textureID  = vampire_?3:1;
 
-        unsigned int diffuseNr  = 0;
-        unsigned int specularNr = 0;
-        unsigned int normalNr   = 0;
-        unsigned int heightNr   = 0;
+        unsigned int diffuseNr  = 1;
+        unsigned int specularNr = 1;
+        unsigned int normalNr   = 1;
+        unsigned int heightNr   = 1;
 
         for(unsigned int i = 0; i < mesh->textures.size(); i++)
         {
-            glActiveTexture(GL_TEXTURE0 + mesh->textures[i].id); // active proper texture unit before binding
+            glActiveTexture(GL_TEXTURE0+mesh->textures[i].id);    
             // retrieve texture number (the N in diffuse_textureN)
-            string number;
-            string name = mesh->textures[i].type;
-            if(name == "material.texture_diffused")
-                number = to_string(diffuseNr++);
-            else if(name == "material.texture_specular")
-                number = to_string(specularNr++); // transfer unsigned int to string
-            else if(name == "material.texture_normal")
-                number = to_string(normalNr++); // transfer unsigned int to string
-            else if(name == "material.texture_height")
-                number = to_string(heightNr++); // transfer unsigned int to string
+            unsigned int number;
+            std::string name = mesh->textures[i].type;
+            if(strcmp(name.c_str(),"material.texture_diffused") == 0){
+                number = diffuseNr++;
+            }else if(strcmp(name.c_str(),"material.texture_specular")==0){
+                
+                number = specularNr++; // transfer unsigned int to string
+            }else if(strcmp(name.c_str(),"material.texture_normal")==0){
+                
+                number = normalNr++; // transfer unsigned int to string
+            } else if(strcmp(name.c_str(),"material.texture_height")==0){
+                
+                number = heightNr++; // transfer unsigned int to string
+            }
 
             // now set the sampler to the correct texture unit
             // and finally bind the texture
             glBindTexture(GL_TEXTURE_2D, mesh->textures[i].id);
-            glUniform1i(glGetUniformLocation(*progID, (name + number).c_str()), mesh->textures[i].id);
+            glUniform1i(glGetUniformLocation(*progID, (name+std::to_string(number)).c_str()), mesh->textures[i].id);
+            //printf("TextureID: mesh->textures[i].id: %d, sampler2D name: %s\n", mesh->textures[i].id, (name+std::to_string(number)).c_str());
         }
 
         // Draw the mesh(Bind array, Load model, draw element/array)
