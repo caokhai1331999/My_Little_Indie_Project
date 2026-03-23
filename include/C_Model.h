@@ -30,9 +30,10 @@ public:
     std::unordered_map<std::string, Bone_Info>* m_BoneInfoMap;
     int m_BoneCounter;
     bool gammaCorrection;
-
-    Model_(const char *path = nullptr, bool gamma = false)
-        : gammaCorrection(gamma) {
+    std::string name;
+    
+    Model_(bool gamma = false, std::string* model_name = nullptr)
+            : gammaCorrection(gamma), name(*model_name) {
       m_BoneCounter = 0;
       m_BoneInfoMap = nullptr;
       m_BoneInfoMap = new std::unordered_map<std::string, Bone_Info>;
@@ -53,7 +54,5 @@ void loadModel_(Model_*model, string path);
 void processNode(Model_* model, aiNode* node, const aiScene* scene);
 vector <Texture>loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene);
 
-
-void Draw(Mesh* mesh = nullptr, GLuint* programID = nullptr);
 void DDraw(Model_* model = nullptr, GLuint* programID = nullptr);
 #endif

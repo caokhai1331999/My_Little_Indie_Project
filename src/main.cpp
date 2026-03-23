@@ -708,9 +708,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 setMat4(ScreenBuffer.glData.ProgramIDs[0], "view", BackBuffer.camera.view);
 
 
-                
+                std::string Mname = "backpack";                
                 Model_* backpack = nullptr;
-                backpack = new Model_();
+                backpack = new Model_(false, &Mname);
                 std::string backpack_path = "./media/backpack.obj";
                 loadModel_(backpack, backpack_path);
 
@@ -719,7 +719,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
 //NOW THE ANIMATING PART
 
                 Model_* dancing_vampire = nullptr;
-                dancing_vampire = new Model_();
+                Mname = "vampire";
+                dancing_vampire = new Model_(false, &Mname);
                 std::string dancing_vampire_path = "./media/dancing_vampire.dae";
                 loadModel_(dancing_vampire, dancing_vampire_path);
 
@@ -1079,7 +1080,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     GLuint brushID = model_shader_->GetProgramID();
                     model_shader_->setMat4("model", backpack_core);
                     DDraw(backpack, &brushID);
-                    //DDraw(dancing_vampire, &brushID);                    
+                    DDraw(dancing_vampire, &brushID);                    
 // Now Draw the vampire
                     Game_Input* Temp = NewInput;
                     NewInput = OldInput;  //???? still don't understand

@@ -10,9 +10,15 @@
 using namespace std;
 
 void DDraw(Model_* model, GLuint* programID){
+    bool32 vampire = false;
+    if(strcmp(model->name.c_str(), "vampire") == 0){
+        vampire = true;
+        //printf("being drawn model: %s\n", model->name.c_str());
+    }
+
     if(model != nullptr && programID != nullptr){
         for(unsigned int i = 0; i < model->meshes.size(); i++){
-            Draw(&model->meshes[i], programID);
+            Draw(&model->meshes[i], programID, vampire);
         }   
     } else {
         printf("model or programID is NULL\n");
@@ -280,10 +286,10 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
   std::string filename = string(path);
   //May the file path is insufficient here
   filename = directory + '/' + filename;
-    printf("texture file path: %s\n", filename.c_str());
     unsigned int textureID;
     glGenTextures(1, &textureID);
-
+    printf("texture file path: %s\n", filename.c_str());
+    printf("Texture ID: %d\n", textureID);
     int width, height, nrComponents;
 
     //stbi_set_flip_vertically_on_load(true);
@@ -358,6 +364,8 @@ unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bo
     if(tex){
         printf("We got a texture\n");
         glGenTextures(1, &textureID);
+        printf("Texture ID in memory texture loading: %d\n", textureID);
+
         stbi_set_flip_vertically_on_load(true);
         if(tex->pcData){
             //Wrong here

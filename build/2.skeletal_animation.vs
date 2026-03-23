@@ -43,40 +43,14 @@ void main()
 	 localNormal = mat3(finalBoneMatrices[boneids[i]]) * norm;
 	 Normal += localNormal;
        }
-
-	 // vec3 localNormal = vec3(finalBoneMatrices[boneids[0]] * model)* norm; 
-	 // localNormal += vec3(finalBoneMatrices[boneids[1]] * model)* norm; 
-	 // localNormal += vec3(finalBoneMatrices[boneids[2]] * model)* norm; 
-	 // localNormal += vec3(finalBoneMatrices[boneids[3]] * model)* norm; 
-
-	 // mat4 boneTransform;
-
-	 // for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
-     	 // if(boneids[i] == -1)
-	 //   continue;
-	 // if(boneids[i] <= MAX_BONES){
-	 //   boneTransform += finalBoneMatrices[boneids[i]] * weights[i];
-	 //   break;
-	 // }
-
+       
 	 // vec3 localNormal = vec3(finalBoneMatrices[boneids[i]] * model)* norm;
 	 //For What???
        // }
 //Second method
-
-	 // mat4 boneTransform = finalBoneMatrices[boneids[0]] * weights[0];
- 	 // boneTransform += finalBoneMatrices[boneids[1]] * weights[1];
- 	 // boneTransform += finalBoneMatrices[boneids[2]] * weights[2];
- 	 // boneTransform += finalBoneMatrices[boneids[3]] * weights[3];
-
-	 // mat3 normalMatrix = transpose(inverse(mat3(boneTransform)));
-	 // vec3 T = normalize(normalMatrix * tangent);
-	 // vec3 B = normalize(normalMatrix * bitangent);
-	 // vec3 N = normalize(normalMatrix * norm);
-
-         // vec4 localPosition = finalBoneMatrices[boneids[0]]*vec4(pos,1.0f);
-	 // totalPosition += localPosition * weights[0];
-	 // Normal = mat3(finalBoneMatrices[boneids[0]]) * norm;
+         vec4 localPositionn = finalBoneMatrices[boneids[0]]*vec4(pos,1.0f);
+	 vec4 totalPositionn = localPositionn * weights[0];
+	 Normal = mat3(finalBoneMatrices[boneids[0]]) * norm;
 
          // localPosition = finalBoneMatrices[boneids[1]]*vec4(pos,1.0f);
 	 // totalPosition += localPosition * weights[1];
@@ -91,16 +65,12 @@ void main()
 	 // Normal += mat3(finalBoneMatrices[boneids[3]]) * norm;
 
      // local postion, total position, weights,
-     vec4 modelPos_after= totalPosition * vec4(-pos, 1.0f);
-
-     //mat4 view_after = model * modelPos_after;
-     //gl_Position = World_after_transform * viewModel;
 
      //2nd method
-     gl_Position = projection * view * model * modelPos_after;
-	// gl_Position = projection * view * model * vec4(pos, 1.0f);
+     // gl_Position = projection * view * model * totalPositionn;
+      gl_Position = projection * view * model * vec4(pos, 1.0f);
 	//   /window2d space//clip space//world space//local space/
 	TexCoords = tex;
      	// FragPos = vec3(model *vec4(pos, 1.0f));
-        FragPos = vec3(model * totalPosition);
+        FragPos = vec3(model * totalPositionn);
 }

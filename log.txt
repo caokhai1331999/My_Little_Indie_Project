@@ -1158,3 +1158,16 @@ Next: delve into the mesh draw function, try to fill what we lack
 ---------------- Sun, 22 Mar 26: 02:56PM
 
 how to check whether the matched boneids and weitghts will be call every vertex
+
+---------------- Mon, 23 Mar 26: 10:39AM
+
+NOTE: Seemed like there are no bone IDs set inside the set mesh function
+thing is I still don't know how to set the boneID per vertex. which data from
+aiMesh is matched to them
+
+Now I understand the sampler2D is the index of generated texture
+
+Just figure out something. The var set for boneData static location seem wrong
+
+NOTE: I misscalled the backpack texture id instead of 2nd model's one to draw
+vampire model
