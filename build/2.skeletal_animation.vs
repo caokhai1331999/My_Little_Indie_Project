@@ -22,6 +22,7 @@ out vec3 Normal;
 out vec3 FragPos;
 out vec2 TexCoords;
 //vertex shader run every vertex
+
 void main()
 {
 //aPos is the vertex position so the Fragment position is
@@ -50,7 +51,7 @@ void main()
 //Second method
          vec4 localPositionn = finalBoneMatrices[boneids[0]]*vec4(pos,1.0f);
 	 vec4 totalPositionn = localPositionn * weights[0];
-	 Normal = mat3(finalBoneMatrices[boneids[0]]) * norm;
+	 // Normal = mat3(finalBoneMatrices[boneids[0]]) * norm;
 
          // localPosition = finalBoneMatrices[boneids[1]]*vec4(pos,1.0f);
 	 // totalPosition += localPosition * weights[1];
@@ -67,10 +68,13 @@ void main()
      // local postion, total position, weights,
 
      //2nd method
-     // gl_Position = projection * view * model * totalPositionn;
-      gl_Position = projection * view * model * vec4(pos, 1.0f);
-	//   /window2d space//clip space//world space//local space/
+     mat4 viewModel = view * model;
+     // gl_Position = projection * viewModel * totalPositionn;
+
+     gl_Position = projection * viewModel * vec4(pos, 1.0f);
+
+//   /window2d space//clip space//world space//local space/
 	TexCoords = tex;
      	// FragPos = vec3(model *vec4(pos, 1.0f));
-        FragPos = vec3(model * totalPositionn);
+        FragPos = vec3(model * totalPosition);
 }

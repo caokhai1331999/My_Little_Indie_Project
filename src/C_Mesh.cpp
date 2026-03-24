@@ -66,16 +66,15 @@ void setupMesh(Mesh* mesh){
         // again translate to 3/2 float which translate into a byte array 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size()*sizeof(unsigned int), &mesh->indices[0], GL_STATIC_DRAW);
-
         
         glBindVertexArray(0);    
 };
 
 
-void Draw(Mesh* mesh, GLuint* progID, bool32 vampire_){
+void Draw(Mesh* mesh, GLuint* progID){
         // bind appropriate textures
     
-        unsigned int textureID  = vampire_?3:1;
+        //unsigned int textureID  = vampire_?3:1;
 
         unsigned int diffuseNr  = 1;
         unsigned int specularNr = 1;

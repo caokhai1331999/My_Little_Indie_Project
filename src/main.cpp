@@ -620,7 +620,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 glm::mat4 Plane = glm::mat4(1.0f);
                 Plane = glm::translate(Plane, glm::vec3(0.0f));
 
-                glm::mat4 Projection = glm::mat4(1.0f);
+                //glm::mat4 Projection = glm::mat4(1.0f);
 
                 //View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
                 glm::vec3 Position = glm::vec3(2.0f, -8.0f, 0.0f);
@@ -669,13 +669,14 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 std::cout<<"Stand still model 2 matrix is :"<<glm::to_string(backpack_core)<<std::endl;
 
                 // Set containing model for dancing vampire
-                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, -0.4f, 0.0f));
-                dancing_vampire_core = glm::scale(dancing_vampire_core, glm::vec3(0.5f,0.5f,0.5f));
+                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-2.0f, 2.0f, 0.0f));
+                dancing_vampire_core = glm::scale(dancing_vampire_core,glm::vec3( 0.02f));
+
                 
                 BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
                 
                 if(glIsProgram(ScreenBuffer.glData.ProgramIDs[0])){
-                    useProgram(ScreenBuffer.glData.ProgramIDs[0]);
+                    //useProgram(ScreenBuffer.glData.ProgramIDs[0]);
                     printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[0]);
                 } else {
                   glDebugMessageCallback(MessageCallback, 0);
@@ -684,7 +685,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 }
 
                 if(glIsProgram(ScreenBuffer.glData.ProgramIDs[1])){
-                    model_shader_->use();
+                    //model_shader_->use();
                     printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[1]);
                 } else {
                   glDebugMessageCallback(MessageCallback, 0);
@@ -693,7 +694,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 }
 
                 if(glIsProgram(ScreenBuffer.glData.ProgramIDs[2])){
-                    animating_shader_->use();
+                    //animating_shader_->use();
                     printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[2]);
                 } else {
                     glDebugMessageCallback(MessageCallback, 0);
@@ -810,8 +811,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
                  //model_shader_->setFloat("pointLights[3].constant", 1.0f);
                  //model_shader_->setFloat("pointLights[3].linear", 0.09f);
                  //model_shader_->setFloat("pointLights[3].quadratic", 0.032f);
-
+                animating_shader_->use();
+                animating_shader_->setMat4( "projection", BackBuffer.camera.projection);
+                
                 useProgram(ScreenBuffer.glData.ProgramIDs[0]);
+                
                 QueryPerformanceCounter(&LastCounter);
 
                 while (GlobalRunning) {
@@ -984,6 +988,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         basic_shader_->setMat4("projection", BackBuffer.camera.projection);
                         glUseProgram(ScreenBuffer.glData.ProgramIDs[1]);
                         model_shader_->setMat4("projection", BackBuffer.camera.projection);
+
+                        glUseProgram(ScreenBuffer.glData.ProgramIDs[2]);
+                        animating_shader_->setMat4( "projection", BackBuffer.camera.projection);
                         BackBuffer.camera.mouse.Wheeled = false;
                     }
 
@@ -993,6 +1000,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     model_shader_->use();
                     model_shader_->setMat4("view", BackBuffer.camera.view);
 
+                    animating_shader_->use();
+                    animating_shader_->setMat4( "view", BackBuffer.camera.view);
                     // Start to add some basic lighting to the model
                     useProgram(ScreenBuffer.glData.ProgramIDs[1]);
                     //setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Model);
@@ -1080,7 +1089,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     GLuint brushID = model_shader_->GetProgramID();
                     model_shader_->setMat4("model", backpack_core);
                     DDraw(backpack, &brushID);
-                    DDraw(dancing_vampire, &brushID);                    
+
+                    //model_shader_->setMat4("model", dancing_vampire_core);
+                    //DDraw(dancing_vampire, &brushID);
 // Now Draw the vampire
                     Game_Input* Temp = NewInput;
                     NewInput = OldInput;  //???? still don't understand
@@ -1119,11 +1130,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
                             PlayAnimation(animator, danceAnimation);
                       }
 
-
                       animating_shader_->use();
-                      animating_shader_->setMat4( "model", dancing_vampire_core);
-                      animating_shader_->setMat4( "projection", Projection);
-                      animating_shader_->setMat4( "view", BackBuffer.camera.view);
+                      animating_shader_->setMat4("model", dancing_vampire_core);
 
                       std::unordered_map<std::string, Bone_Info>* boneMapClone = danceAnimation->GetBoneIDMap();
                       std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();

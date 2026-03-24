@@ -1175,3 +1175,13 @@ vampire model
 don't know why when the number = diffuseNr++ (diffuseNr is 0) is equal to 0
 
 maybe the vampire diffuse loaded wrongly
+
+Texture is fine
+model_ is fine
+model matrix also fine
+
+possibles causes: +shaders
+                  +may be the difference between arrangement of meshs
+                  construction of 2 model caused this NO
+                  +the shaders itself is only thing wrong
+

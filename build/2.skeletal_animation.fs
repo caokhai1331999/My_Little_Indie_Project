@@ -21,6 +21,5 @@ struct Material{
 uniform Material material;
 
 void main(){
-  FragColor = texture(material.texture_diffused1, TexCoords);
-  // FragColor = Texturee * vec4(FragPos, 1.0f); 
+  FragColor = vec4(texture(material.texture_diffused1, TexCoords).rgb, 1.0f);
 };

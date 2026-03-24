@@ -255,6 +255,7 @@ void main()
 // NOTHING wrong with the calcspotlight fx. The model messed something else up
 	//result += CalcSpotLight(spotlight, norm, viewDir);
 
-	FragColor = vec4(result, 1.0f);
+	 FragColor = vec4(result, 1.0f);
+	//FragColor = vec4(texture(material.texture_diffused1, TexCoord).rgb, 1.0f); 
 }
 

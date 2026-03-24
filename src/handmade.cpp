@@ -288,3 +288,15 @@ void* LoadFunctionFromDLL(const char *DLLName,
 //Then turn the void* type to any function type using static converter
 
 };
+
+bool32 string_contain(std::string* string, char* substr){
+    int substrIndex = 0;
+    while (substrIndex < sizeof(*substr)){
+        if (string->find(substr[substrIndex])==string->npos){
+            return false;
+        } else {
+            substrIndex++;
+        }
+    };
+    return true;
+};

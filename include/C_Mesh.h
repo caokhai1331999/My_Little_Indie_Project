@@ -94,5 +94,5 @@ void SetVertexBoneDataToDefault(Vertex* vertex){
 
 void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
 void setupMesh(Mesh* mesh = nullptr);
-void Draw(Mesh* mesh = nullptr, GLuint* progID = nullptr, bool32 vampire_ = false);
+void Draw(Mesh* mesh = nullptr, GLuint* progID = nullptr);
 #endif

@@ -18,7 +18,7 @@ void DDraw(Model_* model, GLuint* programID){
 
     if(model != nullptr && programID != nullptr){
         for(unsigned int i = 0; i < model->meshes.size(); i++){
-            Draw(&model->meshes[i], programID, vampire);
+            Draw(&model->meshes[i], programID);
         }   
     } else {
         printf("model or programID is NULL\n");
@@ -157,8 +157,10 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
     vector<Texture>textures;
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++){
         aiString str;
+        std::string strr = {str.C_Str()};
         if(mat->GetTexture(type, i, &str) == aiReturn_SUCCESS){
-            if(std::strcmp(str.C_Str(),"specular.jpg") == 0){
+            if(string_contain(&strr, "specular")) {
+            //if(std::strcmp(str.C_Str(),"specular.jpg") == 0){
                 if(first_specular_time){
                     printf("Texture successfully retrieved %s\n", str.C_Str());
                     first_specular_time = false;
@@ -201,14 +203,13 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
                 //This is wrong in fbx case : How to fix this???
             if(scene->mNumTextures == 0){                
                 texture.id = TextureFromFile(str.C_Str(), model->directory);
-                printf("texture path is:%s\n",model->directory.c_str());
+                //printf("texture path is:%s\n",model->directory.c_str());
                 texture.type = typeName;
                 texture.path = str.C_Str();
                 textures.push_back(texture);
-                printf("Start loading texture from external file , model path is :%s\n",model->directory.c_str());
+                printf("Start loading texture from external file , model path is :%s :%s\n",model->directory.c_str(), texture.path.c_str());
                 model->loaded_textures.push_back(texture);
-            } else
-            {
+            } else {
                 //for(unsigned int i = 0; i < scene->mNumTextures; i++){
 
                 /*
@@ -288,7 +289,7 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
   filename = directory + '/' + filename;
     unsigned int textureID;
     glGenTextures(1, &textureID);
-    printf("texture file path: %s\n", filename.c_str());
+    //printf("texture file path: %s\n", filename.c_str());
     int width, height, nrComponents;
 
     //stbi_set_flip_vertically_on_load(true);
@@ -309,7 +310,7 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
                 format = GL_RGBA;
 
             glActiveTexture(GL_TEXTURE0+textureID);
-            printf("Texture ID: %d\n", textureID);
+            printf("Texture ID: %d, load from:%s \n", textureID, filename.c_str());
             glBindTexture(GL_TEXTURE_2D, textureID);
             glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
@@ -321,8 +322,9 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
             stbi_image_free(data);
+            glActiveTexture(GL_TEXTURE0);            
         } else {
-            std::cout << "Texture failed to load at path: " << path << std::endl;
+            std::cout << "Texture failed to load at path: " << filename.c_str() << std::endl;
             stbi_image_free(data);
         }
     return textureID;
