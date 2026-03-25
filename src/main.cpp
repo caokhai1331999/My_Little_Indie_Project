@@ -469,6 +469,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
   //MDraw Draw = NULL;
       //AniTimeUpdater AniUpdate_;
 
+  B_shader_program* model_shader_;
+  B_shader_program* animating_shader_;
+  B_shader_program* basic_shader_;
+
+  
   Animation* danceAnimation = nullptr;
   Animator* animator = nullptr;
   int delay_count = 0;
@@ -546,8 +551,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
             //=====================================================
 
           if(game_memory.TransientStorage && game_memory.PermanentStorage){
-            debug_read_file_result result2;
-            debug_read_file_result result;
+              
+              debug_read_file_result result2;
+              debug_read_file_result result;
             // BMPContent = new imagee_content;
             // BMPContent = DEBUGReadBMP("Harry_and_Accomplices_rescaled.bmp",
             // &result);
@@ -595,16 +601,16 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
                 // Basic shader
                 std::string shader_name = "basic brush";
-                B_shader_program* basic_shader_ = new B_shader_program("shader.vs", "shader.fs", shader_name.c_str());             ScreenBuffer.glData.ProgramIDs.push_back(basic_shader_->GetProgramID());
+                basic_shader_ = new B_shader_program("shader.vs", "shader.fs", shader_name.c_str());             ScreenBuffer.glData.ProgramIDs.push_back(basic_shader_->GetProgramID());
 
                 //shader_name.clear();
                 shader_name = "model drawing brush";
                 //basic model shader
-                B_shader_program* model_shader_ = new B_shader_program("1.model.vs", "1.model.fs", shader_name.c_str());                ScreenBuffer.glData.ProgramIDs.push_back(model_shader_->GetProgramID());
+                model_shader_ = new B_shader_program("1.model.vs", "1.model.fs", shader_name.c_str());                ScreenBuffer.glData.ProgramIDs.push_back(model_shader_->GetProgramID());
 
                 //shader_name.clear();                
                 shader_name = "animating sketching brush";
-                B_shader_program* animating_shader_ = new B_shader_program("2.skeletal_animation.vs", "2.skeletal_animation.fs", shader_name.c_str());                ScreenBuffer.glData.ProgramIDs.push_back(animating_shader_->GetProgramID());
+                animating_shader_ = new B_shader_program("2.skeletal_animation.vs", "2.skeletal_animation.fs", shader_name.c_str());                ScreenBuffer.glData.ProgramIDs.push_back(animating_shader_->GetProgramID());
                 
                 copyBufferData(&BackBuffer, &ScreenBuffer);
                 //????
@@ -818,6 +824,31 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 
                 QueryPerformanceCounter(&LastCounter);
 
+                GLint resultt;
+                glDeleteProgram(0);
+                glGetProgramiv(0, GL_DELETE_STATUS, &resultt);
+                if(resultt == GL_TRUE){
+                    printf("Program ID: %d was successfully deleted\n", 0);
+                } else {
+                    printf("Failed to remove Program ID: %d\n", 0);
+                };
+
+                glDeleteProgram(1);
+                glGetProgramiv(1, GL_DELETE_STATUS, &resultt);
+                if(resultt == GL_TRUE){
+                    printf("Program ID: %d was successfully deleted\n", 1);
+                } else {
+                    printf("Failed to remove Program ID: %d\n", 1);
+                };
+
+                glDeleteProgram(2);
+                glGetProgramiv(2, GL_DELETE_STATUS, &resultt);
+                if(resultt == GL_TRUE){
+                    printf("Program ID: %d was successfully deleted\n", 2);
+                } else {
+                    printf("Failed to remove Program ID: %d\n", 2);
+                };
+                
                 while (GlobalRunning) {
 
                   //if (first_announce) {
@@ -1090,8 +1121,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     model_shader_->setMat4("model", backpack_core);
                     DDraw(backpack, &brushID);
 
-                    //model_shader_->setMat4("model", dancing_vampire_core);
-                    //DDraw(dancing_vampire, &brushID);
+                    model_shader_->setMat4("model", dancing_vampire_core);
+                    DDraw(dancing_vampire, &brushID);
 // Now Draw the vampire
                     Game_Input* Temp = NewInput;
                     NewInput = OldInput;  //???? still don't understand
@@ -1156,15 +1187,49 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                       "]", matrix_);
                                   i++;
                                   if (first_announce) {
-                                  printf("Bone Matrix index %d is: %s\n", (int)i, glm::to_string(matrix_).c_str());
+                                      GLint loc = 0;
+                                      char index[1];
+                                      sprintf(index, "%d", i);
+                                      std::string matrixName = "finalBoneMatrices[]";
+                                      matrixName.insert(matrixName.size()-1, 1, index[0]);
+                                      printf("Matrix name: %s\n", matrixName.c_str());
+                                      GLchar* matrixName_ = (GLchar*)matrixName.c_str();
+                                      glGetUniformLocation(animating_shader_->GetProgramID(),                                       matrixName_);
+                                      //glm::mat4 matVal;
+                                      GLfloat matVal[16];
+                                      glGetUniformfv(animating_shader_->GetProgramID(), loc, matVal);
+                                      printf("Bone Matrix index %d is:", (int)i);
+                                      for(int i = 0 ; i < 16; i++){
+                                          if(i==0||i==4||i==8||i==12)
+                                              printf(",[");
+                                          printf(",%f", matVal[i]);
+                                          if(i==3||i==7||i==11||i==15);
+                                          printf("]");
+                                      };
+                                      printf("\n");
                                   };
                               };
                           }
                       //}
+//==============================================================================
 
-                      brushID = animating_shader_->GetProgramID();
-                      DDraw(dancing_vampire, &brushID);
-                      
+                          //GLint maxLength;
+                          //GLchar* name = new GLchar[maxLength];
+                          //GLsizei length;
+                          //GLint index;
+                          //GLint size;
+                          //GLenum type;
+                          //std::string cplusString = {*name};
+                          //
+                          //glGetProgramiv(animating_shader_->GetProgramID(), GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength);
+                          //glGetActiveUniform(animating_shader_->GetProgramID(), index, maxLength, &length, &size, &type, name);
+                          //if(string_contain(&cplusString, "finalBoneMatrices["))
+                          //printf("uniform info: index: %d, maxlength: %d, length: %d, size: %d, type: %d, name: %s\n", index, maxLength, length, size, type, name);
+                          
+//==============================================================================
+                          brushID = animating_shader_->GetProgramID();
+                          DDraw(dancing_vampire, &brushID);
+
                       if (showMsPF) {
                           printf("[LastFrameCount:%f,EndFrameCount:%f, "
                                  "CounterPerFrame : %I64d], MiliS per frame: "
@@ -1199,10 +1264,20 @@ LARGE_INTEGER PerfCountFrequencyResult;
 MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per registerMULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register
 */
           SlayAnimator(animator);
-          KillAninmation(danceAnimation);
-          
-            glDeleteVertexArrays(1, &BackBuffer.glData.VAOs);
-            glDeleteBuffers(1, &BackBuffer.glData.VBO);
+          KillAninmation(danceAnimation);          
+
+          glDeleteVertexArrays(1, &BackBuffer.glData.VAOs);
+          glDeleteBuffers(1, &BackBuffer.glData.VBO);
+
+          delete basic_shader_;
+          basic_shader_ = nullptr;
+
+          delete model_shader_;
+          model_shader_ = nullptr;
+
+          delete animating_shader_;
+          animating_shader_ = nullptr;
+
         }
         else{
             //TODO: Logging

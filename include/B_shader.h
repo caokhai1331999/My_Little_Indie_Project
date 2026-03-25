@@ -54,12 +54,22 @@ private:
 public:
     B_shader shaders[2];
     B_shader_program(char* vertex_file_name, char* fragment_file_name, const char* programName = nullptr){
+        ProgramID = 0;
         shaders[vertex_].loadShader(vertex_file_name, vertex_);
         shaders[fragment_].loadShader(fragment_file_name, fragment_);
         setupGLprogram(programName);
     };
 
-    ~B_shader_program();
+    ~B_shader_program(){
+        GLint result;
+        glDeleteProgram(ProgramID);
+        glGetProgramiv(ProgramID, GL_DELETE_STATUS, &result);
+        if(result == GL_TRUE){
+            printf("Program ID: %d was successfully deleted\n", ProgramID);
+        } else {
+            printf("Failed to remove Program ID: %d\n", ProgramID);
+        };
+    };
 
 // Set Int, bool, float and Vector
     void setVec2(const char* name, const glm::vec2 &value);

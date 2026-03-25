@@ -56,7 +56,7 @@ void setupMesh(Mesh* mesh){
 
         // IDS
         glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 4, GL_INT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, m_BoneIDs));
+        glVertexAttribPointer(5, 4, GL_UNSIGNED_INT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, m_BoneIDs));
 
         // WEIGHTs
         glEnableVertexAttribArray(6);
