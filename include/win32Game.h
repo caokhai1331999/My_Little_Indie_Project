@@ -118,6 +118,8 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
 void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
 void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
 
+void showUniformVarValuePerVertex(GLuint* programeId = nullptr, bool32 showBoneIds = false, bool32 showWeights = false, bool32 showFinalBoneMatrices = false);
+
 void APIENTRY MessageCallback(GLenum source,
                               GLenum type,
                               GLuint id,

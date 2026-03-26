@@ -1185,3 +1185,21 @@ possibles causes: +shaders
                   construction of 2 model caused this NO
                   +the shaders itself is only thing wrong
 
+
+---------------- Thu, 26 Mar 26: 09:55AM
+
+NOTE: Seemed like the last column(or row if mat is row major) have a too big
+value (like garbage one) after read the finalbonematrices after set it. Yub,
+they are garbage. The single float value must be from -1.0 to 1.0f
+
+boneIds vec stay the same every vertex. Bug found!!!
+
+---------------- Thu, 26 Mar 26: 11:58AM
+
+one of my mistake is that I assigned the unsigned int value to int boneIds
+variable in shader 
+
+REMEMBER! : Draw out: transfer/assign data between slightly different type
+variable highly likely cause garbage value
+
+Now I now the weight is also zero the whole time

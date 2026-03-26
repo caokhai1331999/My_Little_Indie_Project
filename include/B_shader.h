@@ -40,7 +40,7 @@ private:
     LARGE_INTEGER file_size;
     void* SourceCode;
     void* SourcePath;
-    unsigned int ShaderID;
+    GLuint ShaderID;
     ShaderType ShaderType_;
 public:
     void loadShader(char* name, ShaderType type);    
@@ -49,8 +49,7 @@ public:
 
 class B_shader_program{
 private:
-    unsigned int ProgramID;
-    
+    GLuint ProgramID;
 public:
     B_shader shaders[2];
     B_shader_program(char* vertex_file_name, char* fragment_file_name, const char* programName = nullptr){

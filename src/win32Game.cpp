@@ -872,6 +872,70 @@ bool isNull(unsigned int* member){
     return false;
 }
 
+void showUniformVarValuePerVertex(GLuint* programeId, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices){
+    
+    if(showBoneIds){
+    GLint boneId[4];
+    std::string BoneVec = "boneidsclone";
+    glGetUniformiv(*programeId, glGetUniformLocation(*programeId,                                       BoneVec.c_str()), boneId);
+
+    printf("\nBone ID per vertex is:");
+    for(int j = 0 ; j < 4; j++){
+        if(j==0)
+            printf("[");
+        j==0?printf("%d", (int)boneId[j]):printf(", %d", (int)boneId[j]);
+        if(j==3)
+            printf("]");
+    };
+
+    printf("\n");
+    }
+
+    if(showWeights){
+        GLfloat weights[4];
+        std::string weightName = "weightsclone";
+            glGetUniformfv(*programeId, glGetUniformLocation(*programeId,                                       weightName.c_str()), weights);
+
+        printf("Weights per vertex is:");
+        for(int k = 0 ; k < 4; k++){
+            if(k==0)
+                printf("[");
+            k==0?printf("%f", (float)weights[k]):printf(", %f", (float)weights[k]);
+            if(k==3)
+                printf("]");
+        };
+        printf("\n");
+    }    
+
+    if(showFinalBoneMatrices){
+        GLfloat matVal[16];
+        char index[1];
+        std::string matrixName_;
+        for(int k = 0; k < 100; k++){
+            matrixName_.clear();
+            matrixName_ = "finalBoneMatrices[]";
+        sprintf(index, "%d", k);
+        matrixName_.insert(matrixName_.size()-1, 1, index[0]);
+
+        glGetUniformfv(*programeId, glGetUniformLocation(*programeId,                                       matrixName_.c_str()), matVal);
+
+        printf("\nBone Matrix index %d is:", k);
+
+        for(int i = 0 ; i < 16; i++){
+            if(i==0||i==4||i==8||i==12){
+                i==0?printf("["):printf(", [");
+            }
+            (i==0||i==4||i==8||i==12)?printf("%f", matVal[i]):printf(", %f", matVal[i]);
+            if(i==3||i==7||i==11||i==15){
+            }
+        printf("]");
+        };
+        printf("\n");            
+        }
+
+    };
+};
+
 
 void ErrorExit() 
 { 

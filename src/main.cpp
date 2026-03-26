@@ -1167,8 +1167,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                       std::unordered_map<std::string, Bone_Info>* boneMapClone = danceAnimation->GetBoneIDMap();
                       std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
 
-                      //if(first_announce){
-                      int i = 0;
                           if (boneMapClone->size() > 1) {
                               //for(const std::pair<std::string, Bone_Info>&bone : (*boneMapClone))
                               //{
@@ -1181,35 +1179,17 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                       //printf("finalBoneMatrices[boneIds[%d]]: %s\n", (int)bone.second.id, glm::to_string((*Transform)[bone.second.id]).c_str());
                                   //}
                               //};
+                              int i = 0;
                               for(const glm::mat4&matrix_ : (*Transform)){
                                   animating_shader_->setMat4(
                                       "finalBoneMatrices[" + std::to_string(i) +
                                       "]", matrix_);
                                   i++;
-                                  if (first_announce) {
-                                      GLint loc = 0;
-                                      char index[1];
-                                      sprintf(index, "%d", i);
-                                      std::string matrixName = "finalBoneMatrices[]";
-                                      matrixName.insert(matrixName.size()-1, 1, index[0]);
-                                      printf("Matrix name: %s\n", matrixName.c_str());
-                                      GLchar* matrixName_ = (GLchar*)matrixName.c_str();
-                                      glGetUniformLocation(animating_shader_->GetProgramID(),                                       matrixName_);
-                                      //glm::mat4 matVal;
-                                      GLfloat matVal[16];
-                                      glGetUniformfv(animating_shader_->GetProgramID(), loc, matVal);
-                                      printf("Bone Matrix index %d is:", (int)i);
-                                      for(int i = 0 ; i < 16; i++){
-                                          if(i==0||i==4||i==8||i==12)
-                                              printf(",[");
-                                          printf(",%f", matVal[i]);
-                                          if(i==3||i==7||i==11||i==15);
-                                          printf("]");
-                                      };
-                                      printf("\n");
-                                  };
                               };
-                          }
+                          };
+                          brushID = animating_shader_->GetProgramID();
+                          if(showMsPF)showUniformVarValuePerVertex(&brushID, true, true, true);
+
                       //}
 //==============================================================================
 
@@ -1227,7 +1207,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                           //printf("uniform info: index: %d, maxlength: %d, length: %d, size: %d, type: %d, name: %s\n", index, maxLength, length, size, type, name);
                           
 //==============================================================================
-                          brushID = animating_shader_->GetProgramID();
                           DDraw(dancing_vampire, &brushID);
 
                       if (showMsPF) {
