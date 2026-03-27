@@ -30,15 +30,19 @@ void main()
 
    vec4 totalPosition = vec4(0.0f);
    vec3 localNormal;
+   vec3 poss = pos;
 
-     for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
+if(poss==vec3(0.0f))
+ poss = vec3(1.0f);
+
+ for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
 	 if(boneids[i] == -1)
 	   continue;
 	 if(boneids[i] >= MAX_BONES){
-	   totalPosition = vec4(pos, 1.0f);
+	   totalPosition = vec4(poss, 1.0f);
 	   break;
 	 }
-         vec4 localPosition = finalBoneMatrices[boneids[i]]*vec4(pos,1.0f);
+         vec4 localPosition = finalBoneMatrices[boneids[i]]*vec4(poss, 1.0f);
 	 totalPosition += localPosition * weights[i];
 	 localNormal = mat3(finalBoneMatrices[boneids[i]]) * norm;
 	 Normal += localNormal;
@@ -71,7 +75,6 @@ void main()
      mat4 viewModel = view * model;
      gl_Position = projection * viewModel * totalPosition;
 
-     // gl_Position = projection * viewModel * vec4(pos, 1.0f);
 
 //   /window2d space//clip space//world space//local space/
 	TexCoords = tex;

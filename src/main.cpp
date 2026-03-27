@@ -848,7 +848,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 } else {
                     printf("Failed to remove Program ID: %d\n", 2);
                 };
-                
+                int k = 0;                
                 while (GlobalRunning) {
 
                   //if (first_announce) {
@@ -1121,9 +1121,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     model_shader_->setMat4("model", backpack_core);
                     DDraw(backpack, &brushID);
 
-                    model_shader_->setMat4("model", dancing_vampire_core);
-                    DDraw(dancing_vampire, &brushID);
-// Now Draw the vampire
+                    //model_shader_->setMat4("model", dancing_vampire_core);
+                    //DDraw(dancing_vampire, &brushID);
+//// Now Draw the vampire
                     Game_Input* Temp = NewInput;
                     NewInput = OldInput;  //???? still don't understand
                     OldInput = Temp;
@@ -1179,34 +1179,26 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                       //printf("finalBoneMatrices[boneIds[%d]]: %s\n", (int)bone.second.id, glm::to_string((*Transform)[bone.second.id]).c_str());
                                   //}
                               //};
+
                               int i = 0;
-                              for(const glm::mat4&matrix_ : (*Transform)){
-                                  animating_shader_->setMat4(
-                                      "finalBoneMatrices[" + std::to_string(i) +
-                                      "]", matrix_);
-                                  i++;
+                              //assuming that vertices[i] is matched with indices[i];
+                              
+                              // dancing_vampire->mesh[0].vertices[k].m_BoneIDs[];
+                              for (int j = 0; j < 4;  j++){                                   animating_shader_->setMat4(                                     "finalBoneMatrices[" + std::to_string(dancing_vampire->meshes[0].vertices[k].m_BoneIDs[j]) +"]", (*Transform)[dancing_vampire->meshes[0].vertices[k].m_BoneIDs[j]]);
                               };
+                              k<(int)dancing_vampire->meshes[0].vertices.size()?k++:k=0;
+
+                              //for(const glm::mat4&matrix_ : (*Transform)){
+                                  //animating_shader_->setMat4(
+                                      //"finalBoneMatrices[" + std::to_string(i) +
+                                      //"]", matrix_);
+                                  //i++;
+                              //};
                           };
                           brushID = animating_shader_->GetProgramID();
                           if(showMsPF)showUniformVarValuePerVertex(&brushID, true, true, true);
 
                       //}
-//==============================================================================
-
-                          //GLint maxLength;
-                          //GLchar* name = new GLchar[maxLength];
-                          //GLsizei length;
-                          //GLint index;
-                          //GLint size;
-                          //GLenum type;
-                          //std::string cplusString = {*name};
-                          //
-                          //glGetProgramiv(animating_shader_->GetProgramID(), GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength);
-                          //glGetActiveUniform(animating_shader_->GetProgramID(), index, maxLength, &length, &size, &type, name);
-                          //if(string_contain(&cplusString, "finalBoneMatrices["))
-                          //printf("uniform info: index: %d, maxlength: %d, length: %d, size: %d, type: %d, name: %s\n", index, maxLength, length, size, type, name);
-                          
-//==============================================================================
                           DDraw(dancing_vampire, &brushID);
 
                       if (showMsPF) {

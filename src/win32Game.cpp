@@ -873,39 +873,6 @@ bool isNull(unsigned int* member){
 }
 
 void showUniformVarValuePerVertex(GLuint* programeId, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices){
-    
-    if(showBoneIds){
-    GLint boneId[4];
-    std::string BoneVec = "boneidsclone";
-    glGetUniformiv(*programeId, glGetUniformLocation(*programeId,                                       BoneVec.c_str()), boneId);
-
-    printf("\nBone ID per vertex is:");
-    for(int j = 0 ; j < 4; j++){
-        if(j==0)
-            printf("[");
-        j==0?printf("%d", (int)boneId[j]):printf(", %d", (int)boneId[j]);
-        if(j==3)
-            printf("]");
-    };
-
-    printf("\n");
-    }
-
-    if(showWeights){
-        GLfloat weights[4];
-        std::string weightName = "weightsclone";
-            glGetUniformfv(*programeId, glGetUniformLocation(*programeId,                                       weightName.c_str()), weights);
-
-        printf("Weights per vertex is:");
-        for(int k = 0 ; k < 4; k++){
-            if(k==0)
-                printf("[");
-            k==0?printf("%f", (float)weights[k]):printf(", %f", (float)weights[k]);
-            if(k==3)
-                printf("]");
-        };
-        printf("\n");
-    }    
 
     if(showFinalBoneMatrices){
         GLfloat matVal[16];
@@ -927,8 +894,8 @@ void showUniformVarValuePerVertex(GLuint* programeId, bool32 showBoneIds, bool32
             }
             (i==0||i==4||i==8||i==12)?printf("%f", matVal[i]):printf(", %f", matVal[i]);
             if(i==3||i==7||i==11||i==15){
+                printf("]");
             }
-        printf("]");
         };
         printf("\n");            
         }

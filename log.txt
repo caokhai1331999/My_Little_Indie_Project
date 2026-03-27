@@ -1203,3 +1203,18 @@ REMEMBER! : Draw out: transfer/assign data between slightly different type
 variable highly likely cause garbage value
 
 Now I now the weight is also zero the whole time
+
+---------------- Fri, 27 Mar 26: 11:54AM
+
+NOTE: One thing is the some mat in the finalbonematrices has really big value
+like over 60 or 200 per single float. Is this proper
+
+The boneIds and weight's value inside that big mesh is valid
+
+There are only 2 possible cause IMO:
+   1. The vertex shader code
+   2. the invalid final bone matrices (or the unproper animation play(reset
+   counter) which cause the matrices's values overflow)
+
+Next time: Use read back data to read binding value at fixed location inside the
+skeletal vertex shader

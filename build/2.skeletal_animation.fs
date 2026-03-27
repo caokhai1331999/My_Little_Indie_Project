@@ -21,5 +21,9 @@ struct Material{
 uniform Material material;
 
 void main(){
+  if(texture(material.texture_diffused1, TexCoords).rgb!=vec3(0.0f)){
   FragColor = vec4(texture(material.texture_diffused1, TexCoords).rgb, 1.0f);
+}else{
+  FragColor = vec4(0.4f, 0.23f, 0.3f, 0.7f);
+}
 };
