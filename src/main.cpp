@@ -824,30 +824,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 
                 QueryPerformanceCounter(&LastCounter);
 
-                GLint resultt;
-                glDeleteProgram(0);
-                glGetProgramiv(0, GL_DELETE_STATUS, &resultt);
-                if(resultt == GL_TRUE){
-                    printf("Program ID: %d was successfully deleted\n", 0);
-                } else {
-                    printf("Failed to remove Program ID: %d\n", 0);
-                };
-
-                glDeleteProgram(1);
-                glGetProgramiv(1, GL_DELETE_STATUS, &resultt);
-                if(resultt == GL_TRUE){
-                    printf("Program ID: %d was successfully deleted\n", 1);
-                } else {
-                    printf("Failed to remove Program ID: %d\n", 1);
-                };
-
-                glDeleteProgram(2);
-                glGetProgramiv(2, GL_DELETE_STATUS, &resultt);
-                if(resultt == GL_TRUE){
-                    printf("Program ID: %d was successfully deleted\n", 2);
-                } else {
-                    printf("Failed to remove Program ID: %d\n", 2);
-                };
                 int k = 0;                
                 while (GlobalRunning) {
 
@@ -950,7 +926,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                     DeviceContext = GetDC(Window);
                     // use shader program
-                    //printf("texture id:%d\n", ScreenBuffer.glData.textureHandle[0]);
+                    //printf("texture id:%d\n", ScreenBuffer.glDatatextureHandle[0]);
                     //DeviceContext = GetDC(Window);
                     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);             
                     //printf("Program ID:%d \n", ScreenBuffer.glData.ProgramID);
@@ -1097,12 +1073,13 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //RENDER =====================================
                     basic_shader_->use();
                     glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
+                    basic_shader_->setMat4("projection", BackBuffer.camera.projection);
                     basic_shader_->setMat4("model", Plane);
                     //why it only show half the plane
-                    glDrawArrays(GL_TRIANGLES, 0, 6);
+                    glDrawArrays(GL_TRIANGLES, 0, 3);
 
-                    basic_shader_->setFloat("colorOffset", ColorOffset);
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
+                    basic_shader_->setFloat("colorOffset", ColorOffset);
                     basic_shader_->setMat4("model", basic_cube_core);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -1196,11 +1173,12 @@ LARGE_INTEGER PerfCountFrequencyResult;
                               //};
                           };
                           brushID = animating_shader_->GetProgramID();
-                          if(showMsPF)showUniformVarValuePerVertex(&brushID, true, true, true);
-
+                          glBindBuffer(GL_ARRAY_BUFFER, dancing_vampire->meshes[0].VBO);
+                          if(showMsPF)showUniformVarValuePerVertex(&brushID, true, true, true, true);
+                          glBindBuffer(GL_ARRAY_BUFFER, 0);
                       //}
                           DDraw(dancing_vampire, &brushID);
-
+                          glBindBuffer(GL_ARRAY_BUFFER, 0);
                       if (showMsPF) {
                           printf("[LastFrameCount:%f,EndFrameCount:%f, "
                                  "CounterPerFrame : %I64d], MiliS per frame: "

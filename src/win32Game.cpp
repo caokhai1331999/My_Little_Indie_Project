@@ -500,18 +500,19 @@ HDC windowDC = GetDC(window);
                    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
                 };
                 
-                static const GLfloat PlaneVerticles[] = {
+                static const float PlaneVertices[] = {
                     // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
                   // x,    y,     z
-                   -1.0f, -1.0f,  5.0f,  0.583f, 0.771f, 0.014f,  2.0f, 0.0f, // Each verticle
-                    5.0f, -1.0f,  5.0f,  0.609f, 0.115f, 0.436f,  0.0f, 0.0f,
-                   -1.0f, -1.0f, -5.0f,  0.327f, 0.483f, 0.844f,  0.0f, 2.0f,
 
-                    5.0f, -1.0f,  5.0f,  0.822f, 0.569f, 0.201f,  2.0f, 0.0f,
-                   -1.0f, -1.0f, -5.0f,  0.435f, 0.602f, 0.223f,  0.0f, 2.0f,
-                    5.0f, -1.0f, -5.0f,  0.310f, 0.747f, 0.185f,  2.0f, 2.0f			        
+                    5.0f, -1.0f, -5.0f,  0.0f, 0.0f, -1.0f, 0.0f, 2.0f,
+                   -1.0f, -1.0f,  5.0f,  0.0f, 0.0f, -1.0f, 0.0f, 2.0f,
+                    5.0f, -1.0f,  5.0f,  0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+
+                   -1.0f, -1.0f,  5.0f,  0.0f, 0.0f, -1.0f, 2.0f, 0.0f,
+                   -1.0f, -1.0f, -5.0f,  0.0f, 0.0f, -1.0f, 2.0f, 2.0f,
+                    5.0f, -1.0f, -5.0f,  0.0f, 0.0f, -1.0f, 2.0f, 0.0f
                 };
-
+                
                 static const GLfloat g_color_buffer_data[] = {
                     0.583f,  0.771f,  0.014f,
                     0.609f,  0.115f,  0.436f,
@@ -555,59 +556,60 @@ HDC windowDC = GetDC(window);
                 glGenVertexArrays(1, &OBuffer->glData.PlaneVAOs);
 
 
+                glBindVertexArray(OBuffer->glData.VAOs);
                 glGenBuffers(1, &OBuffer->glData.VBO);
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.VBO);
                 glBufferData(GL_ARRAY_BUFFER, sizeof(fullvertices), &fullvertices, GL_STATIC_DRAW);
-
-
-                glGenBuffers(1, &OBuffer->glData.PlaneVBO);
-                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.PlaneVBO);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(PlaneVerticles), &PlaneVerticles, GL_STATIC_DRAW);
-
-                glGenBuffers(1, &OBuffer->glData.ColorVBO);
-                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.ColorVBO);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), &g_color_buffer_data, GL_STATIC_DRAW);
-
-                //glBufferData(GL_ARRAY_BUFFER, sizeof(trianglesVerticles), &trianglesVerticles, GL_STATIC_DRAW);
-                printf("Size of Vertices:%d\n", sizeof(Vertices));
-
-                glBindVertexArray(OBuffer->glData.VAOs);
-
-                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.VBO);
+                
                 // CUBE position in NDC
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
                 glEnableVertexAttribArray(0);
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
 
                 //Normal
-                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)3);
                 glEnableVertexAttribArray(1);
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)3);
 
                 //TextCoord
-                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)6);
                 glEnableVertexAttribArray(2);
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)6);
 
                 // Mere Color
-                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.ColorVBO);
-                glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+                glGenBuffers(1, &OBuffer->glData.ColorVBO);
+                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.ColorVBO);                
+                glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), &g_color_buffer_data, GL_STATIC_DRAW);
+
                 glEnableVertexAttribArray(3);
+                glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
                 //  index, size, type, .., stride, pointer
 //========================================================================
-
 // FOR PLANE
-                glBindVertexArray(OBuffer->glData.PlaneVAOs);
+                glBindVertexArray(OBuffer->glData.PlaneVAOs);       
+                glGenBuffers(1, &OBuffer->glData.PlaneVBO);
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.PlaneVBO);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(PlaneVertices), &PlaneVertices[0], GL_STREAM_DRAW);
+
                  //Position
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
                 glEnableVertexAttribArray(0);
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
 
-                 //COLOR
-                glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
-                glEnableVertexAttribArray(3);
-
-                 //TEXTURE COOR
-                glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));
+                 //Normal
                 glEnableVertexAttribArray(1);
-                //
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
+                
+                 //TEXTURE COOR
+                glEnableVertexAttribArray(2);                
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));
+
+                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.ColorVBO);                
+                glEnableVertexAttribArray(3);
+                glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+                
+                //glBufferData(GL_ARRAY_BUFFER, sizeof(trianglesVerticles), &trianglesVerticles, GL_STATIC_DRAW);
+                printf("hmm... Size of Vertices:%d\n", (int)(sizeof(PlaneVertices)/sizeof(float)));
+
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                glBindVertexArray(0);
+
 
                 // NOTE: To here we done assigned CubeVerticles data to VAOs and VBO
                 // We will call bindbuffer/vertexArray whenever before glDrawArray
@@ -805,6 +807,7 @@ void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* F
     printf("PlaneVAOS        |  %d         | %d\n", BackBuffer->glData.PlaneVAOs, FrontBuffer->glData.PlaneVAOs);
     printf("VBO              |  %d         | %d\n", BackBuffer->glData.VBO, FrontBuffer->glData.VBO);
     printf("ColorVBO         |  %d         | %d\n", BackBuffer->glData.ColorVBO, FrontBuffer->glData.ColorVBO);
+    printf("PlaneVBO         |  %d         | %d\n", BackBuffer->glData.PlaneVBO, FrontBuffer->glData.PlaneVBO);
     printf("TextureID        |  %d         | %d\n", BackBuffer->glData.textureHandle, FrontBuffer->glData.textureHandle);
     //printf("ProgramID        |  %d         | %d\n", BackBuffer->glData.ProgramIDs[0], FrontBuffer->glData.ProgramIDs[0]);
     //printf("ProgramID        |  %d         | %d\n", BackBuffer->glData.ProgramIDs[1], FrontBuffer->glData.ProgramIDs[1]);
@@ -863,46 +866,14 @@ void PassGLData(OpenGLData* BackData, OpenGLData* FrontData)
             FrontData->textureHandle = BackData->textureHandle; 
         }
     
-}
 
+}
 bool isNull(unsigned int* member){
     if(member == 0x00){
         return true;
     }
     return false;
 }
-
-void showUniformVarValuePerVertex(GLuint* programeId, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices){
-
-    if(showFinalBoneMatrices){
-        GLfloat matVal[16];
-        char index[1];
-        std::string matrixName_;
-        for(int k = 0; k < 100; k++){
-            matrixName_.clear();
-            matrixName_ = "finalBoneMatrices[]";
-        sprintf(index, "%d", k);
-        matrixName_.insert(matrixName_.size()-1, 1, index[0]);
-
-        glGetUniformfv(*programeId, glGetUniformLocation(*programeId,                                       matrixName_.c_str()), matVal);
-
-        printf("\nBone Matrix index %d is:", k);
-
-        for(int i = 0 ; i < 16; i++){
-            if(i==0||i==4||i==8||i==12){
-                i==0?printf("["):printf(", [");
-            }
-            (i==0||i==4||i==8||i==12)?printf("%f", matVal[i]):printf(", %f", matVal[i]);
-            if(i==3||i==7||i==11||i==15){
-                printf("]");
-            }
-        };
-        printf("\n");            
-        }
-
-    };
-};
-
 
 void ErrorExit() 
 { 

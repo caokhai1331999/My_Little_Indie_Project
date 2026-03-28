@@ -31,11 +31,7 @@ void setupMesh(Mesh* mesh){
 
         // Load data into vertex buffer
         glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
-        glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size()*sizeof(struct Vertex), &mesh->vertices[0], GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size()*sizeof(unsigned int), &mesh->indices[0], GL_STATIC_DRAW);
-        
+        glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size()*sizeof(struct Vertex), &mesh->vertices[0], GL_STATIC_DRAW);        
         // Time to set vertex attribute pointers
         // POSITION
         glEnableVertexAttribArray(0);
@@ -67,8 +63,11 @@ void setupMesh(Mesh* mesh){
 
         // The effect is that we symply pass a pointer to the struct and it traslate into a glm::vec3
         // again translate to 3/2 float which translate into a byte array 
-        
-               glBindVertexArray(0);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size()*sizeof(unsigned int), &mesh->indices[0], GL_STATIC_DRAW);        
+
+        glBindVertexArray(0);
 };
 
 
@@ -112,6 +111,77 @@ void Draw(Mesh* mesh, GLuint* progID){
         useProgram(*progID);
         glBindVertexArray(mesh->VAO);
         glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(mesh->indices.size()), GL_UNSIGNED_INT, 0);
+
         // Always a good practice to set everything back to default once configured
         glActiveTexture(GL_TEXTURE0);    
+};
+
+
+void showUniformVarValuePerVertex(GLuint* programeId, bool32 showPos, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices){
+
+    if(showPos){
+        float readbackPositions[3];
+        glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float)*3, &readbackPositions[0]);
+        if(readbackPositions!=nullptr){
+                printf("Vertex Position:");
+                for(int i = 0; i < 3; i++){
+                    i==0?printf("%f", readbackPositions[i]):printf(", %f", readbackPositions[i]);
+                }
+                printf("\n");  
+        }
+    }
+
+    if(showBoneIds){
+        int readbackBoneIDs[4];
+        glGetBufferSubData(GL_ARRAY_BUFFER, offsetof(Vertex, m_BoneIDs), sizeof(int)*MAX_BONE_INFLUENCE, &readbackBoneIDs[0]);
+        if(readbackBoneIDs!=nullptr){
+                printf("Bone IDs per vertex:");
+                for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
+                    i==0?printf("%d", readbackBoneIDs[i]):printf(", %d", readbackBoneIDs[i]);
+                }
+                printf("\n");
+        };
+        }
+
+if(showWeights){
+    float readbackWeights[4] = {};
+    glGetBufferSubData(GL_ARRAY_BUFFER, offsetof(Vertex, m_Weights), sizeof(float)*MAX_BONE_INFLUENCE, &readbackWeights[0]);
+    if(readbackWeights[0]!=0.0f){
+        printf("Bone weights per vertex:");
+        if(readbackWeights[0]!=0.0f){
+            for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
+                i==0?printf("%f", readbackWeights[i]):printf(", %f", readbackWeights[i]);
+            }
+        };
+        printf("\n");
+    }
+}
+    
+    if(showFinalBoneMatrices){
+        GLfloat matVal[16];
+        char index[1];
+        std::string matrixName_;
+        for(int k = 0; k < 100; k++){
+            matrixName_.clear();
+            matrixName_ = "finalBoneMatrices[]";
+        sprintf(index, "%d", k);
+        matrixName_.insert(matrixName_.size()-1, 1, index[0]);
+
+        glGetUniformfv(*programeId, glGetUniformLocation(*programeId,                                       matrixName_.c_str()), matVal);
+
+        printf("\nBone Matrix index %d is:", k);
+
+        for(int i = 0 ; i < 16; i++){
+            if(i==0||i==4||i==8||i==12){
+                i==0?printf("["):printf(", [");
+            }
+            (i==0||i==4||i==8||i==12)?printf("%f", matVal[i]):printf(", %f", matVal[i]);
+            if(i==3||i==7||i==11||i==15){
+                printf("]");
+            }
+        };
+        printf("\n");            
+        }
+
+    };
 };
