@@ -1218,3 +1218,11 @@ There are only 2 possible cause IMO:
 
 Next time: Use read back data to read binding value at fixed location inside the
 skeletal vertex shader
+
+---------------- Sun, 29 Mar 26: 09:29AM
+
+due to the position of the second triangles in the buffer has an issue
+
+---------------- Sun, 29 Mar 26: 12:10PM
+
+So it's jut how I define the positions of triangles in this buffer.

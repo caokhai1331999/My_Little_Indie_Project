@@ -472,6 +472,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
   B_shader_program* model_shader_;
   B_shader_program* animating_shader_;
   B_shader_program* basic_shader_;
+  B_shader_program* quad_shader_;
 
   
   Animation* danceAnimation = nullptr;
@@ -603,6 +604,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 std::string shader_name = "basic brush";
                 basic_shader_ = new B_shader_program("shader.vs", "shader.fs", shader_name.c_str());             ScreenBuffer.glData.ProgramIDs.push_back(basic_shader_->GetProgramID());
 
+                shader_name = "quad brush";
+                quad_shader_ = new B_shader_program("quad.vs", "quad.fs", shader_name.c_str());             ScreenBuffer.glData.ProgramIDs.push_back(quad_shader_->GetProgramID());
+
                 //shader_name.clear();
                 shader_name = "model drawing brush";
                 //basic model shader
@@ -707,9 +711,17 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     printf("animating sketching program object is buggy \n");
                 }
 
+                if(glIsProgram(ScreenBuffer.glData.ProgramIDs[3])){
+                    //animating_shader_->use();
+                    printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[2]);
+                } else {
+                    glDebugMessageCallback(MessageCallback, 0);
+                    printf("animating sketching program object is buggy \n");
+                }
+
                 //setInt(ScreenBuffer.glData.ProgramIDs[0], "ttexture1", ScreenBuffer.glData.textureHandle);                
 
-                useProgram(ScreenBuffer.glData.ProgramIDs[0]);
+                basic_shader_->use();
                 basic_shader_->setMat4("projection", BackBuffer.camera.projection);
                 std::cout<<"Projection mat: "<<glm::to_string(BackBuffer.camera.projection)<<std::endl;                
                 setMat4(ScreenBuffer.glData.ProgramIDs[0], "view", BackBuffer.camera.view);
@@ -765,7 +777,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                 //Window = SetCapture(Window);
 
-                useProgram(ScreenBuffer.glData.ProgramIDs[1]);
+                model_shader_->use();
                 //setInt(ScreenBuffer.glData.ProgramIDs[1], "material.diffuse", 0);
                 //setInt(ScreenBuffer.glData.ProgramIDs[1], "material.specular", 1);
                 model_shader_->setFloat("material.shininess", 32.0f);
@@ -819,8 +831,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                  //model_shader_->setFloat("pointLights[3].quadratic", 0.032f);
                 animating_shader_->use();
                 animating_shader_->setMat4( "projection", BackBuffer.camera.projection);
-                
-                useProgram(ScreenBuffer.glData.ProgramIDs[0]);
                 
                 QueryPerformanceCounter(&LastCounter);
 
@@ -1004,13 +1014,15 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     basic_shader_->use();
                     basic_shader_->setMat4("view", BackBuffer.camera.view);
 
+                    quad_shader_->use();
+                    quad_shader_->setMat4("view", BackBuffer.camera.view);
+
                     model_shader_->use();
                     model_shader_->setMat4("view", BackBuffer.camera.view);
 
                     animating_shader_->use();
                     animating_shader_->setMat4( "view", BackBuffer.camera.view);
                     // Start to add some basic lighting to the model
-                    useProgram(ScreenBuffer.glData.ProgramIDs[1]);
                     //setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Model);
                     //glBindVertexArray(ScreenBuffer.glData.VAOs);
                     //glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -1071,20 +1083,22 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         basic_cube_core = glm::rotate(basic_cube_core, glm::radians(10.0f) * (float)DelayedRatio, randomRotateAxis);
 
                     //RENDER =====================================
-                    basic_shader_->use();
+                    quad_shader_->use();
                     glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
-                    basic_shader_->setMat4("projection", BackBuffer.camera.projection);
-                    basic_shader_->setMat4("model", Plane);
+                    quad_shader_->setMat4("projection", BackBuffer.camera.projection);
+                    quad_shader_->setFloat("colorOffset", ColorOffset);
+                    quad_shader_->setMat4("model", Plane);
                     //why it only show half the plane
-                    glDrawArrays(GL_TRIANGLES, 0, 3);
-
+                    glDrawArrays(GL_TRIANGLES, 0, 6);
+                    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+                    
+                    basic_shader_->use();
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
                     basic_shader_->setFloat("colorOffset", ColorOffset);
                     basic_shader_->setMat4("model", basic_cube_core);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-
-                    drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], DelayedRatio, &UpdatedAngle, TimeToChangeAxis, &rollCubeMap);
+                    drawTile(ScreenBuffer.glData.VAOs, basic_shader_->GetProgramID(), DelayedRatio, &UpdatedAngle, TimeToChangeAxis, &rollCubeMap);
                     //drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], DelayedRatio, &updateDegreeInPi, TimeToChangeAxis, &rollCubeMap);
 
                     if(TimeToChangeAxis){
@@ -1220,6 +1234,9 @@ MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per registerMULPS -> re
 
           delete basic_shader_;
           basic_shader_ = nullptr;
+
+          delete quad_shader_;
+          quad_shader_ = nullptr;
 
           delete model_shader_;
           model_shader_ = nullptr;

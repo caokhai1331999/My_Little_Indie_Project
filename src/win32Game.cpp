@@ -500,19 +500,40 @@ HDC windowDC = GetDC(window);
                    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
                 };
                 
+                static const unsigned int planeIndices[] = {
+                    0, 4, 1, 2, 1, 7
+                };
+
                 static const float PlaneVertices[] = {
                     // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
                   // x,    y,     z
 
-                    5.0f, -1.0f, -5.0f,  0.0f, 0.0f, -1.0f, 0.0f, 2.0f,
-                   -1.0f, -1.0f,  5.0f,  0.0f, 0.0f, -1.0f, 0.0f, 2.0f,
-                    5.0f, -1.0f,  5.0f,  0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+                    3.0f, -1.0f, -3.0f,
+                   -1.0f, -1.0f,  3.0f,
+                    3.0f, -1.0f,  3.0f,
 
-                   -1.0f, -1.0f,  5.0f,  0.0f, 0.0f, -1.0f, 2.0f, 0.0f,
-                   -1.0f, -1.0f, -5.0f,  0.0f, 0.0f, -1.0f, 2.0f, 2.0f,
-                    5.0f, -1.0f, -5.0f,  0.0f, 0.0f, -1.0f, 2.0f, 0.0f
+                    3.0f, -1.0f, -3.0f,
+                   -1.0f, -1.0f, -3.0f,
+                   -1.0f, -1.0f,  3.0f,
+
+                    3.0f, -1.0f, -3.0f,
+                   -1.0f, -1.0f,  3.0f,
+                   -1.0f, -1.0f, -3.0f
                 };
-                
+//The second part of this vertices buffer is wrong somewhere
+/*  0.0f, 0.0f, -1.0f, 0.0f, 2.0f,
+  0.0f, 0.0f, -1.0f, 0.0f, 2.0f,
+  0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+                                
+  0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
+  0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
+  0.0f, 0.0f, -1.0f, 0.0f, 0.0f,                
+                                
+  0.0f, 0.0f, -1.0f, 2.0f, 0.0f,
+  0.0f, 0.0f, -1.0f, 2.0f, 2.0f,
+  0.0f, 0.0f, -1.0f, 2.0f, 0.0f 
+*/
+
                 static const GLfloat g_color_buffer_data[] = {
                     0.583f,  0.771f,  0.014f,
                     0.609f,  0.115f,  0.436f,
@@ -553,11 +574,8 @@ HDC windowDC = GetDC(window);
                 };
 
                 glGenVertexArrays(1, &OBuffer->glData.VAOs);
-                glGenVertexArrays(1, &OBuffer->glData.PlaneVAOs);
-
-
-                glBindVertexArray(OBuffer->glData.VAOs);
                 glGenBuffers(1, &OBuffer->glData.VBO);
+                glBindVertexArray(OBuffer->glData.VAOs);
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.VBO);
                 glBufferData(GL_ARRAY_BUFFER, sizeof(fullvertices), &fullvertices, GL_STATIC_DRAW);
                 
@@ -583,28 +601,38 @@ HDC windowDC = GetDC(window);
                 //  index, size, type, .., stride, pointer
 //========================================================================
 // FOR PLANE
-                glBindVertexArray(OBuffer->glData.PlaneVAOs);       
+                glBindVertexArray(0);
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+                glGenVertexArrays(1, &OBuffer->glData.PlaneVAOs);
                 glGenBuffers(1, &OBuffer->glData.PlaneVBO);
+
+                glBindVertexArray(OBuffer->glData.PlaneVAOs);       
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.PlaneVBO);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(PlaneVertices), &PlaneVertices[0], GL_STREAM_DRAW);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(float)*sizeof(PlaneVertices), &PlaneVertices, GL_STATIC_DRAW);
 
                  //Position
                 glEnableVertexAttribArray(0);
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
 
                  //Normal
-                glEnableVertexAttribArray(1);
-                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
-                
+                //glEnableVertexAttribArray(1);
+                //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
+                //
                  //TEXTURE COOR
-                glEnableVertexAttribArray(2);                
-                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));
-
+                //glEnableVertexAttribArray(2);                
+                //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));
+//
+                //Color
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.ColorVBO);                
                 glEnableVertexAttribArray(3);
                 glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
-                
-                //glBufferData(GL_ARRAY_BUFFER, sizeof(trianglesVerticles), &trianglesVerticles, GL_STATIC_DRAW);
+
+                GLuint planeindices;
+                glGenBuffers(1, &planeindices);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, planeindices);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(planeIndices), &planeIndices, GL_STATIC_DRAW);
+
                 printf("hmm... Size of Vertices:%d\n", (int)(sizeof(PlaneVertices)/sizeof(float)));
 
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -675,7 +703,7 @@ HDC windowDC = GetDC(window);
                 //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
                 // Deprecated
-                //glEnable(GL_TEXTURE_2D);
+ //glEnable(GL_TEXTURE_2D);
                 glEnable(GL_DEPTH_TEST);
                 glEnable(GL_CULL_FACE);
                 glCullFace(GL_FRONT);
