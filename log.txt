@@ -1226,3 +1226,7 @@ due to the position of the second triangles in the buffer has an issue
 ---------------- Sun, 29 Mar 26: 12:10PM
 
 So it's jut how I define the positions of triangles in this buffer.
+DONE change the draw array much better performance drawelement on cubes.
+
+On the way to set up buffer data report for one that is bound to animating
+shader(got alot of garbage data)

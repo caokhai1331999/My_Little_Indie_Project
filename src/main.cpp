@@ -1089,14 +1089,15 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     quad_shader_->setFloat("colorOffset", ColorOffset);
                     quad_shader_->setMat4("model", Plane);
                     //why it only show half the plane
-                    glDrawArrays(GL_TRIANGLES, 0, 6);
-                    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+                    //glDrawArrays(GL_TRIANGLES, 0, 6);
+                    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
                     
                     basic_shader_->use();
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
                     basic_shader_->setFloat("colorOffset", ColorOffset);
                     basic_shader_->setMat4("model", basic_cube_core);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                    //glDrawArrays(GL_TRIANGLES, 0, 36);
+                    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
                     drawTile(ScreenBuffer.glData.VAOs, basic_shader_->GetProgramID(), DelayedRatio, &UpdatedAngle, TimeToChangeAxis, &rollCubeMap);
                     //drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], DelayedRatio, &updateDegreeInPi, TimeToChangeAxis, &rollCubeMap);
@@ -1188,12 +1189,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
                           };
                           brushID = animating_shader_->GetProgramID();
                           glBindBuffer(GL_ARRAY_BUFFER, dancing_vampire->meshes[0].VBO);
-                          if(showMsPF)showUniformVarValuePerVertex(&brushID, true, true, true, true);
-                          glBindBuffer(GL_ARRAY_BUFFER, 0);
+                          if(showMsPF)showUniformVarValuePerVertex(&brushID, &dancing_vampire->meshes[0], true, true, true, false);
                       //}
                           DDraw(dancing_vampire, &brushID);
-                          glBindBuffer(GL_ARRAY_BUFFER, 0);
-                      if (showMsPF) {
+
+                          if (showMsPF) {
                           printf("[LastFrameCount:%f,EndFrameCount:%f, "
                                  "CounterPerFrame : %I64d], MiliS per frame: "
                                  "%f, real FPS: %I64d \n",

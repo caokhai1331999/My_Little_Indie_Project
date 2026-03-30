@@ -117,45 +117,73 @@ void Draw(Mesh* mesh, GLuint* progID){
 };
 
 
-void showUniformVarValuePerVertex(GLuint* programeId, bool32 showPos, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices){
+void showUniformVarValuePerVertex(GLuint* programeId, Mesh* mesh, bool32 showPos, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices){
+//We already bind the specific VAO before
+    int VertexSizeforVec4 = MAX_BONE_INFLUENCE * 100;
+    int VertexSizeforVec3 = 3 * 100;
 
     if(showPos){
-        float readbackPositions[3];
+        float* readbackPositions;
+        readbackPositions = new float (VertexSizeforVec3);
+
         glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float)*3, &readbackPositions[0]);
         if(readbackPositions!=nullptr){
-                printf("Vertex Position:");
+            for(int k = 0; k < 100; k++){
                 for(int i = 0; i < 3; i++){
-                    i==0?printf("%f", readbackPositions[i]):printf(", %f", readbackPositions[i]);
+                    if(i==0)
+                    printf("Vertex Position id %d :", (3*k)+i);
+
+                    i==0?printf("%f", readbackPositions[(3*k)+i]):printf(", %f", readbackPositions[(3*k)+i]);
                 }
-                printf("\n");  
-        }
+                printf("\n");
+            }
+        }   
     }
 
     if(showBoneIds){
-        int readbackBoneIDs[4];
+        int* readbackBoneIDs;
+        readbackBoneIDs = new int (VertexSizeforVec4);
         glGetBufferSubData(GL_ARRAY_BUFFER, offsetof(Vertex, m_BoneIDs), sizeof(int)*MAX_BONE_INFLUENCE, &readbackBoneIDs[0]);
         if(readbackBoneIDs!=nullptr){
-                printf("Bone IDs per vertex:");
+            for(int k = 0; k < 100; k++){
                 for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
-                    i==0?printf("%d", readbackBoneIDs[i]):printf(", %d", readbackBoneIDs[i]);
+
+                    if(i==0)
+                    printf("Bone IDs per vertex %d is: ", (4*k)+i);
+
+                    i==0?printf("%d", readbackBoneIDs[(4*k)+i]):printf(", %d", readbackBoneIDs[(4*k)+i]);
                 }
                 printf("\n");
-        };
+            }
         }
+    }
 
-if(showWeights){
-    float readbackWeights[4] = {};
-    glGetBufferSubData(GL_ARRAY_BUFFER, offsetof(Vertex, m_Weights), sizeof(float)*MAX_BONE_INFLUENCE, &readbackWeights[0]);
-    if(readbackWeights[0]!=0.0f){
-        printf("Bone weights per vertex:");
-        if(readbackWeights[0]!=0.0f){
-            for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
-                i==0?printf("%f", readbackWeights[i]):printf(", %f", readbackWeights[i]);
+    if(showWeights){
+        float* readbackWeights;
+        readbackWeights = new float (VertexSizeforVec4);
+        glGetBufferSubData(GL_ARRAY_BUFFER, offsetof(Vertex, m_Weights), sizeof(float)*MAX_BONE_INFLUENCE, &readbackWeights[0]);
+        if(readbackWeights != nullptr){
+            for(int k = 0; k < 100; k++){
+                if(readbackWeights[0]!=0.0f){
+                    if(readbackWeights[0]!=0.0f){
+
+
+                    for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
+
+                        if(i==0)
+                        printf("Bone weights per vertex %d: ", (4*k)+i);
+
+                        i==0?printf("%f", readbackWeights[(4*k)+i]):printf(", %f", readbackWeights[(4*k)+i]);
+                        }
+                    };
+                    printf("\n");
+                } else {
+                    continue;   
+                }                
             }
         };
-        printf("\n");
+
     }
-}
     
     if(showFinalBoneMatrices){
         GLfloat matVal[16];
@@ -164,23 +192,23 @@ if(showWeights){
         for(int k = 0; k < 100; k++){
             matrixName_.clear();
             matrixName_ = "finalBoneMatrices[]";
-        sprintf(index, "%d", k);
-        matrixName_.insert(matrixName_.size()-1, 1, index[0]);
+            sprintf(index, "%d", k);
+            matrixName_.insert(matrixName_.size()-1, 1, index[0]);
 
-        glGetUniformfv(*programeId, glGetUniformLocation(*programeId,                                       matrixName_.c_str()), matVal);
+            glGetUniformfv(*programeId, glGetUniformLocation(*programeId,                                       matrixName_.c_str()), matVal);
 
-        printf("\nBone Matrix index %d is:", k);
+            printf("\nBone Matrix index %d is:", k);
 
-        for(int i = 0 ; i < 16; i++){
-            if(i==0||i==4||i==8||i==12){
-                i==0?printf("["):printf(", [");
-            }
-            (i==0||i==4||i==8||i==12)?printf("%f", matVal[i]):printf(", %f", matVal[i]);
-            if(i==3||i==7||i==11||i==15){
-                printf("]");
-            }
-        };
-        printf("\n");            
+            for(int i = 0 ; i < 16; i++){
+                if(i==0||i==4||i==8||i==12){
+                    i==0?printf("["):printf(", [");
+                }
+                (i==0||i==4||i==8||i==12)?printf("%f", matVal[i]):printf(", %f", matVal[i]);
+                if(i==3||i==7||i==11||i==15){
+                    printf("]");
+                }
+            };
+            printf("\n");            
         }
 
     };

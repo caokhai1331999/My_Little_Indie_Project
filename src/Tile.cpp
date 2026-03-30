@@ -87,7 +87,8 @@ void drawTile(unsigned int VaoID, unsigned int shaderID, float speed, float* upd
                 model = glm::translate(model_, tempTilePos); 
                 setMat4(shaderID, "model", model);
             }
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            //glDrawArrays(GL_TRIANGLES, 0, 36);
+            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
             //x__+= TILE_X;
         }        
         //z__+= TILE_Z;

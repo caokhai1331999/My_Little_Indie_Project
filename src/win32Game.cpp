@@ -412,42 +412,43 @@ HDC windowDC = GetDC(window);
                 //};
              //
                 const float Vertices[] = {
-                   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+                   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,// 0
                     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
                     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
                     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
                    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
                    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-                   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,// 1
                     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
                     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
                     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
                    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
                    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-                   -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                   
+                   -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,// 2
                    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
                    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
                    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
                    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
                    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-                    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,// 3
                     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
                     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
                     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
                     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
                     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-                   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,// 4
                     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
                     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
                     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
                    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
                    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-                   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+                   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,// 5
                     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
                     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
                     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
@@ -499,9 +500,20 @@ HDC windowDC = GetDC(window);
                    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,    
                    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
                 };
+
+                static const unsigned int cubeIndices[] = {
+                    0, 1, 2, 2, 4, 0,//0
+                    6, 7, 8, 7, 6, 11,
+                    12, 13, 14, 13, 12, 17,//2
+                    18, 19, 20, 20, 22, 18,
+                    24, 25, 26, 25, 24, 29,//4
+                    30, 31, 32, 32, 34, 30
+                };
+
                 
                 static const unsigned int planeIndices[] = {
-                    0, 4, 1, 2, 1, 7
+//Even though the vertex 1, 0 will be reused but we have to feed them name for opengl just like this
+                    2, 0, 1, 1, 0, 4, 1, 7
                 };
 
                 static const float PlaneVertices[] = {
@@ -598,7 +610,12 @@ HDC windowDC = GetDC(window);
 
                 glEnableVertexAttribArray(3);
                 glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
-                //  index, size, type, .., stride, pointer
+                GLuint cubeIndices_;
+                glGenBuffers(1, &cubeIndices_);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIndices_);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), &cubeIndices, GL_STATIC_DRAW);
+
+//  index, size, type, .., stride, pointer
 //========================================================================
 // FOR PLANE
                 glBindVertexArray(0);
