@@ -126,7 +126,6 @@ void APIENTRY MessageCallback(GLenum source,
                               GLsizei length,
                               const GLchar* message,
                               const void* userParam);
-
 void ErrorExit();
 
 #define WIN32GAME_H

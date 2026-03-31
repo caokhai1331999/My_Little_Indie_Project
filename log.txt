@@ -1214,7 +1214,7 @@ The boneIds and weight's value inside that big mesh is valid
 There are only 2 possible cause IMO:
    1. The vertex shader code
    2. the invalid final bone matrices (or the unproper animation play(reset
-   counter) which cause the matrices's values overflow)
+   counter) which cause the matrices's values overflow) 
 
 Next time: Use read back data to read binding value at fixed location inside the
 skeletal vertex shader
@@ -1230,3 +1230,23 @@ DONE change the draw array much better performance drawelement on cubes.
 
 On the way to set up buffer data report for one that is bound to animating
 shader(got alot of garbage data)
+
+---------------- Tue, 31 Mar 26: 11:31AM
+
+NOTE: The mesh vertices size of vampire model is more than 8000 bytes. How can I
+manage to fetch parts of it properly
+
+---------------- Tue, 31 Mar 26: 01:07PM
+
+Time to think about add a small character to move around
+
+---------------- Tue, 31 Mar 26: 02:44PM
+
+so due to the fact that I don't know what the offsetoff function really do. It
+just give back the position of the element bytes in the array. 
+
+DONE! checking the readbackdata from vertexbuffer object. They all seemed fine
+
+Time to move on to : 1. recheck the vs shader code
+                     2. check the finalbonematrices again to see it is proper or
+                     not even though it is not garbage value

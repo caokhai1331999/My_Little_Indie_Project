@@ -1001,13 +1001,16 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     if(BackBuffer.camera.mouse.Wheeled)
                     {
                         BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
-                        glUseProgram(ScreenBuffer.glData.ProgramIDs[0]);
+
+                        glUseProgram(basic_shader_->GetProgramID());
                         basic_shader_->setMat4("projection", BackBuffer.camera.projection);
-                        glUseProgram(ScreenBuffer.glData.ProgramIDs[1]);
+
+                        glUseProgram(model_shader_->GetProgramID());
                         model_shader_->setMat4("projection", BackBuffer.camera.projection);
 
-                        glUseProgram(ScreenBuffer.glData.ProgramIDs[2]);
+                        glUseProgram(animating_shader_->GetProgramID());
                         animating_shader_->setMat4( "projection", BackBuffer.camera.projection);
+
                         BackBuffer.camera.mouse.Wheeled = false;
                     }
 

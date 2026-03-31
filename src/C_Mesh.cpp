@@ -116,42 +116,34 @@ void Draw(Mesh* mesh, GLuint* progID){
         glActiveTexture(GL_TEXTURE0);    
 };
 
-
 void showUniformVarValuePerVertex(GLuint* programeId, Mesh* mesh, bool32 showPos, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices){
 //We already bind the specific VAO before
     int VertexSizeforVec4 = MAX_BONE_INFLUENCE * 100;
     int VertexSizeforVec3 = 3 * 100;
-
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
     if(showPos){
-        float* readbackPositions;
-        readbackPositions = new float (VertexSizeforVec3);
-
-        glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float)*3, &readbackPositions[0]);
-        if(readbackPositions!=nullptr){
+        glm::vec3 readbackPositions;        
             for(int k = 0; k < 100; k++){
-                for(int i = 0; i < 3; i++){
-                    if(i==0)
-                    printf("Vertex Position id %d :", (3*k)+i);
-
-                    i==0?printf("%f", readbackPositions[(3*k)+i]):printf(", %f", readbackPositions[(3*k)+i]);
-                }
+                GLintptr offset = (k*sizeof(struct Vertex));
+                glGetBufferSubData(GL_ARRAY_BUFFER, offset, sizeof(glm::vec3), &readbackPositions);
+                printf("Position ID %d:", k);
+                std::cout<<glm::to_string(readbackPositions);
                 printf("\n");
             }
-        }   
     }
 
     if(showBoneIds){
-        int* readbackBoneIDs;
-        readbackBoneIDs = new int (VertexSizeforVec4);
-        glGetBufferSubData(GL_ARRAY_BUFFER, offsetof(Vertex, m_BoneIDs), sizeof(int)*MAX_BONE_INFLUENCE, &readbackBoneIDs[0]);
+        int readbackBoneIDs[4];
+        //readbackBoneIDs = new int (VertexSizeforVec4);
         if(readbackBoneIDs!=nullptr){
             for(int k = 0; k < 100; k++){
+                GLintptr offset = (k*sizeof(Vertex)) + offsetof(struct Vertex, m_BoneIDs);
+                glGetBufferSubData(GL_ARRAY_BUFFER, offset, sizeof(int)*MAX_BONE_INFLUENCE, readbackBoneIDs);
                 for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
 
                     if(i==0)
-                    printf("Bone IDs per vertex %d is: ", (4*k)+i);
-
-                    i==0?printf("%d", readbackBoneIDs[(4*k)+i]):printf(", %d", readbackBoneIDs[(4*k)+i]);
+                        printf("Bone IDs per vertex %d is: ", k);
+                    i==0?((readbackBoneIDs[i]<30)&&(readbackBoneIDs[i]>=-1))?printf("%d", readbackBoneIDs[i]):printf("NA"):printf(", %d", readbackBoneIDs[i]);
                 }
                 printf("\n");
             }
@@ -159,23 +151,18 @@ void showUniformVarValuePerVertex(GLuint* programeId, Mesh* mesh, bool32 showPos
     }
 
     if(showWeights){
-        float* readbackWeights;
-        readbackWeights = new float (VertexSizeforVec4);
-        glGetBufferSubData(GL_ARRAY_BUFFER, offsetof(Vertex, m_Weights), sizeof(float)*MAX_BONE_INFLUENCE, &readbackWeights[0]);
+        float readbackWeights[4];
+        //readbackWeights = new float (VertexSizeforVec4);
         if(readbackWeights != nullptr){
             for(int k = 0; k < 100; k++){
-                if(readbackWeights[0]!=0.0f){
+                GLintptr offset = sizeof(Vertex)*k + offsetof(struct Vertex, m_Weights);
+                glGetBufferSubData(GL_ARRAY_BUFFER, offset, sizeof(float)*MAX_BONE_INFLUENCE, readbackWeights);
                     if(readbackWeights[0]!=0.0f){
-
-
                     for(int i = 0; i < MAX_BONE_INFLUENCE; i++){
-
                         if(i==0)
-                        printf("Bone weights per vertex %d: ", (4*k)+i);
-
-                        i==0?printf("%f", readbackWeights[(4*k)+i]):printf(", %f", readbackWeights[(4*k)+i]);
+                        printf("Bone weights per vertex %d: ", k);
+                        i==0?((i==0.0f||i==1.0f)?printf("%f", readbackWeights[i]):printf("NA")):printf(", %f", readbackWeights[i]);
                         }
-                    };
                     printf("\n");
                 } else {
                     continue;   
@@ -184,7 +171,7 @@ void showUniformVarValuePerVertex(GLuint* programeId, Mesh* mesh, bool32 showPos
         };
 
     }
-    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);    
     if(showFinalBoneMatrices){
         GLfloat matVal[16];
         char index[1];
@@ -210,6 +197,5 @@ void showUniformVarValuePerVertex(GLuint* programeId, Mesh* mesh, bool32 showPos
             };
             printf("\n");            
         }
-
     };
 };
