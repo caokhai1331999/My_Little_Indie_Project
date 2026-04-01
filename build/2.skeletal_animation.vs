@@ -1,13 +1,11 @@
 #version 330 core
-layout (location = 0) in vec3 pos;
-layout (location = 1) in vec3 norm;
-layout (location = 2) in vec2 tex;
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aNormal;
+layout (location = 2) in vec2 aTexCoord;
 layout (location = 3) in vec3 tangent;
 layout (location = 4) in vec3 bitangent;
 layout (location = 5) in ivec4 boneids;
 layout (location = 6) in vec4 weights;
-
-uniform vec3 lightPos;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -19,65 +17,33 @@ uniform mat4 finalBoneMatrices[MAX_BONES];
 
 out vec3 Normal;
 out vec3 FragPos;
-out vec2 TexCoords;
-//vertex shader run every vertex
+out vec2 TexCoord;
 
 void main()
 {
-//aPos is the vertex position so the Fragment position is
-//the dot product of model and vertex Position (plus two vector)
-// This is to create a world space coor of fragment
-
    vec4 totalPosition = vec4(0.0f);
-   vec3 localNormal;
-   vec3 poss = pos;
 
-if(poss==vec3(0.0f))
- poss = vec3(1.0f);
+// for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
+// 	 if(boneids[i] == -1)
+// 	   continue;
+// 	 if(boneids[i] >= MAX_BONES){
+// 	   totalPosition = vec4(aPos, 1.0f);
+// 	   break;
+// 	 }
+//          vec4 localPosition = finalBoneMatrices[boneids[i]]*vec4(aPos, 1.0f);
+// 	 totalPosition += localPosition * weights[i];
+// 	 localNormal = mat3(finalBoneMatrices[boneids[i]]) * norm;
+// 	 Normal += localNormal;
+//        }
 
- for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
-	 if(boneids[i] == -1)
-	   continue;
-	 if(boneids[i] >= MAX_BONES){
-	   totalPosition = vec4(poss, 1.0f);
-	   break;
-	 }
-         vec4 localPosition = finalBoneMatrices[boneids[i]]*vec4(poss, 1.0f);
-	 totalPosition += localPosition * weights[i];
-	 localNormal = mat3(finalBoneMatrices[boneids[i]]) * norm;
-	 Normal += localNormal;
-       }
-       
-	 // vec3 localNormal = vec3(finalBoneMatrices[boneids[i]] * model)* norm;
-	 //For What???
-       // }
-//Second method
-// mat multiply to vec produce out vec
-         // vec4 localPositionn = finalBoneMatrices[boneids[0]]*vec4(pos,1.0f);
-	 // vec4 totalPositionn = localPositionn * weights[0];
-	 // Normal = mat3(finalBoneMatrices[boneids[0]]) * norm;
+ gl_Position = projection * view * model * vec4(-aPos, 1.0f);
 
-         // localPositionn = finalBoneMatrices[boneids[1]]*vec4(pos,1.0f);
-	 // totalPositionn += localPositionn * weights[1];
-	 // Normal += mat3(finalBoneMatrices[boneids[1]]) * norm;
+	//aPos is the vertex position so the Fragment position is
+	//the dot product of model and vertex Position (plus two vector)
+	// This is to create a world space coor of fragment
 
-	 // localPositionn = finalBoneMatrices[boneids[2]]*vec4(pos,1.0f);
-	 // totalPositionn += localPositionn * weights[2];
-	 // Normal += mat3(finalBoneMatrices[boneids[2]]) * norm;
+     FragPos = vec3(model *vec4(aPos, 1.0f));
+     Normal = vec3(transpose(inverse(view * model))) * aNormal;
 
-	 // localPositionn = finalBoneMatrices[boneids[3]]*vec4(pos,1.0f);
-	 // totalPositionn += localPositionn * weights[3];
-	 // Normal += mat3(finalBoneMatrices[boneids[3]]) * norm;
-
-     // local postion, total position, weights,
-
-     //2nd method
-     mat4 viewModel = view * model;
-     gl_Position = projection * viewModel * totalPosition;
-
-
-//   /window2d space//clip space//world space//local space/
-	TexCoords = tex;
-     	// FragPos = vec3(model *vec4(pos, 1.0f));
-        FragPos = vec3(model * totalPosition);
-}
+     TexCoord = aTexCoord;
+};

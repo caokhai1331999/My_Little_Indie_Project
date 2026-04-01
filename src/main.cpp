@@ -600,8 +600,14 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 }
 
                 glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
-                // Basic shader
-                std::string shader_name = "basic brush";
+
+                //shader_name.clear();                
+                std::string shader_name = "animating sketching brush";
+                animating_shader_ = new B_shader_program("2.skeletal_animation.vs", "1.model.fs", shader_name.c_str());
+                ScreenBuffer.glData.ProgramIDs.push_back(animating_shader_->GetProgramID());
+
+// Basic shader
+                shader_name = "basic brush";
                 basic_shader_ = new B_shader_program("shader.vs", "shader.fs", shader_name.c_str());             ScreenBuffer.glData.ProgramIDs.push_back(basic_shader_->GetProgramID());
 
                 shader_name = "quad brush";
@@ -611,10 +617,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 shader_name = "model drawing brush";
                 //basic model shader
                 model_shader_ = new B_shader_program("1.model.vs", "1.model.fs", shader_name.c_str());                ScreenBuffer.glData.ProgramIDs.push_back(model_shader_->GetProgramID());
-
-                //shader_name.clear();                
-                shader_name = "animating sketching brush";
-                animating_shader_ = new B_shader_program("2.skeletal_animation.vs", "2.skeletal_animation.fs", shader_name.c_str());                ScreenBuffer.glData.ProgramIDs.push_back(animating_shader_->GetProgramID());
                 
                 copyBufferData(&BackBuffer, &ScreenBuffer);
                 //????
@@ -713,7 +715,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                 if(glIsProgram(ScreenBuffer.glData.ProgramIDs[3])){
                     //animating_shader_->use();
-                    printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[2]);
+                    printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[3]);
                 } else {
                     glDebugMessageCallback(MessageCallback, 0);
                     printf("animating sketching program object is buggy \n");
@@ -748,9 +750,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     
 //modell->Texturedirectory = texpath.substr(0, path.find_last_of('/'));
                 printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
-                printf("vertex array :%d\n", ScreenBuffer.glData.VAOs);
-
-                
+                printf("vertex array :%d\n", ScreenBuffer.glData.VAOs);                
 
                 Game_Input Input[2] = {};
                 Game_Input* OldInput = &Input[0];
@@ -778,8 +778,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 //Window = SetCapture(Window);
 
                 model_shader_->use();
-                //setInt(ScreenBuffer.glData.ProgramIDs[1], "material.diffuse", 0);
-                //setInt(ScreenBuffer.glData.ProgramIDs[1], "material.specular", 1);
                 model_shader_->setFloat("material.shininess", 32.0f);
                 //
                 model_shader_->setMat4( "projection", BackBuffer.camera.projection);
@@ -1011,6 +1009,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         glUseProgram(animating_shader_->GetProgramID());
                         animating_shader_->setMat4( "projection", BackBuffer.camera.projection);
 
+                        glUseProgram(0);
                         BackBuffer.camera.mouse.Wheeled = false;
                     }
 
@@ -1024,7 +1023,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     model_shader_->setMat4("view", BackBuffer.camera.view);
 
                     animating_shader_->use();
-                    animating_shader_->setMat4( "view", BackBuffer.camera.view);
+                    animating_shader_->setMat4("view", BackBuffer.camera.view);
+                    
+                    glUseProgram(0);
                     // Start to add some basic lighting to the model
                     //setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Model);
                     //glBindVertexArray(ScreenBuffer.glData.VAOs);
@@ -1103,22 +1104,26 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
                     drawTile(ScreenBuffer.glData.VAOs, basic_shader_->GetProgramID(), DelayedRatio, &UpdatedAngle, TimeToChangeAxis, &rollCubeMap);
+                    glUseProgram(0);
+                    glBindVertexArray(0);
                     //drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], DelayedRatio, &updateDegreeInPi, TimeToChangeAxis, &rollCubeMap);
 
                     if(TimeToChangeAxis){
                         TimeToChangeAxis = false;
                     }
 
+                    GLuint brushID;
+                    brushID = model_shader_->GetProgramID();
                     //Draw the backpack
                     model_shader_->use();
                     //glBindVertexArray(ScreenBuffer.glData.VAOs);
-                    GLuint brushID = model_shader_->GetProgramID();
                     model_shader_->setMat4("model", backpack_core);
                     DDraw(backpack, &brushID);
-
                     //model_shader_->setMat4("model", dancing_vampire_core);
                     //DDraw(dancing_vampire, &brushID);
+                    //glUseProgram(0);
 //// Now Draw the vampire
+
                     Game_Input* Temp = NewInput;
                     NewInput = OldInput;  //???? still don't understand
                     OldInput = Temp;
@@ -1156,45 +1161,39 @@ LARGE_INTEGER PerfCountFrequencyResult;
                             PlayAnimation(animator, danceAnimation);
                       }
 
+                      brushID = animating_shader_->GetProgramID();
+
                       animating_shader_->use();
-                      animating_shader_->setMat4("model", dancing_vampire_core);
+                      animating_shader_->setMat4("model", dancing_vampire_core);                      
+                      Draw(&(dancing_vampire->meshes[0]), &brushID);
+                      GLint textureId;
+                      glGetUniformiv(animating_shader_->GetProgramID(), glGetUniformLocation(animating_shader_->GetProgramID(),                                       "material.texture_diffused1"), &textureId);
 
                       std::unordered_map<std::string, Bone_Info>* boneMapClone = danceAnimation->GetBoneIDMap();
                       std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
 
                           if (boneMapClone->size() > 1) {
-                              //for(const std::pair<std::string, Bone_Info>&bone : (*boneMapClone))
-                              //{
-                                  //animating_shader_->setMat4(
-                                      //"finalBoneMatrices[boneIds[" + std::to_string(bone.second.id) +
-                                      //"]]",
-                                      //(*Transform)[bone.second.id]);
-                                  // what is boneIds actually;
-                                  //if (first_announce) {
-                                      //printf("finalBoneMatrices[boneIds[%d]]: %s\n", (int)bone.second.id, glm::to_string((*Transform)[bone.second.id]).c_str());
-                                  //}
-                              //};
-
                               int i = 0;
                               //assuming that vertices[i] is matched with indices[i];
                               
                               // dancing_vampire->mesh[0].vertices[k].m_BoneIDs[];
-                              for (int j = 0; j < 4;  j++){                                   animating_shader_->setMat4(                                     "finalBoneMatrices[" + std::to_string(dancing_vampire->meshes[0].vertices[k].m_BoneIDs[j]) +"]", (*Transform)[dancing_vampire->meshes[0].vertices[k].m_BoneIDs[j]]);
-                              };
-                              k<(int)dancing_vampire->meshes[0].vertices.size()?k++:k=0;
-
-                              //for(const glm::mat4&matrix_ : (*Transform)){
-                                  //animating_shader_->setMat4(
-                                      //"finalBoneMatrices[" + std::to_string(i) +
-                                      //"]", matrix_);
-                                  //i++;
+                              //for (int j = 0; j < 4;  j++){                                   animating_shader_->setMat4(                                     "finalBoneMatrices[" + std::to_string(dancing_vampire->meshes[0].vertices[k].m_BoneIDs[j]) +"]", (*Transform)[dancing_vampire->meshes[0].vertices[k].m_BoneIDs[j]]);
                               //};
+                              //k<(int)dancing_vampire->meshes[0].vertices.size()?k++:k=0;
+
+                              for(const glm::mat4&matrix_ : (*Transform)){
+                                  animating_shader_->setMat4(
+                                      "finalBoneMatrices[" + std::to_string(i) +
+                                      "]", matrix_);
+                                  i++;
+                              };
                           };
-                          brushID = animating_shader_->GetProgramID();
-                          glBindBuffer(GL_ARRAY_BUFFER, dancing_vampire->meshes[0].VBO);
-                          if(showMsPF)showUniformVarValuePerVertex(&brushID, &dancing_vampire->meshes[0], true, true, true, false);
-                      //}
                           DDraw(dancing_vampire, &brushID);
+                          //}
+                          if(showMsPF){
+                              printf("Material diffuse texture id read back from animating shader: %d\n", textureId);
+                              showUniformVarValuePerVertex(&brushID, &dancing_vampire->meshes[0], true, true, true, true, false);
+                          }
 
                           if (showMsPF) {
                           printf("[LastFrameCount:%f,EndFrameCount:%f, "

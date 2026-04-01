@@ -52,16 +52,16 @@ struct Vertex {
     // bitangent
     glm::vec3 Bitangent;
 	//bone indexes which will influence this vertex
-    int m_BoneIDs[MAX_BONE_INFLUENCE]{};
+    glm::ivec4 m_BoneIDs;
 	//weights from each bone
-	float m_Weights[MAX_BONE_INFLUENCE]{};
-    Vertex(){
-        for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
-        {
-            m_BoneIDs[i] = -1;
-            m_Weights[i] = 0.0f;       
-        }
-    }
+    glm::vec4 m_Weights;
+    //Vertex(){
+        //for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
+        //{
+            //m_BoneIDs[i] = -1;
+            //m_Weights[i] = 0.0f;       
+        //}
+    //}
 };
 
 // Data in bone weight[]
@@ -102,5 +102,5 @@ void SetVertexBoneDataToDefault(Vertex* vertex){
 void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
 void setupMesh(Mesh* mesh = nullptr);
 void Draw(Mesh* mesh = nullptr, GLuint* progID = nullptr);
-void showUniformVarValuePerVertex(GLuint* programeId = nullptr, Mesh* mesh = nullptr,  bool32 showPos = false,  bool32 showBoneIds = false, bool32 showWeights = false, bool32 showFinalBoneMatrices = false);
+void showUniformVarValuePerVertex(GLuint* programeId = nullptr, Mesh* mesh = nullptr, bool32 showIndices = false,  bool32 showPos = false,  bool32 showBoneIds = false, bool32 showWeights = false, bool32 showFinalBoneMatrices = false);
 #endif

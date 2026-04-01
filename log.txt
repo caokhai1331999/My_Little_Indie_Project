@@ -1250,3 +1250,11 @@ DONE! checking the readbackdata from vertexbuffer object. They all seemed fine
 Time to move on to : 1. recheck the vs shader code
                      2. check the finalbonematrices again to see it is proper or
                      not even though it is not garbage value
+
+---------------- Wed, 01 Apr 26: 10:24AM
+Something off: if the model shader can draw the vampire model. So the vertex
+data except boneMatrices is fine. But why even after I exclude out the final
+boneMatrices. It seemed like nothing changed.
+
+Now thing to check: 1. Setup process of animating shader. FINE.
+                    2. Shader code NOTE:THIS ONE IS BUG
