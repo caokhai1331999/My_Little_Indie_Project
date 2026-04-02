@@ -603,7 +603,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                 //shader_name.clear();                
                 std::string shader_name = "animating sketching brush";
-                animating_shader_ = new B_shader_program("2.skeletal_animation.vs", "1.model.fs", shader_name.c_str());
+                animating_shader_ = new B_shader_program("2.skeletal_animation.vs", "2.skeletal_animation.fs", shader_name.c_str());
                 ScreenBuffer.glData.ProgramIDs.push_back(animating_shader_->GetProgramID());
 
 // Basic shader
@@ -1106,13 +1106,42 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     drawTile(ScreenBuffer.glData.VAOs, basic_shader_->GetProgramID(), DelayedRatio, &UpdatedAngle, TimeToChangeAxis, &rollCubeMap);
                     glUseProgram(0);
                     glBindVertexArray(0);
+                    GLuint brushID;
                     //drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], DelayedRatio, &updateDegreeInPi, TimeToChangeAxis, &rollCubeMap);
 
                     if(TimeToChangeAxis){
                         TimeToChangeAxis = false;
                     }
+// animation update and render ================================================
+                      if (updateTime > 0.0f) {
+                            AniUpdate(animator, &updateTime);
+                            PlayAnimation(animator, danceAnimation);
+                      }
 
-                    GLuint brushID;
+                      std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
+
+                              //assuming that vertices[i] is matched with indices[i];
+                              
+                              // dancing_vampire->mesh[0].vertices[k].m_BoneIDs[];
+                              //for (int j = 0; j < 4;  j++){                                   animating_shader_->setMat4(                                     "finalBoneMatrices[" + std::to_string(dancing_vampire->meshes[0].vertices[k].m_BoneIDs[j]) +"]", (*Transform)[dancing_vampire->meshes[0].vertices[k].m_BoneIDs[j]]);
+                              //};
+                              //k<(int)dancing_vampire->meshes[0].vertices.size()?k++:k=0;
+
+                              int i = 0;
+                              for(const glm::mat4&matrix_ : (*Transform)){
+                                  animating_shader_->setMat4(
+                                      "finalBoneMatrices[" + std::to_string(i) +
+                                      "]", matrix_);
+                                  i++;
+                              };
+
+                      brushID = animating_shader_->GetProgramID();
+                      animating_shader_->use();
+                      animating_shader_->setMat4("model", dancing_vampire_core);                      
+                      DDraw(dancing_vampire, &brushID);
+
+// animation update and render ================================================
+
                     brushID = model_shader_->GetProgramID();
                     //Draw the backpack
                     model_shader_->use();
@@ -1121,14 +1150,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     DDraw(backpack, &brushID);
                     //model_shader_->setMat4("model", dancing_vampire_core);
                     //DDraw(dancing_vampire, &brushID);
-                    //glUseProgram(0);
-//// Now Draw the vampire
-
-                    Game_Input* Temp = NewInput;
-                    NewInput = OldInput;  //???? still don't understand
-                    OldInput = Temp;
-                    SwapBuffers(DeviceContext);
-                    ReleaseDC(Window, DeviceContext);
+                    glUseProgram(0);
+// Now Draw the vampire
 
                     //real32 endFrame = EndCycleCounts;
                     //LastCycleCounts = EndCycleCounts;
@@ -1137,8 +1160,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     // Why this produce same result
 //Two different approaching ways
 
-                    
-                      if (!QueryPerformanceCounter(&EndCounter)) {
+                      //brushID = model_shader_->GetProgramID();
+                      //model_shader_->use();
+
+//Weird behaviour may happened close to this part
+                    if (!QueryPerformanceCounter(&EndCounter)) {
                         printf("Failed to call performancecounter function\n");
                       };
 
@@ -1156,42 +1182,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
                           }
                       }
 
-                      if (updateTime > 0.0f) {
-                            AniUpdate(animator, &updateTime);
-                            PlayAnimation(animator, danceAnimation);
-                      }
+//The model is no longer drawable after these lines
 
-                      brushID = animating_shader_->GetProgramID();
-
-                      animating_shader_->use();
-                      animating_shader_->setMat4("model", dancing_vampire_core);                      
-                      Draw(&(dancing_vampire->meshes[0]), &brushID);
-                      GLint textureId;
-                      glGetUniformiv(animating_shader_->GetProgramID(), glGetUniformLocation(animating_shader_->GetProgramID(),                                       "material.texture_diffused1"), &textureId);
-
-                      std::unordered_map<std::string, Bone_Info>* boneMapClone = danceAnimation->GetBoneIDMap();
-                      std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
-
-                          if (boneMapClone->size() > 1) {
-                              int i = 0;
-                              //assuming that vertices[i] is matched with indices[i];
-                              
-                              // dancing_vampire->mesh[0].vertices[k].m_BoneIDs[];
-                              //for (int j = 0; j < 4;  j++){                                   animating_shader_->setMat4(                                     "finalBoneMatrices[" + std::to_string(dancing_vampire->meshes[0].vertices[k].m_BoneIDs[j]) +"]", (*Transform)[dancing_vampire->meshes[0].vertices[k].m_BoneIDs[j]]);
-                              //};
-                              //k<(int)dancing_vampire->meshes[0].vertices.size()?k++:k=0;
-
-                              for(const glm::mat4&matrix_ : (*Transform)){
-                                  animating_shader_->setMat4(
-                                      "finalBoneMatrices[" + std::to_string(i) +
-                                      "]", matrix_);
-                                  i++;
-                              };
-                          };
-                          DDraw(dancing_vampire, &brushID);
                           //}
+
                           if(showMsPF){
-                              printf("Material diffuse texture id read back from animating shader: %d\n", textureId);
                               showUniformVarValuePerVertex(&brushID, &dancing_vampire->meshes[0], true, true, true, true, false);
                           }
 
@@ -1217,13 +1212,22 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     if (first_announce) {
                        first_announce = false;
                       }
-                    //char Buffers[256];
+
+//
+                    Game_Input* Temp = NewInput;
+                    NewInput = OldInput;  //???? still don't understand
+                    OldInput = Temp;
+                    SwapBuffers(DeviceContext);
+                    ReleaseDC(Window, DeviceContext);//maybe this one
+//Show things to screen
+//char Buffers[256];
                     //sprintf(Buffers,
                             //"[LastFrameCount: %f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame,MsPerFrame, FPS);
                     //printf("[LastFrameCount:%f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame, MsPerFrame, FPS);
                     //OutputDebugStringA(Buffers);
                     }
           }
+
 
 /*
 MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per registerMULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register

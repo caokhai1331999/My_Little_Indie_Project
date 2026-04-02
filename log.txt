@@ -1258,3 +1258,14 @@ boneMatrices. It seemed like nothing changed.
 
 Now thing to check: 1. Setup process of animating shader. FINE.
                     2. Shader code NOTE:THIS ONE IS BUG
+
+---------------- Thu, 02 Apr 26: 10:56AM
+
+Turns out the calculatefinalBoneMatrices is the real bug nest
+
+Weird behaviour may happened close to the QueryPerformanceCounter part
+
+move up the part now I can use the animating shader
+
+Partially Conclude: The position is fine, the uniform matrix is fine.
+                    The finalBoneMatrices still not work

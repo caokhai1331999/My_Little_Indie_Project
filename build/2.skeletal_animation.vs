@@ -23,19 +23,43 @@ void main()
 {
    vec4 totalPosition = vec4(0.0f);
 
-// for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
-// 	 if(boneids[i] == -1)
-// 	   continue;
-// 	 if(boneids[i] >= MAX_BONES){
-// 	   totalPosition = vec4(aPos, 1.0f);
-// 	   break;
-// 	 }
-//          vec4 localPosition = finalBoneMatrices[boneids[i]]*vec4(aPos, 1.0f);
-// 	 totalPosition += localPosition * weights[i];
-// 	 localNormal = mat3(finalBoneMatrices[boneids[i]]) * norm;
-// 	 Normal += localNormal;
-//        }
+for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
+	 if(boneids[i] == -1)
+	   continue;
+	 if(boneids[i] >= MAX_BONES){
+	   totalPosition = vec4(-aPos, 1.0f);
+	   break;
+	 }
+         vec4 localPosition = finalBoneMatrices[boneids[i]]*vec4(-aPos, 1.0f);
+	 totalPosition += localPosition * weights[i];
+	 vec3 localNormal = mat3(finalBoneMatrices[boneids[i]]) * aNormal;
+	 Normal += localNormal;
+       }
+         vec4 localPosition = finalBoneMatrices[boneids[0]]*vec4(-aPos, 1.0f);
+	 totalPosition += localPosition * weights[0];
+	 vec3 localNormal = mat3(finalBoneMatrices[boneids[0]]) * aNormal;
+	 Normal += localNormal;
 
+	 localPosition = finalBoneMatrices[boneids[1]]*vec4(-aPos, 1.0f);
+	 totalPosition += localPosition * weights[1];
+	 localNormal = mat3(finalBoneMatrices[boneids[1]]) * aNormal;
+	 Normal += localNormal;
+
+	 localPosition = finalBoneMatrices[boneids[2]]*vec4(-aPos, 1.0f);
+	 totalPosition += localPosition * weights[2];
+	 localNormal = mat3(finalBoneMatrices[boneids[2]]) * aNormal;
+	 Normal += localNormal;
+
+	 localPosition = finalBoneMatrices[boneids[3]]*vec4(-aPos, 1.0f);
+	 totalPosition += localPosition * weights[3];
+	 localNormal = mat3(finalBoneMatrices[boneids[3]]) * aNormal;
+	 Normal += localNormal;
+
+
+// vec4 LocalPosition = finalBoneMatrices[boneids[0]]*vec4(aPos, 1.0f);
+// vec4 TotalPosition = LocalPosition * weights[0];
+
+ // gl_Position = projection * view * model * totalPosition;
  gl_Position = projection * view * model * vec4(-aPos, 1.0f);
 
 	//aPos is the vertex position so the Fragment position is
