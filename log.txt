@@ -1269,3 +1269,13 @@ move up the part now I can use the animating shader
 
 Partially Conclude: The position is fine, the uniform matrix is fine.
                     The finalBoneMatrices still not work
+
+---------------- Fri, 03 Apr 26: 11:29AM
+
+It's still mysterious that the animating shader just produce mere color while be
+passed the texture id(which worked on the normal model previously)
+
+REMEMBER! : Just found out don't to inspect more on the code syntax. Try to
+imagine the dataflow
+
+comment out the for loop the shader worked finely

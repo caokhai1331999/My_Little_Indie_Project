@@ -288,7 +288,6 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
   //May the file path is insufficient here
   filename = directory + '/' + filename;
     unsigned int textureID;
-    glGenTextures(1, &textureID);
     //printf("texture file path: %s\n", filename.c_str());
     int width, height, nrComponents;
 
@@ -297,10 +296,12 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
 
     // TODO: find out why stbi load failed to load image data
     // and create alternative function if there is no way to fix this
-     unsigned char *data = (unsigned char*)stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
 
+     unsigned char *data = (unsigned char*)stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
         if (data)
         {
+            glGenTextures(1, &textureID);
+
             GLenum format;
             if (nrComponents == 1)
                 format = GL_RED;
@@ -310,6 +311,7 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
                 format = GL_RGBA;
 
             glActiveTexture(GL_TEXTURE0+textureID);
+
             printf("Texture ID: %d, load from:%s \n", textureID, filename.c_str());
             glBindTexture(GL_TEXTURE_2D, textureID);
             glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
@@ -322,7 +324,8 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
             stbi_image_free(data);
-            glActiveTexture(GL_TEXTURE0);            
+
+            //glActiveTexture(GL_TEXTURE0);            
         } else {
             std::cout << "Texture failed to load at path: " << filename.c_str() << std::endl;
             stbi_image_free(data);
@@ -367,9 +370,10 @@ unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bo
     if(tex){
         printf("We got a texture\n");
         glGenTextures(1, &textureID);
+        
         printf("Texture ID in memory texture loading: %d\n", textureID);
-
         stbi_set_flip_vertically_on_load(true);
+
         if(tex->pcData){
             //Wrong here
 
@@ -406,7 +410,8 @@ unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bo
                     printf("align pixels\n");
                     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
                 }
-                
+
+                glActiveTexture(GL_TEXTURE0+textureID);
                 glBindTexture(GL_TEXTURE_2D, textureID);
                 printf("width is: %d, height is:%d, nrComponent is:%d \n", width, height, nrComponents);
                 glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, img);
@@ -419,6 +424,7 @@ unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bo
 
                 stbi_image_free(img);
                 img = nullptr;
+                
             } else {
                 printf("Got no data from Scene embedded texture\n");
             }

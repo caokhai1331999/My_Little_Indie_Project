@@ -1,12 +1,12 @@
 #version 330 core
 
-out vec4 FragColor;
+out vec4 FragColorr;
 
-in vec3 Normal;
-in vec3 FragPos;
-in vec2 TexCoord;
+smooth in vec3 Normal;
+smooth in vec3 FragPos;
+smooth in vec2 TexCoord_;
 
-struct Material{
+struct Materiall{
 // Ambient will be the same even with change in input
    sampler2D texture_diffused1;
    sampler2D texture_specular1;
@@ -18,13 +18,15 @@ struct Material{
    float shininess;
 };
 
-uniform Material material;
+uniform Materiall material;
 
 void main(){
-//  if(texture(material.texture_diffused1, TexCoord).rgb!=vec3(0.0f)){
-  FragColor = vec4(texture(material.texture_diffused1, TexCoord).rgb, 1.0f);
-  FragColor *= vec4(texture(material.texture_specular1, TexCoord).rgb, 1.0f);
-// }else{
-  // FragColor = vec4(0.4f, 0.23f, 0.3f, 0.7f);
-// }
+     vec4 outFrag;
+     if(TexCoord_ != vec2(0.0f) || texture(material.texture_diffused1, TexCoord_).rgb != vec3(0.0f)){
+     outFrag = vec4(texture(material.texture_diffused1, TexCoord_).rgb, 1.0f);
+     // outFrag = vec4(TexCoord_, 0.0, 1.0f);
+     } else {
+     outFrag = vec4(TexCoord_, 0.0, 1.0f);
+      }
+     FragColorr = outFrag;	
 };

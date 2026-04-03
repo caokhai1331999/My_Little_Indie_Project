@@ -1117,7 +1117,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                             AniUpdate(animator, &updateTime);
                             PlayAnimation(animator, danceAnimation);
                       }
-
+                      animating_shader_->use();
                       std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
 
                               //assuming that vertices[i] is matched with indices[i];
@@ -1136,9 +1136,49 @@ LARGE_INTEGER PerfCountFrequencyResult;
                               };
 
                       brushID = animating_shader_->GetProgramID();
-                      animating_shader_->use();
-                      animating_shader_->setMat4("model", dancing_vampire_core);                      
+                      animating_shader_->setMat4("model", dancing_vampire_core);
+
+//Why the later shader texture drawing work but not the one above
+
+                      //brushID = model_shader_->GetProgramID();
+                      //model_shader_->use();
+                      //model_shader_->setMat4("model", dancing_vampire_core);
+
+                      if(showMsPF){
+                          glm::vec2 TexCoordToShow;
+                          int TextureID;
+                          //for(int i = 0; i < dancing_vampire->meshes[0].vertices.size(); i++){
+                              //int TexCoordoffset = (i*sizeof(Vertex)) + offsetof(Vertex, TexCoords);
+                              //glGetBufferSubData(GL_ARRAY_BUFFER, TexCoordoffset, sizeof(glm::vec2), &TexCoordToShow);
+                              //printf("TexCoord %d: %s\n", i, glm::to_string(TexCoordToShow).c_str());
+                          //
+                          //};
+
+                                  glGetUniformiv(brushID, glGetUniformLocation(brushID, "material.texture_diffused1"), &TextureID);
+                                  printf("material.texture_diffused1 got from animating shader id is: %d\n", TextureID);
+                                  glGetUniformiv(brushID, glGetUniformLocation(brushID, "material.texture_specular1"), &TextureID);
+                                  printf("material.texture_specular1 got from animating shader id is: %d\n", TextureID);                              
+
+                                  if(glIsTexture((GLint)dancing_vampire->meshes[0].textures[0].id)){
+                                      printf("Texture %d is created before and can be used", dancing_vampire->meshes[0].textures[0].id);
+                                          }else{
+                                      printf("Texture %d isn't created before or something cause it's not valid\n", dancing_vampire->meshes[0].textures[0].id);
+};
+                                  if(glIsTexture((GLint)dancing_vampire->meshes[0].textures[1].id)){
+                                      printf("Texture %d is created before and can be used\n", dancing_vampire->meshes[0].textures[1].id);
+                                          }else{
+                                      printf("Texture %d isn't created before or something cause it's not valid\n", dancing_vampire->meshes[0].textures[1].id);                                        
+};
+                                  GLint loc =
+                                      glGetUniformLocation(brushID, "material.texture_diffused1");
+
+                                  printf("diffuse texture sampler location on model shader : %d\n", loc);
+                                  loc =
+                                      glGetUniformLocation(model_shader_->GetProgramID(), "material.texture_diffused1");
+                                  printf("diffuse texture sampler location on animating  shader : %d\n", loc);
+                      }
                       DDraw(dancing_vampire, &brushID);
+                      
 
 // animation update and render ================================================
 
@@ -1205,6 +1245,10 @@ LARGE_INTEGER PerfCountFrequencyResult;
                           printf("updated angle :%f\n", UpdatedAngle);
                           std::cout<<"Center Cube Matrix is: "<<glm::to_string(basic_cube_core)<<std::endl;
                           std::cout<<"Current rotating axis is: "<<glm::to_string(randomRotateAxis)<<std::endl;
+
+                          GLint loc = glGetAttribLocation(animating_shader_->GetProgramID(), "TexCoordd");
+                          printf("TexCoord location: %d\n", loc);
+
                           showMsPF = false;
                       };
                       LastCounter = EndCounter;

@@ -81,10 +81,13 @@ void Draw(Mesh* mesh, GLuint* progID){
         unsigned int normalNr   = 1;
         unsigned int heightNr   = 1;
 
+        glBindVertexArray(mesh->VAO);
+        useProgram(*progID);
+        int textureID;
         for(unsigned int i = 0; i < mesh->textures.size(); i++)
         {
-            glActiveTexture(GL_TEXTURE0+mesh->textures[i].id);    
-            // retrieve texture number (the N in diffuse_textureN)
+            glActiveTexture(GL_TEXTURE0+mesh->textures[i].id);
+// retrieve texture number (the N in diffuse_textureN)
             unsigned int number;
             std::string name = mesh->textures[i].type;
             if(strcmp(name.c_str(),"material.texture_diffused") == 0){
@@ -99,21 +102,16 @@ void Draw(Mesh* mesh, GLuint* progID){
                 
                 number = heightNr++; // transfer unsigned int to string
             }
-
             // now set the sampler to the correct texture unit
             // and finally bind the texture
             glBindTexture(GL_TEXTURE_2D, mesh->textures[i].id);
-            glUniform1i(glGetUniformLocation(*progID, (name+std::to_string(number)).c_str()), mesh->textures[i].id);
-            //printf("TextureID: mesh->textures[i].id: %d, sampler2D name: %s\n", mesh->textures[i].id, (name+std::to_string(number)).c_str());
+            glUniform1i(glGetUniformLocation((*progID), (name+std::to_string(number)).c_str()), mesh->textures[i].id);
         }
 
         // Draw the mesh(Bind array, Load model, draw element/array)
-        useProgram(*progID);
-        glBindVertexArray(mesh->VAO);
         glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(mesh->indices.size()), GL_UNSIGNED_INT, 0);
-
         // Always a good practice to set everything back to default once configured
-        glActiveTexture(GL_TEXTURE0);    
+        //glActiveTexture(GL_TEXTURE0);
 };
 
 void showUniformVarValuePerVertex(GLuint* programeId, Mesh* mesh, bool32 showIndices, bool32 showPos, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices){
