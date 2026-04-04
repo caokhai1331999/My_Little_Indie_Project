@@ -1279,3 +1279,12 @@ REMEMBER! : Just found out don't to inspect more on the code syntax. Try to
 imagine the dataflow
 
 comment out the for loop the shader worked finely
+
+---------------- Sat, 04 Apr 26: 11:24AM
+
+It weird that now when I tried to read back finalBoneMatrices it produces out
+garbage
+
+one more thing I learnt from this shader: that is if I dont call it in main(), I
+won't see its value read back. Still model won't move fragment shown
+partially. Don't know why!!!

@@ -1112,75 +1112,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     if(TimeToChangeAxis){
                         TimeToChangeAxis = false;
                     }
-// animation update and render ================================================
-                      if (updateTime > 0.0f) {
-                            AniUpdate(animator, &updateTime);
-                            PlayAnimation(animator, danceAnimation);
-                      }
-                      animating_shader_->use();
-                      std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
 
-                              //assuming that vertices[i] is matched with indices[i];
-                              
-                              // dancing_vampire->mesh[0].vertices[k].m_BoneIDs[];
-                              //for (int j = 0; j < 4;  j++){                                   animating_shader_->setMat4(                                     "finalBoneMatrices[" + std::to_string(dancing_vampire->meshes[0].vertices[k].m_BoneIDs[j]) +"]", (*Transform)[dancing_vampire->meshes[0].vertices[k].m_BoneIDs[j]]);
-                              //};
-                              //k<(int)dancing_vampire->meshes[0].vertices.size()?k++:k=0;
-
-                              int i = 0;
-                              for(const glm::mat4&matrix_ : (*Transform)){
-                                  animating_shader_->setMat4(
-                                      "finalBoneMatrices[" + std::to_string(i) +
-                                      "]", matrix_);
-                                  i++;
-                              };
-
-                      brushID = animating_shader_->GetProgramID();
-                      animating_shader_->setMat4("model", dancing_vampire_core);
-
-//Why the later shader texture drawing work but not the one above
-
-                      //brushID = model_shader_->GetProgramID();
-                      //model_shader_->use();
-                      //model_shader_->setMat4("model", dancing_vampire_core);
-
-                      if(showMsPF){
-                          glm::vec2 TexCoordToShow;
-                          int TextureID;
-                          //for(int i = 0; i < dancing_vampire->meshes[0].vertices.size(); i++){
-                              //int TexCoordoffset = (i*sizeof(Vertex)) + offsetof(Vertex, TexCoords);
-                              //glGetBufferSubData(GL_ARRAY_BUFFER, TexCoordoffset, sizeof(glm::vec2), &TexCoordToShow);
-                              //printf("TexCoord %d: %s\n", i, glm::to_string(TexCoordToShow).c_str());
-                          //
-                          //};
-
-                                  glGetUniformiv(brushID, glGetUniformLocation(brushID, "material.texture_diffused1"), &TextureID);
-                                  printf("material.texture_diffused1 got from animating shader id is: %d\n", TextureID);
-                                  glGetUniformiv(brushID, glGetUniformLocation(brushID, "material.texture_specular1"), &TextureID);
-                                  printf("material.texture_specular1 got from animating shader id is: %d\n", TextureID);                              
-
-                                  if(glIsTexture((GLint)dancing_vampire->meshes[0].textures[0].id)){
-                                      printf("Texture %d is created before and can be used", dancing_vampire->meshes[0].textures[0].id);
-                                          }else{
-                                      printf("Texture %d isn't created before or something cause it's not valid\n", dancing_vampire->meshes[0].textures[0].id);
-};
-                                  if(glIsTexture((GLint)dancing_vampire->meshes[0].textures[1].id)){
-                                      printf("Texture %d is created before and can be used\n", dancing_vampire->meshes[0].textures[1].id);
-                                          }else{
-                                      printf("Texture %d isn't created before or something cause it's not valid\n", dancing_vampire->meshes[0].textures[1].id);                                        
-};
-                                  GLint loc =
-                                      glGetUniformLocation(brushID, "material.texture_diffused1");
-
-                                  printf("diffuse texture sampler location on model shader : %d\n", loc);
-                                  loc =
-                                      glGetUniformLocation(model_shader_->GetProgramID(), "material.texture_diffused1");
-                                  printf("diffuse texture sampler location on animating  shader : %d\n", loc);
-                      }
-                      DDraw(dancing_vampire, &brushID);
-                      
-
-// animation update and render ================================================
 
                     brushID = model_shader_->GetProgramID();
                     //Draw the backpack
@@ -1204,31 +1136,85 @@ LARGE_INTEGER PerfCountFrequencyResult;
                       //model_shader_->use();
 
 //Weird behaviour may happened close to this part
-                    if (!QueryPerformanceCounter(&EndCounter)) {
-                        printf("Failed to call performancecounter function\n");
-                      };
-
-                      if (EndCounter.QuadPart > LastCounter.QuadPart) {
-                          // We got how many count per frame
-                          CountsPerFrame =
-                              (int64)(EndCounter.QuadPart - LastCounter.QuadPart);
-                          MsPerFrame =
-                              (real64)((1000.0f * (real64)CountsPerFrame) / (real64)PerfCountFrequency);
-                          updateTime = ((real64)MsPerFrame/1000.0f)>0.0f?((real64)MsPerFrame/1000.0f):updateTime;
-                          if (MsPerFrame > 0.0f) {
-                              //SPerFrame = MsPerFrame / 1000;
-                              // deltaTime = (float)(1 / 60);
-                              FPS = (real64)(1000.0f / MsPerFrame);
-                          }
-                      }
 
 //The model is no longer drawable after these lines
+// animation update and render ================================================
+
+                      if(updateTime > 0.0f) {
+                            AniUpdate(animator, &updateTime);
+                            PlayAnimation(animator, danceAnimation);
+                      }
+
+                      animating_shader_->use();
+                      std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
+
+                              int i = 0;
+                              std::string matrixName_;
+                              char index[1];
+                              char indexx[2];
+                              for(const glm::mat4&matrix_ : (*Transform)){
+                                  matrixName_ = "finalBoneMatrices[]";
+                                  if(i<10){
+                                      sprintf(index, "%d", i);
+                                      matrixName_.insert(matrixName_.size()-1, index);
+                                          } else {
+                                      sprintf(indexx, "%d", i);
+                                      matrixName_.insert(matrixName_.size()-1, indexx);                                     
+                                  }
+                                  animating_shader_->setMat4(
+                                      matrixName_.c_str(), matrix_);
+                                  if(showMsPF){
+                                      printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string(matrix_).c_str());
+                                  }
+                                  i++;
+                              };
+
+                      brushID = animating_shader_->GetProgramID();
+                      animating_shader_->setMat4("model", dancing_vampire_core);
+
+//Why the later shader texture drawing work but not the one above
+
+                      DDraw(dancing_vampire, &brushID);
+
+                      if(showMsPF){
+                          glm::vec2 TexCoordToShow;
+                          int TextureID;
+
+                          //for(int i = 0; i < dancing_vampire->meshes[0].vertices.size(); i++){
+                              //int TexCoordoffset = (i*sizeof(Vertex)) + offsetof(Vertex, TexCoords);
+                              //glGetBufferSubData(GL_ARRAY_BUFFER, TexCoordoffset, sizeof(glm::vec2), &TexCoordToShow);
+                              //printf("TexCoord %d: %s\n", i, glm::to_string(TexCoordToShow).c_str());
+                          //
+                          //};
+
+                                  glGetUniformiv(brushID, glGetUniformLocation(brushID, "material.texture_diffused1"), &TextureID);
+                                  printf("material.texture_diffused1 got from animating shader id is: %d\n", TextureID);
+                                  glGetUniformiv(brushID, glGetUniformLocation(brushID, "material.texture_specular1"), &TextureID);
+                                  printf("material.texture_specular1 got from animating shader id is: %d\n", TextureID);                              
+
+                                  if(glIsTexture((GLint)dancing_vampire->meshes[0].textures[0].id)){
+                                      printf("Texture %d is created before and can be used", dancing_vampire->meshes[0].textures[0].id);
+                                          }else{
+                                      printf("Texture %d isn't created before or something cause it's not valid\n", dancing_vampire->meshes[0].textures[0].id);
+};
+                                  if(glIsTexture((GLint)dancing_vampire->meshes[0].textures[1].id)){
+                                      printf("Texture %d is created before and can be used\n", dancing_vampire->meshes[0].textures[1].id);
+                                          }else{
+                                      printf("Texture %d isn't created before or something cause it's not valid\n", dancing_vampire->meshes[0].textures[1].id);                                        
+};
+
+                                  GLint loc =
+                                      glGetUniformLocation(brushID, "material.texture_diffused1");
+
+                                  printf("diffuse texture sampler location on model shader : %d\n", loc);
+                                  loc =
+                                      glGetUniformLocation(model_shader_->GetProgramID(), "material.texture_diffused1");
+                                  printf("diffuse texture sampler location on animating  shader : %d\n", loc);
+                                  showUniformVarValuePerVertex(&brushID, &dancing_vampire->meshes[0], true, true, true, true, true);
+                      }
+// animation update and render ================================================
 
                           //}
-
-                          if(showMsPF){
-                              showUniformVarValuePerVertex(&brushID, &dancing_vampire->meshes[0], true, true, true, true, false);
-                          }
 
                           if (showMsPF) {
                           printf("[LastFrameCount:%f,EndFrameCount:%f, "
@@ -1237,7 +1223,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                  (real32)LastCounter.QuadPart,
                                  (real32)EndCounter.QuadPart, CountsPerFrame,
                                  MsPerFrame, FPS);
-                          printf("Delay Ratio: %f, msPerframe: %f, SPF: %f\n",
+                          printf("Delay Ratio: %f, msPerframe: %f, updateTime: %f\n",
                                  DelayedRatio, MsPerFrame, updateTime);
                           printf("WaitTimeCounter: %f, Axis changing counter: %f\n", WaitTimeCounter, ChangeAxisCounter);
                           printf("ColorOffset is:%f\n", ColorOffset);
@@ -1251,7 +1237,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                           showMsPF = false;
                       };
-                      LastCounter = EndCounter;
 
                     if (first_announce) {
                        first_announce = false;
@@ -1269,7 +1254,28 @@ LARGE_INTEGER PerfCountFrequencyResult;
                             //"[LastFrameCount: %f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame,MsPerFrame, FPS);
                     //printf("[LastFrameCount:%f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame, MsPerFrame, FPS);
                     //OutputDebugStringA(Buffers);
-                    }
+
+                    //End count of frame time
+                    if (!QueryPerformanceCounter(&EndCounter)) {
+                        printf("Failed to call performancecounter function\n");
+                      };
+
+                      if (EndCounter.QuadPart > LastCounter.QuadPart) {
+                          // We got how many count per frame
+                          CountsPerFrame =
+                              (int64)(EndCounter.QuadPart - LastCounter.QuadPart);
+                          MsPerFrame =
+                              (real64)((1000.0f * (real64)CountsPerFrame) / (real64)PerfCountFrequency);
+                          //UpdateTime is really a pain here
+                          updateTime = ((real64)MsPerFrame/1000.0f)>0.0f?((real64)MsPerFrame/1000.0f):updateTime;
+                          if (MsPerFrame > 0.0f) {
+                              //SPerFrame = MsPerFrame / 1000;
+                              // deltaTime = (float)(1 / 60);
+                              FPS = (real64)(1000.0f / MsPerFrame);
+                          }
+                      }
+                      LastCounter = EndCounter;
+                }
           }
 
 
