@@ -174,8 +174,8 @@ void showUniformVarValuePerVertex(GLuint* programeId, Mesh* mesh, bool32 showInd
         char index[1];
         char indexx[2];
 
-        for(int k = 0; k < 100; k++){
-            matrixName_ = "finalBoneMatrices["+std::to_string(k)+"]"+'\0';
+        for(int k = 0; k < 50; k++){
+            matrixName_ = "finalBoneMatrices["+std::to_string(k)+"]";
 
             printf("matrix name: %s, programmeID: %d\n", matrixName_.c_str(), *programeId);
 

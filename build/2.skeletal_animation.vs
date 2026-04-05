@@ -23,11 +23,10 @@ void main()
 {
    vec4 totalPosition = vec4(0.0f);
 
-for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
-	 if(boneids[i] == -1){
- 	   continue;
+   for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
+    	 if(boneids[i] == -1){
+	   continue;
 	 }
-
 	 if(boneids[i] >= MAX_BONES){
 	   totalPosition = vec4(-aPos, 1.0f);
 	   break;
@@ -39,12 +38,14 @@ for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
        }
 
 // This one froze the shader here
+
 // if(boneids[0]!=-1){
 // 	 vec4 localPosition = finalBoneMatrices[boneids[0]]*vec4(aPos, 1.0f);
 // 	 totalPosition += localPosition * weights[0];
 // 	 vec3 localNormal = mat3(finalBoneMatrices[boneids[0]]) * aNormal;
 // 	 Normal += localNormal;
 //    }
+
 // if(boneids[1]!=-1){
 // 	 localPosition = finalBoneMatrices[boneids[1]]*vec4(-aPos, 1.0f);
 // 	 totalPosition += localPosition * weights[1];
@@ -52,6 +53,7 @@ for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
 // 	 Normal += localNormal;
 
 // }
+
 // if(boneids[2]!=-1){
 // 	 localPosition = finalBoneMatrices[boneids[2]]*vec4(-aPos, 1.0f);
 // 	 totalPosition += localPosition * weights[2];
@@ -81,6 +83,6 @@ for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
 
 
  gl_Position = projection * view * model * totalPosition;
-//gl_Position = projection * view * model * vec4(-aPos, 1.0f);
+// gl_Position = projection * view * model * vec4(-aPos, 1.0f);
      TexCoord_ = TexCoordd;
 };

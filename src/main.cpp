@@ -16,6 +16,7 @@ bool32 first_size = true;
 bool32 first_announce = true;
 bool32 Load_Lib = false;
 bool32 showMsPF = false;
+bool32 hit_play = false;
 
 LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
                                     LPARAM Lparam) {
@@ -119,9 +120,12 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
       }
 
       else if (vkCode == VK_SPACE) {
-        BackBuffer.camera.Position +=
-            BackBuffer.camera.Up * (float)BackBuffer.camera.speed;
-        if (!WasDown) {
+
+          if(!hit_play)
+              hit_play = !hit_play;
+          //BackBuffer.camera.Position += BackBuffer.camera.Up * (float)BackBuffer.camera.speed;
+
+          if (!WasDown) {
             printf("Space is HIT\n");
         }
         // XOffset += 10;
@@ -435,10 +439,12 @@ LARGE_INTEGER PerfCountFrequencyResult;
   float ColorOffset = 0.0f;
 
   uint64 TicksPerFrame = 0;
-  int64 TicksPerMicroS = 0;
+  real64 TicksPerS = 0;
+
   int64 CountsPerFrame = 0;
+  //So what will be less than 0 must be float type
   real64 MsPerFrame = 0.0f;
-  int64 SPerFrame = 0;
+  real64 SPerFrame = 0;
   int64 FPS = 0;
   // Time elapsed of one cycle/frame in second
 
@@ -677,7 +683,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 BackBuffer.camera.fov = 45.0f;
                 basic_cube_core = glm::translate(basic_cube_core, glm::vec3(2.0f, -4.0f, 0.0f));
                 std::cout<<"Central rotating model is"<<glm::to_string(basic_cube_core)<<std::endl;
-                backpack_core = glm::translate(backpack_core, glm::vec3(-4.0f, 4.0f, 0.0f));
+                backpack_core = glm::translate(backpack_core, glm::vec3(-4.0f, 2.0f, 3.0f));
                 std::cout<<"Stand still model 2 matrix is :"<<glm::to_string(backpack_core)<<std::endl;
 
                 // Set containing model for dancing vampire
@@ -830,19 +836,45 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 animating_shader_->use();
                 animating_shader_->setMat4( "projection", BackBuffer.camera.projection);
                 
-                QueryPerformanceCounter(&LastCounter);
 
                 int k = 0;                
                 while (GlobalRunning) {
 
-                  //if (first_announce) {
-                      //LastCycleCounts = __rdtsc();
-                  //} else {
+                  if (first_announce) {
+                      QueryPerformanceCounter(&LastCounter);
+                      LastCycleCounts = __rdtsc();
+                  } else {
                     // NOTE: Why this stay the same over and equal to zero the
                     // the next 8 frames
                     // This one is buggy somehow
-                    //TicksPerFrame = EndCycleCounts - LastCycleCounts;
-                  //}
+                    if (EndCounter.QuadPart > LastCounter.QuadPart) {
+                          // We got how many count per frame
+                        CountsPerFrame = (int64)(EndCounter.QuadPart - LastCounter.QuadPart);
+                      }
+                      MsPerFrame = (real64)((1000.0f * (real64)CountsPerFrame) / (real64)PerfCountFrequency);
+                          //UpdateTime is really a pain here
+                      real64 FramePerS = 1000.0f/((real64)MsPerFrame);
+
+                      SPerFrame = ((real64)MsPerFrame/1000.0f)>0.0f?((real64)MsPerFrame/1000.0f):SPerFrame;
+
+                      if (MsPerFrame > 0.0f) {
+                          //SPerFrame = MsPerFrame / 1000;
+                          // deltaTime = (float)(1 / 60);
+                          FPS = (real64)(1000.0f / MsPerFrame);
+                      }
+
+                      //Cause the ms per frame is always less than 1000ms that mean it will be less than 0 after being converted to second then;
+                      TicksPerFrame = EndCycleCounts - LastCycleCounts;
+
+                      if(SPerFrame > 0.0f){
+                          TicksPerS = TicksPerFrame/SPerFrame;
+                      }else{
+                          TicksPerS = TicksPerFrame*FramePerS;                          
+                      };
+
+                      LastCycleCounts = EndCycleCounts;
+                      LastCounter = EndCounter;
+                  }
 
                     //printf("Count from start of frame: %I64d\n",LastCycleCounts);
 
@@ -1034,7 +1066,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     // NOTE: Thing went wrong inside this function
                     // whether the waittimecounter or the function itself
                     // produce bugs
-                    real64 updateTime;                    
+                    real64 SPerFrame;                    
                     if (first_size) {
                         printf("counter: %f\n", WaitTimeCounter);
                     }
@@ -1125,9 +1157,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     glUseProgram(0);
 // Now Draw the vampire
 
-                    //real32 endFrame = EndCycleCounts;
-                    //LastCycleCounts = EndCycleCounts;
-                    //EndCycleCounts = __rdtsc();
+
                     //printf("Count by the end of frame: %I64d\n", EndCycleCounts);
                     // Why this produce same result
 //Two different approaching ways
@@ -1139,42 +1169,50 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
 //The model is no longer drawable after these lines
 // animation update and render ================================================
+                    animating_shader_->use();
+                    if(hit_play || first_announce){
+                        PlayAnimation(animator, danceAnimation);
+                        if(hit_play);
+                        hit_play = !hit_play;
+                    };
 
-                      if(updateTime > 0.0f) {
-                            AniUpdate(animator, &updateTime);
-                            PlayAnimation(animator, danceAnimation);
-                      }
+                    if(TicksPerS > 0.0f) {
+                        //AniUpdate expect S per frame;
+                        AniUpdate(animator, &SPerFrame);
+                    }
 
-                      animating_shader_->use();
-                      std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
+                            int i = 0;
+                            std::string matrixName_;
+                            char index[1];
+                            char indexx[2];
+                            std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
 
-                              int i = 0;
-                              std::string matrixName_;
-                              char index[1];
-                              char indexx[2];
-                              for(const glm::mat4&matrix_ : (*Transform)){
-                                  matrixName_ = "finalBoneMatrices[]";
-                                  if(i<10){
-                                      sprintf(index, "%d", i);
-                                      matrixName_.insert(matrixName_.size()-1, index);
-                                          } else {
-                                      sprintf(indexx, "%d", i);
-                                      matrixName_.insert(matrixName_.size()-1, indexx);                                     
-                                  }
-                                  animating_shader_->setMat4(
-                                      matrixName_.c_str(), matrix_);
-                                  if(showMsPF){
-                                      printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string(matrix_).c_str());
-                                  }
-                                  i++;
-                              };
+                            if (Transform != nullptr){
+                                for(const glm::mat4&matrix_ : (*Transform)){
+                                    matrixName_ = "finalBoneMatrices[]";
+                                    if(i<10){
+                                        sprintf(index, "%d", i);
+                                        matrixName_.insert(matrixName_.size()-1, index);
+                                    } else {
+                                        sprintf(indexx, "%d", i);
+                                        matrixName_.insert(matrixName_.size()-1, indexx);                                     
+                                    }
+                                    animating_shader_->setMat4(
+                                        matrixName_.c_str(), matrix_);
+                                    if(showMsPF){
+                                        printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string(matrix_).c_str());
+                                    }
 
-                      brushID = animating_shader_->GetProgramID();
-                      animating_shader_->setMat4("model", dancing_vampire_core);
+                                    if(i < (int)Transform->size())
+                                    i++;
+                                };                                
+                            };
+
+                            brushID = animating_shader_->GetProgramID();
+                            animating_shader_->setMat4("model", dancing_vampire_core);
 
 //Why the later shader texture drawing work but not the one above
-
-                      DDraw(dancing_vampire, &brushID);
+                            DDraw(dancing_vampire, &brushID);
 
                       if(showMsPF){
                           glm::vec2 TexCoordToShow;
@@ -1223,8 +1261,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                  (real32)LastCounter.QuadPart,
                                  (real32)EndCounter.QuadPart, CountsPerFrame,
                                  MsPerFrame, FPS);
-                          printf("Delay Ratio: %f, msPerframe: %f, updateTime: %f\n",
-                                 DelayedRatio, MsPerFrame, updateTime);
+                          printf("Delay Ratio: %f, msPerframe: %f, TicksPerS: %f\n",
+                                 DelayedRatio, MsPerFrame, TicksPerS);
                           printf("WaitTimeCounter: %f, Axis changing counter: %f\n", WaitTimeCounter, ChangeAxisCounter);
                           printf("ColorOffset is:%f\n", ColorOffset);
 
@@ -1259,22 +1297,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     if (!QueryPerformanceCounter(&EndCounter)) {
                         printf("Failed to call performancecounter function\n");
                       };
-
-                      if (EndCounter.QuadPart > LastCounter.QuadPart) {
-                          // We got how many count per frame
-                          CountsPerFrame =
-                              (int64)(EndCounter.QuadPart - LastCounter.QuadPart);
-                          MsPerFrame =
-                              (real64)((1000.0f * (real64)CountsPerFrame) / (real64)PerfCountFrequency);
-                          //UpdateTime is really a pain here
-                          updateTime = ((real64)MsPerFrame/1000.0f)>0.0f?((real64)MsPerFrame/1000.0f):updateTime;
-                          if (MsPerFrame > 0.0f) {
-                              //SPerFrame = MsPerFrame / 1000;
-                              // deltaTime = (float)(1 / 60);
-                              FPS = (real64)(1000.0f / MsPerFrame);
-                          }
-                      }
-                      LastCounter = EndCounter;
+                      EndCycleCounts = __rdtsc();
                 }
           }
 

@@ -42,10 +42,10 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
         //printf("Bone name:%s\n", nodeName.c_str());
     //}
 
-    //if(bone){
-        //bone->Update(&m_currentTime);
-        //nodeTransform = bone->GetLocalTransformation();
-    //}
+    if(bone){
+        bone->Update(&m_currentTime);
+        nodeTransform = bone->GetLocalTransformation();
+    }
     ////
 
     glm::mat4 globalTransform = nodeTransform * (*parentTransform);

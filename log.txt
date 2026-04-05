@@ -1288,3 +1288,8 @@ garbage
 one more thing I learnt from this shader: that is if I dont call it in main(), I
 won't see its value read back. Still model won't move fragment shown
 partially. Don't know why!!!
+
+---------------- Sun, 05 Apr 26: 10:54AM
+
+Found: Actually the updateAnimation need to be fed ticks per second of the frame
+time in second

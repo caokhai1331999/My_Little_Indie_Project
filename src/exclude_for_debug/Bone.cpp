@@ -50,9 +50,9 @@ void Bone::Update(real64* animationTime){
 float GetScaleFactor(real64* animationTime, float* lastkeyTime, float* nextkeyTime){
 
     float scaleFactor = 0.0f;
-    float midWayLength = (float)*animationTime - (*lastkeyTime);
     float timeDiff = (*nextkeyTime) - (*lastkeyTime);
 
+    float midWayLength = (float)*animationTime - (*lastkeyTime);
     scaleFactor = midWayLength/timeDiff;
 
     return scaleFactor;
