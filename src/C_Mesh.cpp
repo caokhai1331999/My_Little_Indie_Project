@@ -114,12 +114,12 @@ void Draw(Mesh* mesh, GLuint* progID){
         //glActiveTexture(GL_TEXTURE0);
 };
 
-void showUniformVarValuePerVertex(GLuint* programeId, Mesh* mesh, bool32 showIndices, bool32 showPos, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices){
+void showUniformVarValuePerVertex(GLuint* programeId, Mesh* mesh, bool32 showIndices, bool32 showPos, bool32 showTexCoords, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices){
 //We already bind the specific VAO before
     int VertexSizeforVec4 = MAX_BONE_INFLUENCE * 100;
     int VertexSizeforVec3 = 3 * 100;
     glBindVertexArray(mesh->VAO);
-    for(int k = 0; k < 100; k++){
+    for(int k = 0; k < 52; k++){
 
         if(showIndices){
             GLuint index;   
@@ -135,7 +135,17 @@ void showUniformVarValuePerVertex(GLuint* programeId, Mesh* mesh, bool32 showInd
                 std::cout<<glm::to_string(readbackPositions);
                 printf("\n");
             }
+        
+        if(showTexCoords){
+        glm::vec2 readbackTexCoords;        
+                GLintptr offset = (k*sizeof(struct Vertex)) + offsetof(struct Vertex, TexCoords);
+                glGetBufferSubData(GL_ARRAY_BUFFER, offset, sizeof(glm::vec2), &readbackTexCoords);
+                printf("TexCoords ID %d:", k);
+                std::cout<<glm::to_string(readbackTexCoords);
+                printf("\n");
+            }
 
+        
     if(showBoneIds){
         int readbackBoneIDs[4];
         //readbackBoneIDs = new int (VertexSizeforVec4);
@@ -173,8 +183,10 @@ void showUniformVarValuePerVertex(GLuint* programeId, Mesh* mesh, bool32 showInd
 
         char index[1];
         char indexx[2];
-
-        for(int k = 0; k < 50; k++){
+        GLint maxUniforms;
+        glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &maxUniforms);
+        printf("FinalBoneMatrice legit elements: %d\n", maxUniforms);
+        for(int k = 0; k < 52; k++){
             matrixName_ = "finalBoneMatrices["+std::to_string(k)+"]";
 
             printf("matrix name: %s, programmeID: %d\n", matrixName_.c_str(), *programeId);

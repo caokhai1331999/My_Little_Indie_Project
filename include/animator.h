@@ -12,20 +12,21 @@
 // structure of function type return type of original function (*) (argument type)
 //typedef Animation* (* Animationn) (char*, class Model_*);
 
-class  Animator{
+class Animator{
 public:
     Animator(Animation *animation = nullptr):m_currentAnimation(animation) {
       m_currentTime = 0.0f;
       m_deltaTime = 0.0f;
 
       m_currentAnimation = animation;
-      finalBoneMatrices.reserve(100);
-      finalBoneMatrices.resize(100);
+      finalBoneMatrices.reserve(52);
+      finalBoneMatrices.resize(52);
       //NOTE: Init finalBoneMatrices first
-      for(int i = 0; i < 100; i++);
-      finalBoneMatrices.push_back(glm::mat4(1.0f));
-      };
 
+      //for(int i = 0; i < 100; i++);
+      //finalBoneMatrices.push_back(glm::mat4(1.0f));
+      //};
+    }
       ~Animator(){
         delete m_currentAnimation;
         m_currentAnimation = nullptr;
@@ -40,7 +41,7 @@ public:
     void updateAnimationTime(real64* dt);
 
     void playAnimation(Animation* pAnimation);
-    void calculateBoneTransform(const AssimpNodeData* node, glm::mat4* parentTransform);
+    void calculateBoneTransform(const AssimpNodeData* node = nullptr, glm::mat4* parentTransform = nullptr, glm::mat4* parentInverseTransform = nullptr);
 
     std::vector<glm::mat4>*getFinalBoneMatrices(){return &finalBoneMatrices;};
 

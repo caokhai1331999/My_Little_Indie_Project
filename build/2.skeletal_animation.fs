@@ -2,9 +2,9 @@
 
 out vec4 FragColorr;
 
-smooth in vec3 Normal;
-smooth in vec3 FragPos;
-smooth in vec2 TexCoord_;
+in vec3 Normal;
+in vec3 FragPos;
+in vec2 TexCoord_;
 
 struct Materiall{
 // Ambient will be the same even with change in input

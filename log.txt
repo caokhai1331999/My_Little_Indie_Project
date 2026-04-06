@@ -1293,3 +1293,10 @@ partially. Don't know why!!!
 
 Found: Actually the updateAnimation need to be fed ticks per second of the frame
 time in second
+
+---------------- Mon, 06 Apr 26: 10:09AM
+
+Remeber that Bone is different than boneInfo
+And the interpolation (T, S, R) apply keyframe calculation between two frame
+inside the destined frame time
+

@@ -1169,15 +1169,16 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
 //The model is no longer drawable after these lines
 // animation update and render ================================================
+
                     animating_shader_->use();
-                    if(hit_play || first_announce){
-                        PlayAnimation(animator, danceAnimation);
+                    if(hit_play){
                         if(hit_play);
                         hit_play = !hit_play;
                     };
 
                     if(TicksPerS > 0.0f) {
                         //AniUpdate expect S per frame;
+                        PlayAnimation(animator, danceAnimation);
                         AniUpdate(animator, &SPerFrame);
                     }
 
@@ -1188,26 +1189,28 @@ LARGE_INTEGER PerfCountFrequencyResult;
                             std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
 
                             if (Transform != nullptr){
-                                for(const glm::mat4&matrix_ : (*Transform)){
-                                    matrixName_ = "finalBoneMatrices[]";
-                                    if(i<10){
-                                        sprintf(index, "%d", i);
-                                        matrixName_.insert(matrixName_.size()-1, index);
-                                    } else {
-                                        sprintf(indexx, "%d", i);
-                                        matrixName_.insert(matrixName_.size()-1, indexx);                                     
-                                    }
+                                for(const glm::mat4& matrix_ : (*Transform)){
+                                    //matrixName_ = "finalBoneMatrices[]";
+                                    matrixName_ = "finalBoneMatrices["+std::to_string(i)+"]";
+                                    //if(i<10){
+                                        //sprintf(index, "%d", i);
+                                        //matrixName_.insert(matrixName_.size()-1, index);
+                                    //} else {
+                                        //sprintf(indexx, "%d", i);
+                                        //matrixName_.insert(matrixName_.size()-1, indexx);                                     
+                                    //}
                                     animating_shader_->setMat4(
                                         matrixName_.c_str(), matrix_);
-                                    if(showMsPF){
-                                        printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string(matrix_).c_str());
-                                    }
-
+//
+                                    //if(showMsPF){
+                                        //printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string(matrix_).c_str());
+                                    //}
+//
                                     if(i < (int)Transform->size())
                                     i++;
                                 };                                
                             };
-
+//
                             brushID = animating_shader_->GetProgramID();
                             animating_shader_->setMat4("model", dancing_vampire_core);
 
@@ -1248,7 +1251,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                   loc =
                                       glGetUniformLocation(model_shader_->GetProgramID(), "material.texture_diffused1");
                                   printf("diffuse texture sampler location on animating  shader : %d\n", loc);
-                                  showUniformVarValuePerVertex(&brushID, &dancing_vampire->meshes[0], true, true, true, true, true);
+                                  showUniformVarValuePerVertex(&brushID, &dancing_vampire->meshes[0], true, true, true, true, true, true);
                       }
 // animation update and render ================================================
 

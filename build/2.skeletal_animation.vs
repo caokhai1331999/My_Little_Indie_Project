@@ -11,59 +11,86 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-const int MAX_BONES = 100;
+const int MAX_BONES = 52;
 const int MAX_BONE_INFLUENCE = 4;
-uniform mat4 finalBoneMatrices[MAX_BONES];
+uniform mat4[MAX_BONES] finalBoneMatrices;
 
-smooth out vec3 Normal;
-smooth out vec3 FragPos;
-smooth out vec2 TexCoord_;
+out vec3 Normal;
+out vec3 FragPos;
+out vec2 TexCoord_;
 
 void main()
 {
-   vec4 totalPosition = vec4(0.0f);
+    Normal = vec3(0.0f);
+    vec3 localNormal = vec3(0.0f);
+    TexCoord_ = vec2(0.0f);
 
-   for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
-    	 if(boneids[i] == -1){
-	   continue;
-	 }
-	 if(boneids[i] >= MAX_BONES){
-	   totalPosition = vec4(-aPos, 1.0f);
-	   break;
-	 }
-         vec4 localPosition = finalBoneMatrices[boneids[i]]*vec4(-aPos, 1.0f);
-	 totalPosition += localPosition * weights[i];
-	 vec3 localNormal = mat3(finalBoneMatrices[boneids[i]]) * aNormal;
-	 Normal += localNormal;
-       }
+    vec4 totalPosition = vec4(0.0f);
+    vec4 localPosition = vec4(1.0f);
+    
+   // for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
+
+   // 	 if(boneids[i] == -1){
+   // 	   continue;
+   // 	 }
+
+   // 	if(boneids[i] >= MAX_BONES){
+   // 	   totalPosition = vec4(-aPos, 1.0f);
+   // 	   break;
+   // 	 }
+	 
+   // 	 localPosition = finalBoneMatrices[boneids[i]]*vec4(-aPos, 1.0f);
+   // 	 totalPosition += localPosition * weights[i];
+   // 	 vec3 localNormal = mat3(finalBoneMatrices[boneids[i]]) * aNormal;
+   // 	 Normal += localNormal;
+   //     }
+
+   //     if(totalPosition.w == 0.0f){
+   //     totalPosition = vec4(-aPos, 1.0f);
+   //     }
 
 // This one froze the shader here
-
+// vec3 localNormal;
 // if(boneids[0]!=-1){
 // 	 vec4 localPosition = finalBoneMatrices[boneids[0]]*vec4(aPos, 1.0f);
+// 	 if(weights[0]!=0.0f){
 // 	 totalPosition += localPosition * weights[0];
-// 	 vec3 localNormal = mat3(finalBoneMatrices[boneids[0]]) * aNormal;
+// 	 }else{
+// 	 totalPosition += localPosition * 1.0f;	 
+// 	 }
+// 	 localNormal = mat3(finalBoneMatrices[boneids[0]]) * aNormal;
 // 	 Normal += localNormal;
 //    }
 
 // if(boneids[1]!=-1){
 // 	 localPosition = finalBoneMatrices[boneids[1]]*vec4(-aPos, 1.0f);
+// 	 if(weights[1]!=0.0f){
 // 	 totalPosition += localPosition * weights[1];
+// 	 }else{
+// 	 totalPosition += localPosition * 1.0f;	 
+// 	 }
 // 	 localNormal = mat3(finalBoneMatrices[boneids[1]]) * aNormal;
 // 	 Normal += localNormal;
-
 // }
 
 // if(boneids[2]!=-1){
 // 	 localPosition = finalBoneMatrices[boneids[2]]*vec4(-aPos, 1.0f);
+// 	 if(weights[2]!=0.0f){
 // 	 totalPosition += localPosition * weights[2];
+// 	 }else{
+// 	 totalPosition += localPosition * 1.0f;	 
+// 	 }
 // 	 localNormal = mat3(finalBoneMatrices[boneids[2]]) * aNormal;
 // 	 Normal += localNormal;
 // }
 
 // if(boneids[3]!=-1){
-// 	localposition = finalBoneMatrices[boneids[3]]*vec4(-aPos, 1.0f);
+// 	localPosition = finalBoneMatrices[boneids[3]]*vec4(-aPos, 1.0f);
+// 	 if(weights[3]!=0.0f){
 // 	 totalPosition += localPosition * weights[3];
+// 	 }else{
+// 	 totalPosition += localPosition * 1.0f;	 
+// 	 }
 // 	 localNormal = mat3(finalBoneMatrices[boneids[3]]) * aNormal;
 // 	 Normal += localNormal;
 // }
@@ -81,8 +108,7 @@ void main()
      // FragPos = vec3(model *vec4(aPos, 1.0f));
      // Normal = vec3(transpose(inverse(view * model))) * aNormal;
 
-
- gl_Position = projection * view * model * totalPosition;
-// gl_Position = projection * view * model * vec4(-aPos, 1.0f);
      TexCoord_ = TexCoordd;
+     // gl_Position = projection * view * model * totalPosition;
+    gl_Position = projection * view * model * vec4(-aPos, 1.0f);
 };
