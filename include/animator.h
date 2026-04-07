@@ -15,12 +15,15 @@
 class Animator{
 public:
     Animator(Animation *animation = nullptr):m_currentAnimation(animation) {
+      UBO = 0;        
       m_currentTime = 0.0f;
       m_deltaTime = 0.0f;
 
       m_currentAnimation = animation;
       finalBoneMatrices.reserve(52);
       finalBoneMatrices.resize(52);
+
+      g_iGlobalMatricesBindingIndex = 1;
       //NOTE: Init finalBoneMatrices first
 
       //for(int i = 0; i < 100; i++);
@@ -43,9 +46,15 @@ public:
     void playAnimation(Animation* pAnimation);
     void calculateBoneTransform(const AssimpNodeData* node = nullptr, glm::mat4* parentTransform = nullptr, glm::mat4* parentInverseTransform = nullptr);
 
+    void setupUBO(GLuint * ProgramID = nullptr);
+    void updateUBOData();
+
     std::vector<glm::mat4>*getFinalBoneMatrices(){return &finalBoneMatrices;};
 
 private:
+    //Check out the uniform buffer
+    unsigned int UBO;
+    GLuint g_iGlobalMatricesBindingIndex;
     //Current Animation
     std::vector<glm::mat4>finalBoneMatrices;
     Animation* m_currentAnimation;
@@ -59,10 +68,16 @@ extern "C" __declspec(dllexport) void DestroyAnimatorClass(Animator *ani);
 extern "C" __declspec(dllexport) void updateAnimationTime_(Animator *ani, real64* dt);
 extern "C" __declspec(dllexport) void PlayAni_(Animator* ani, Animation* animation);
 
+extern "C" __declspec(dllexport) void setupUBO_(Animator *ani, GLuint* programID);
+extern "C" __declspec(dllexport) void updateUBOData_(Animator *ani);
+
+//Assign new name for function here
 typedef Animator* (__cdecl *AniUserClassSpawner) (Animation*);
 typedef void (__cdecl *AniUserClassSlayer) (Animator*);
 typedef void (__cdecl *AniTimeUpdater) (Animator*, real64*);
 typedef void (*PlayAni__)(Animator*, Animation*);
+typedef void (*setUpUBO__)(Animator*, GLuint*);
+typedef void (*updateUBOData__)(Animator*);
 
 /*
 #pragma comment(linker, "/export:CreateAnimatorClass")

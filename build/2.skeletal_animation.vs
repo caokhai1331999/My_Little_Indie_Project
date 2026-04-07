@@ -7,13 +7,20 @@ layout (location = 4) in vec3 bitangent;
 layout (location = 5) in ivec4 boneids;
 layout (location = 6) in vec4 weights;
 
+const int MAX_BONES = 52;
+const int MAX_BONE_INFLUENCE = 4;
+
+layout (std140) uniform finalBone{
+ mat4 finalBoneMatrices [MAX_BONES];
+};
+
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-const int MAX_BONES = 52;
-const int MAX_BONE_INFLUENCE = 4;
-uniform mat4[MAX_BONES] finalBoneMatrices;
+
+// uniform block
+// uniform mat4[MAX_BONES] finalBoneMatrices;
 
 out vec3 Normal;
 out vec3 FragPos;
@@ -27,27 +34,31 @@ void main()
 
     vec4 totalPosition = vec4(0.0f);
     vec4 localPosition = vec4(1.0f);
-    
-   // for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
+    mat4 TotalBoneMatrices = mat4(1.0f);
 
-   // 	 if(boneids[i] == -1){
-   // 	   continue;
-   // 	 }
+   for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
 
-   // 	if(boneids[i] >= MAX_BONES){
-   // 	   totalPosition = vec4(-aPos, 1.0f);
-   // 	   break;
-   // 	 }
-	 
-   // 	 localPosition = finalBoneMatrices[boneids[i]]*vec4(-aPos, 1.0f);
-   // 	 totalPosition += localPosition * weights[i];
-   // 	 vec3 localNormal = mat3(finalBoneMatrices[boneids[i]]) * aNormal;
-   // 	 Normal += localNormal;
-   //     }
+	 if(boneids[i] == -1){
+	   continue;
+	 }
 
-   //     if(totalPosition.w == 0.0f){
-   //     totalPosition = vec4(-aPos, 1.0f);
-   //     }
+	if(boneids[i] >= MAX_BONES){
+	   totalPosition = vec4(-aPos, 1.0f);
+	   break;
+	 }
+	 TotalBoneMatrices += finalBone.finalBoneMatrices[boneids[i]] * weights[i];
+
+	 localPosition = finalBone.finalBoneMatrices[boneids[i]]*vec4(-aPos, 1.0f);
+	 totalPosition += localPosition;
+	 vec3 localNormal = mat3(finalBone.finalBoneMatrices[boneids[i]]) * aNormal;
+	 Normal += localNormal;
+       }
+
+       if(totalPosition.w == 0.0f){
+       totalPosition = vec4(-aPos, 1.0f);
+       }
+
+vec4 totalPosition_ = TotalBoneMatrices * vec4(-aPos, 1.0f);
 
 // This one froze the shader here
 // vec3 localNormal;
@@ -109,6 +120,6 @@ void main()
      // Normal = vec3(transpose(inverse(view * model))) * aNormal;
 
      TexCoord_ = TexCoordd;
-     // gl_Position = projection * view * model * totalPosition;
-    gl_Position = projection * view * model * vec4(-aPos, 1.0f);
+     gl_Position = projection * view * model * totalPosition_;
+    // gl_Position = projection * view * model * vec4(-aPos, 1.0f);
 };

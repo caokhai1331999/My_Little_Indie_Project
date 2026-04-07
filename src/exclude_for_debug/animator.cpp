@@ -20,9 +20,10 @@ void Animator::updateAnimationTime(real64* dt){
         glm::mat4 parentTransform = glm::mat4(1.0f);
         //printf("test to see code changed once again\n");
 //BUGs here//============================================
-        glm::mat4 globalInverseTransform = glm::inverse(m_currentAnimation->getRootNode()->transformation);
 
-        calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform, &globalInverseTransform);
+        //glm::mat4 globalInverseTransform = glm::inverse(m_currentAnimation->getRootNode()->transformation);
+
+        calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform, &glm::mat4(1.0f));
     };
 //============================================
 };
@@ -47,7 +48,7 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
 
     if(bone){
         bone->Update(&m_currentTime);
-        nodeTransform = (*parentInverseTransform) * bone->GetLocalTransformation();
+        nodeTransform = bone->GetLocalTransformation();
     }
     ////
 
@@ -95,6 +96,30 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
           }
 };
 
+void Animator::setupUBO(GLuint* ProgramID){
+    // Gen, bind, bufferdata UBO container
+    wglMakeCurrent(NULL, NULL);
+    HGLRC GLcontext = wglGetCurrentContext();
+
+    glGenBuffers(1, &UBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)* 52, NULL, GL_STREAM_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    //// get Uniform location from ProgramID
+    GLint boneMatricIndex = glGetUniformBlockIndex(*ProgramID, "finalBone");
+    // bind that location to global binding point (using glUniformBlock binding)
+    glUniformBlockBinding(*ProgramID, boneMatricIndex, g_iGlobalMatricesBindingIndex);
+    // then bind the binding point to UBO using glBindbufferrange
+    glBindBufferRange(GL_UNIFORM_BUFFER, g_iGlobalMatricesBindingIndex, UBO, 0, sizeof(glm::mat4)* 52);
+};
+
+void Animator::updateUBOData(){
+    glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4)* 52, &finalBoneMatrices[0]);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+};
+
 Animator* CreateAnimatorClass(Animation *animation) {
   return new Animator(animation);
 };
@@ -109,4 +134,12 @@ void updateAnimationTime_(Animator *ani, real64* dt) {
 
 void PlayAni_ (Animator* ani, Animation* animation){
     ani->playAnimation(animation);
+}
+
+void setupUBO_(Animator* ani, GLuint* programeID){
+    ani->setupUBO(programeID);  
+}
+
+void updateUBOData_(Animator* ani){
+    ani->updateUBOData();
 }

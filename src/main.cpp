@@ -471,6 +471,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
   AniUserClassSlayer SlayAnimator = NULL;
   AniTimeUpdater AniUpdate = NULL;
   PlayAni__ PlayAnimation = NULL;
+
+  setUpUBO__ setUpUBO = NULL;
+  updateUBOData__ updateUBOData = NULL;
   //setupMeshh setupMesh = NULL;
   //MDraw Draw = NULL;
       //AniTimeUpdater AniUpdate_;
@@ -524,6 +527,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
           SlayAnimator = (AniUserClassSlayer)GetProcAddress(AniLib, "DestroyAnimatorClass");
           AniUpdate = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTime_");
           PlayAnimation = (PlayAni__)GetProcAddress(AniLib, "PlayAni_");
+
+          setUpUBO = (setUpUBO__)GetProcAddress(AniLib, "setupUBO_");
+          updateUBOData = (updateUBOData__)GetProcAddress(AniLib, "updateUBOData_");
           //setupMesh = (setupMeshh)GetProcAddress(AniLib, "setupMesh");
           //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
           //Load_Lib = false;
@@ -836,7 +842,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 animating_shader_->use();
                 animating_shader_->setMat4( "projection", BackBuffer.camera.projection);
                 
-
+                GLuint UBO;
                 int k = 0;                
                 while (GlobalRunning) {
 
@@ -1171,27 +1177,53 @@ LARGE_INTEGER PerfCountFrequencyResult;
 // animation update and render ================================================
 
                     animating_shader_->use();
+                    brushID = animating_shader_->GetProgramID();
+
+                    if(first_announce){
+                        //setUpUBO(animator, &brushID);
+//Setup UBO
+                        glGenBuffers(1, &UBO);
+                        glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+                        glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)* 52, NULL, GL_STREAM_DRAW);
+                        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+                        //// get Uniform location from ProgramID
+                        GLint boneMatricIndex = glGetUniformBlockIndex(brushID, "finalBone");
+                        // bind that location to global binding point (using glUniformBlock binding)
+                        glUniformBlockBinding(brushID, boneMatricIndex, 1);
+                        // then bind the binding point to UBO using glBindbufferrange
+                        glBindBufferRange(GL_UNIFORM_BUFFER, 1, UBO, 0, sizeof(glm::mat4)* 52);
+                    }
+
                     if(hit_play){
                         if(hit_play);
                         hit_play = !hit_play;
                     };
 
+
                     if(TicksPerS > 0.0f) {
                         //AniUpdate expect S per frame;
                         PlayAnimation(animator, danceAnimation);
                         AniUpdate(animator, &SPerFrame);
+                        std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
+                        //updateUBOData(animator);
+
+                        glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+                        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4)* 52, Transform->data());
+                        glBindBuffer(GL_UNIFORM_BUFFER, 0);
                     }
 
-                            int i = 0;
-                            std::string matrixName_;
-                            char index[1];
-                            char indexx[2];
-                            std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
-
-                            if (Transform != nullptr){
-                                for(const glm::mat4& matrix_ : (*Transform)){
-                                    //matrixName_ = "finalBoneMatrices[]";
-                                    matrixName_ = "finalBoneMatrices["+std::to_string(i)+"]";
+                            //int i = 0;
+                            //std::string matrixName_;
+                            //char index[1];
+                            //char indexx[2];
+                            //
+//
+                            
+                            //if (Transform != nullptr){
+                                //for(const glm::mat4& matrix_ : (*Transform)){
+                                    //matrixName_ = "finalBoneMatrices["+std::to_string(i)+"]";
+                                    ////matrixName_ = "finalBoneMatrices[]";
                                     //if(i<10){
                                         //sprintf(index, "%d", i);
                                         //matrixName_.insert(matrixName_.size()-1, index);
@@ -1199,19 +1231,18 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                         //sprintf(indexx, "%d", i);
                                         //matrixName_.insert(matrixName_.size()-1, indexx);                                     
                                     //}
-                                    animating_shader_->setMat4(
-                                        matrixName_.c_str(), matrix_);
+                                    //animating_shader_->setMat4(
+                                        //matrixName_.c_str(), matrix_);
 //
                                     //if(showMsPF){
                                         //printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string(matrix_).c_str());
                                     //}
-//
-                                    if(i < (int)Transform->size())
-                                    i++;
-                                };                                
-                            };
-//
-                            brushID = animating_shader_->GetProgramID();
+
+                                    //if(i < (int)Transform->size())
+                                    //i++;
+                                //};                                
+                            //};
+////
                             animating_shader_->setMat4("model", dancing_vampire_core);
 
 //Why the later shader texture drawing work but not the one above
@@ -1244,14 +1275,13 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                       printf("Texture %d isn't created before or something cause it's not valid\n", dancing_vampire->meshes[0].textures[1].id);                                        
 };
 
-                                  GLint loc =
-                                      glGetUniformLocation(brushID, "material.texture_diffused1");
+                                  GLint loc = glGetUniformLocation(brushID, "material.texture_diffused1");
 
                                   printf("diffuse texture sampler location on model shader : %d\n", loc);
-                                  loc =
-                                      glGetUniformLocation(model_shader_->GetProgramID(), "material.texture_diffused1");
+                                  loc =                                      glGetUniformLocation(model_shader_->GetProgramID(), "material.texture_diffused1");
+
                                   printf("diffuse texture sampler location on animating  shader : %d\n", loc);
-                                  showUniformVarValuePerVertex(&brushID, &dancing_vampire->meshes[0], true, true, true, true, true, true);
+                                  showUniformVarValuePerVertex(&UBO, &brushID, &dancing_vampire->meshes[0], true, true, true, true, true, true);
                       }
 // animation update and render ================================================
 

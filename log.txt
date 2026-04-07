@@ -1300,3 +1300,15 @@ Remeber that Bone is different than boneInfo
 And the interpolation (T, S, R) apply keyframe calculation between two frame
 inside the destined frame time
 
+
+---------------- Tue, 07 Apr 26: 11:34AM
+Now I saw skeleton liked looking when just multiply pos after done matrices
+multiplying
+
+By the way the finalBoneMatrices doesn't seem like changing over the time
+Seemed like the update function didn't work well
+
+---------------- Tue, 07 Apr 26: 03:22PM
+
+After moving the storage to buffer by using uniform block and buffer object
+method. I can make sure that 
