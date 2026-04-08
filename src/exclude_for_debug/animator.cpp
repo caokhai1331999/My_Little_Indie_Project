@@ -11,8 +11,9 @@
 
 bool32 showbefore = false;
 
-void Animator::updateAnimationTime(real64* dt){
-    real64* m_deltaTime = dt;
+void Animator::updateAnimationTime(const real64* dt){
+    real64* m_deltaTime;
+    *m_deltaTime = *dt;
     if(m_currentAnimation){
         m_currentTime += (*m_deltaTime) * m_currentAnimation->GetTicksPerSecond();
         m_currentTime = fmod((float)m_currentTime, m_currentAnimation->GetDuration());
@@ -44,7 +45,6 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
     //if(nodeName.size() > 0){
         //printf("Bone name:%s\n", nodeName.c_str());
     //}
-
 
     if(bone){
         bone->Update(&m_currentTime);
@@ -98,9 +98,12 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
 
 void Animator::setupUBO(GLuint* ProgramID){
     // Gen, bind, bufferdata UBO container
+
     wglMakeCurrent(NULL, NULL);
     HGLRC GLcontext = wglGetCurrentContext();
-
+// We have to get the wglGetopenglextention again so this approaching way is no so
+    // viable
+    
     glGenBuffers(1, &UBO);
     glBindBuffer(GL_UNIFORM_BUFFER, UBO);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)* 52, NULL, GL_STREAM_DRAW);
@@ -128,7 +131,7 @@ void DestroyAnimatorClass(Animator *ani) {
     delete ani;
 }
 
-void updateAnimationTime_(Animator *ani, real64* dt) {
+void updateAnimationTime_(Animator *ani, const real64* dt) {
   ani->updateAnimationTime(dt);
 }
 

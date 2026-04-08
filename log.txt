@@ -1312,3 +1312,24 @@ Seemed like the update function didn't work well
 
 After moving the storage to buffer by using uniform block and buffer object
 method. I can make sure that 
+
+---------------- Wed, 08 Apr 26: 09:37AM
+
+TODO: today. We will check over the key frame and the find bone to find out why
+the finalbonematrices didn't update
+    1. keyFrames
+    2. find Bone
+
+Is that just me or it really a incomplete process if the whole bone array is
+built based on findMissingBone function. Is that funcntion supposed to just
+compensate for m_Bone construction 
+
+---------------- Wed, 08 Apr 26: 01:33PM
+
+Now after fixing some stupid mistake I successfully forward the delta Time, thus
+the finalBoneMatrics did update in running time. But still the model is
+unchanged
+
+Update: FinalboneMatrices did update.
+        Now I saw a static upside down skeleton.
+        

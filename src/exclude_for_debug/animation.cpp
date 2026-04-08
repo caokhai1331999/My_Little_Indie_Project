@@ -67,6 +67,7 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
             (*boneInfoMap)[boneName].id = boneCount;
             (boneCount)++;
         }
+//Bone is compensated right here
         m_Bones.push_back(Bone(channel->mNodeName.data, (*boneInfoMap)[channel->mNodeName.data].id, channel));
         //printf("Add bone data to animation container\n");
         }

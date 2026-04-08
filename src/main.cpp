@@ -123,7 +123,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
 
           if(!hit_play)
               hit_play = !hit_play;
-          //BackBuffer.camera.Position += BackBuffer.camera.Up * (float)BackBuffer.camera.speed;
+          BackBuffer.camera.Position += BackBuffer.camera.Up * (float)BackBuffer.camera.speed;
 
           if (!WasDown) {
             printf("Space is HIT\n");
@@ -444,7 +444,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
   int64 CountsPerFrame = 0;
   //So what will be less than 0 must be float type
   real64 MsPerFrame = 0.0f;
-  real64 SPerFrame = 0;
+  real64 SPerFrame = 0.0f;
   int64 FPS = 0;
   // Time elapsed of one cycle/frame in second
 
@@ -661,11 +661,14 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     glm::vec3(-4.0f,  2.0f, -12.0f),
                     glm::vec3( 0.0f,  0.0f, -3.0f)
                 };
-                
+
+                glm::mat4 WorldToCamera = glm::mat4(1.0f);
                 //set camera view here
                 //std::cout<<"View matrix from camera: "<<glm::to_string(BackBuffer.camera.view)<<std::endl;
                 BackBuffer.camera = Camera(BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, Position, Front, Right, Up);
 
+                WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
+                
                 TRACKMOUSEEVENT mouseEventVar = {};
                 mouseEventVar.cbSize = sizeof(TRACKMOUSEEVENT);
                 mouseEventVar.dwFlags = TME_HOVER|TME_LEAVE;
@@ -695,7 +698,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 // Set containing model for dancing vampire
                 dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-2.0f, 2.0f, 0.0f));
                 dancing_vampire_core = glm::scale(dancing_vampire_core,glm::vec3( 0.02f));
-
                 
                 BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
                 
@@ -844,6 +846,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 
                 GLuint UBO;
                 int k = 0;                
+
                 while (GlobalRunning) {
 
                   if (first_announce) {
@@ -857,11 +860,16 @@ LARGE_INTEGER PerfCountFrequencyResult;
                           // We got how many count per frame
                         CountsPerFrame = (int64)(EndCounter.QuadPart - LastCounter.QuadPart);
                       }
-                      MsPerFrame = (real64)((1000.0f * (real64)CountsPerFrame) / (real64)PerfCountFrequency);
-                          //UpdateTime is really a pain here
-                      real64 FramePerS = 1000.0f/((real64)MsPerFrame);
 
-                      SPerFrame = ((real64)MsPerFrame/1000.0f)>0.0f?((real64)MsPerFrame/1000.0f):SPerFrame;
+                    MsPerFrame = (real64)((1000.0f * (real64)CountsPerFrame) / PerfCountFrequency);
+
+
+                    // The value of s per frame is too small for float to hold
+                    SPerFrame = (real64)(MsPerFrame/1000);
+                          //UpdateTime is really a pain here
+                    real64 FramePerS = 1000.0f/((real64)MsPerFrame);
+
+                    SPerFrame = (SPerFrame>0.0f)?SPerFrame:0.0167;
 
                       if (MsPerFrame > 0.0f) {
                           //SPerFrame = MsPerFrame / 1000;
@@ -884,6 +892,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                     //printf("Count from start of frame: %I64d\n",LastCycleCounts);
 
+                    // NOTE: Thing went wrong inside this function
+                    // whether the waittimecounter or the function itself
+                    // produce bugs
                   MSG Message;
                     //NOTE: This is where receiving the message to change
                     // for any change in window
@@ -1032,8 +1043,10 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     
                     
                     //if(BackBuffer.camera.moved || BackBuffer.camera.mouse.moved){
-                    UpdateCamera(&BackBuffer.camera, DelayedRatio);                    
+                    UpdateCamera(&BackBuffer.camera, DelayedRatio);
+                    WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
                     //}
+                    
                     if(BackBuffer.camera.mouse.Wheeled)
                     {
                         BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
@@ -1061,7 +1074,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     model_shader_->setMat4("view", BackBuffer.camera.view);
 
                     animating_shader_->use();
-                    animating_shader_->setMat4("view", BackBuffer.camera.view);
+                    animating_shader_->setMat4("WorldToCamera", WorldToCamera);
                     
                     glUseProgram(0);
                     // Start to add some basic lighting to the model
@@ -1069,10 +1082,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //glBindVertexArray(ScreenBuffer.glData.VAOs);
                     //glDrawArrays(GL_TRIANGLES, 0, 36);
 
-                    // NOTE: Thing went wrong inside this function
-                    // whether the waittimecounter or the function itself
-                    // produce bugs
-                    real64 SPerFrame;                    
                     if (first_size) {
                         printf("counter: %f\n", WaitTimeCounter);
                     }
@@ -1201,29 +1210,29 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     };
 
 
-                    if(TicksPerS > 0.0f) {
+                    if(SPerFrame > 0.0f) {
                         //AniUpdate expect S per frame;
                         PlayAnimation(animator, danceAnimation);
                         AniUpdate(animator, &SPerFrame);
-                        std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
                         //updateUBOData(animator);
+                        std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
 
                         glBindBuffer(GL_UNIFORM_BUFFER, UBO);
                         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4)* 52, Transform->data());
                         glBindBuffer(GL_UNIFORM_BUFFER, 0);
                     }
 
+                            
                             //int i = 0;
                             //std::string matrixName_;
                             //char index[1];
                             //char indexx[2];
-                            //
 //
                             
                             //if (Transform != nullptr){
                                 //for(const glm::mat4& matrix_ : (*Transform)){
                                     //matrixName_ = "finalBoneMatrices["+std::to_string(i)+"]";
-                                    ////matrixName_ = "finalBoneMatrices[]";
+                                    //matrixName_ = "finalBoneMatrices[]";
                                     //if(i<10){
                                         //sprintf(index, "%d", i);
                                         //matrixName_.insert(matrixName_.size()-1, index);
@@ -1237,13 +1246,13 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                     //if(showMsPF){
                                         //printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string(matrix_).c_str());
                                     //}
-
+//
                                     //if(i < (int)Transform->size())
                                     //i++;
                                 //};                                
                             //};
-////
-                            animating_shader_->setMat4("model", dancing_vampire_core);
+//////
+                            animating_shader_->setMat4("WorldToCamera", WorldToCamera);
 
 //Why the later shader texture drawing work but not the one above
                             DDraw(dancing_vampire, &brushID);
@@ -1288,14 +1297,15 @@ LARGE_INTEGER PerfCountFrequencyResult;
                           //}
 
                           if (showMsPF) {
-                          printf("[LastFrameCount:%f,EndFrameCount:%f, "
-                                 "CounterPerFrame : %I64d], MiliS per frame: "
-                                 "%f, real FPS: %I64d \n",
-                                 (real32)LastCounter.QuadPart,
-                                 (real32)EndCounter.QuadPart, CountsPerFrame,
-                                 MsPerFrame, FPS);
-                          printf("Delay Ratio: %f, msPerframe: %f, TicksPerS: %f\n",
-                                 DelayedRatio, MsPerFrame, TicksPerS);
+                          //printf("[LastFrameCount:%f,EndFrameCount:%f, "
+                                 //"CounterPerFrame : %I64d], MiliS per frame: "
+                                 //"%f, real FPS: %I64d \n",
+                                 //(real32)LastCounter.QuadPart,
+                                 //(real32)EndCounter.QuadPart, CountsPerFrame,
+                                 //MsPerFrame, FPS);
+//
+                          printf("Delay Ratio: %f, msPerframe: %f, SPerFrame: %f\n",
+                                 DelayedRatio, MsPerFrame, SPerFrame);
                           printf("WaitTimeCounter: %f, Axis changing counter: %f\n", WaitTimeCounter, ChangeAxisCounter);
                           printf("ColorOffset is:%f\n", ColorOffset);
 
@@ -1305,6 +1315,10 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                           GLint loc = glGetAttribLocation(animating_shader_->GetProgramID(), "TexCoordd");
                           printf("TexCoord location: %d\n", loc);
+//char Buffers[256];
+                          //sprintf(Buffers,
+                          //"[LastFrameCount: %f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame,MsPerFrame, FPS);
+                          //OutputDebugStringA(Buffers);
 
                           showMsPF = false;
                       };
@@ -1319,12 +1333,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     OldInput = Temp;
                     SwapBuffers(DeviceContext);
                     ReleaseDC(Window, DeviceContext);//maybe this one
-//Show things to screen
-//char Buffers[256];
-                    //sprintf(Buffers,
-                            //"[LastFrameCount: %f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame,MsPerFrame, FPS);
-                    //printf("[LastFrameCount:%f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame, MsPerFrame, FPS);
-                    //OutputDebugStringA(Buffers);
 
                     //End count of frame time
                     if (!QueryPerformanceCounter(&EndCounter)) {

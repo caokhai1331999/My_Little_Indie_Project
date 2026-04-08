@@ -17,7 +17,7 @@ layout (std140) uniform finalBone{
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-
+uniform mat4 WorldToCamera;
 
 // uniform block
 // uniform mat4[MAX_BONES] finalBoneMatrices;
@@ -49,7 +49,7 @@ void main()
 	 TotalBoneMatrices += finalBone.finalBoneMatrices[boneids[i]] * weights[i];
 
 	 localPosition = finalBone.finalBoneMatrices[boneids[i]]*vec4(-aPos, 1.0f);
-	 totalPosition += localPosition;
+	 totalPosition += localPosition * weights[i];
 	 vec3 localNormal = mat3(finalBone.finalBoneMatrices[boneids[i]]) * aNormal;
 	 Normal += localNormal;
        }
@@ -120,6 +120,7 @@ vec4 totalPosition_ = TotalBoneMatrices * vec4(-aPos, 1.0f);
      // Normal = vec3(transpose(inverse(view * model))) * aNormal;
 
      TexCoord_ = TexCoordd;
-     gl_Position = projection * view * model * totalPosition_;
+
+     gl_Position = projection * WorldToCamera * totalPosition;
     // gl_Position = projection * view * model * vec4(-aPos, 1.0f);
 };

@@ -41,7 +41,7 @@ public:
     void SetDeltaTime(real64 Time);
     void AddDeltaTime(real64 Time);
 
-    void updateAnimationTime(real64* dt);
+    void updateAnimationTime(const real64* dt);
 
     void playAnimation(Animation* pAnimation);
     void calculateBoneTransform(const AssimpNodeData* node = nullptr, glm::mat4* parentTransform = nullptr, glm::mat4* parentInverseTransform = nullptr);
@@ -65,7 +65,7 @@ private:
 // Class wrapper
 extern "C" __declspec(dllexport) Animator* CreateAnimatorClass(Animation *animation);
 extern "C" __declspec(dllexport) void DestroyAnimatorClass(Animator *ani);
-extern "C" __declspec(dllexport) void updateAnimationTime_(Animator *ani, real64* dt);
+extern "C" __declspec(dllexport) void updateAnimationTime_(Animator *ani, const real64* dt);
 extern "C" __declspec(dllexport) void PlayAni_(Animator* ani, Animation* animation);
 
 extern "C" __declspec(dllexport) void setupUBO_(Animator *ani, GLuint* programID);
@@ -74,7 +74,7 @@ extern "C" __declspec(dllexport) void updateUBOData_(Animator *ani);
 //Assign new name for function here
 typedef Animator* (__cdecl *AniUserClassSpawner) (Animation*);
 typedef void (__cdecl *AniUserClassSlayer) (Animator*);
-typedef void (__cdecl *AniTimeUpdater) (Animator*, real64*);
+typedef void (__cdecl *AniTimeUpdater) (Animator*, const real64*);
 typedef void (*PlayAni__)(Animator*, Animation*);
 typedef void (*setUpUBO__)(Animator*, GLuint*);
 typedef void (*updateUBOData__)(Animator*);

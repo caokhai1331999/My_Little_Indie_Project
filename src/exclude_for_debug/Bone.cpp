@@ -9,6 +9,7 @@
 
 
 int Bone::GetPositionIndex(real64* animationTime){
+
     for(int index = 0; index < mNumPositions - 1; index++){
         // why animationTime < m_Positions[index].timestamp
         if(*animationTime < m_Positions[index + 1].timestamp){
@@ -39,6 +40,7 @@ int Bone::GetScalingIndex(real64* animationTime){
 }
 
 void Bone::Update(real64* animationTime){
+
     glm::mat4 Translation = InterpolatePosition(animationTime);
     glm::mat4 Rotation = InterpolateRotation(animationTime);
     glm::mat4 Scaling = InterpolateScaling(animationTime);
@@ -119,6 +121,8 @@ glm::mat4 Bone::InterpolateRotation(real64* animationTime){
 
         glm::quat finalRotation = glm::slerp(m_Rotations[pt0index].Orientation, m_Rotations[pt1index].Orientation, scaleFactor);
 
+        finalRotation = glm::normalize(finalRotation);
+        
         return glm::toMat4(finalRotation);   
 
 };
