@@ -1333,3 +1333,15 @@ unchanged
 Update: FinalboneMatrices did update.
         Now I saw a static upside down skeleton.
         
+
+---------------- Thu, 09 Apr 26: 11:11AM
+
+New learnt thing.
+    1. The Quartenion is the method to encode the orientation/rotation data
+    {x*sin#, y*sin#, z*sin#, cos1/2#}
+    2. Use Quartenion to solve the gimbal lock problem. 2 gimbal rotate the same
+    axis. And error add up in running time
+
+the debug read out put inside hot loading files cause data corrupted
+
+The shader must be stuck at somewhere while calculating the bone matrices

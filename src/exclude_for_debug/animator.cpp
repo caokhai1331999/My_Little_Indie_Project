@@ -5,14 +5,13 @@
    $Creator: Cao Khai(Casey Muratori's disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
-#include <iostream>
-#include <unordered_map>
+
 #include "animator.h"
 
 bool32 showbefore = false;
 
 void Animator::updateAnimationTime(const real64* dt){
-    real64* m_deltaTime;
+    real64* m_deltaTime = new real64;
     *m_deltaTime = *dt;
     if(m_currentAnimation){
         m_currentTime += (*m_deltaTime) * m_currentAnimation->GetTicksPerSecond();
@@ -22,9 +21,11 @@ void Animator::updateAnimationTime(const real64* dt){
         //printf("test to see code changed once again\n");
 //BUGs here//============================================
 
-        //glm::mat4 globalInverseTransform = glm::inverse(m_currentAnimation->getRootNode()->transformation);
+        glm::mat4 globalInverseTransform = glm::inverse(m_currentAnimation->getRootNode()->transformation);
 
-        calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform, &glm::mat4(1.0f));
+        SetGlobalInverse(&globalInverseTransform);
+
+        calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
     };
 //============================================
 };
@@ -34,7 +35,7 @@ void Animator::playAnimation(Animation* pAnimation){
     m_currentTime = 0.0f;
 };
 
-void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* parentTransform, glm::mat4* parentInverseTransform){
+void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* parentTransform){
  //first fetch Transform from node or matched bone(needed to be updated) existed
     const std::string& nodeName = node->name;
     glm::mat4 nodeTransform = node->transformation;
@@ -56,28 +57,44 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
 
     //Find missing bones and do the same
     // Bone_Info include id and offset matrix of the bone
-    std::unordered_map<std::string, Bone_Info> *boneInfoMap =
-        m_currentAnimation->GetBoneIDMap();
+    std::unordered_map<std::string, Bone_Info> *boneInfoMap =         m_currentAnimation->GetBoneIDMap();
 
-    char Buffer[100] = {};
-    //std::string offset_content = glm::to_string((*boneInfoMap)["Hips"].offset);
-    //sprintf(Buffer, "BoneInfo offset Matrix at Hips is: %s",offset_content.c_str()) ;
+    //char Buffer[100] = {};
+    //std::string global_inverse = glm::to_string(GetGlobalInverse());
+    //sprintf(Buffer, "Global Inverse Transform matrix is: %s",global_inverse.c_str()) ;
      //OutputDebugStringA(Buffer);
+////
      //std::string test_name = "Hips";
-    //
-     
     // WORKING====
     // BUG HERE =================================================
+    glm::mat4 globalInverse = GetGlobalInverse();
+
+    bool32 inverseIsFinite = false;
+    //for(int i =0; i < 4; i++){
+        //for(int j = 0; j < 4; j++){
+            //if(std::isfinite((float)globalInverse[i][j])){
+             //continue;
+            //}
+         //else{
+             //printf("global inverse matrix is wrong\n");
+             //inverseIsFinite = false;
+             //break;
+         //};  
+        //};
+    //}
+//
     if((*boneInfoMap).find(nodeName) != (*boneInfoMap).end()){
         //The boneId represent the index of boneInfo in map
         int index = (*boneInfoMap)[nodeName].id;
         glm::mat4 offset = (*boneInfoMap)[nodeName].offset;
 
-        finalBoneMatrices[index] = globalTransform * offset;
-     } else {
-        sprintf(Buffer, "There is no bone called %s inside the boneInfoMap\n", nodeName.c_str());
-        OutputDebugStringA(Buffer);
-    }
+        //GetGlobalInverse() * 
+              finalBoneMatrices[index] =  inverseIsFinite ? globalInverse * globalTransform * offset: globalTransform * offset;
+     }
+    //else {
+        //sprintf(Buffer, "There is no bone called %s inside the boneInfoMap\n", nodeName.c_str());
+        //OutputDebugStringA(Buffer);
+    //}
 // BUG HERE =================================================
         //if (!showbefore) {
           //std::cout << "finalBoneMatrix at index 0 "
@@ -88,10 +105,9 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
           // NOTE: can not print out finalbonematrices
           
            //Global Transform now is used as parent transform
-          if ((int)node->children.size() > 0) {
-            for (int i = 0; i < node->children.size(); i++) {
-              Animator::calculateBoneTransform(&node->children[i],
-                                               &globalTransform, parentInverseTransform);
+          if (node->children.size() > 0) {
+            for (int i = 0; i < node->children.size(); i++)
+            { calculateBoneTransform(&node->children[i],                                              &globalTransform);
             }
           }
 };

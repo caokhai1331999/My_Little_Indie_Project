@@ -1303,6 +1303,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                  //(real32)LastCounter.QuadPart,
                                  //(real32)EndCounter.QuadPart, CountsPerFrame,
                                  //MsPerFrame, FPS);
+
+                              glm::mat4 inverse_Trans = glm::inverse(danceAnimation->getRootNode()->transformation);
+                              printf("Global Inverse Transform matrix: %s\n", glm::to_string(inverse_Trans).c_str());
 //
                           printf("Delay Ratio: %f, msPerframe: %f, SPerFrame: %f\n",
                                  DelayedRatio, MsPerFrame, SPerFrame);

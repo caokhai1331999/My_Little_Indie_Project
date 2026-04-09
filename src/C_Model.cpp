@@ -29,13 +29,16 @@ void loadModel_(Model_* model, string path){
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path,
     aiProcess_CalcTangentSpace       |
-    aiProcess_Triangulate            |
-    aiProcess_JoinIdenticalVertices  |
-    aiProcess_SortByPType|
-    aiProcess_FindInvalidData|
-    aiProcess_FindInstances|
-    aiProcess_OptimizeMeshes);    
-    //texture_file.C_str()="C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
+    aiProcess_Triangulate            
+);    
+
+/*
+  aiProcess_JoinIdenticalVertices  |
+  aiProcess_SortByPType|
+  aiProcess_FindInvalidData|
+  aiProcess_FindInstances|
+  aiProcess_OptimizeMeshes
+*/    //texture_file.C_str()="C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
 
     //const char* path_= "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
     //aiString texture_file_ = path_;

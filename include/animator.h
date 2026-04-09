@@ -6,8 +6,12 @@
    $Creator: Cao Khai(Casey's disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
-
+#include <glm/gtx/compatibility.hpp> 
 #include "animation.h"
+
+#include <iostream>
+#include <unordered_map>
+
 
 // structure of function type return type of original function (*) (argument type)
 //typedef Animation* (* Animationn) (char*, class Model_*);
@@ -24,6 +28,8 @@ public:
       finalBoneMatrices.resize(52);
 
       g_iGlobalMatricesBindingIndex = 1;
+
+      globalInverseBoneTransform = glm::mat4(1.0f);
       //NOTE: Init finalBoneMatrices first
 
       //for(int i = 0; i < 100; i++);
@@ -41,10 +47,14 @@ public:
     void SetDeltaTime(real64 Time);
     void AddDeltaTime(real64 Time);
 
+    glm::mat4 GetGlobalInverse(){return globalInverseBoneTransform;};
+    void SetGlobalInverse(const glm::mat4* Trans){
+        globalInverseBoneTransform = (*Trans);};
+    
     void updateAnimationTime(const real64* dt);
 
     void playAnimation(Animation* pAnimation);
-    void calculateBoneTransform(const AssimpNodeData* node = nullptr, glm::mat4* parentTransform = nullptr, glm::mat4* parentInverseTransform = nullptr);
+    void calculateBoneTransform(const AssimpNodeData* node = nullptr, glm::mat4* parentTransform = nullptr);
 
     void setupUBO(GLuint * ProgramID = nullptr);
     void updateUBOData();
@@ -55,6 +65,7 @@ private:
     //Check out the uniform buffer
     unsigned int UBO;
     GLuint g_iGlobalMatricesBindingIndex;
+    glm::mat4 globalInverseBoneTransform;
     //Current Animation
     std::vector<glm::mat4>finalBoneMatrices;
     Animation* m_currentAnimation;

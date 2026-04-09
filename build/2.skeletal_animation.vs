@@ -29,10 +29,11 @@ out vec2 TexCoord_;
 void main()
 {
     Normal = vec3(0.0f);
-    vec3 localNormal = vec3(0.0f);
+    // vec3 localNormal = vec3(0.0f);
     TexCoord_ = vec2(0.0f);
 
     vec4 totalPosition = vec4(0.0f);
+    vec4 totalPosition_ = vec4(0.0f);
     vec4 localPosition = vec4(1.0f);
     mat4 TotalBoneMatrices = mat4(1.0f);
 
@@ -46,22 +47,33 @@ void main()
 	   totalPosition = vec4(-aPos, 1.0f);
 	   break;
 	 }
-	 TotalBoneMatrices += finalBone.finalBoneMatrices[boneids[i]] * weights[i];
 
-	 localPosition = finalBone.finalBoneMatrices[boneids[i]]*vec4(-aPos, 1.0f);
-	 totalPosition += localPosition * weights[i];
+	 localPosition = finalBone.finalBoneMatrices[boneids[i]]*vec4(aPos, 1.0f);
+	      
+	 if(weights[i]!=0.0f){
+		TotalBoneMatrices += finalBone.finalBoneMatrices[boneids[i]] * weights[i];
+		totalPosition += localPosition * weights[i];
+ 	 }else{
+		totalPosition_ = vec4(aPos, 1.0f);
+		totalPosition = vec4(aPos, 1.0f);
+		break;
+	 } 
+
+
 	 vec3 localNormal = mat3(finalBone.finalBoneMatrices[boneids[i]]) * aNormal;
-	 Normal += localNormal;
+	 // Normal += localNormal;
        }
 
-       if(totalPosition.w == 0.0f){
-       totalPosition = vec4(-aPos, 1.0f);
-       }
+       // if(totalPosition.w == 0.0f){
+       // totalPosition = vec4(-aPos, 1.0f);
+       // }
 
-vec4 totalPosition_ = TotalBoneMatrices * vec4(-aPos, 1.0f);
+totalPosition_ = TotalBoneMatrices * vec4(aPos, 1.0f);
+totalPosition_.y *= -1.0;
+totalPosition_.z *= -1.0;
 
 // This one froze the shader here
-// vec3 localNormal;
+vec3 localNormal;
 // if(boneids[0]!=-1){
 // 	 vec4 localPosition = finalBoneMatrices[boneids[0]]*vec4(aPos, 1.0f);
 // 	 if(weights[0]!=0.0f){
@@ -106,12 +118,6 @@ vec4 totalPosition_ = TotalBoneMatrices * vec4(-aPos, 1.0f);
 // 	 Normal += localNormal;
 // }
 
-
-
-// vec4 LocalPosition = finalBoneMatrices[boneids[0]]*vec4(aPos, 1.0f);
-// vec4 TotalPosition = LocalPosition * weights[0];
-
-
 	//aPos is the vertex position so the Fragment position is
 	//the dot product of model and vertex Position (plus two vector)
 	// This is to create a world space coor of fragment
@@ -120,7 +126,6 @@ vec4 totalPosition_ = TotalBoneMatrices * vec4(-aPos, 1.0f);
      // Normal = vec3(transpose(inverse(view * model))) * aNormal;
 
      TexCoord_ = TexCoordd;
-
      gl_Position = projection * WorldToCamera * totalPosition;
     // gl_Position = projection * view * model * vec4(-aPos, 1.0f);
 };

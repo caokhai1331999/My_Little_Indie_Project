@@ -21,12 +21,12 @@ struct Materiall{
 uniform Materiall material;
 
 void main(){
-     vec4 outFrag;
-     if(TexCoord_ != vec2(0.0f) || texture(material.texture_diffused1, TexCoord_).rgb != vec3(0.0f)){
-     outFrag = vec4(texture(material.texture_diffused1, TexCoord_).rgb, 1.0f);
+     // if(TexCoord_ != vec2(0.0f) || texture(material.texture_diffused1, TexCoord_).rgb != vec3(0.0f)){
+     vec4 outFrag = vec4(texture(material.texture_diffused1, TexCoord_).rgb, 1.0f);
+
      // outFrag = vec4(TexCoord_, 0.0, 1.0f);
-     } else {
-     outFrag = vec4(TexCoord_, 0.0, 1.0f);
-      }
-     FragColorr = outFrag;	
+     // } else {
+     // outFrag = vec4(TexCoord_, 0.0, 1.0f);
+     //  }
+     FragColorr = outFrag * vec4(texture(material.texture_specular1, TexCoord_).rgb, 1.0f); 
 };
