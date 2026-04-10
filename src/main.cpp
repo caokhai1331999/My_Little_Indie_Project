@@ -1204,55 +1204,90 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         glBindBufferRange(GL_UNIFORM_BUFFER, 1, UBO, 0, sizeof(glm::mat4)* 52);
                     }
 
-                    if(hit_play){
-                        if(hit_play);
-                        hit_play = !hit_play;
-                    };
+                    //if(hit_play){
+                        //if(hit_play);
+                        //hit_play = !hit_play;
+                    //};
 
+                    //float* Transform;
+                    std::vector<glm::mat4>* Transform_;
 
-                    if(SPerFrame > 0.0f) {
-                        //AniUpdate expect S per frame;
-                        PlayAnimation(animator, danceAnimation);
-                        AniUpdate(animator, &SPerFrame);
-                        //updateUBOData(animator);
-                        std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
+                    if(animator->GetCurrentTime() > danceAnimation->GetDuration())
+                    {
+                        PlayAnimation(animator, danceAnimation);                        
+                    } else {
+                        if(SPerFrame > 0.0f && SPerFrame < 0.004f ) {
+                            //AniUpdate expect S per frame;
+                            AniUpdate(animator, &SPerFrame);
+                            //updateUBOData(animator);
+                            //std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
+                        }else{
+                            SPerFrame = 0.0035f;
+                            AniUpdate(animator, &SPerFrame);                        
+                        }                        
 
-                        glBindBuffer(GL_UNIFORM_BUFFER, UBO);
-                        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4)* 52, Transform->data());
-                        glBindBuffer(GL_UNIFORM_BUFFER, 0);
                     }
 
-                            
-                            //int i = 0;
-                            //std::string matrixName_;
-                            //char index[1];
-                            //char indexx[2];
+                    //Transform = animator->getFinalBoneMatrices();
+                        Transform_ = animator->getFinalBoneMatrices();
+                        glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+                        //glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float) * 16 * 52, Transform);
+                        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4)* 52, Transform_->data());
+                        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+                        int i = 0;
+                            std::string matrixName_;
+
+                            char index[1];
+                            char indexx[2];
 //
                             
-                            //if (Transform != nullptr){
-                                //for(const glm::mat4& matrix_ : (*Transform)){
+                            
+                            if (Transform_ != nullptr){
+                                for(const glm::mat4& matrix_ : (*Transform_)) {
                                     //matrixName_ = "finalBoneMatrices["+std::to_string(i)+"]";
-                                    //matrixName_ = "finalBoneMatrices[]";
-                                    //if(i<10){
-                                        //sprintf(index, "%d", i);
-                                        //matrixName_.insert(matrixName_.size()-1, index);
-                                    //} else {
-                                        //sprintf(indexx, "%d", i);
-                                        //matrixName_.insert(matrixName_.size()-1, indexx);                                     
-                                    //}
+
+                                    matrixName_ = "final.finalBoneMatrices[]";
+
+                                    if(i<10){
+                                        sprintf(index, "%d", i);
+                                        matrixName_.insert(matrixName_.size()-1, index);
+                                    } else {
+                                        sprintf(indexx, "%d", i);
+                                        matrixName_.insert(matrixName_.size()-1, indexx);                                     
+                                    }
+
                                     //animating_shader_->setMat4(
                                         //matrixName_.c_str(), matrix_);
+
+                                    if(showMsPF){
+                                        printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string(matrix_).c_str());
+                                    }
 //
-                                    //if(showMsPF){
-                                        //printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string(matrix_).c_str());
-                                    //}
+                                    //if(i < Transform->size())
+                                    i++;
+                                };
+                            };
+
 //
-                                    //if(i < (int)Transform->size())
-                                    //i++;
-                                //};                                
-                            //};
-//////
-                            animating_shader_->setMat4("WorldToCamera", WorldToCamera);
+                    //if(showMsPF){
+                        //for(int i = 0 ; i < 52; i++){
+                            //printf("Bone Matrix [%d]: \n", i);
+                            //for(int j = 0 ; j < 16 ; j++){
+                                //if(j%4==0)
+                                    //printf("[");
+//
+                                //((j%4)!=3)?printf("%f, ", Transform[(16*i) + j]):printf("%f", Transform[(16*i) + j]);
+//
+                                //if((j%4)==3)
+                                //printf("], ");
+//
+                            //}
+                            //printf("\n");
+                        //}                        
+                    //}
+//
+                    animating_shader_->setMat4("WorldToCamera", WorldToCamera);
 
 //Why the later shader texture drawing work but not the one above
                             DDraw(dancing_vampire, &brushID);

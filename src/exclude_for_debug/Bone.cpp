@@ -8,7 +8,7 @@
 #include "Bone.h"
 
 
-int Bone::GetPositionIndex(real64* animationTime){
+int Bone::GetPositionIndex(const real64* animationTime){
 
     for(int index = 0; index < mNumPositions - 1; index++){
         // why animationTime < m_Positions[index].timestamp
@@ -16,12 +16,12 @@ int Bone::GetPositionIndex(real64* animationTime){
             return index;
         }
     }
-    printf("mNumPositions is %d and the m_Positions size is %d, animation time %f\n", mNumPositions, (int)m_Positions.size(), *animationTime);
+    //printf("mNumPositions is %d and the m_Positions size is %d, animation time %f\n", mNumPositions, (int)m_Positions.size(), *animationTime);
     // So the assert happen while there is no animationTime less than any timestamp;
     assert(0);
 }
 
-int Bone::GetRotationIndex(real64* animationTime){
+int Bone::GetRotationIndex(const real64* animationTime){
     for(int index = 0; index < mNumRotations - 1; index++){
         if(*animationTime < m_Rotations[index + 1].timestamp)
             return index;
@@ -30,7 +30,7 @@ int Bone::GetRotationIndex(real64* animationTime){
     //This one track whether the index is invalid or not!!!
 }
 
-int Bone::GetScalingIndex(real64* animationTime){
+int Bone::GetScalingIndex(const real64* animationTime){
     for(int index = 0; index < mNumScalings - 1; index++){
         if(*animationTime < m_KeyScales[index + 1].timestamp){
             return index;
@@ -39,7 +39,7 @@ int Bone::GetScalingIndex(real64* animationTime){
         assert(0);
 }
 
-void Bone::Update(real64* animationTime){
+void Bone::Update(const real64* animationTime){
 
     glm::mat4 Translation = InterpolatePosition(animationTime);
     glm::mat4 Rotation = InterpolateRotation(animationTime);
@@ -49,7 +49,7 @@ void Bone::Update(real64* animationTime){
 };
 
 // Get normalized value for Lerp and Slerp 
-float GetScaleFactor(real64* animationTime, float* lastkeyTime, float* nextkeyTime){
+float GetScaleFactor(const real64* animationTime, float* lastkeyTime, float* nextkeyTime){
 
     float scaleFactor = 0.0f;
     float timeDiff = (*nextkeyTime) - (*lastkeyTime);
@@ -62,7 +62,7 @@ float GetScaleFactor(real64* animationTime, float* lastkeyTime, float* nextkeyTi
 
 // Figure out which Position key to interpolation b/w interpolate and return the
 // final matrix
-glm::mat4 Bone::InterpolatePosition(real64* animationTime){
+glm::mat4 Bone::InterpolatePosition(const real64* animationTime){
 
     if(mNumPositions == 1){
         return glm::translate(glm::mat4(1.0f), m_Positions[0].Position);
@@ -82,7 +82,7 @@ glm::mat4 Bone::InterpolatePosition(real64* animationTime){
 
 // Figure out which Scale key to interpolation b/w interpolate and return the
 // final matrix
-glm::mat4 Bone::InterpolateScaling(real64* animationTime){
+glm::mat4 Bone::InterpolateScaling(const real64* animationTime){
 
     if(mNumScalings == 1){
         return glm::scale(glm::mat4(1.0f), m_KeyScales[0].Scale);
@@ -101,7 +101,7 @@ glm::mat4 Bone::InterpolateScaling(real64* animationTime){
 
 // Figure out which Scale key to interpolation b/w interpolate and return the
 // final matrix
-glm::mat4 Bone::InterpolateRotation(real64* animationTime){
+glm::mat4 Bone::InterpolateRotation(const real64* animationTime){
 
     if(mNumRotations == 1){
         auto rotation = m_Rotations[0].Orientation;

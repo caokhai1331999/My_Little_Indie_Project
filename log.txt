@@ -1291,7 +1291,7 @@ partially. Don't know why!!!
 
 ---------------- Sun, 05 Apr 26: 10:54AM
 
-Found: Actually the updateAnimation need to be fed ticks per second of the frame
+Found: Actually the updateAnimation need to be fed the frame
 time in second
 
 ---------------- Mon, 06 Apr 26: 10:09AM
@@ -1345,3 +1345,17 @@ New learnt thing.
 the debug read out put inside hot loading files cause data corrupted
 
 The shader must be stuck at somewhere while calculating the bone matrices
+
+---------------- Fri, 10 Apr 26: 12:09PM
+
+Actually, the playAnimation which reset the play frame time to 0.0f stall the
+model to move
+
+One more annoying issue is that The get bone index get out of bound usually the
+time get bigger than duration
+
+By reset mAnimation time if it got bigger than the given duration. The get index
+of bone no longer get out of bound. Now the model move but it the unexpected
+way.
+
+NOTE: Time to solve the why the part of model won't move

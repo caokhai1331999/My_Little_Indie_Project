@@ -58,8 +58,10 @@ public:
 
     void setupUBO(GLuint * ProgramID = nullptr);
     void updateUBOData();
-
-    std::vector<glm::mat4>*getFinalBoneMatrices(){return &finalBoneMatrices;};
+    real64 GetCurrentTime(){return m_currentTime;};
+    
+    //float* getFinalBoneMatrices(){return &(*finalBoneMatrices.data())[0][0];};
+    std::vector<glm::mat4>* getFinalBoneMatrices(){return &finalBoneMatrices;};
 
 private:
     //Check out the uniform buffer

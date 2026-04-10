@@ -40,7 +40,6 @@ public:
     void ReadHierarchyData(AssimpNodeData& dest, const aiNode* src);
     AssimpNodeData* getRootNode(){return &m_RootNode;};
 
-
 private:
     float m_Duration;
     int m_TicksPerSecond;
