@@ -444,7 +444,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
   int64 CountsPerFrame = 0;
   //So what will be less than 0 must be float type
   real64 MsPerFrame = 0.0f;
-  real64 SPerFrame = 0.0f;
+  float SPerFrame = 0.0f;
   int64 FPS = 0;
   // Time elapsed of one cycle/frame in second
 
@@ -865,7 +865,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
 
                     // The value of s per frame is too small for float to hold
-                    SPerFrame = (real64)(MsPerFrame/1000);
+                    SPerFrame = (float)(MsPerFrame/1000);
                           //UpdateTime is really a pain here
                     real64 FramePerS = 1000.0f/((real64)MsPerFrame);
 
@@ -1215,7 +1215,14 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     if(animator->GetCurrentTime() > danceAnimation->GetDuration())
                     {
                         PlayAnimation(animator, danceAnimation);                        
+                        if(showMsPF)
+                            printf("animator current time: %f, animation duration: %f", animator->GetCurrentTime(), danceAnimation->GetDuration());
+
                     } else {
+
+                        if(showMsPF)
+                            printf("animator current time: %f, animation duration: %f", animator->GetCurrentTime(), danceAnimation->GetDuration());
+
                         if(SPerFrame > 0.0f && SPerFrame < 0.004f ) {
                             //AniUpdate expect S per frame;
                             AniUpdate(animator, &SPerFrame);

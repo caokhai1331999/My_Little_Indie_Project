@@ -95,18 +95,18 @@ public:
   glm::mat4 GetLocalTransformation(){return m_LocalTransform;};
         const std::string* GetBoneName() const {return &m_Name;};
     int GetBoneID(){return m_ID;};
-        void Update(const real64* animationTime);
+        void Update(const float* animationTime);
         /*Return current index on mKeyPositions and interpolate it based on current animation time*/
-        int GetPositionIndex(const real64* animationTime);
+        int GetPositionIndex(const float* animationTime);
         /*Return current index on mRotations and interpolate it based on current animation time*/
-        int GetRotationIndex(const real64* animationTime);
+        int GetRotationIndex(const float* animationTime);
         /*Return current index on mScalings and interpolate it based on current animation time*/
-        int GetScalingIndex(const real64* animationTime);
+        int GetScalingIndex(const float* animationTime);
 
         // insert bone
-        glm::mat4 InterpolatePosition(const real64* animationTime);
-        glm::mat4 InterpolateScaling(const real64* animationTime);
-        glm::mat4 InterpolateRotation(const real64* animationTime);        
+        glm::mat4 InterpolatePosition(const float* animationTime);
+        glm::mat4 InterpolateScaling(const float* animationTime);
+        glm::mat4 InterpolateRotation(const float* animationTime);        
 };
 
 

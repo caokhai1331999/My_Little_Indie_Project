@@ -26,9 +26,8 @@ void setupMesh(Mesh* mesh){
 
         glBindVertexArray(mesh->VAO);
         // Good thing about struct is that their memory is sequential for all its time
+        //glVertexAttribPointer(0, 1, GL_UNSIGNED_INT, GL_FALSE, sizeof(unsigned int), (const void*)0);
         
-        glVertexAttribPointer(0, 1, GL_UNSIGNED_INT, GL_FALSE, sizeof(unsigned int), (const void*)0);
-
         // Load data into vertex buffer
         glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
         glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size()*sizeof(struct Vertex), &mesh->vertices[0], GL_STATIC_DRAW);        
@@ -55,12 +54,12 @@ void setupMesh(Mesh* mesh){
 
         // IDS
         glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 4, GL_INT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(struct Vertex, m_BoneIDs));
-
+        glVertexAttribPointer(5, 4, GL_INT, GL_FALSE, sizeof(Vertex), (const void*)(int)offsetof(struct Vertex, m_BoneIDs));
+        //printf("Current pointer in vertex struct after m_BoneIDs: %d\n", (int)offsetof(struct Vertex, m_BoneIDs));
         // WEIGHTs
         glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(struct Vertex, m_Weights));
-
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(int)offsetof(struct Vertex, m_Weights));
+        //printf("Current pointer in vertex struct after m_Weights set up: %d\n", (int)offsetof(struct Vertex, m_Weights));
         // The effect is that we symply pass a pointer to the struct and it traslate into a glm::vec3
         // again translate to 3/2 float which translate into a byte array 
 
@@ -73,7 +72,9 @@ void setupMesh(Mesh* mesh){
 
 void Draw(Mesh* mesh, GLuint* progID){
         // bind appropriate textures
-    
+
+    glBindVertexArray(0);
+    useProgram(0);
         //unsigned int textureID  = vampire_?3:1;
 
         unsigned int diffuseNr  = 1;
@@ -110,8 +111,11 @@ void Draw(Mesh* mesh, GLuint* progID){
 
         // Draw the mesh(Bind array, Load model, draw element/array)
         glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(mesh->indices.size()), GL_UNSIGNED_INT, 0);
+
+        glBindVertexArray(0);
+        useProgram(0);
         // Always a good practice to set everything back to default once configured
-        //glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE0);
 };
 
 void showUniformVarValuePerVertex(GLuint* UBO, GLuint* programeId, Mesh* mesh, bool32 showIndices, bool32 showPos, bool32 showTexCoords, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices){

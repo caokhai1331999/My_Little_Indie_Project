@@ -1359,3 +1359,21 @@ of bone no longer get out of bound. Now the model move but it the unexpected
 way.
 
 NOTE: Time to solve the why the part of model won't move
+
+---------------- Sat, 11 Apr 26: 11:56AM
+
+So the bone weight decide how much the bone offset matrices deform the vertice
+space
+
+---------------- Sat, 11 Apr 26: 02:51PM
+
+What show is just t-pose frozen gait moving skeleton.
+Based on the consultation from chatGPT there must be something wrong with the
+interpolation part
+
+So the freezing symptom is that the finalbonematrices showing its bind pose
+matrix(node original transformation)
+
+By the way, why the animation duration is way bigger than the last bone
+timestamp.
+The bone construct is missing something may be.

@@ -10,8 +10,8 @@
 
 bool32 showbefore = false;
 
-void Animator::updateAnimationTime(const real64* dt){
-    real64* m_deltaTime = new real64;
+void Animator::updateAnimationTime(const float* dt){
+    float* m_deltaTime = new float;
     *m_deltaTime = *dt;
     if(m_currentAnimation){
         m_currentTime += (*m_deltaTime) * m_currentAnimation->GetTicksPerSecond();
@@ -147,7 +147,7 @@ void DestroyAnimatorClass(Animator *ani) {
     delete ani;
 }
 
-void updateAnimationTime_(Animator *ani, const real64* dt) {
+void updateAnimationTime_(Animator *ani, const float* dt) {
   ani->updateAnimationTime(dt);
 }
 
