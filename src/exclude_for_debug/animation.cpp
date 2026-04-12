@@ -7,28 +7,23 @@
    ======================================================================== */
 #include "animation.h"
 
-//extern "C" __declspec(dllexport)
-//#pragma comment(linker, "/export:Animation=??0Animation@@QEAA@PEADPEAVModel_@@@Z")
-
 Animation::Animation(const char* animationPath, Model_ *model) {
   // assert throw out the error when 0 is the value
-  m_Bones.reserve(100);
-  m_Bone_InfoMap.reserve(100);
 
   Assimp::Importer importer;
-  const aiScene *scene =
-      importer.ReadFile(animationPath, aiProcess_Triangulate);
+  const aiScene *scene = importer.ReadFile(animationPath, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_LimitBoneWeights);
   // Still don't understand this part
   // Now I understand this: This line check whether one of these two
   // the scene->mRootNode is NULL or not
   assert(scene && scene->mRootNode);
 
   // Bone construct based on scene here
-  auto animation = scene->mAnimations[0];
+  aiAnimation* animation = scene->mAnimations[0];
+
   m_Duration = animation->mDuration;
   m_TicksPerSecond = animation->mTicksPerSecond;
 
-  ReadHierarchyData(m_RootNode, scene->mRootNode);
+  ReadHierarchyData(this->m_RootNode, scene->mRootNode);
   ReadMissingBone(animation, model);
 };
 
@@ -47,16 +42,22 @@ Bone* Animation::FindBone(const std::string& name){
     }else {return &(*iter);}
 };
 
+// NOTE: Focus on this
 void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
+// So the mNumChannels is the number of bone
     int size = animation->mNumChannels;
+    m_Bones.reserve(size);
+    //m_Bones.resize(size);
 
+    m_Bone_InfoMap.reserve(size);
     // Get these properties from model var
     std::unordered_map<std::string, Bone_Info>* boneInfoMap;
+
     boneInfoMap = model->GetBoneInfoMap();
     int boneCount = model->GetBoneCount();
 
     //Reading channels (bone engaged in an animation and keyframes)
-
+// BUGs likely to be in here
     for(int i = 0; i < size; i++){
         //TODO: Debug here
         aiNodeAnim *channel = animation->mChannels[i];
@@ -76,8 +77,10 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
 
 void Animation::ReadHierarchyData(AssimpNodeData& dest, const aiNode* src){
     assert(src);
+    
     dest.name = src->mName.data;
     dest.transformation = AssimpGLMHelpers::ConvertMatrixToGLMFormat(src->mTransformation);
+
     dest.children.resize(src->mNumChildren);
     dest.children.reserve(src->mNumChildren);
     // as told this line prevent children vector from reallocating after an

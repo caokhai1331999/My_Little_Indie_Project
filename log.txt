@@ -1377,3 +1377,22 @@ matrix(node original transformation)
 By the way, why the animation duration is way bigger than the last bone
 timestamp.
 The bone construct is missing something may be.
+
+So why only Position of bone is lackly contructed
+
+---------------- Sun, 12 Apr 26: 10:29AM
+
+TODO: 1. Mull over model.aiMesh to see real number of bone.Position
+      2.
+
+So the mPositionKeys is 104. What actually shown is just 15 of them. By the way
+calling channels in the mnumchannels is fishy either
+
+NOTE: So there are more than one animations should be considered while in our
+code there is only one. Bug may be found!
+
+NOTE: FOUND one bug: I stupidly bind channel position, scale and rotation number
+to local variable and loop based on it instead of matching already created class
+member -> The result is that now the skeleton is moving.
+
+But It seemed wrong in ratio term. Have to work on that next time

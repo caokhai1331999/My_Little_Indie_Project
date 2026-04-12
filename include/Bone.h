@@ -50,12 +50,14 @@ private:
 
 public:
     // Read keyframe from aiNodeAnim
+    Bone(){};
     Bone(const std::string& name, int ID, const aiNodeAnim* channel):m_Name(name), m_ID(ID), m_LocalTransform(1.0f){
         //NOTE: In turn we copy KeyPostion, KeyRotation and KeyScale data from aiNodeAnim to Bone
 
         //First build up POSITION of Bone first
-        int m_NumPositions = channel->mNumPositionKeys;
-        for(int positionIndex = 0; positionIndex < m_NumPositions; positionIndex++){
+        mNumPositions = (int)channel->mNumPositionKeys;
+
+        for(int positionIndex = 0; positionIndex < mNumPositions; positionIndex++){
             aiVector3D aiPosition = channel->mPositionKeys[positionIndex].mValue;
             float timeStamp = channel->mPositionKeys[positionIndex].mTime;
 
@@ -66,7 +68,7 @@ public:
         }
 
         //Then the Rotation
-        int m_NumRotations = channel->mNumRotationKeys;
+        mNumRotations = (int)channel->mNumRotationKeys;
         for(int rotationIndex = 0; rotationIndex < mNumRotations; rotationIndex++){
             aiQuaternion aiOrientation = channel->mRotationKeys[rotationIndex].mValue;
             float timeStamp = channel->mRotationKeys[rotationIndex].mTime;
@@ -79,8 +81,8 @@ public:
         };
 
         // Finally the Scale
-        int m_NumScalings = channel->mNumScalingKeys;
-        for(int scalingIndex = 0; scalingIndex < m_NumScalings; scalingIndex++){
+        mNumScalings = (int)channel->mNumScalingKeys;
+        for(int scalingIndex = 0; scalingIndex < mNumScalings; scalingIndex++){
 
             aiVector3D scale = channel->mScalingKeys[scalingIndex].mValue;
             float timestamp = channel->mScalingKeys[scalingIndex].mTime;

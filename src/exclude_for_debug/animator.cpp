@@ -89,7 +89,8 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
         glm::mat4 offset = (*boneInfoMap)[nodeName].offset;
 
         //GetGlobalInverse() * 
-              finalBoneMatrices[index] =  inverseIsFinite ? globalInverse * globalTransform * offset: globalTransform * offset;
+              //finalBoneMatrices[index] =  inverseIsFinite ? globalInverse * globalTransform * offset: globalTransform * offset;
+              finalBoneMatrices[index] = globalTransform * offset;
      }
     //else {
         //sprintf(Buffer, "There is no bone called %s inside the boneInfoMap\n", nodeName.c_str());
