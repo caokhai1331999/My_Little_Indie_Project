@@ -120,7 +120,8 @@ Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
             vertex.TexCoords = glm::vec2(0.0f, 0.0f);
         }
         vertices.push_back(vertex);
-        // Process VERTEX Position, Normal, Texure Coordinates
+
+      // Process VERTEX Position, Normal, Texure Coordinates
     }
 
     // Process INDICES(order of mesh vertex(which contain Position, Norm, TexCoords))
@@ -246,7 +247,6 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
 void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex>&vertices){
 
     std::unordered_map<std::string, Bone_Info>* mBoneInfoMap = this->m_BoneInfoMap;
-    int* m_BoneCounter = new int(0);
     
     if(mesh->mNumBones > 0)
     {    for(int boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++){
@@ -257,15 +257,17 @@ void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex
             if(mBoneInfoMap->find(boneName) == mBoneInfoMap->end()){
                 Bone_Info newboneinfo ;
 // On the way of learning here
-                newboneinfo.id = (*m_BoneCounter);
+                newboneinfo.id = m_BoneCounter;
                 newboneinfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
-                (*mBoneInfoMap)[boneName] = newboneinfo;
 
-                boneID = (*m_BoneCounter);
-                (*m_BoneCounter)++;
+                (*mBoneInfoMap)[boneName] = newboneinfo;
+                boneID = m_BoneCounter;
+
+                m_BoneCounter++;
             }else{
                 boneID = (*mBoneInfoMap)[boneName].id;
             }
+
             assert(boneID != -1);
             //what exactly weights's type is
             auto weights = mesh->mBones[boneIndex]->mWeights;

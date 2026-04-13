@@ -1396,3 +1396,7 @@ to local variable and loop based on it instead of matching already created class
 member -> The result is that now the skeleton is moving.
 
 But It seemed wrong in ratio term. Have to work on that next time
+
+---------------- Mon, 13 Apr 26: 10:41AM
+
+Mismatch boneID between bound mesh data and boneInfoMap is likely a scapegoat

@@ -49,7 +49,7 @@ public:
     void updateAnimationTime(const float* dt);
 
     void playAnimation(Animation* pAnimation);
-    void calculateBoneTransform(const AssimpNodeData* node = nullptr, glm::mat4* parentTransform = nullptr);
+    void calculateBoneTransform(const AssimpNodeData* node = nullptr, glm::mat4* parentTransform = nullptr, glm::mat4* GlobalInverse = nullptr);
 
     void setupUBO(GLuint * ProgramID = nullptr);
     void updateUBOData();

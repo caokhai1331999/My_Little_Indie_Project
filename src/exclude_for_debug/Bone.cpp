@@ -19,7 +19,7 @@ int Bone::GetPositionIndex(const float* animationTime){
     }
     printf("mNumPositions is %d and the last bone timestamp is %f, animation time %f\n", mNumPositions, m_Positions[mNumPositions - 1].timestamp, *animationTime);
     // So the assert happen while there is no animationTime less than any timestamp;
-    //assert(0);
+    assert(0);
 }
 
 int Bone::GetRotationIndex(const float* animationTime){

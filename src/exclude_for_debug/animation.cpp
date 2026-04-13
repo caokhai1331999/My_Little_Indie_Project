@@ -11,6 +11,7 @@ Animation::Animation(const char* animationPath, Model_ *model) {
   // assert throw out the error when 0 is the value
 
   Assimp::Importer importer;
+  m_Bone_InfoMap = new std::unordered_map<std::string, Bone_Info>;
   const aiScene *scene = importer.ReadFile(animationPath, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_LimitBoneWeights);
   // Still don't understand this part
   // Now I understand this: This line check whether one of these two
@@ -47,9 +48,9 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
 // So the mNumChannels is the number of bone
     int size = animation->mNumChannels;
     m_Bones.reserve(size);
+    m_Bone_InfoMap->reserve(size);
     //m_Bones.resize(size);
 
-    m_Bone_InfoMap.reserve(size);
     // Get these properties from model var
     std::unordered_map<std::string, Bone_Info>* boneInfoMap;
 
@@ -64,15 +65,17 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
         assert(channel);
         std::string boneName = channel->mNodeName.data;
 
-        if((*boneInfoMap).find(boneName) == (*boneInfoMap).end()){
-            (*boneInfoMap)[boneName].id = boneCount;
-            (boneCount)++;
-        }
+            // Why we have to reapply the boneId
+        //if((*boneInfoMap).find(boneName) == (*boneInfoMap).end()){
+            //(*boneInfoMap)[boneName].id = boneCount;
+            //(boneCount)++;
+        //}
+
 //Bone is compensated right here
         m_Bones.push_back(Bone(channel->mNodeName.data, (*boneInfoMap)[channel->mNodeName.data].id, channel));
         //printf("Add bone data to animation container\n");
         }
-    m_Bone_InfoMap = (*boneInfoMap);
+    m_Bone_InfoMap = boneInfoMap;
 };
 
 void Animation::ReadHierarchyData(AssimpNodeData& dest, const aiNode* src){

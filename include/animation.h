@@ -24,7 +24,7 @@ public:
     
     inline float GetTicksPerSecond(){return m_TicksPerSecond;};
     inline float GetDuration(){return m_Duration;};
-    inline std::unordered_map<std::string, Bone_Info>* GetBoneIDMap() {return &m_Bone_InfoMap;};
+    inline std::unordered_map<std::string, Bone_Info>* GetBoneIDMap() {return m_Bone_InfoMap;};
     
 // Functions
     void ConstructBone(); 
@@ -47,7 +47,7 @@ private:
     // Bone is a class type while Bone_Info is just a struct contain id and
     // offset matrix
     std::vector<Bone> m_Bones;
-    std::unordered_map<std::string, Bone_Info> m_Bone_InfoMap;
+    std::unordered_map<std::string, Bone_Info>* m_Bone_InfoMap;
 };
 
 // Class wrapper
