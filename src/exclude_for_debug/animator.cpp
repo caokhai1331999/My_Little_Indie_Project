@@ -21,7 +21,8 @@ void Animator::updateAnimationTime(const float* dt){
         //printf("test to see code changed once again\n");
 //BUGs here//============================================
 
-        glm::mat4 globalInverseTransform = glm::inverse(m_currentAnimation->getRootNode()->transformation);
+        //glm::mat4 globalInverseTransform = glm::inverse(m_currentAnimation->getRootNode()->transformation);
+        glm::mat4 globalInverseTransform = m_currentAnimation->getRootNode()->transformation;
 
         SetGlobalInverse(&globalInverseTransform);
 
@@ -90,7 +91,7 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
 
         //GetGlobalInverse() * 
               //finalBoneMatrices[index] =  inverseIsFinite ? globalInverse * globalTransform * offset: globalTransform * offset;
-              finalBoneMatrices[index] = globalTransform * offset;
+              finalBoneMatrices[index] = globalInverse * globalTransform * offset;
      }
     //else {
         //sprintf(Buffer, "There is no bone called %s inside the boneInfoMap\n", nodeName.c_str());

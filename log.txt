@@ -1400,3 +1400,29 @@ But It seemed wrong in ratio term. Have to work on that next time
 ---------------- Mon, 13 Apr 26: 10:41AM
 
 Mismatch boneID between bound mesh data and boneInfoMap is likely a scapegoat
+Proof: Scale misapply cause leg so small and hand so big.
+
+How can we know for sure that the aiMesh.mNumChannels and mNumBone match with
+each other
+
+If based on name, it hardly miss matched between boneInfoMap and boneVertex
+attributes
+
+So based on the ExtractBoneWeightForVertices function.
+The VertexId lied inside the mesh->mBones[i]->mWeights[4]
+so here the hierarchy of the mBones: + mOffsetMatrix
+                                     + mWeights[4] : ++ int mVerTexId
+                                                     ++ float mWeight
+
+so Vertices[mVerTexId].boneID will be match with the first affect animation
+affecting node + numberof count node inside the mBones order. Cause The
+mOffsetMatrix and Weight and VertexId is taken from the same mBones[index].
+
+The mBoneCounter will later be a mark in finalBoneMatrices[mark]
+ -- mBoneCounter-> boneInfoMap.id-> finalboneMatrices[mark] -- 
+
+so the vertices[mBone[boneIndex].mWeight[i].mVertexId].mBoneIDs[i] and the
+[boneID] as mark in the finalBoneMatrices all from the m_BoneCounter which point
+to the same mBones[] member in aiMesh processed in 
+extractBoneWeightForVertices. So the possibilities for the mismatch
+finalBoneMatrices and Vertex attribute is highly unlikely to happened

@@ -29,8 +29,7 @@ void loadModel_(Model_* model, string path){
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path,
     aiProcess_CalcTangentSpace       |
-    aiProcess_Triangulate            
-);    
+    aiProcess_Triangulate            );    
 
 /*
   aiProcess_JoinIdenticalVertices  |
@@ -254,14 +253,16 @@ void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex
             //What is mName
             std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
 //If no elements was found!!!
+
             if(mBoneInfoMap->find(boneName) == mBoneInfoMap->end()){
                 Bone_Info newboneinfo ;
 // On the way of learning here
+                boneID = m_BoneCounter;
+
                 newboneinfo.id = m_BoneCounter;
                 newboneinfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
 
                 (*mBoneInfoMap)[boneName] = newboneinfo;
-                boneID = m_BoneCounter;
 
                 m_BoneCounter++;
             }else{
@@ -274,8 +275,10 @@ void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex
             int numWeights = mesh->mBones[boneIndex]->mNumWeights;
 
             for(int weightIndex = 0; weightIndex < numWeights; weightIndex++){
+//NOTE:  How do they know that the vertexId is matched with the boneID
                 int vertexId = weights[weightIndex].mVertexId;
                 float weight = weights[weightIndex].mWeight;
+
                 assert(vertexId <= vertices.size());
                 SetVertexBoneData(&vertices[vertexId], boneID, weight);
             }

@@ -47,16 +47,23 @@ Bone* Animation::FindBone(const std::string& name){
 void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
 // So the mNumChannels is the number of bone
     int size = animation->mNumChannels;
-    m_Bones.reserve(size);
-    m_Bone_InfoMap->reserve(size);
+
+    m_Bones.reserve(100);
+    m_Bone_InfoMap->reserve(100);
     //m_Bones.resize(size);
 
     // Get these properties from model var
-    std::unordered_map<std::string, Bone_Info>* boneInfoMap;
+    std::unordered_map<std::string, Bone_Info>* boneInfoMapForAni;
+    boneInfoMapForAni = new std::unordered_map<std::string, Bone_Info>;
+    boneInfoMapForAni->reserve(100);
 
-    boneInfoMap = model->GetBoneInfoMap();
-    int boneCount = model->GetBoneCount();
+    std::unordered_map<std::string, Bone_Info>* ModelboneInfoMapClone;
 
+    ModelboneInfoMapClone = model->GetBoneInfoMap();
+    int ExtraBoneCount = model->GetBoneCount();
+
+    // Not any node is affected by this animation we have to choose between them
+    
     //Reading channels (bone engaged in an animation and keyframes)
 // BUGs likely to be in here
     for(int i = 0; i < size; i++){
@@ -66,16 +73,28 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
         std::string boneName = channel->mNodeName.data;
 
             // Why we have to reapply the boneId
-        //if((*boneInfoMap).find(boneName) == (*boneInfoMap).end()){
-            //(*boneInfoMap)[boneName].id = boneCount;
-            //(boneCount)++;
-        //}
 
-//Bone is compensated right here
-        m_Bones.push_back(Bone(channel->mNodeName.data, (*boneInfoMap)[channel->mNodeName.data].id, channel));
+//Bone is compensated right here it find the bone just in case it exist
+//of the boneInfo map
+        if((*ModelboneInfoMapClone).find(boneName) == (*ModelboneInfoMapClone).end()){
+            Bone_Info newbone;
+
+            newbone.id = ExtraBoneCount;
+            newbone.offset = glm::mat4(1.0f);
+
+            (*boneInfoMapForAni)[boneName] = newbone;
+            ExtraBoneCount++;
+        }else{
+            //This bracket will show bug which indicate the mismatch between
+            //boneInfo_map and m_bones
+            (*boneInfoMapForAni)[boneName] = (*ModelboneInfoMapClone)[boneName];
+            //Add bone if channel Name exist in boneInfo_Map
+            m_Bones.push_back(Bone(channel->mNodeName.data, (*ModelboneInfoMapClone)[channel->mNodeName.data].id, channel));
+        }
+//The ID have to be matched with the give channel
         //printf("Add bone data to animation container\n");
         }
-    m_Bone_InfoMap = boneInfoMap;
+    m_Bone_InfoMap = boneInfoMapForAni;
 };
 
 void Animation::ReadHierarchyData(AssimpNodeData& dest, const aiNode* src){
@@ -86,6 +105,7 @@ void Animation::ReadHierarchyData(AssimpNodeData& dest, const aiNode* src){
 
     dest.children.resize(src->mNumChildren);
     dest.children.reserve(src->mNumChildren);
+
     // as told this line prevent children vector from reallocating after an
     // element is added(which is believed would speed things up)
     for(int i = 0; i < src->mNumChildren; i++){

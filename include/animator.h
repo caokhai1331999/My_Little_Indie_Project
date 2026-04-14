@@ -37,10 +37,9 @@ public:
       //finalBoneMatrices.push_back(glm::mat4(1.0f));
       //};
     }
-      ~Animator(){
-        delete m_currentAnimation;
-        m_currentAnimation = nullptr;
-        };
+
+    ~Animator(){
+    };
 
     glm::mat4 GetGlobalInverse(){return globalInverseBoneTransform;};
     void SetGlobalInverse(const glm::mat4* Trans){
