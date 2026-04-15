@@ -113,6 +113,12 @@ mat4 localBone = mat4(1.0f);
 totalPosition.y *= -1;
 totalPosition.z *= -1;
 
+// totalPosition.x = clamp(totalPosition.x, -1, 1);
+// totalPosition.y = clamp(totalPosition.y, -1, 1);
+// totalPosition.z = clamp(totalPosition.z, -1, 1);
+// totalPosition.w = clamp(totalPosition.w, -1, 1);
+
+
 //aPos is the vertex position so the Fragment position is
 	//the dot product of model and vertex Position (plus two vector)
 	// This is to create a world space coor of fragment
@@ -121,6 +127,6 @@ totalPosition.z *= -1;
      // Normal = vec3(transpose(inverse(view * model))) * aNormal;
      // Actually the model matrix is what carried world's feature
       gl_Position = projection * WorldToCamera * totalPosition;     
-      // gl_Position = projection * WorldToCamera * totalBoneMatrices * vec4(aPos, 1.0f);     
+       //gl_Position = projection * WorldToCamera * totalBoneMatrices * vec4(aPos, 1.0f);     
     // gl_Position = projection * view * model * vec4(-aPos, 1.0f);
 };

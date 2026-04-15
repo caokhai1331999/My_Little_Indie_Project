@@ -1409,20 +1409,31 @@ If based on name, it hardly miss matched between boneInfoMap and boneVertex
 attributes
 
 So based on the ExtractBoneWeightForVertices function.
-The VertexId lied inside the mesh->mBones[i]->mWeights[4]
+
 so here the hierarchy of the mBones: + mOffsetMatrix
                                      + mWeights[4] : ++ int mVerTexId
                                                      ++ float mWeight
 
-so Vertices[mVerTexId].boneID will be match with the first affect animation
-affecting node + numberof count node inside the mBones order. Cause The
-mOffsetMatrix and Weight and VertexId is taken from the same mBones[index].
+Vertices[mVerTexId].boneID will be match with the
+finalBoneMatrix[mBoneCounter] cause the mBoneCounter = boneID. Plus, The
+mOffsetMatrix and Weight and VertexId is taken from the same mBones[] element.
 
-The mBoneCounter will later be a mark in finalBoneMatrices[mark]
- -- mBoneCounter-> boneInfoMap.id-> finalboneMatrices[mark] -- 
-
-so the vertices[mBone[boneIndex].mWeight[i].mVertexId].mBoneIDs[i] and the
-[boneID] as mark in the finalBoneMatrices all from the m_BoneCounter which point
-to the same mBones[] member in aiMesh processed in 
-extractBoneWeightForVertices. So the possibilities for the mismatch
+Final verdict: The offsetBoneMatrix and VertexId are marked by
+mBoneCounter/BoneId which point to the same mBones[] member in aiMesh processed in 
+extractBoneWeightForVertices. So the possibility for the mismatch between
 finalBoneMatrices and Vertex attribute is highly unlikely to happened
+
+---------------- Wed, 15 Apr 26: 09:59AM
+
+What possible causes to lay eyes on today:
+     1. Transformation computing part.
+
+There are something positive happened here the globalInverse may be is something
+we lack of
+
+NOTE: Actually, we somehow fix part of it by changing the order of matrices
+multiplied chain
+      The orders: finalBoneMat = globalInverse * ParentTransform * offset
+
+Note that: the ParentTransform is the id mat that carried feature node transform
+matrix (which is update over time) in order : children of children * children * rootnode

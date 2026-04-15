@@ -40,24 +40,24 @@ private:
     std::vector<KeyRotation>m_Rotations;
     std::vector<KeyScale>m_KeyScales;
 
-    int mNumPositions;
-    int mNumRotations;
-    int mNumScalings;
+    unsigned int mNumPositions;
+    unsigned int mNumRotations;
+    unsigned int mNumScalings;
 
     glm::mat4 m_LocalTransform;
     std::string m_Name;
-    int m_ID;
+    unsigned int m_ID;
 
 public:
     // Read keyframe from aiNodeAnim
     Bone(){};
-    Bone(const std::string& name, int ID, const aiNodeAnim* channel):m_Name(name), m_ID(ID), m_LocalTransform(1.0f){
+    Bone(const std::string& name, unsigned int ID, const aiNodeAnim* channel):m_Name(name), m_ID(ID), m_LocalTransform(1.0f){
         //NOTE: In turn we copy KeyPostion, KeyRotation and KeyScale data from aiNodeAnim to Bone
 
         //First build up POSITION of Bone first
-        mNumPositions = (int)channel->mNumPositionKeys;
+        mNumPositions = channel->mNumPositionKeys;
 
-        for(int positionIndex = 0; positionIndex < mNumPositions; positionIndex++){
+        for(unsigned int positionIndex = 0; positionIndex < mNumPositions; positionIndex++){
             aiVector3D aiPosition = channel->mPositionKeys[positionIndex].mValue;
             float timeStamp = channel->mPositionKeys[positionIndex].mTime;
 
@@ -68,8 +68,8 @@ public:
         }
 
         //Then the Rotation
-        mNumRotations = (int)channel->mNumRotationKeys;
-        for(int rotationIndex = 0; rotationIndex < mNumRotations; rotationIndex++){
+        mNumRotations = channel->mNumRotationKeys;
+        for(unsigned int rotationIndex = 0; rotationIndex < mNumRotations; rotationIndex++){
             aiQuaternion aiOrientation = channel->mRotationKeys[rotationIndex].mValue;
             float timeStamp = channel->mRotationKeys[rotationIndex].mTime;
 
@@ -81,8 +81,8 @@ public:
         };
 
         // Finally the Scale
-        mNumScalings = (int)channel->mNumScalingKeys;
-        for(int scalingIndex = 0; scalingIndex < mNumScalings; scalingIndex++){
+        mNumScalings = channel->mNumScalingKeys;
+        for(unsigned int scalingIndex = 0; scalingIndex < mNumScalings; scalingIndex++){
 
             aiVector3D scale = channel->mScalingKeys[scalingIndex].mValue;
             float timestamp = channel->mScalingKeys[scalingIndex].mTime;
@@ -99,11 +99,11 @@ public:
     int GetBoneID(){return m_ID;};
         void Update(const float* animationTime);
         /*Return current index on mKeyPositions and interpolate it based on current animation time*/
-        int GetPositionIndex(const float* animationTime);
+        unsigned int GetPositionIndex(const float* animationTime);
         /*Return current index on mRotations and interpolate it based on current animation time*/
-        int GetRotationIndex(const float* animationTime);
+        unsigned int GetRotationIndex(const float* animationTime);
         /*Return current index on mScalings and interpolate it based on current animation time*/
-        int GetScalingIndex(const float* animationTime);
+        unsigned int GetScalingIndex(const float* animationTime);
 
         // insert bone
         glm::mat4 InterpolatePosition(const float* animationTime);

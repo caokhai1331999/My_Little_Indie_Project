@@ -22,10 +22,9 @@ void Animator::updateAnimationTime(const float* dt){
 //BUGs here//============================================
 
         //glm::mat4 globalInverseTransform = glm::inverse(m_currentAnimation->getRootNode()->transformation);
-        glm::mat4 globalInverseTransform = m_currentAnimation->getRootNode()->transformation;
+        glm::mat4 globalInverseTransform = glm::inverse (m_currentAnimation->getRootNode()->transformation);
 
         SetGlobalInverse(&globalInverseTransform);
-
         calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
     };
 //============================================
@@ -54,7 +53,7 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
     }
     ////
 
-    glm::mat4 globalTransform = nodeTransform * (*parentTransform);
+    glm::mat4 globalTransform = (*parentTransform) * nodeTransform;
 
     //Find missing bones and do the same
     // Bone_Info include id and offset matrix of the bone
@@ -86,12 +85,12 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
 //
     if((*boneInfoMap).find(nodeName) != (*boneInfoMap).end()){
         //The boneId represent the index of boneInfo in map
-        int index = (*boneInfoMap)[nodeName].id;
+        unsigned int index = (*boneInfoMap)[nodeName].id;
         glm::mat4 offset = (*boneInfoMap)[nodeName].offset;
 
         //GetGlobalInverse() * 
               //finalBoneMatrices[index] =  inverseIsFinite ? globalInverse * globalTransform * offset: globalTransform * offset;
-              finalBoneMatrices[index] = globalInverse * globalTransform * offset;
+              finalBoneMatrices[index] =  globalInverse * globalTransform * offset;
      }
     //else {
         //sprintf(Buffer, "There is no bone called %s inside the boneInfoMap\n", nodeName.c_str());

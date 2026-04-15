@@ -249,7 +249,7 @@ void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex
     
     if(mesh->mNumBones > 0)
     {    for(int boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++){
-            int boneID = -1;
+            unsigned int boneID = -1;
             //What is mName
             std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
 //If no elements was found!!!

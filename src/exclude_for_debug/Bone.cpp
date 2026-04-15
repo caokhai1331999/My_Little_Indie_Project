@@ -8,12 +8,12 @@
 #include "Bone.h"
 
 
-int Bone::GetPositionIndex(const float* animationTime){
+unsigned int Bone::GetPositionIndex(const float* animationTime){
 
     //for(int index = 0; index < mNumPositions - 1; index++){
-    for(int index = 0; index < mNumPositions; index++){
+    for(unsigned int index = 0; index < mNumPositions; index++){
         // why animationTime < m_Positions[index].timestamp
-        if((*animationTime) < m_Positions[index].timestamp){
+        if((*animationTime) <= m_Positions[index].timestamp){
             return index;
         }
     }
@@ -22,20 +22,20 @@ int Bone::GetPositionIndex(const float* animationTime){
     assert(0);
 }
 
-int Bone::GetRotationIndex(const float* animationTime){
+unsigned int Bone::GetRotationIndex(const float* animationTime){
     //for(int index = 0; index < mNumRotations - 1; index++){
-    for(int index = 0; index < mNumRotations; index++){
-        if((*animationTime) < m_Rotations[index].timestamp)
+    for(unsigned int index = 0; index < mNumRotations; index++){
+        if((*animationTime) <= m_Rotations[index].timestamp)
             return index;
     }
         assert(0);
     //This one track whether the index is invalid or not!!!
 }
 
-int Bone::GetScalingIndex(const float* animationTime){
+unsigned int Bone::GetScalingIndex(const float* animationTime){
     //for(int index = 0; index < mNumScalings - 1; index++){
-    for(int index = 0; index < mNumScalings; index++){
-        if((*animationTime) < m_KeyScales[index].timestamp){
+    for(unsigned int index = 0; index < mNumScalings; index++){
+        if((*animationTime) <= m_KeyScales[index].timestamp){
             return index;
         }
     }
@@ -73,8 +73,9 @@ glm::mat4 Bone::InterpolatePosition(const float* animationTime){
     } else if (mNumPositions == 0){
         return glm::mat4(1.0f);
     }
-    int pt0index = GetPositionIndex(animationTime);
-    int pt1index = pt0index + 1;
+
+    unsigned int pt0index = GetPositionIndex(animationTime);
+    unsigned int pt1index = pt0index + 1;
     float scaleFactor = GetScaleFactor(animationTime, &(m_Positions[pt0index].timestamp), &(m_Positions[pt1index].timestamp));
 
     glm::vec3 finalPosition = glm::mix(m_Positions[pt0index].Position, m_Positions[pt1index].Position, scaleFactor);
@@ -93,8 +94,9 @@ glm::mat4 Bone::InterpolateScaling(const float* animationTime){
     } else if (mNumScalings == 0){
         return glm::mat4(1.0f);
     } 
-        int pt0index = GetScalingIndex(animationTime);
-        int pt1index = pt0index + 1;
+        unsigned int pt0index = GetScalingIndex(animationTime);
+        unsigned int pt1index = pt0index + 1;
+
         float scaleFactor = GetScaleFactor(animationTime, &(m_KeyScales[pt0index].timestamp), &(m_KeyScales[pt1index].timestamp));
 
         glm::vec3 finalScale = glm::mix(m_KeyScales[pt0index].Scale, m_KeyScales[pt1index].Scale, scaleFactor);
@@ -114,16 +116,16 @@ glm::mat4 Bone::InterpolateRotation(const float* animationTime){
         return glm::mat4(1.0f);
     } 
         // NOTE: things were tracked to go wrong from here
-        int pt0index = GetRotationIndex(animationTime);
+        unsigned int pt0index = GetRotationIndex(animationTime);
 
         //if (pt0index < 0) {
         //assert(0);
         //};
 
-        int pt1index = pt0index + 1;
+        unsigned int pt1index = pt0index + 1;
         float scaleFactor = GetScaleFactor(animationTime, &(m_Rotations[pt0index].timestamp), &(m_Rotations[pt1index].timestamp));
 
-        glm::quat finalRotation = glm::slerp(m_Rotations[pt0index].Orientation, m_Rotations[pt1index].Orientation, scaleFactor);
+        glm::fquat finalRotation = glm::slerp(m_Rotations[pt0index].Orientation, m_Rotations[pt1index].Orientation, scaleFactor);
 
         finalRotation = glm::normalize(finalRotation);
         

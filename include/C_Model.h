@@ -28,7 +28,7 @@ public:
     std::string Texturedirectory;
     vector<Texture>loaded_textures;
     std::unordered_map<std::string, Bone_Info>* m_BoneInfoMap;
-    int m_BoneCounter;
+    unsigned int m_BoneCounter;
     bool gammaCorrection;
     std::string name;
     
@@ -45,7 +45,7 @@ public:
     std::string* GetModelDir(){return &directory;};
 // About skeletal animation
     std::unordered_map<std::string, Bone_Info>*GetBoneInfoMap(){return m_BoneInfoMap;};
-    int GetBoneCount() { return m_BoneCounter;};
+    unsigned int GetBoneCount() { return m_BoneCounter;};
 };
 
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);

@@ -697,7 +697,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                 // Set containing model for dancing vampire
                 dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-2.0f, 2.0f, 0.0f));
-                //dancing_vampire_core = glm::scale(dancing_vampire_core,glm::vec3( 0.02f));
+                dancing_vampire_core = glm::scale(dancing_vampire_core,glm::vec3( 0.01f));
                 
                 BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
                 

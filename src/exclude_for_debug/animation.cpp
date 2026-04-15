@@ -12,7 +12,9 @@ Animation::Animation(const char* animationPath, Model_ *model) {
 
   Assimp::Importer importer;
   m_Bone_InfoMap = new std::unordered_map<std::string, Bone_Info>;
-  const aiScene *scene = importer.ReadFile(animationPath, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_LimitBoneWeights);
+  const aiScene *scene = importer.ReadFile(animationPath, aiProcess_CalcTangentSpace | aiProcess_Triangulate);
+
+  //| aiProcess_LimitBoneWeights
   // Still don't understand this part
   // Now I understand this: This line check whether one of these two
   // the scene->mRootNode is NULL or not
@@ -30,11 +32,12 @@ Animation::Animation(const char* animationPath, Model_ *model) {
 
 
 Bone* Animation::FindBone(const std::string& name){
-  auto iter = find_if(m_Bones.begin(), m_Bones.end(),
+
+    auto iter = find_if(m_Bones.begin(), m_Bones.end(),
                       [&](const Bone& Bone)
                       {
                           return *(Bone.GetBoneName()) == name; //line 15
-                      });//lambda to findout address of bone that have the same name of given name
+                      });//lambda to find out address of bone that have the same name of given name
   
   
   if(iter == m_Bones.end()){
@@ -60,7 +63,7 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
     std::unordered_map<std::string, Bone_Info>* ModelboneInfoMapClone;
 
     ModelboneInfoMapClone = model->GetBoneInfoMap();
-    int ExtraBoneCount = model->GetBoneCount();
+    unsigned int ExtraBoneCount = model->GetBoneCount();
 
     // Not any node is affected by this animation we have to choose between them
     
@@ -78,7 +81,6 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
 //of the boneInfo map
         if((*ModelboneInfoMapClone).find(boneName) == (*ModelboneInfoMapClone).end()){
             Bone_Info newbone;
-
             newbone.id = ExtraBoneCount;
             newbone.offset = glm::mat4(1.0f);
 
@@ -89,7 +91,7 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
             //boneInfo_map and m_bones
             (*boneInfoMapForAni)[boneName] = (*ModelboneInfoMapClone)[boneName];
             //Add bone if channel Name exist in boneInfo_Map
-            m_Bones.push_back(Bone(channel->mNodeName.data, (*ModelboneInfoMapClone)[channel->mNodeName.data].id, channel));
+            m_Bones.push_back(Bone(channel->mNodeName.data, (*boneInfoMapForAni)[channel->mNodeName.data].id, channel));
         }
 //The ID have to be matched with the give channel
         //printf("Add bone data to animation container\n");
@@ -103,7 +105,6 @@ void Animation::ReadHierarchyData(AssimpNodeData& dest, const aiNode* src){
     dest.name = src->mName.data;
     dest.transformation = AssimpGLMHelpers::ConvertMatrixToGLMFormat(src->mTransformation);
 
-    dest.children.resize(src->mNumChildren);
     dest.children.reserve(src->mNumChildren);
 
     // as told this line prevent children vector from reallocating after an
