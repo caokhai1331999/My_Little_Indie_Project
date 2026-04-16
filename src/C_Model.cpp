@@ -26,17 +26,27 @@ void DDraw(Model_* model, GLuint* programID){
 }
 
 void loadModel_(Model_* model, string path){
-    Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path,
-    aiProcess_CalcTangentSpace       |
-    aiProcess_Triangulate            );    
 
-/*
+    bool32 vampire = false;
+
+    if(strcmp(model->name.c_str(), "vampire") == 0){
+        vampire = true;
+        //printf("being drawn model: %s\n", model->name.c_str());
+    }
+
+    Assimp::Importer importer;
+
+    const aiScene* scene = importer.ReadFile(path,
   aiProcess_JoinIdenticalVertices  |
   aiProcess_SortByPType|
   aiProcess_FindInvalidData|
   aiProcess_FindInstances|
-  aiProcess_OptimizeMeshes
+  aiProcess_OptimizeMeshes|
+  aiProcess_CalcTangentSpace       |
+  aiProcess_Triangulate            );    
+
+/*
+
 */    //texture_file.C_str()="C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
 
     //const char* path_= "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_t/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.png";
@@ -111,9 +121,11 @@ Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
         vertex.Normal = AssimpGLMHelpers::GetGLMVec(mesh->mNormals[i]);
         
         if(mesh->mTextureCoords[0]){
-            glm::vec2 vec;
-            vec.x = mesh->mTextureCoords[0][i].x;
-            vec.y = mesh->mTextureCoords[0][i].y;
+            glm::vec2 vec = AssimpGLMHelpers::GetGLMVec(mesh->mTextureCoords[0][i]);
+
+            //vec.x = mesh->mTextureCoords[0][i].x;
+            //vec.y = mesh->mTextureCoords[0][i].y;
+
             vertex.TexCoords = vec;            
         } else {
             vertex.TexCoords = glm::vec2(0.0f, 0.0f);

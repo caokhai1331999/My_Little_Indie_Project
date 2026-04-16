@@ -24,6 +24,10 @@ void Animator::updateAnimationTime(const float* dt){
         //glm::mat4 globalInverseTransform = glm::inverse(m_currentAnimation->getRootNode()->transformation);
         glm::mat4 globalInverseTransform = glm::inverse (m_currentAnimation->getRootNode()->transformation);
 
+        auto TempBoneInfo = m_currentAnimation->GetBoneIDMap();
+        
+        reserveBoneMatrices((int)TempBoneInfo->size());
+        
         SetGlobalInverse(&globalInverseTransform);
         calculateBoneTransform(m_currentAnimation->getRootNode(), &parentTransform);
     };
@@ -68,30 +72,14 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
     // WORKING====
     // BUG HERE =================================================
     glm::mat4 globalInverse = GetGlobalInverse();
-
-    bool32 inverseIsFinite = false;
-    //for(int i =0; i < 4; i++){
-        //for(int j = 0; j < 4; j++){
-            //if(std::isfinite((float)globalInverse[i][j])){
-             //continue;
-            //}
-         //else{
-             //printf("global inverse matrix is wrong\n");
-             //inverseIsFinite = false;
-             //break;
-         //};  
-        //};
-    //}
-//
     if((*boneInfoMap).find(nodeName) != (*boneInfoMap).end()){
         //The boneId represent the index of boneInfo in map
         unsigned int index = (*boneInfoMap)[nodeName].id;
         glm::mat4 offset = (*boneInfoMap)[nodeName].offset;
 
-        //GetGlobalInverse() * 
-              //finalBoneMatrices[index] =  inverseIsFinite ? globalInverse * globalTransform * offset: globalTransform * offset;
-              finalBoneMatrices[index] =  globalInverse * globalTransform * offset;
-     }
+        //finalBoneMatrices[index] =  inverseIsFinite ? globalInverse * globalTransform * offset: globalTransform * offset;
+        finalBoneMatrices[index] =  globalInverse * globalTransform * offset;
+    }
     //else {
         //sprintf(Buffer, "There is no bone called %s inside the boneInfoMap\n", nodeName.c_str());
         //OutputDebugStringA(Buffer);

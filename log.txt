@@ -1437,3 +1437,20 @@ multiplied chain
 
 Note that: the ParentTransform is the id mat that carried feature node transform
 matrix (which is update over time) in order : children of children * children * rootnode
+
+---------------- Thu, 16 Apr 26: 09:57AM
+
+Issues remains: .model empty at knee part :solved we loaded the model in the
+                versered handedness from the default one DONE!
+
+                .giant triangles flashed sometimes
+                .No Texture(TexCoord stuck)
+
+So the Normala calculation part is the main culprit of texture issue.
+and if I don't calculate the normal the boneMatrices index is stucks at the last
+member.
+
+SOLVED! Actually, I used the wrong glVertexAttribPointer for boneID.
+
+Tomorrow, Check the overflow data at the end frame matrix calculation. Then time
+to build my first top-down looking game.

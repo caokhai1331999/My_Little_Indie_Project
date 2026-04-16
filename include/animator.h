@@ -23,11 +23,7 @@ public:
 
       m_currentTime = 0.0f;
       m_deltaTime = 0.0f;
-
       m_currentAnimation = animation;
-      finalBoneMatrices.reserve(52);
-      finalBoneMatrices.resize(52);
-
       g_iGlobalMatricesBindingIndex = 1;
 
       globalInverseBoneTransform = glm::mat4(1.0f);
@@ -56,7 +52,8 @@ public:
     
     //float* getFinalBoneMatrices(){return &(*finalBoneMatrices.data())[0][0];};
     std::vector<glm::mat4>* getFinalBoneMatrices(){return &finalBoneMatrices;};
-
+    void reserveBoneMatrices(int size = 1){finalBoneMatrices.reserve(size);};
+    
 private:
     //Check out the uniform buffer
     unsigned int UBO;

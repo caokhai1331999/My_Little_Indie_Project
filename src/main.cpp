@@ -1332,7 +1332,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                   loc =                                      glGetUniformLocation(model_shader_->GetProgramID(), "material.texture_diffused1");
 
                                   printf("diffuse texture sampler location on animating  shader : %d\n", loc);
-                                  showUniformVarValuePerVertex(&UBO, &brushID, &dancing_vampire->meshes[0], true, true, true, true, true, true);
+                                  showUniformVarValuePerVertex(&UBO, &brushID, &dancing_vampire->meshes[0], false, false, true, false, false, true);
                       }
 // animation update and render ================================================
 
@@ -1346,8 +1346,21 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                  //(real32)EndCounter.QuadPart, CountsPerFrame,
                                  //MsPerFrame, FPS);
 
-                              glm::mat4 inverse_Trans = glm::inverse(danceAnimation->getRootNode()->transformation);
-                              printf("Global Inverse Transform matrix: %s\n", glm::to_string(inverse_Trans).c_str());
+                              bool isfinite = true;
+                              glm::mat4& inverse_Trans = glm::inverse(danceAnimation->getRootNode()->transformation);
+
+                              for(int i = 0; i < 4; i++)
+                              {
+                                  if(glm::all(glm::isfinite(inverse_Trans[i]))){
+                                      continue;  
+                                  }else{
+                                      isfinite=false;
+                                      break;
+                                  }
+                              }
+                              
+                              isfinite?printf("Global Inverse Transform matrix is finite"):printf("Global Inverse Transform matrix is not finite");
+                              printf(" : %s\n", glm::to_string(inverse_Trans).c_str());
 //
                           printf("Delay Ratio: %f, msPerframe: %f, SPerFrame: %f\n",
                                  DelayedRatio, MsPerFrame, SPerFrame);

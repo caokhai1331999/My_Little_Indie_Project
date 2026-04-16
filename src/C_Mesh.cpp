@@ -54,11 +54,11 @@ void setupMesh(Mesh* mesh){
 
         // IDS
         glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 4, GL_INT, GL_FALSE, sizeof(Vertex), (const void*)(int)offsetof(struct Vertex, m_BoneIDs));
+        glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex), (const void*)offsetof(struct Vertex, m_BoneIDs));
         //printf("Current pointer in vertex struct after m_BoneIDs: %d\n", (int)offsetof(struct Vertex, m_BoneIDs));
         // WEIGHTs
         glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(int)offsetof(struct Vertex, m_Weights));
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(struct Vertex, m_Weights));
         //printf("Current pointer in vertex struct after m_Weights set up: %d\n", (int)offsetof(struct Vertex, m_Weights));
         // The effect is that we symply pass a pointer to the struct and it traslate into a glm::vec3
         // again translate to 3/2 float which translate into a byte array 

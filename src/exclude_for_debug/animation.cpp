@@ -12,7 +12,9 @@ Animation::Animation(const char* animationPath, Model_ *model) {
 
   Assimp::Importer importer;
   m_Bone_InfoMap = new std::unordered_map<std::string, Bone_Info>;
-  const aiScene *scene = importer.ReadFile(animationPath, aiProcess_CalcTangentSpace | aiProcess_Triangulate);
+  const aiScene *scene = importer.ReadFile(animationPath,
+  aiProcess_CalcTangentSpace |
+  aiProcess_Triangulate);
 
   //| aiProcess_LimitBoneWeights
   // Still don't understand this part
@@ -51,8 +53,8 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
 // So the mNumChannels is the number of bone
     int size = animation->mNumChannels;
 
-    m_Bones.reserve(100);
-    m_Bone_InfoMap->reserve(100);
+    m_Bones.reserve(size);
+    m_Bone_InfoMap->reserve(size);
     //m_Bones.resize(size);
 
     // Get these properties from model var
