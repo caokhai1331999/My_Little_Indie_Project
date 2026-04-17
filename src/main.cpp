@@ -1212,9 +1212,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //float* Transform;
                     std::vector<glm::mat4>* Transform_;
 
-                    if(animator->GetCurrentTime() > danceAnimation->GetDuration())
+                    if(animator->GetCurrentTime() > danceAnimation->GetDuration() )
                     {
-                        PlayAnimation(animator, danceAnimation);                        
+                        PlayAnimation(animator, danceAnimation);
                         if(showMsPF)
                             printf("animator current time: %f, animation duration: %f", animator->GetCurrentTime(), danceAnimation->GetDuration());
 

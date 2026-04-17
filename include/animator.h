@@ -49,11 +49,13 @@ public:
     void setupUBO(GLuint * ProgramID = nullptr);
     void updateUBOData();
     float GetCurrentTime(){return m_currentTime;};
+    void SetCurrentTime(const float* new_time = nullptr){m_currentTime = *new_time;};
     
     //float* getFinalBoneMatrices(){return &(*finalBoneMatrices.data())[0][0];};
     std::vector<glm::mat4>* getFinalBoneMatrices(){return &finalBoneMatrices;};
     void reserveBoneMatrices(int size = 1){finalBoneMatrices.reserve(size);};
-    
+    Animation* GetCurrentAnimation(){return m_currentAnimation;};
+
 private:
     //Check out the uniform buffer
     unsigned int UBO;

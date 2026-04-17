@@ -1454,3 +1454,40 @@ SOLVED! Actually, I used the wrong glVertexAttribPointer for boneID.
 
 Tomorrow, Check the overflow data at the end frame matrix calculation. Then time
 to build my first top-down looking game.
+
+
+---------------- Fri, 17 Apr 26: 09:49AM
+
+Bug Found for the last issues. The get index of position, scale, and rotation
+function written by me is buggy at the loop end. Cause we only get one index
+and then increment it by one. But the loop will run to the end. That will lead
+to one index is out of bound. Make it garbage -> giant triangle appears
+
+We stuck at the last frame index.
+
+We got one dilemma. While the get index can not produce proper index cause the
+animation time is between second last and last member. it would produce the last
+one(No I was wrong, the mNumPosition - 1 end condition loop will end at
+mNumPositon - 2 that mean it will get out of loop without fetching any index
+value) but the mechanism will increment it for one as the pt1 index which out of
+bound. Otherwise if we confine the loop to just the second one in this it can
+not produce any index cause the animation time already bigger than the second
+last. index so we lock them with the second last to play the last keyframe
+
+So my bad, due to lack of fundamental knowledge. I think the index end point
+will be equal to the comparing value in condition but it never.
+
+Now we fix it, the animation works
+
+
+NOTE: Sum up, through these prolong issues. We learnt that.
+      . Loop end at endpoint value - 1
+      . We need to learn more about type difference in bytes. These are the
+      underlying issues we came across so often.
+
+DONE! ANIMATION PART
+
+Now Time to write game.
+
+Purpose. Top-down looking. animation whenver moving. Legend of zelda/pokemon
+style.

@@ -109,6 +109,11 @@ public:
         glm::mat4 InterpolatePosition(const float* animationTime);
         glm::mat4 InterpolateScaling(const float* animationTime);
         glm::mat4 InterpolateRotation(const float* animationTime);        
+
+    unsigned int GetNumPosition(){return mNumPositions;};
+    float GetPositionTimeStamp(int index = 0){
+        return m_Positions[index].timestamp;
+    }
 };
 
 

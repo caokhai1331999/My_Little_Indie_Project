@@ -10,36 +10,58 @@
 
 unsigned int Bone::GetPositionIndex(const float* animationTime){
 
-    //for(int index = 0; index < mNumPositions - 1; index++){
-    for(unsigned int index = 0; index < mNumPositions; index++){
+ for(unsigned int index = 0; index < mNumPositions - 1; index++){
         // why animationTime < m_Positions[index].timestamp
-        if((*animationTime) <= m_Positions[index].timestamp){
+        if((*animationTime) < m_Positions[index].timestamp){
             return index;
         }
+
+        //if(index == mNumPositions - 2){
+            //printf("mNumPositions is %d and the second last bone timestamp is %f, animation time %f\n", mNumPositions - 2, m_Positions[mNumPositions - 2].timestamp, *animationTime);
+//
+            //if((*animationTime) < m_Positions[index].timestamp){
+                //printf("The comparing operation worked, the animation time did perceived to be less than the second last Position timestamp.\n");
+            //};
+        //}
     }
-    printf("mNumPositions is %d and the last bone timestamp is %f, animation time %f\n", mNumPositions, m_Positions[mNumPositions - 1].timestamp, *animationTime);
+
+ if((*animationTime) > m_Positions[mNumPositions - 2].timestamp && (*animationTime) < m_Positions[mNumPositions - 1].timestamp)
+ {
+     return mNumPositions - 2;
+ }
+    //If do this way the last frame index will get out of the bound
+    //printf("mNumPositions is %d and the last bone timestamp is %f, animation time %f\n", mNumPositions, m_Positions[mNumPositions - 1].timestamp, *animationTime);
     // So the assert happen while there is no animationTime less than any timestamp;
     assert(0);
 }
 
 unsigned int Bone::GetRotationIndex(const float* animationTime){
-    //for(int index = 0; index < mNumRotations - 1; index++){
-    for(unsigned int index = 0; index < mNumRotations; index++){
-        if((*animationTime) <= m_Rotations[index].timestamp)
+    for(unsigned int index = 0; index < mNumRotations - 1 ; index++){
+        if((*animationTime) < m_Rotations[index].timestamp)
             return index;
     }
+
+    if((*animationTime) > m_Rotations[mNumRotations - 2].timestamp && (*animationTime) < m_Rotations[mNumRotations - 1].timestamp)
+    {
+        return mNumRotations - 2;
+    }    
         assert(0);
     //This one track whether the index is invalid or not!!!
 }
 
 unsigned int Bone::GetScalingIndex(const float* animationTime){
-    //for(int index = 0; index < mNumScalings - 1; index++){
-    for(unsigned int index = 0; index < mNumScalings; index++){
-        if((*animationTime) <= m_KeyScales[index].timestamp){
+    for(unsigned int index = 0; index < mNumScalings - 1; index++){
+        if((*animationTime) < m_KeyScales[index].timestamp){
             return index;
         }
     }
-        assert(0);
+
+    if((*animationTime) > m_KeyScales[mNumScalings - 2].timestamp && (*animationTime) < m_KeyScales[mNumScalings - 1].timestamp)
+    {
+        return mNumScalings - 2;
+    }
+
+    assert(0);
 }
 
 void Bone::Update(const float* animationTime){
@@ -75,7 +97,11 @@ glm::mat4 Bone::InterpolatePosition(const float* animationTime){
     }
 
     unsigned int pt0index = GetPositionIndex(animationTime);
-    unsigned int pt1index = pt0index + 1;
+    unsigned int pt1index = 0;
+
+    if(pt0index < GetNumPosition() - 1)
+    pt1index = pt0index + 1;
+
     float scaleFactor = GetScaleFactor(animationTime, &(m_Positions[pt0index].timestamp), &(m_Positions[pt1index].timestamp));
 
     glm::vec3 finalPosition = glm::mix(m_Positions[pt0index].Position, m_Positions[pt1index].Position, scaleFactor);
@@ -95,7 +121,10 @@ glm::mat4 Bone::InterpolateScaling(const float* animationTime){
         return glm::mat4(1.0f);
     } 
         unsigned int pt0index = GetScalingIndex(animationTime);
-        unsigned int pt1index = pt0index + 1;
+        unsigned int pt1index  = 0;;
+
+        if(pt0index < mNumScalings - 1)
+        pt1index = pt0index + 1;
 
         float scaleFactor = GetScaleFactor(animationTime, &(m_KeyScales[pt0index].timestamp), &(m_KeyScales[pt1index].timestamp));
 
@@ -121,8 +150,11 @@ glm::mat4 Bone::InterpolateRotation(const float* animationTime){
         //if (pt0index < 0) {
         //assert(0);
         //};
+        unsigned int pt1index = 0;
 
-        unsigned int pt1index = pt0index + 1;
+        if(pt0index < mNumRotations - 1)
+        pt1index = pt0index + 1;
+
         float scaleFactor = GetScaleFactor(animationTime, &(m_Rotations[pt0index].timestamp), &(m_Rotations[pt1index].timestamp));
 
         glm::fquat finalRotation = glm::slerp(m_Rotations[pt0index].Orientation, m_Rotations[pt1index].Orientation, scaleFactor);

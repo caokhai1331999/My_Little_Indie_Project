@@ -15,6 +15,7 @@ void Animator::updateAnimationTime(const float* dt){
     *m_deltaTime = *dt;
     if(m_currentAnimation){
         m_currentTime += (*m_deltaTime) * m_currentAnimation->GetTicksPerSecond();
+
         m_currentTime = fmod((float)m_currentTime, m_currentAnimation->GetDuration());
         //// calculate bone transform here;
         glm::mat4 parentTransform = glm::mat4(1.0f);
@@ -35,8 +36,13 @@ void Animator::updateAnimationTime(const float* dt){
 };
 
 void Animator::playAnimation(Animation* pAnimation){
+    Animation* currentAni = GetCurrentAnimation();
+
+    float new_threshold = GetCurrentTime() - currentAni->GetDuration();
+    SetCurrentTime(&new_threshold);
+
     m_currentAnimation = pAnimation;
-    m_currentTime = 0.0f;
+    //m_currentTime = 0.0f;
 };
 
 void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* parentTransform, glm::mat4* GlobalInverse){
@@ -52,6 +58,7 @@ void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* par
     //}
 
     if(bone){
+        //Issues happened here
         bone->Update(&m_currentTime);
         nodeTransform = bone->GetLocalTransformation();
     }

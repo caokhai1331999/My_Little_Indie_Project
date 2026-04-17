@@ -38,6 +38,7 @@ public:
     Bone* FindBone(const std::string& name);
     void ReadMissingBone(const aiAnimation* animation, Model_* model);
     void ReadHierarchyData(AssimpNodeData& dest, const aiNode* src);
+    std::vector<Bone>* GetBoneArray(){return &m_Bones;};
     AssimpNodeData* getRootNode(){return &m_RootNode;};
     
 private:
