@@ -16,7 +16,11 @@ bool32 first_size = true;
 bool32 first_announce = true;
 bool32 Load_Lib = false;
 bool32 showMsPF = false;
-bool32 hit_play = false;
+
+glm::mat4 dancing_vampire_core = glm::mat4(1.0f);
+bool32 is_moving = false;
+
+float DelayedRatio = 0.5f;
 
 LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
                                     LPARAM Lparam) {
@@ -51,20 +55,130 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
     OutputDebugStringA("WM_CLOSE\n");
   } break;
 
-  case WM_KEYDOWN: {
+      case WM_KEYUP:{
+
+          bool IsUp = ((Lparam & (1 << 31)) != 1);
+          bool WasUP = ((Lparam & (1 << 30)) == 0);
+          bool WasDown = ((Lparam & (1 << 30)) == 1);
+
+          uint32 vkCode = Wparam;
+          
+          if (vkCode == VK_UP) {
+              // Actually the front vec is at the back of the camera
+              // State.BlueOffset+= 10;
+                  if(is_moving)
+                  is_moving = !is_moving;
+
+                  printf("Up is released\n");
+          }
+
+          else if (vkCode == VK_DOWN) {
+              // Actually the front vec is at the back of the camera
+              // State.BlueOffset+= 10;
+                  if(is_moving){
+                      is_moving = !is_moving;
+                  }
+              printf("DOWN is released\n");
+          }
+
+          else if (vkCode == VK_LEFT) {
+              // Actually the front vec is at the back of the camera
+              // State.BlueOffset+= 10;
+              printf("LEFT is released\n");
+              if(is_moving)
+                is_moving = !is_moving;
+
+          }
+
+          else if (vkCode == VK_RIGHT) {
+              // Actually the front vec is at the back of the camera
+              // State.BlueOffset+= 10;
+              if(is_moving)
+                is_moving = !is_moving;
+              printf("RIGHT is released\n");
+          }          
+
+          //else if (vkCode == VK_TAB) {
+              //if (SoundOutPut.hz == 128) {
+                  //SoundOutPut.hz = 256;
+              //} else if (SoundOutPut.hz == 256) {
+                  //SoundOutPut.hz = 512;
+              //} else {
+                  //SoundOutPut.hz = 128;
+              //}
+              //char Output[256];
+              //sprintf(Output, "TAB button hitted, Current Hert is: %d\n",
+                      //SoundOutPut.hz);
+              //SoundOutPut.WavePeriod = SoundOutPut.SamplePerSecond / SoundOutPut.hz;
+//
+              //OutputDebugStringA("TAB button hitted");
+          //}
+//          
+      }break;
+
+ case WM_KEYDOWN: {
     bool IsDown = ((Lparam & (1 << 31)) == 0);
-    bool WasDown = ((Lparam & (1 << 30)) != 0);
+    bool WasDown = ((Lparam & (1 << 30)) == 1);
+    bool WasUp = ((Lparam & (1 << 30)) == 0);
 
     uint32 vkCode = Wparam;
     if (IsDown) {
-      if (vkCode == 'W') {
+      if (vkCode == VK_UP) {
+        // Actually the front vec is at the back of the camera
+        // State.BlueOffset+= 10;
+            //if (WasUp) {
+                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, 15.0f * DelayedRatio));
+
+                if(!is_moving)
+                    is_moving = !is_moving;
+
+                printf("Up is hit\n");
+            //}
+      }
+
+      else if (vkCode == VK_DOWN) {
+        // Actually the front vec is at the back of the camera
+        // State.BlueOffset+= 10;
+            //if (WasUp) {
+                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, -(15.0f * DelayedRatio)));
+                if(!is_moving)
+                    is_moving = !is_moving;
+                printf("DOWN is HIT\n");
+            //}
+
+      }
+
+      else if (vkCode == VK_LEFT) {
+        // Actually the front vec is at the back of the camera
+        // State.BlueOffset+= 10;
+            //if (WasUp) {
+                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-(15.0f * DelayedRatio), 0.0f, 0.0f));
+                if(!is_moving)
+                    is_moving = !is_moving;
+
+                printf("LEFT is HIT\n");
+        //}
+      }
+
+      else if (vkCode == VK_RIGHT) {
+        // Actually the front vec is at the back of the camera
+        // State.BlueOffset+= 10;
+            //if (WasUp) {
+                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(15.0f * DelayedRatio, 0.0f, 0.0f));
+                if(!is_moving)
+                    is_moving = !is_moving;
+                printf("RIGHT is HIT\n");
+            //}
+      }
+        
+      else  if (vkCode == 'W') {
         // Actually the front vec is at the back of the camera
         // State.BlueOffset+= 10;
         BackBuffer.camera.Position +=
             glm::normalize(BackBuffer.camera.Direction) *
             (float)BackBuffer.camera.speed;
         if (!WasDown) {
-            printf("Up is HIT\n");
+            printf("W is HIT\n");
         }
       }
 
@@ -74,7 +188,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
             glm::normalize(BackBuffer.camera.Direction) *
             (float)BackBuffer.camera.speed;
         if (!WasDown) {
-            printf("Down is HIT\n");
+            printf("S is HIT\n");
         }
       }
 
@@ -90,7 +204,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
         // OutputDebugStringA(" Was Down");
         // }
         if (!WasDown) {
-            printf("LEFT is HIT\n");
+            printf("A is HIT\n");
         }
       }
 
@@ -114,15 +228,13 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
                 glm::cross(BackBuffer.camera.Direction, BackBuffer.camera.Up)) *
             (float)BackBuffer.camera.speed;
         if (!WasDown) {
-            printf("Right is HIT\n");
+            printf("D is HIT\n");
         }
         // XOffset += 10;
       }
 
       else if (vkCode == VK_SPACE) {
 
-          if(!hit_play)
-              hit_play = !hit_play;
           BackBuffer.camera.Position += BackBuffer.camera.Up * (float)BackBuffer.camera.speed;
 
           if (!WasDown) {
@@ -349,33 +461,6 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
     OutputDebugStringA("WM_SYSKEYUP\n");
   } break;
 
-  case WM_KEYUP: {
-    uint32 vkCode = Wparam;
-    // NOTE: This is whether bit 30 or 0 (never 1).
-    //  So if it is bit 30 it is down
-    bool WasDown = ((Lparam & (1 << 30)) != 0);
-    bool IsDown = ((Lparam & (1 << 31)) == 0);
-    // if (WasDown != IsDown) {
-
-    // else
-    if (vkCode == VK_TAB) {
-      if (SoundOutPut.hz == 128) {
-        SoundOutPut.hz = 256;
-      } else if (SoundOutPut.hz == 256) {
-        SoundOutPut.hz = 512;
-      } else {
-        SoundOutPut.hz = 128;
-      }
-      char Output[256];
-      sprintf(Output, "TAB button hitted, Current Hert is: %d\n",
-              SoundOutPut.hz);
-      SoundOutPut.WavePeriod = SoundOutPut.SamplePerSecond / SoundOutPut.hz;
-
-      OutputDebugStringA("TAB button hitted");
-    }
-
-  } break;
-
   case WM_DESTROY: {
     GlobalRunning = false;
     PostQuitMessage(0);
@@ -577,7 +662,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
             // byte order: AA BB GG RR bottom up
             // JPGContent = DEBUGReadJPG("Harry and Accomplices.jpg", &result2);
             // OpenGL part
-            Win32_Front_Buffer ScreenBuffer = Win32_Front_Buffer(
+
+              Win32_Front_Buffer ScreenBuffer = Win32_Front_Buffer(
                 BackBuffer.BitmapWidth, BackBuffer.BitmapHeight,
                 &BackBuffer.glData, BackBuffer.BitmapMemory);
 
@@ -639,7 +725,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                 glm::mat4 basic_cube_core = glm::mat4(1.0f);
                 glm::mat4 backpack_core = glm::mat4(1.0f);
-                glm::mat4 dancing_vampire_core = glm::mat4(1.0f);
 
                 glm::mat4 Plane = glm::mat4(1.0f);
                 Plane = glm::translate(Plane, glm::vec3(0.0f));
@@ -696,8 +781,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 std::cout<<"Stand still model 2 matrix is :"<<glm::to_string(backpack_core)<<std::endl;
 
                 // Set containing model for dancing vampire
-                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-2.0f, 2.0f, 0.0f));
+                
                 dancing_vampire_core = glm::scale(dancing_vampire_core,glm::vec3( 0.01f));
+                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-2.0f, 0.0f, 0.0f));
                 
                 BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
                 
@@ -734,8 +820,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     glDebugMessageCallback(MessageCallback, 0);
                     printf("animating sketching program object is buggy \n");
                 }
-
-                //setInt(ScreenBuffer.glData.ProgramIDs[0], "ttexture1", ScreenBuffer.glData.textureHandle);                
 
                 basic_shader_->use();
                 basic_shader_->setMat4("projection", BackBuffer.camera.projection);
@@ -1027,7 +1111,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //Ratio is based on miscalculated Msperframe
                     //if (RatioCalculated) {
                      DelayedRatio =
-                         (real64)(MsPerFrame/StandardMSperFrame);
+                         (float)(MsPerFrame/StandardMSperFrame);
                         DelayedRatio>0.0f?BackBuffer.camera.speed = (2.5f * DelayedRatio):BackBuffer.camera.speed = (2.5f  * 0.17f);                
                         ColorOffset += (float)0.1*DelayedRatio;
                         if(ColorOffset > 1.0f){
@@ -1154,7 +1238,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     glUseProgram(0);
                     glBindVertexArray(0);
                     GLuint brushID;
-                    //drawTile(ScreenBuffer.glData.VAOs, ScreenBuffer.glData.ProgramIDs[0], DelayedRatio, &updateDegreeInPi, TimeToChangeAxis, &rollCubeMap);
 
                     if(TimeToChangeAxis){
                         TimeToChangeAxis = false;
@@ -1167,8 +1250,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //glBindVertexArray(ScreenBuffer.glData.VAOs);
                     model_shader_->setMat4("model", backpack_core);
                     DDraw(backpack, &brushID);
-                    //model_shader_->setMat4("model", dancing_vampire_core);
-                    //DDraw(dancing_vampire, &brushID);
+
                     glUseProgram(0);
 // Now Draw the vampire
 
@@ -1204,43 +1286,47 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         glBindBufferRange(GL_UNIFORM_BUFFER, 1, UBO, 0, sizeof(glm::mat4)* 52);
                     }
 
-                    //if(hit_play){
-                        //if(hit_play);
-                        //hit_play = !hit_play;
-                    //};
-
                     //float* Transform;
                     std::vector<glm::mat4>* Transform_;
 
-                    if(animator->GetCurrentTime() > danceAnimation->GetDuration() )
-                    {
-                        PlayAnimation(animator, danceAnimation);
-                        if(showMsPF)
-                            printf("animator current time: %f, animation duration: %f", animator->GetCurrentTime(), danceAnimation->GetDuration());
+                    if(is_moving){
+                        if(animator->GetCurrentTime() > danceAnimation->GetDuration() )
+                        {
+                            PlayAnimation(animator, danceAnimation);
+                            if(showMsPF)
+                                printf("animator current time: %f, animation duration: %f", animator->GetCurrentTime(), danceAnimation->GetDuration());
 
+                        } else {
+
+                            if(showMsPF){
+                                printf("animator current time: %f, animation duration: %f", animator->GetCurrentTime(), danceAnimation->GetDuration());
+                            }
+
+                            if(SPerFrame > 0.0f && SPerFrame < 0.004f ) {
+                                //AniUpdate expect S per frame;
+                                AniUpdate(animator, &SPerFrame);
+                                //updateUBOData(animator);
+                                //std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
+                            }else{
+                                SPerFrame = 0.0035f;
+                                AniUpdate(animator, &SPerFrame);                        
+                            }                        
+
+                        }   
                     } else {
-
-                        if(showMsPF)
-                            printf("animator current time: %f, animation duration: %f", animator->GetCurrentTime(), danceAnimation->GetDuration());
-
-                        if(SPerFrame > 0.0f && SPerFrame < 0.004f ) {
-                            //AniUpdate expect S per frame;
-                            AniUpdate(animator, &SPerFrame);
-                            //updateUBOData(animator);
-                            //std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
-                        }else{
-                            SPerFrame = 0.0035f;
-                            AniUpdate(animator, &SPerFrame);                        
-                        }                        
-
+                        PlayAnimation(animator, danceAnimation);
                     }
 
+                    
                     //Transform = animator->getFinalBoneMatrices();
                         Transform_ = animator->getFinalBoneMatrices();
-                        glBindBuffer(GL_UNIFORM_BUFFER, UBO);
                         //glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float) * 16 * 52, Transform);
-                        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4)* 52, Transform_->data());
-                        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+                        //if(Transform_->size() > 0){
+                            glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+                            glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4)* 52, Transform_->data());
+                            glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+                            glBindBuffer(GL_UNIFORM_BUFFER, 0);
+                        //}
 
                         int i = 0;
                             std::string matrixName_;
@@ -1249,7 +1335,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                             char indexx[2];
 //
                             
-                            
+/*                            
                             if (Transform_ != nullptr){
                                 for(const glm::mat4& matrix_ : (*Transform_)) {
                                     //matrixName_ = "finalBoneMatrices["+std::to_string(i)+"]";
@@ -1263,7 +1349,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                         sprintf(indexx, "%d", i);
                                         matrixName_.insert(matrixName_.size()-1, indexx);                                     
                                     }
-
                                     //animating_shader_->setMat4(
                                         //matrixName_.c_str(), matrix_);
 
@@ -1293,11 +1378,18 @@ LARGE_INTEGER PerfCountFrequencyResult;
                             //printf("\n");
                         //}                        
                     //}
-//
-                    animating_shader_->setMat4("WorldToCamera", WorldToCamera);
+
+*/
+                            //if(is_moving){
+                                WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
+                                animating_shader_->setMat4("WorldToCamera", WorldToCamera);                                
+                            //}
+
+
+                    animating_shader_->setBool("is_moving", is_moving);
 
 //Why the later shader texture drawing work but not the one above
-                            DDraw(dancing_vampire, &brushID);
+                    DDraw(dancing_vampire, &brushID);
 
                       if(showMsPF){
                           glm::vec2 TexCoordToShow;

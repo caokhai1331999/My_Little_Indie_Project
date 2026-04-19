@@ -1491,3 +1491,40 @@ Now Time to write game.
 
 Purpose. Top-down looking. animation whenver moving. Legend of zelda/pokemon
 style.
+
+---------------- Sat, 18 Apr 26: 10:43AM
+
+. Core knownledge I have to grasp:
+  animation.
+. lighting
+
+1. Build simple collision check boxes.
+2. Start to control the character.
+
+Cause casey course is whole crazy town of knowledge. We just watch what we
+really need
+
+NOTE: We have to admit that we don't have enough time, ability to learn all the
+technique, algo to make our game looked beautiful enough. That the company/team
+size work. So just come to make the game with what we have. The Ideas is what we
+focus on.
+
+. Let's just have a consensus here. If an object is inside the space defined by
+another one. They collided each other.
+
+A'sPosition.x/y/z <= B'sPosition.x/y/z+box_size && A'sPosition.x/y/z >=
+B'sPosition.x/y/z
+
+How to record it in the scale of multiple object.
+
+Do we need to apply hand shake math here. A function run multitude time that
+check for collision
+
+---------------- Sun, 19 Apr 26: 11:02AM
+
+Time to make sure check box is working.
+
+side quest DONE! Make model animate anytime it move. I was wrong at the
+translate thing. The position vector doesn't move model linearly but just the id
+matrix itself. Actually we only can move model throught cause it store model
+information during time

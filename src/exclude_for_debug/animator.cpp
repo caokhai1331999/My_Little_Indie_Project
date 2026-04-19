@@ -41,6 +41,7 @@ void Animator::playAnimation(Animation* pAnimation){
     float new_threshold = GetCurrentTime() - currentAni->GetDuration();
     SetCurrentTime(&new_threshold);
 
+    //finalBoneMatrices.clear();
     m_currentAnimation = pAnimation;
     //m_currentTime = 0.0f;
 };

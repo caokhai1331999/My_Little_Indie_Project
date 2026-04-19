@@ -21,6 +21,8 @@ uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 WorldToCamera;
 
+uniform bool is_moving;
+
 // uniform mat4[MAX_BONES] finalBoneMatrices;
 
 out vec2 TexCoord_;
@@ -38,22 +40,31 @@ mat4 localBone = mat4(1.0f);
 
 vec3 Normal_;
 
+if(is_moving){
+
 for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
 
-	 if(boneids[i] == -1){
-	   continue;
-	 }
-
-	if(boneids[i] >= MAX_BONES){
-	   totalPosition = vec4(aPos, 1.0f);
-	   continue;
-	 }
-
-	 vec4 localPosition = finalBone.finalBoneMatrices[boneids[i]] * vec4(aPos, 1.0f);
-	 totalPosition += localPosition * weights[i];
-	 // vec3 localNormal = mat3(transpose(inverse(finalBone.finalBoneMatrices[boneids[i]]))) * aNormal;
-	 // Normal_ += localNormal;
+if(boneids[i] == -1){
+continue;
 }
+
+if(boneids[i] >= MAX_BONES){
+totalPosition = vec4(aPos, 1.0f);
+continue;
+}
+
+vec4 localPosition = finalBone.finalBoneMatrices[boneids[i]] * vec4(aPos, 1.0f);
+totalPosition += localPosition * weights[i];
+
+// vec3 localNormal = mat3(transpose(inverse(finalBone.finalBoneMatrices[boneids[i]]))) * aNormal;
+// Normal_ += localNormal;
+
+}
+
+} else{
+totalPosition = vec4(aPos, 1.0f);
+}
+
 
 
        // if(totalPosition.w == 0.0f){
@@ -62,10 +73,18 @@ for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
 
 // Normal = vec3(transpose(inverse(WorldToCamera)))*Normal_;
 
-
 totalPosition.x *= -1;
 totalPosition.y *= -1;
 totalPosition.z *= -1;
+
+bool notNull = false;
+
+for (int i = 0; i < 4 ; i++){
+    if(totalPosition[i]!=0.0f){
+	notNull = true;
+	break;
+    }
+}
 
 //aPos is the vertex position so the Fragment position is
 	//the dot product of model and vertex Position (plus two vector)
@@ -75,8 +94,9 @@ totalPosition.z *= -1;
      // Actually the model matrix is what carried world's feature
      
      TexCoord_ = TexCoordd;
+
      gl_Position = projection * WorldToCamera * totalPosition;     
 
-      // gl_Position = projection * WorldToCamera * vec4(-aPos, 1.0f);     
+      //gl_Position = projection * WorldToCamera * vec4(-aPos, 1.0f);     
     // gl_Position = projection * view * model * vec4(-aPos, 1.0f);
 };
