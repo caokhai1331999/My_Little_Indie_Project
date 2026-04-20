@@ -282,8 +282,9 @@ HDC dummyDrawingContext = GetDC(windowDummy);
 INT pixelFormatDummy = ChoosePixelFormat(dummyDrawingContext, &pfdDummy);
 SetPixelFormat(dummyDrawingContext, pixelFormatDummy, &pfdDummy);
 
-HGLRC dummyContext = wglCreateContext(dummyDrawingContext);
-wglMakeCurrent(dummyDrawingContext, dummyContext);
+OBuffer->glData.defaultContext = wglCreateContext(dummyDrawingContext);
+
+wglMakeCurrent(dummyDrawingContext, OBuffer->glData.defaultContext);
 
 //Succeed make enable wgl
 PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetExtensionsStringARB = nullptr;
@@ -320,7 +321,7 @@ wglCreateContextAttribsARB =
 // Delete dummy here
 if (wglCreateContextAttribsARB) {
     printf("Succeed get wglCreateContextAttribsARB function pointer\n");
-    wglDeleteContext(dummyContext);
+    //wglDeleteContext(dummyContext);
     DestroyWindow(windowDummy);
 } else {
     printf("wglCreateContextAttribsARB is NULL\n");    
@@ -723,6 +724,7 @@ HDC windowDC = GetDC(window);
  //glEnable(GL_TEXTURE_2D);
                 glEnable(GL_DEPTH_TEST);
                 glEnable(GL_CULL_FACE);
+
                 glCullFace(GL_FRONT);
                 glDepthFunc(GL_LESS);
                 // GL 4.3+
@@ -946,3 +948,16 @@ void ErrorExit()
     LocalFree(lpMsgBuf);
     ExitProcess(dw); 
 }
+
+void ResetGLState(Win32_OffScreen_Buffer* BackBuffer, HWND window){
+
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEBUG_OUTPUT);
+    glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
+    HDC windowContext = GetDC(window);
+    wglMakeCurrent(windowContext, BackBuffer->glData.defaultContext);
+
+    wglDeleteContext(BackBuffer->glData.openglRC);
+};

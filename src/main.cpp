@@ -410,14 +410,14 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
   } break;
 
   case WM_MOUSEMOVE: {
-    if (fDraw) {
-      DeviceContext = GetDC(Window);
-      MoveToEx(DeviceContext, ptPrevious.x, ptPrevious.y, NULL);
-      LineTo(DeviceContext, ptPrevious.x = LOWORD(Lparam),
-             ptPrevious.y = HIWORD(Lparam));
-      ReleaseDC(Window, DeviceContext);
-    }
-
+    //if (fDraw) {
+      //DeviceContext = GetDC(Window);
+      //MoveToEx(DeviceContext, ptPrevious.x, ptPrevious.y, NULL);
+      //LineTo(DeviceContext, ptPrevious.x = LOWORD(Lparam),
+             //ptPrevious.y = HIWORD(Lparam));
+      //ReleaseDC(Window, DeviceContext);
+    //}
+//
     BackBuffer.camera.mouse.xPos = GET_X_LPARAM(Lparam);
     //
     // if(BackBuffer.camera.mouse.xPos > BackBuffer.BitmapWidth){
@@ -556,9 +556,10 @@ LARGE_INTEGER PerfCountFrequencyResult;
   AniUserClassSlayer SlayAnimator = NULL;
   AniTimeUpdater AniUpdate = NULL;
   PlayAni__ PlayAnimation = NULL;
-
-  setUpUBO__ setUpUBO = NULL;
-  updateUBOData__ updateUBOData = NULL;
+  ShowInfo_ showUniformVarValuePerVertex = NULL;
+  
+  //setUpUBO__ setUpUBO = NULL;
+  //updateUBOData__ updateUBOData = NULL;
   //setupMeshh setupMesh = NULL;
   //MDraw Draw = NULL;
       //AniTimeUpdater AniUpdate_;
@@ -613,8 +614,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
           AniUpdate = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTime_");
           PlayAnimation = (PlayAni__)GetProcAddress(AniLib, "PlayAni_");
 
-          setUpUBO = (setUpUBO__)GetProcAddress(AniLib, "setupUBO_");
-          updateUBOData = (updateUBOData__)GetProcAddress(AniLib, "updateUBOData_");
+          showUniformVarValuePerVertex = (ShowInfo_)GetProcAddress(AniLib, "ShowInfo");
+
+          //setUpUBO = (setUpUBO__)GetProcAddress(AniLib, "setupUBO_");
+          //updateUBOData = (updateUBOData__)GetProcAddress(AniLib, "updateUBOData_");
+
           //setupMesh = (setupMeshh)GetProcAddress(AniLib, "setupMesh");
           //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
           //Load_Lib = false;
@@ -931,9 +935,12 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 GLuint UBO;
                 int k = 0;                
 
+                GLuint id = animating_shader_->GetProgramID();
+                showUniformVarValuePerVertex(&UBO, &id, &dancing_vampire->meshes[0], false, false, false, false, false, false);
+
                 while (GlobalRunning) {
 
-                  if (first_announce) {
+                  if(first_announce) {
                       QueryPerformanceCounter(&LastCounter);
                       LastCycleCounts = __rdtsc();
                   } else {
@@ -1005,22 +1012,24 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //}
                     if (Load_Lib) {
                       if (AniLib != NULL) {
-                        // if (FreeLibrary(AniLib)) {
-                        // printf("Succeed free current lib\n");
-                        //} else {
-                        // printf("fail to free current lib
-                        // %s\n",GetLastError());
-                        //}
-                        FreeLibrary(AniLib);
+                         if (FreeLibrary(AniLib)) {
+                         printf("Succeed free current lib\n");
+                        } else {
+                             printf("fail to free current lib %s\n", GetLastError());
+                        }
+
+                        //FreeLibrary(AniLib);
+//
                         if (CopyFile("skeletalAni32.dll",
                                      "skeletalAni32_copy.dll", false)) {
 
-                          // printf("Succeed copy dll file\n");
+                           printf("Succeed copy dll file\n");
                           AniLib = LoadLibraryA("skeletalAni32_copy.dll");
                         }
+//
                         // Animation
                         if (AniLib != NULL) {
-                          //printf("Succeed load code from dll\n");
+                            printf("Succeed reload code and opengl function from dll\n");
                           KillAninmation = (AniClassSlainer)GetProcAddress(
                               AniLib, "DestroysAniClass");
 
@@ -1031,7 +1040,10 @@ LARGE_INTEGER PerfCountFrequencyResult;
                               AniLib, "updateAnimationTime_");
 
                           PlayAnimation = (PlayAni__)GetProcAddress(AniLib, "PlayAni_");                          
-                          //setupMesh =
+
+                          showUniformVarValuePerVertex = (ShowInfo_)GetProcAddress(AniLib, "ShowInfo");
+
+//setupMesh =
                               //(setupMeshh)GetProcAddress(AniLib, "setMesh");
                           //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
                           }
@@ -1392,9 +1404,10 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     DDraw(dancing_vampire, &brushID);
 
                       if(showMsPF){
+
                           glm::vec2 TexCoordToShow;
                           int TextureID;
-
+                          showUniformVarValuePerVertex(&UBO, &brushID, &dancing_vampire->meshes[0], false, false, false, false, false, false);
                           //for(int i = 0; i < dancing_vampire->meshes[0].vertices.size(); i++){
                               //int TexCoordoffset = (i*sizeof(Vertex)) + offsetof(Vertex, TexCoords);
                               //glGetBufferSubData(GL_ARRAY_BUFFER, TexCoordoffset, sizeof(glm::vec2), &TexCoordToShow);
@@ -1424,8 +1437,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                   loc =                                      glGetUniformLocation(model_shader_->GetProgramID(), "material.texture_diffused1");
 
                                   printf("diffuse texture sampler location on animating  shader : %d\n", loc);
-                                  showUniformVarValuePerVertex(&UBO, &brushID, &dancing_vampire->meshes[0], false, false, true, false, false, true);
                       }
+
 // animation update and render ================================================
 
                           //}
@@ -1490,6 +1503,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                       };
                       EndCycleCounts = __rdtsc();
                 }
+
           }
 
 
@@ -1501,6 +1515,8 @@ MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per registerMULPS -> re
 
           glDeleteVertexArrays(1, &BackBuffer.glData.VAOs);
           glDeleteBuffers(1, &BackBuffer.glData.VBO);
+
+          ResetGLState(&BackBuffer, Window);
 
           delete basic_shader_;
           basic_shader_ = nullptr;
@@ -1537,6 +1553,6 @@ MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per registerMULPS -> re
         FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, buffer, sizeof(buffer), NULL);
         printf("%s\n", buffer);
     }
-    wglDeleteContext(BackBuffer.glData.openglRC);
+    //wglDeleteContext(BackBuffer.glData.openglRC);
     return (0);
 }

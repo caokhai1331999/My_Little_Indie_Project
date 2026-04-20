@@ -16,7 +16,7 @@ call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build
 rem color 07
 @echo Copying project file for backup purpose!! * o 0
 @echo off
-runemacs
+runemacs --no-splash
 cd ..
 rem backupp.bat
 @echo DONE!!!

@@ -145,7 +145,7 @@ void DestroyAnimatorClass(Animator *ani) {
 }
 
 void updateAnimationTime_(Animator *ani, const float* dt) {
-  ani->updateAnimationTime(dt);
+    ani->updateAnimationTime(dt);
 }
 
 void PlayAni_ (Animator* ani, Animation* animation){

@@ -31,6 +31,8 @@ struct OpenGLData{
     std::vector<GLuint> ProgramIDs = {};
     
     HGLRC openglRC;
+    HGLRC defaultContext;
+
     unsigned int textureHandle;
 
     OpenGLData(){
@@ -126,6 +128,7 @@ void APIENTRY MessageCallback(GLenum source,
                               GLsizei length,
                               const GLchar* message,
                               const void* userParam);
+void ResetGLState(Win32_OffScreen_Buffer* BackBuffer = nullptr, HWND window = 0);
 void ErrorExit();
 
 #define WIN32GAME_H

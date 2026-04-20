@@ -40,8 +40,7 @@ mat4 localBone = mat4(1.0f);
 
 vec3 Normal_;
 
-if(is_moving){
-
+bool clone_flag = is_moving;
 for (int i = 0; i < MAX_BONE_INFLUENCE; i++){
 
 if(boneids[i] == -1){
@@ -59,10 +58,6 @@ totalPosition += localPosition * weights[i];
 // vec3 localNormal = mat3(transpose(inverse(finalBone.finalBoneMatrices[boneids[i]]))) * aNormal;
 // Normal_ += localNormal;
 
-}
-
-} else{
-totalPosition = vec4(aPos, 1.0f);
 }
 
 

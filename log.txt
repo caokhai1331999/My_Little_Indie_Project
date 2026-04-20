@@ -1528,3 +1528,10 @@ side quest DONE! Make model animate anytime it move. I was wrong at the
 translate thing. The position vector doesn't move model linearly but just the id
 matrix itself. Actually we only can move model throught cause it store model
 information during time
+
+---------------- Mon, 20 Apr 26: 10:02AM
+
+Keep building check box
+
+NOTE: New knowledge, I have to call gladloadfunction everytime reload dll in
+order to call gl function

@@ -125,3 +125,169 @@ Animation* __cdecl CreateAniClass(const char *animationPath, Model_ *model) {
 void __cdecl DestroysAniClass(Animation *ani) {
     delete ani;
 }
+
+void showUniformVarValuePerVertex(GLuint* UBO, GLuint* programeId, Mesh* mesh, bool32 showIndices, bool32 showPos, bool32 showTexCoords, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices){
+    
+//We already bind the specific VAO before
+    int VertexSizeforVec4 = MAX_BONE_INFLUENCE * 100;
+    int VertexSizeforVec3 = 3 * 100;
+    glBindVertexArray(mesh->VAO);
+
+    GLint is_moving;
+    std::string moving_flag = "is_moving";
+    GLint location_ = -1;
+    printf("moving flag location is %d\n", (int)location_);
+    location_ = glGetUniformLocation((*programeId), (GLchar*)moving_flag.c_str());
+    printf("programme id:%d\n", (*programeId));    
+    if((int)location_ != -1){
+        glGetUniformiv(*programeId, location_, &is_moving);
+        printf("moving flag location is %d\n", location_);
+        printf("moving flag is %s\n", is_moving==1?"true":"false");
+    } else {
+        printf("Moving_flag location is invalid\n");
+    };
+
+    for(int k = 0; k < 52; k++){
+
+        if(showIndices){
+            GLuint index;   
+            glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, k*sizeof(GLuint), sizeof(GLuint), &index);
+            printf("index of %d vertex is: %d\n", k, index);
+        }
+        
+        if(showPos){
+        glm::vec3 readbackPositions;        
+                GLintptr offset = (k*sizeof(struct Vertex));
+                glGetBufferSubData(GL_ARRAY_BUFFER, offset, sizeof(glm::vec3), &readbackPositions);
+                printf("Position ID %d:", k);
+                std::cout<<glm::to_string(readbackPositions);
+                printf("\n");
+            }
+        
+        if(showTexCoords){
+        glm::vec2 readbackTexCoords;        
+                GLintptr offset = (k*sizeof(struct Vertex)) + offsetof(struct Vertex, TexCoords);
+                glGetBufferSubData(GL_ARRAY_BUFFER, offset, sizeof(glm::vec2), &readbackTexCoords);
+                printf("TexCoords ID %d:", k);
+                std::cout<<glm::to_string(readbackTexCoords);
+                printf("\n");
+            }
+
+        
+    if(showBoneIds){
+        int readbackBoneIDs[4];
+        //readbackBoneIDs = new int (VertexSizeforVec4);
+        if(readbackBoneIDs!=nullptr){
+            GLintptr offset = (k*sizeof(Vertex)) + offsetof(struct Vertex, m_BoneIDs);
+            glGetBufferSubData(GL_ARRAY_BUFFER, offset, sizeof(int)*MAX_BONE_INFLUENCE, readbackBoneIDs);
+            printf("Bone IDs per vertex %d is: ", k);
+            printf("[%d, %d, %d, %d] ", readbackBoneIDs[0], readbackBoneIDs[1], readbackBoneIDs[2], readbackBoneIDs[3]);
+            printf("\n");
+        }
+    }
+
+    if(showWeights){
+        float readbackWeights[4];
+        //readbackWeights = new float (VertexSizeforVec4);
+        if(readbackWeights != nullptr){
+            GLintptr offset = sizeof(Vertex)*k + offsetof(struct Vertex, m_Weights);
+            glGetBufferSubData(GL_ARRAY_BUFFER, offset, sizeof(float)*MAX_BONE_INFLUENCE, readbackWeights);
+            if(readbackWeights[0]!=0.0f){
+                printf("Bone weights per vertex %d: ", k);
+                printf("[%f, %f, %f, %f]", readbackWeights[0], readbackWeights[1], readbackWeights[2], readbackWeights[3]);
+                printf("\n");
+            } else {
+                continue;   
+            }                
+        }
+    }
+ }
+
+    if(showFinalBoneMatrices) {
+
+        //GLfloat matVal[16];
+        GLfloat* matVal_;
+        std::string matrixName_;
+        glUseProgram(*programeId);
+
+        //char index[1];
+        //char indexx[2];
+        GLint maxUniforms;
+
+        for(int k = 0; k < 52; k++){
+            matrixName_ = "finalBone.finalBoneMatrices[]";
+
+
+                //if(k<10){
+                    //sprintf(index, "%d", k);
+                    //matrixName_.insert(matrixName_.size()-1, index);
+                //} else {
+                    //sprintf(indexx, "%d", k);
+                    //matrixName_.insert(matrixName_.size()-1, indexx);                                     
+                //}
+//
+            //printf("matrix name: %s, programmeID: %d\n", matrixName_.c_str(), *programeId);
+
+            //GLint matrixLocation = glGetUniformLocation(*programeId,                                       (GLchar*)matrixName_.c_str());
+
+            //printf("location of current finalbone matrices: %d\n", matrixLocation);
+            
+//NOTE: This one is for uniform buffer
+            GLint matrixLocation = glGetUniformBlockIndex(*programeId,                                       (GLchar*)matrixName_.c_str());
+//
+            glBindBuffer(GL_UNIFORM_BUFFER, *UBO);
+
+// 2. Map the buffer memory
+            void* ptr = glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(GLfloat)*16*52, GL_MAP_READ_BIT);
+
+// 3. Read data using the offset obtained earlier
+            matVal_ = (float*)((char*)ptr + (k*sizeof(GLfloat)*16));
+            glUnmapBuffer(GL_UNIFORM_BUFFER);
+// Read *member1Data...
+
+// 4. Unmap the buffer
+
+            //if(matrixLocation != -1){
+                //glGetUniformfv(*programeId, matrixLocation, matVal);
+
+                if(matVal_[0]!=0.0f){
+                    printf("\nBone Matrix index %d is:", k);
+                    for(int i = 0 ; i < 16; i++){
+                        if(i==0||i==4||i==8||i==12){
+                            i==0?printf("["):printf(", [");
+                        }
+                        (i==0||i==4||i==8||i==12)?printf("%f", matVal_[i]):printf(", %f", matVal_[i]);
+                        if(i==3||i==7||i==11||i==15){
+                            printf("]");
+                        }
+                    };
+                    printf("\n");                                 
+                }
+            //} else {
+                //GLenum error = glGetError();
+                //if(error == GL_INVALID_VALUE){
+                    //printf("ProgramID is not a value generated by OPENGL\n");
+                //} else if(error == GL_INVALID_OPERATION){
+                    //printf("ProgramID is not an object or successfully linked\n");                            
+                //};                
+            //}
+
+//So function failed to retrieved matrix from shader
+
+        }
+    }
+};
+
+void __cdecl ShowInfo(GLuint* UBO, GLuint* programeId, Mesh* mesh, bool32 showIndices, bool32 showPos, bool32 showTexCoords, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices){
+
+    if(wglGetCurrentContext() != NULL){
+        bool success = false;
+        success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
+        assert(success);
+        printf("Succeed reloading gl function pointers\n");        
+    } else{
+        printf("The gl context is NULL in this block\n");
+    }
+
+    showUniformVarValuePerVertex(UBO, programeId, mesh, showIndices, showPos, showTexCoords, showBoneIds, showWeights, showFinalBoneMatrices);
+};

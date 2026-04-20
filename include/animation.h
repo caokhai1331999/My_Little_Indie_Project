@@ -51,12 +51,19 @@ private:
     std::unordered_map<std::string, Bone_Info>* m_Bone_InfoMap;
 };
 
+void showUniformVarValuePerVertex(GLuint* UBO = nullptr, GLuint* programeId = nullptr, Mesh* mesh = nullptr, bool32 showIndices = false,  bool32 showPos = false, bool32 showTexCoords = false,  bool32 showBoneIds = false, bool32 showWeights = false, bool32 showFinalBoneMatrices = false);
+
 // Class wrapper
 extern "C" __declspec(dllexport) Animation* __cdecl CreateAniClass(const char* animationPath, Model_ *model);
-extern "C" __declspec(dllexport) void __cdecl DestroysAniClass(Animation *ani);
-
 typedef Animation* (__cdecl *AniClassSpawner) (const char *, Model_ *);
+
+extern "C" __declspec(dllexport) void __cdecl DestroysAniClass(Animation *ani);
 typedef void (__cdecl *AniClassSlainer) (Animation* );
+
+extern "C" __declspec(dllexport) void __cdecl ShowInfo(GLuint* UBO, GLuint* programeId, Mesh* mesh, bool32 showIndices, bool32 showPos, bool32 showTexCoords, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices);
+
+typedef void (__cdecl *ShowInfo_) (GLuint*, GLuint*, Mesh*, bool32, bool32, bool32, bool32, bool32, bool32);
+
 
 #define ANIMATION_H
 #endif
