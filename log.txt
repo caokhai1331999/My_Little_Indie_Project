@@ -1535,3 +1535,13 @@ Keep building check box
 
 NOTE: New knowledge, I have to call gladloadfunction everytime reload dll in
 order to call gl function
+
+---------------- Tue, 21 Apr 26: 09:52AM
+
+NOTE: I was so stupid, I reset the bonematrices and animating time one button
+release. which cause the deformation and incompleted animation
+
+TODO: complete check box part
+
+Time to read to the gaussian light to simulate the lamp light effect in game
+

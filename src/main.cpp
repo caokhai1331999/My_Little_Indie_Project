@@ -127,7 +127,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
         // Actually the front vec is at the back of the camera
         // State.BlueOffset+= 10;
             //if (WasUp) {
-                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, 15.0f * DelayedRatio));
+                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, 5.0f * DelayedRatio));
 
                 if(!is_moving)
                     is_moving = !is_moving;
@@ -140,7 +140,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
         // Actually the front vec is at the back of the camera
         // State.BlueOffset+= 10;
             //if (WasUp) {
-                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, -(15.0f * DelayedRatio)));
+                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, -(5.0f * DelayedRatio)));
                 if(!is_moving)
                     is_moving = !is_moving;
                 printf("DOWN is HIT\n");
@@ -152,7 +152,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
         // Actually the front vec is at the back of the camera
         // State.BlueOffset+= 10;
             //if (WasUp) {
-                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-(15.0f * DelayedRatio), 0.0f, 0.0f));
+                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-(5.0f * DelayedRatio), 0.0f, 0.0f));
                 if(!is_moving)
                     is_moving = !is_moving;
 
@@ -164,13 +164,13 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
         // Actually the front vec is at the back of the camera
         // State.BlueOffset+= 10;
             //if (WasUp) {
-                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(15.0f * DelayedRatio, 0.0f, 0.0f));
+                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(5.0f * DelayedRatio, 0.0f, 0.0f));
                 if(!is_moving)
                     is_moving = !is_moving;
                 printf("RIGHT is HIT\n");
             //}
       }
-        
+        //====================================================
       else  if (vkCode == 'W') {
         // Actually the front vec is at the back of the camera
         // State.BlueOffset+= 10;
@@ -627,6 +627,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
       
       MSG message;
 
+      space_box obj1 = space_box(glm::vec3(9.0f, 0.3, 1.0f));
+      space_box obj2 = space_box(glm::vec3(-9.0f, 0.3, 1.0f));
+
       if (refreshRate > 1) {
         printf("Refresh rate is : %dHz\n", refreshRate);
       };
@@ -730,6 +733,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 glm::mat4 basic_cube_core = glm::mat4(1.0f);
                 glm::mat4 backpack_core = glm::mat4(1.0f);
 
+                
                 glm::mat4 Plane = glm::mat4(1.0f);
                 Plane = glm::translate(Plane, glm::vec3(0.0f));
 
@@ -1010,6 +1014,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //} else {
                     //printf("Can not track Mouse event\n");                
                     //}
+
                     if (Load_Lib) {
                       if (AniLib != NULL) {
                          if (FreeLibrary(AniLib)) {
@@ -1229,6 +1234,22 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         //BUGGY
                         basic_cube_core = glm::rotate(basic_cube_core, glm::radians(10.0f) * (float)DelayedRatio, randomRotateAxis);
 
+                        // Move and check collision here
+                        glm::vec3 move_right = glm::vec3(2.0f * DelayedRatio, 0.0f, 0.0f);
+                        glm::vec3 move_left = glm::vec3(-2.0f * DelayedRatio, 0.0f, 0.0f);
+
+                        bool32 collided_ = check_collision(&space_box1, &space_box2);
+                        if(collided_){
+                            space_box1.position = glm::translate(space_box1.position, move_right);
+                            space_box2.position = glm::translate(space_box2.position, mov_left);                            
+                        }else{
+                            space_box1.position = glm::translate(space_box1.position, move_left);
+                            space_box2.position = glm::translate(space_box2.position, move_right);
+                        }
+                        
+//=========================================================================
+
+                        
                     //RENDER =====================================
                     quad_shader_->use();
                     glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
@@ -1244,6 +1265,14 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     basic_shader_->setFloat("colorOffset", ColorOffset);
                     basic_shader_->setMat4("model", basic_cube_core);
                     //glDrawArrays(GL_TRIANGLES, 0, 36);
+
+                    //Draw colliding objects here
+                    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+                    basic_shader_->setMat4("model", collided_obj1_core);
+                    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+                    basic_shader_->setMat4("model", collided_obj2_core);
                     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
                     drawTile(ScreenBuffer.glData.VAOs, basic_shader_->GetProgramID(), DelayedRatio, &UpdatedAngle, TimeToChangeAxis, &rollCubeMap);
@@ -1325,8 +1354,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                             }                        
 
                         }   
-                    } else {
-                        PlayAnimation(animator, danceAnimation);
                     }
 
                     

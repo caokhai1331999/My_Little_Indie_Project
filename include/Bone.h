@@ -31,7 +31,33 @@ struct AssimpNodeData{
     std::string name;
     std::vector<AssimpNodeData>children;
 };
+// Test zone=====================
+struct collided_space{
+// How to store direction
+    glm::vec3 space;
+    glm::ivec3 direction;
+    collided_space(glm::vec3 sp, glm::ivec3 dir):space{sp}, direction{dir}{};
+};
 
+struct space_box{
+    // We have to spawn the unique id for every object in order not to confuse with other one
+    glm::mat4 position;
+    glm::vec3 size;
+
+    std::vector<collided_space>* collide_list;
+
+    space_box(glm::vec3 first_pos = glm::vec3(0.0f)){
+        position = glm::ma4(1.0f);
+        position = glm::translate(position, first_pos);
+
+        collide_list = new std::vector<collided_space>;
+        collide_list->reserve(10);
+    }
+//NOTE: How to define direction for both box
+    // question is do we need to store it on one general list or each object space box list
+    // animation for each motions;
+};
+// Test zone=====================
 class Bone{
 
 private:
@@ -116,6 +142,8 @@ public:
     }
 };
 
+
+bool32 check_collision( space_box* box1 = nullptr, space_box* box2 = nullptr);
 
 #define BONE_H
 #endif
