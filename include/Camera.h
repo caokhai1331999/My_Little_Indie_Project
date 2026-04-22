@@ -94,7 +94,7 @@ struct Camera{
     {
         // We just could take Front as default
         // The Up have to be calculated from Right(Which is calculated from Direction)
-        Direction = glm::vec3(0.0f) - Position;
+        Direction = glm::vec3(-6.0f, 0.3f, 1.0f) - Position;
         WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
         
         view = glm::lookAt(

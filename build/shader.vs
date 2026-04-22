@@ -37,7 +37,7 @@ void main(){
 	TextCoord = aTextCoord;
 
 // Model Pos for deciding showing texture or mere color
- ModelPos = vec3(0.0f);
+     ModelPos = vec3(0.0f);
 
      ModelPos.z = model[1][0];
      ModelPos.y = model[2][0];

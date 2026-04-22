@@ -165,35 +165,36 @@ glm::mat4 Bone::InterpolateRotation(const float* animationTime){
 
 };
 
-bool32 check_collision( space_box* box1 = nullptr, space_box* box2 = nullptr){
+bool32 check_collision(space_box* box1, space_box* box2){
     //AABB BBAA
     //assume that the position point is in the center of the box
     bool32 collided = false;
 
     glm::vec3 spaceforBox1;
     //ON X-axis
-    if (((box1->position[0][0] < box2->position[0][0])&&(box1->position[0][0] + box1->size.x > box2->position[0][0])) || ((box2->position[0][0] < box1->position[0][0])&&(box2->position[0][0] + box2->size.x > box1->position[0][0]))){
+    if (((box1->position[3][0] < box2->position[3][0])&&(box1->position[3][0] + box1->size.x > box2->position[3][0])) || ((box2->position[3][0] < box1->position[3][0])&&(box2->position[3][0] + box2->size.x > box1->position[3][0]))){
         //implement here
-        spaceforBox1.x = box2->[0][0] > box1->[0][0]?box2->[0][0] - box1->[0][0]:box1->[0][0] - box2->[0][0];
+        spaceforBox1.x = box1->position[3][0] - box2->position[3][0];
         !collided?collided = true:collided=false;     
     }
     //ON y-axis
-    else if (((box1->position[1][1] < box2->position[1][1])&&(box1->position[1][1] + box1->size.y > box2->position[1][1])) || ((box2->position[1][1] < box1->position[1][1])&&(box2->position[1][1] + box2->size.y > box1->position[1][1]))){
-        spaceforBox1.y = box2->[1][1] - box1->[1][1];
-        dirforBox1.y = (box2->y > box1->y)?-1:1;
+    else if (((box1->position[3][1] < box2->position[3][1])&&(box1->position[3][1] + box1->size.y > box2->position[3][1])) || ((box2->position[3][1] < box1->position[3][1])&&(box2->position[3][1] + box2->size.y > box1->position[3][1]))){
+        spaceforBox1.y = box1->position[3][1] - box1->position[3][1];
         !collided?collided = true:collided=false;        
     }
     //ON z-axis
-    else if (((box1->position[2][2] < box2->position[2][2])&&(box1->position[2][2] + box1->size.z > box2->position[2][2])) || ((box2->position[2][2] < box1->position[2][2])&&(box2->position[2][2] + box2->size.z > box1->position[2][2]))){
-        spaceforBox1.z = |box2->[2][2] - box1->[2][2]|;
-        dirforBox1.z = (box2->z > box1->z)?-1:1;
+    else if (((box1->position[3][2] < box2->position[3][2])&&(box1->position[3][2] + box1->size.z > box2->position[3][2])) || ((box2->position[3][2] < box1->position[3][2])&&(box2->position[3][2] + box2->size.z > box1->position[3][2]))){
+        spaceforBox1.z = box1->position[3][2] - box1->position[3][2];
         !collided?collided = true:collided=false;        
     }
 
-    //box1->collided_space->push_back(collided_space(spaceforBox1, dirforBox1));
-    //box2->collided_space->push_back(collided_space(spaceforBox1, -1 * dirforBox1));
+    box2->collide_list->push_back(collided_space(spaceforBox1));
+    glm::vec3 spaceforBox2 = glm::vec3(-1 * spaceforBox1.x, -1 * spaceforBox1.y, -1 * spaceforBox1.z);
+    box1->collide_list->push_back(collided_space(spaceforBox2));
 
-    box1->position = glm::translate(box1->position, glm::vec3(spaceforBox))
-    
     return collided;
+};
+
+bool32 __cdecl check_collision_wrapper(space_box* box1, space_box* box2){
+    return check_collision(box1, box2);  
 };

@@ -536,6 +536,13 @@ LARGE_INTEGER PerfCountFrequencyResult;
   bool RatioCalculated = false;
   real64 DelayedRatio = 0.0f;
   real64 StandardMSperFrame = 16.67f;
+
+  bool32 collided_  = false;
+  bool32 along1 = true;  
+  bool32 along2 = true;  
+  bool32 short_color_change_ = false;
+  float color_switch_dur = 0.0f;
+
   
   win32LoadXInput();
   WNDCLASSEXA WindowClass = {};
@@ -557,7 +564,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
   AniTimeUpdater AniUpdate = NULL;
   PlayAni__ PlayAnimation = NULL;
   ShowInfo_ showUniformVarValuePerVertex = NULL;
-  
+  check_collision_ check_collision = NULL;
   //setUpUBO__ setUpUBO = NULL;
   //updateUBOData__ updateUBOData = NULL;
   //setupMeshh setupMesh = NULL;
@@ -615,7 +622,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
           PlayAnimation = (PlayAni__)GetProcAddress(AniLib, "PlayAni_");
 
           showUniformVarValuePerVertex = (ShowInfo_)GetProcAddress(AniLib, "ShowInfo");
-
+          check_collision = (check_collision_)GetProcAddress(AniLib, "check_collision_wrapper");
           //setUpUBO = (setUpUBO__)GetProcAddress(AniLib, "setupUBO_");
           //updateUBOData = (updateUBOData__)GetProcAddress(AniLib, "updateUBOData_");
 
@@ -627,8 +634,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
       
       MSG message;
 
-      space_box obj1 = space_box(glm::vec3(9.0f, 0.3, 1.0f));
-      space_box obj2 = space_box(glm::vec3(-9.0f, 0.3, 1.0f));
+      glm::vec3 tempPos = glm::vec3(9.0f, 0.3, 1.0f);
+      glm::vec3 size = glm::vec3(1.0f);
+      space_box obj1 = space_box(&tempPos, &size);
+      tempPos = glm::vec3(-9.0f, 0.3, 1.0f);
+      space_box obj2 = space_box(&tempPos, &size);
 
       if (refreshRate > 1) {
         printf("Refresh rate is : %dHz\n", refreshRate);
@@ -704,7 +714,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     std::cerr << "OpenGL Error: " << err << std::endl;
                 }
 
-                glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
+                GetWindowDimension(Window);
+                glViewport(0, 0, Dimens.Width, Dimens.Height);
 
                 //shader_name.clear();                
                 std::string shader_name = "animating sketching brush";
@@ -740,7 +751,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 //glm::mat4 Projection = glm::mat4(1.0f);
 
                 //View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
-                glm::vec3 Position = glm::vec3(2.0f, -8.0f, 0.0f);
+                glm::vec3 Position = glm::vec3(-3.0f, -10.0f, -12.0f);
                 glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
                 glm::vec3 WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -792,8 +803,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 
                 dancing_vampire_core = glm::scale(dancing_vampire_core,glm::vec3( 0.01f));
                 dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-2.0f, 0.0f, 0.0f));
-                
-                BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
+
+                GetWindowDimension(Window);
+                BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)Dimens.Width / (float)Dimens.Height, 0.1f, 100.0f);
                 
                 if(glIsProgram(ScreenBuffer.glData.ProgramIDs[0])){
                     //useProgram(ScreenBuffer.glData.ProgramIDs[0]);
@@ -1048,6 +1060,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                           showUniformVarValuePerVertex = (ShowInfo_)GetProcAddress(AniLib, "ShowInfo");
 
+                          check_collision = (check_collision_)GetProcAddress(AniLib, "check_collision_wrapper");
 //setupMesh =
                               //(setupMeshh)GetProcAddress(AniLib, "setMesh");
                           //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
@@ -1123,6 +1136,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //OutputDebugStringA(Buffer);
 #endif                
 
+                           collided_ = false;
                     int ChosenAxis = 0;
 
                     //Ratio is based on miscalculated Msperframe
@@ -1235,17 +1249,37 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         basic_cube_core = glm::rotate(basic_cube_core, glm::radians(10.0f) * (float)DelayedRatio, randomRotateAxis);
 
                         // Move and check collision here
-                        glm::vec3 move_right = glm::vec3(2.0f * DelayedRatio, 0.0f, 0.0f);
-                        glm::vec3 move_left = glm::vec3(-2.0f * DelayedRatio, 0.0f, 0.0f);
+                        glm::vec3 move_right = glm::vec3(DelayedRatio>0.0f?(0.2f * DelayedRatio):0.02f, 0.0f, 0.0f);
+                        glm::vec3 move_left = glm::vec3(DelayedRatio>0.0f?(-0.2f * DelayedRatio):-0.02f, 0.0f, 0.0f);
 
-                        bool32 collided_ = check_collision(&space_box1, &space_box2);
-                        if(collided_){
-                            space_box1.position = glm::translate(space_box1.position, move_right);
-                            space_box2.position = glm::translate(space_box2.position, mov_left);                            
-                        }else{
-                            space_box1.position = glm::translate(space_box1.position, move_left);
-                            space_box2.position = glm::translate(space_box2.position, move_right);
+                        collided_ = check_collision(&obj1, &obj2);
+
+                        if(obj1.position[3][0] < -15.0f){
+                            if(along1)
+                            along1 = !along1;
                         }
+
+                        if(obj2.position[3][0] > 15.0f){
+                            if(along2)
+                            along2 = !along2;
+                        }
+
+                        if(collided_){
+                            obj1.position = glm::translate(obj1.position, (*obj1.collide_list)[0].space);
+                            obj1.collide_list->pop_back();
+
+                            obj2.position = glm::translate(obj2.position, (*obj2.collide_list)[0].space);
+                            obj1.collide_list->pop_back();
+
+                            if(!along1)
+                            along1 = !along1;
+                            if(!along2)
+                            along2 = !along2;
+                        }
+
+                        obj1.position = glm::translate(obj1.position, along1?move_left:move_right);//along?move_left:move_right
+                        obj2.position = glm::translate(obj2.position, along2?move_right:move_left);//along?move_right:move_left
+                        
                         
 //=========================================================================
 
@@ -1259,23 +1293,58 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //why it only show half the plane
                     //glDrawArrays(GL_TRIANGLES, 0, 6);
                     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-                    
+                    //===============================================
                     basic_shader_->use();
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
+
+                    bool32 dummyflag = false;
+                    basic_shader_->setBool("short_color_change_", dummyflag);
                     basic_shader_->setFloat("colorOffset", ColorOffset);
                     basic_shader_->setMat4("model", basic_cube_core);
                     //glDrawArrays(GL_TRIANGLES, 0, 36);
-
                     //Draw colliding objects here
                     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+                    
+                    //drawTile(ScreenBuffer.glData.VAOs, basic_shader_->GetProgramID(), DelayedRatio, &UpdatedAngle, TimeToChangeAxis, &rollCubeMap);
 
-                    basic_shader_->setMat4("model", collided_obj1_core);
+                    if(!collided_ && color_switch_dur > 0.045f){
+                        if(short_color_change_)
+                        short_color_change_ != short_color_change_ ;
+
+                        if(color_switch_dur > 0.045f){
+                            color_switch_dur = 0.0f;
+                        }                        
+                    }else if(collided_ || color_switch_dur < 0.05f){
+
+                        if(!short_color_change_)
+                        short_color_change_ = !short_color_change_;
+
+                        if(color_switch_dur > 0.05f){
+                            color_switch_dur = 0.0f;
+                        }
+                        color_switch_dur += SPerFrame;
+                    }
+                    
+                    basic_shader_->setBool("short_color_change_", short_color_change_);
+                    basic_shader_->setMat4("model", obj1.position);
                     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
-                    basic_shader_->setMat4("model", collided_obj2_core);
+                    basic_shader_->setMat4("model", obj2.position);
                     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
-                    drawTile(ScreenBuffer.glData.VAOs, basic_shader_->GetProgramID(), DelayedRatio, &UpdatedAngle, TimeToChangeAxis, &rollCubeMap);
+                        if(showMsPF){
+                            printf("along1 is %s, along2 is %s\n", along1?"true":"false", along2?"true":"false");
+                            printf("obj1 %f %f %f\n",
+                                   obj1.position[3][0],
+                                   obj1.position[3][1],
+                                   obj1.position[3][2]);
+                            printf("Color switch: %s, duration: %f\n", short_color_change_?"true":"false", color_switch_dur );
+                        }
+
+                    
+                    if(collided_)
+                        collided_ = !collided_;
+                    
                     glUseProgram(0);
                     glBindVertexArray(0);
                     GLuint brushID;

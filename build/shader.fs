@@ -5,6 +5,7 @@ out vec4 FragColor;
 
 uniform sampler2D ttexture;
 uniform float colorOffset;
+uniform bool short_color_change_;
 
 in vec3 ModelPos;
 in vec2 TextCoord;
@@ -42,11 +43,15 @@ void resetColor(vec4 color){
 }
 
 void main(){
-     if(ModelPos.x >= 0.0f){
-     // FragColor = interpolateColor(FragColorr, colorOffset);
+     // if(ModelPos.x >= 0.0f){
      // resetColor(FragColor);
-     FragColor = FragColorr;
-    } else {
-     FragColor = vec4(0.0f);
-    }
+     // FragColor = interpolateColor(FragColorr, colorOffset);
+     if(!short_color_change_){
+          FragColor = interpolateColor(FragColorr, colorOffset);
+     }else{
+	  FragColor = vec4(0.7, 0.3, 0.1, 1.0f);
+     }
+    // } else {
+    //  FragColor = vec4(0.0f);
+    // }
 }

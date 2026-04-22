@@ -1545,3 +1545,13 @@ TODO: complete check box part
 
 Time to read to the gaussian light to simulate the lamp light effect in game
 
+
+---------------- Wed, 22 Apr 26: 02:37PM
+
+NOTE: Due to the fact that I misknow about object position in id matrix. I make
+it wrong
+
+The position adjust function of mine is buggy, instead of bring obj back to it
+positon before collided. it swap the bring back vector's directions between 2
+objects which is used to bring object back. Thus incidentally swap two object position.
+Which confused the bound check wherein just check one side. 

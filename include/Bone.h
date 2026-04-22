@@ -35,8 +35,8 @@ struct AssimpNodeData{
 struct collided_space{
 // How to store direction
     glm::vec3 space;
-    glm::ivec3 direction;
-    collided_space(glm::vec3 sp, glm::ivec3 dir):space{sp}, direction{dir}{};
+    //glm::ivec3 direction;
+    collided_space(glm::vec3 sp):space{sp}{};
 };
 
 struct space_box{
@@ -46,9 +46,11 @@ struct space_box{
 
     std::vector<collided_space>* collide_list;
 
-    space_box(glm::vec3 first_pos = glm::vec3(0.0f)){
-        position = glm::ma4(1.0f);
-        position = glm::translate(position, first_pos);
+    space_box(glm::vec3* first_pos = nullptr, glm::vec3* size_ = nullptr){
+        size = *size_; 
+        
+        position = glm::mat4(1.0f);
+        position = glm::translate(position, (*first_pos));
 
         collide_list = new std::vector<collided_space>;
         collide_list->reserve(10);
@@ -143,7 +145,12 @@ public:
 };
 
 
-bool32 check_collision( space_box* box1 = nullptr, space_box* box2 = nullptr);
+bool32 check_collision(space_box* box1 = nullptr, space_box* box2 = nullptr);
+
+extern "C" __declspec(dllexport) bool32 __cdecl check_collision_wrapper(space_box* box1 = nullptr, space_box* box2 = nullptr);
+//declare a function pointer;
+typedef bool32 (__cdecl *check_collision_) (space_box*, space_box*);
+
 
 #define BONE_H
 #endif
