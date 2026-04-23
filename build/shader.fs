@@ -47,7 +47,8 @@ void main(){
      // resetColor(FragColor);
      // FragColor = interpolateColor(FragColorr, colorOffset);
      if(!short_color_change_){
-          FragColor = interpolateColor(FragColorr, colorOffset);
+          // FragColor = interpolateColor(FragColorr, colorOffset);
+          FragColor = FragColorr;
      }else{
 	  FragColor = vec4(0.7, 0.3, 0.1, 1.0f);
      }

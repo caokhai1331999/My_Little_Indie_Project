@@ -92,7 +92,7 @@ global_variable x_input_get_state* XinputGetState_  = XinputGetStateStub;
 
 // This one is to replace the XinputGetState which already been called in Xinput.h
 // with the XinputGetState                                                 
-// ==================================================================
+   // ==================================================================
 #define X_INPUT_SET_STATE(name) DWORD WINAPI name(DWORD dwUserIndex,XINPUT_VIBRATION *pVibration)
 typedef X_INPUT_SET_STATE(x_input_set_state);
 X_INPUT_SET_STATE(XinputSetStateStub) {
@@ -106,7 +106,7 @@ global_variable x_input_set_state* XinputSetState_  = XinputSetStateStub;
 //#define GET_X_LPARAM(name) int name(LPARAM lparam)
 //typedef GET_X_LPARAM(get_x_lparam);
 //GET_X_LPARAM(getxlparam) {
-    //return (NULL);
+//return (NULL);
 //}
 //global_variable get_x_lparam* getxlparam_  = getxlparam;
 //#define get_x_lparam getxlparam_
@@ -114,7 +114,7 @@ global_variable x_input_set_state* XinputSetState_  = XinputSetStateStub;
 //#define GET_Y_LPARAM(name) int name(LPARAM lparam)
 //typedef GET_Y_LPARAM(get_y_lparam);
 //GET_Y_LPARAM(getylparam) {
-    //return (NULL);
+//return (NULL);
 //}
 //global_variable get_y_lparam* getylparam_  = getylparam;
 //#define get_y_lparam getylparam_
@@ -243,6 +243,18 @@ struct Game_State{
     int Hz = 256;    
 };
 
+//struct Clock_Set{
+//};
+
+struct Per_Win_Properties{
+    WNDCLASSEXA WindowClass;
+    HWND Window;
+    Per_Win_Properties(){
+        WindowClass = {};
+        Window = {};
+    };
+};
+
 // TODO: Allow the sample offset here for more robust platform options
 uint32 safetruncateUint64(uint64 value);
 real32 saferatioN(real32 numerator, real32 divisor);
@@ -262,7 +274,7 @@ void ProcessInput(int maxControllerCount, Game_Input* OldInput, Game_Input* NewI
 
 void* GetAnyGLFuncAddress(const char* name);
 void* LoadFunctionFromDLL(const char* DLLName = nullptr, const char* FuncName = nullptr);
-
+void SetUpWindow();
 glm::vec3 randomRotateAxis_(int rollIndex);
 bool32 string_contain(std::string* string = nullptr, char* substr = nullptr);
 

@@ -76,6 +76,12 @@ void UpdateCamera (Camera* camera, float DelayRatio) {
                                    );
         //camera->moved = false;
     //}
+//===================================================
+        ////ViewRotateCount++;
+        //float CamX = sin(ViewRotateCount)*10.0f;
+        //float CamZ = cos(ViewRotateCount)*10.0f;
+        //BackBuffer.camera.view = glm::lookAt(glm::vec3(CamX, 0.0f, CamZ), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        //setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
 };
 
 void Zoom(Camera* camera, float offset){
@@ -90,3 +96,9 @@ void Zoom(Camera* camera, float offset){
     };
 }
 
+void ViewCamera(Camera* camera){;
+    std::cout<<"View matrix: "<<glm::to_string(camera->view)<<std::endl;
+    std::cout<<"Front vec: "<<glm::to_string(camera->Front)<<std::endl;
+    std::cout<<"Right vec: "<<glm::to_string(camera->Right)<<std::endl;
+    std::cout<<"Up vec: "<<glm::to_string(camera->Up)<<std::endl;
+};

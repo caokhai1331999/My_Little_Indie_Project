@@ -37,10 +37,10 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
   // of the new window and update a new proper DIB for that
   // DIB is a table where store BIT color infor
   case WM_SIZE: {
+      GetWindowDimension(Window, &BackBuffer);
     if (first_size) {
       first_size = false;
     } else {
-      GetWindowDimension(Window);
       Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
       if (!BackBuffer.transferNeed) {
         BackBuffer.transferNeed = true;
@@ -340,7 +340,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
   case WM_MOUSEWHEEL: {
     float wheelPos = GET_WHEEL_DELTA_WPARAM(Wparam) * 0.1f;
     // printf("Wheel delta: %d\n", (GET_WHEEL_DELTA_WPARAM(Wparam)));
-    BackBuffer.camera.fov += wheelPos * BackBuffer.camera.speed;
+    BackBuffer.camera.fov -= wheelPos * BackBuffer.camera.speed;
 
     if (BackBuffer.camera.fov < 1.0f) {
       BackBuffer.camera.fov = 1.0f;
@@ -359,6 +359,8 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
   } break;
 
   case WM_MOUSELEAVE: {
+      GetWindowDimension(Window, &BackBuffer);
+      
     if (BackBuffer.camera.mouse.LastX != BackBuffer.BitmapWidth / 2) {
       BackBuffer.camera.mouse.LastX = BackBuffer.BitmapWidth / 2;
     }
@@ -467,27 +469,6 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
     OutputDebugStringA("WM_DESTROY\n");
   } break;
 
-  //case WM_PAINT: {
-//
-    //BeginPaint(Window, NULL);
-    //HDC tempDC = GetDC(Window);
-    // Start to save bit drawing data to the current HDC
-    //RenderSplendidGradient(&BackBuffer, NULL, BMPContent, 0, 0, 4);
-    //Win32DisplayBufferWindow(tempDC, Dimens.Width, Dimens.Height, &BackBuffer);
-
-    //if (glGetError() != GL_NO_ERROR) {
-      //printf("OpenGL Error: %d\n", glGetError());
-    //};
-
-    // glBindVertexArray(BackBuffer.glData.VAOs);
-    // glDrawArrays(GL_TRIANGLES, 0, 6);
-    //SwapBuffers(tempDC);
-    //EndPaint(Window, NULL);
-    //ReleaseDC(Window, tempDC);
-//
-    //OutputDebugStringA("WM_PAINT\n");
-  //} break;
-
   default: {
     OutputDebugStringA("DEFAULT\n");
     result = DefWindowProcA(Window, Message, Wparam, Lparam);
@@ -516,8 +497,13 @@ LARGE_INTEGER PerfCountFrequencyResult;
   LARGE_INTEGER LastCounter = {};
   LARGE_INTEGER EndCounter = {};
 
+  LARGE_INTEGER previous_collided = {};
+  LARGE_INTEGER current_collided = {};
+  float collided_time = 0.0f;
+
   uint64 LastCycleCounts = 0;
   uint64 EndCycleCounts = 0;
+
 
   float TimeCounter = 0.0f;
   float WaitTimeCounter = 0.0f;
@@ -542,7 +528,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
   bool32 along2 = true;  
   bool32 short_color_change_ = false;
   float color_switch_dur = 0.0f;
-
   
   win32LoadXInput();
   WNDCLASSEXA WindowClass = {};
@@ -565,6 +550,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
   PlayAni__ PlayAnimation = NULL;
   ShowInfo_ showUniformVarValuePerVertex = NULL;
   check_collision_ check_collision = NULL;
+
   //setUpUBO__ setUpUBO = NULL;
   //updateUBOData__ updateUBOData = NULL;
   //setupMeshh setupMesh = NULL;
@@ -714,7 +700,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     std::cerr << "OpenGL Error: " << err << std::endl;
                 }
 
-                GetWindowDimension(Window);
+                GetWindowDimension(Window, &BackBuffer);
                 glViewport(0, 0, Dimens.Width, Dimens.Height);
 
                 //shader_name.clear();                
@@ -747,30 +733,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 
                 glm::mat4 Plane = glm::mat4(1.0f);
                 Plane = glm::translate(Plane, glm::vec3(0.0f));
-
-                //glm::mat4 Projection = glm::mat4(1.0f);
-
-                //View = glm::translate(View, glm::vec3(0.0f, 0.0f, -0.3f));
-                glm::vec3 Position = glm::vec3(-3.0f, -10.0f, -12.0f);
-                glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
-                glm::vec3 WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-                glm::vec3 Right =  glm::vec3(1.0f, 0.0f, 0.0f);
-                glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
-
-                // positions of the point lights
-                glm::vec3 pointLightPositions[] = {
-                    glm::vec3( 0.7f,  0.2f,  2.0f),
-                    glm::vec3( 2.3f, -3.3f, -4.0f),
-                    glm::vec3(-4.0f,  2.0f, -12.0f),
-                    glm::vec3( 0.0f,  0.0f, -3.0f)
-                };
-
                 glm::mat4 WorldToCamera = glm::mat4(1.0f);
-                //set camera view here
-                //std::cout<<"View matrix from camera: "<<glm::to_string(BackBuffer.camera.view)<<std::endl;
-                BackBuffer.camera = Camera(BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, Position, Front, Right, Up);
-
                 WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
                 
                 TRACKMOUSEEVENT mouseEventVar = {};
@@ -778,7 +741,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 mouseEventVar.dwFlags = TME_HOVER|TME_LEAVE;
                 mouseEventVar.hwndTrack = Window;
                 mouseEventVar.dwHoverTime = 1000;
-
                 BackBuffer.camera.mouse.mouseEvent = &mouseEventVar;
 
                 //if(BackBuffer.camera.mouse.mouseEvent == NULL){
@@ -788,12 +750,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 //}
                 
                 // This will be replaced by camera.view matrix
-                std::cout<<"View matrix: "<<glm::to_string(BackBuffer.camera.view)<<std::endl;
-                std::cout<<"Front vec: "<<glm::to_string(BackBuffer.camera.Front)<<std::endl;
-                std::cout<<"Right vec: "<<glm::to_string(BackBuffer.camera.Right)<<std::endl;
-                std::cout<<"Up vec: "<<glm::to_string(BackBuffer.camera.Up)<<std::endl;
+                //
+                GetWindowDimension(Window, &BackBuffer);
+                InitCamera(&BackBuffer);
+                ViewCamera(&BackBuffer.camera);
 
-                BackBuffer.camera.fov = 45.0f;
                 basic_cube_core = glm::translate(basic_cube_core, glm::vec3(2.0f, -4.0f, 0.0f));
                 std::cout<<"Central rotating model is"<<glm::to_string(basic_cube_core)<<std::endl;
                 backpack_core = glm::translate(backpack_core, glm::vec3(-4.0f, 2.0f, 3.0f));
@@ -804,48 +765,16 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 dancing_vampire_core = glm::scale(dancing_vampire_core,glm::vec3( 0.01f));
                 dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-2.0f, 0.0f, 0.0f));
 
-                GetWindowDimension(Window);
                 BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)Dimens.Width / (float)Dimens.Height, 0.1f, 100.0f);
                 
-                if(glIsProgram(ScreenBuffer.glData.ProgramIDs[0])){
-                    //useProgram(ScreenBuffer.glData.ProgramIDs[0]);
-                    printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[0]);
-                } else {
-                  glDebugMessageCallback(MessageCallback, 0);
-                  checkCompileErrors(ScreenBuffer.glData.ProgramIDs[0], programme_, "basic brush");
-                    printf("NO program object created before\n");
-                }
-
-                if(glIsProgram(ScreenBuffer.glData.ProgramIDs[1])){
-                    //model_shader_->use();
-                    printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[1]);
-                } else {
-                  glDebugMessageCallback(MessageCallback, 0);
-                    checkCompileErrors(ScreenBuffer.glData.ProgramIDs[1], programme_, "model drawing brush");
-                    printf("model drawing program object is buggy\n");
-                }
-
-                if(glIsProgram(ScreenBuffer.glData.ProgramIDs[2])){
-                    //animating_shader_->use();
-                    printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[2]);
-                } else {
-                    glDebugMessageCallback(MessageCallback, 0);
-                    printf("animating sketching program object is buggy \n");
-                }
-
-                if(glIsProgram(ScreenBuffer.glData.ProgramIDs[3])){
-                    //animating_shader_->use();
-                    printf("Program ID: %d\n", ScreenBuffer.glData.ProgramIDs[3]);
-                } else {
-                    glDebugMessageCallback(MessageCallback, 0);
-                    printf("animating sketching program object is buggy \n");
-                }
+                  CheckShader(ScreenBuffer.glData.ProgramIDs[0], programme_, "basic brush");
+                  CheckShader(ScreenBuffer.glData.ProgramIDs[1], programme_, "model drawing brush");
+                  CheckShader(ScreenBuffer.glData.ProgramIDs[2], programme_, "animating brush");
 
                 basic_shader_->use();
                 basic_shader_->setMat4("projection", BackBuffer.camera.projection);
-                std::cout<<"Projection mat: "<<glm::to_string(BackBuffer.camera.projection)<<std::endl;                
-                setMat4(ScreenBuffer.glData.ProgramIDs[0], "view", BackBuffer.camera.view);
 
+                Set_Projection_View(&BackBuffer);
 
                 std::string Mname = "backpack";                
                 Model_* backpack = nullptr;
@@ -863,24 +792,20 @@ LARGE_INTEGER PerfCountFrequencyResult;
                 std::string dancing_vampire_path = "./media/dancing_vampire.dae";
                 loadModel_(dancing_vampire, dancing_vampire_path);
 
-                    danceAnimation = CreateAnimation((char* )dancing_vampire_path.c_str(), dancing_vampire);
-                    animator = SpawnAnimator(danceAnimation);
+                danceAnimation = CreateAnimation((char* )dancing_vampire_path.c_str(), dancing_vampire);
+                animator = SpawnAnimator(danceAnimation);
                     
-//modell->Texturedirectory = texpath.substr(0, path.find_last_of('/'));
-                printf("texture id:%d\n", ScreenBuffer.glData.textureHandle);
-                printf("vertex array :%d\n", ScreenBuffer.glData.VAOs);                
-
                 Game_Input Input[2] = {};
                 Game_Input* OldInput = &Input[0];
                 Game_Input* NewInput = &Input[1];
 
 
-                win32_Sound_OutPut SoundOutPut = {};
-                Game_Sound_OutPut SoundBuffer = {};
-                InitSoundBuffer(&Window, &SoundOutPut);
-                int16* SSamples = (int16* )VirtualAlloc(0 , SoundOutPut.SecondBufferSize ,MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+                //win32_Sound_OutPut SoundOutPut = {};
+                //Game_Sound_OutPut SoundBuffer = {};
+                //InitSoundBuffer(&Window, &SoundOutPut);
+                //int16* SSamples = (int16* )VirtualAlloc(0 , SoundOutPut.SecondBufferSize ,MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
 
-                //Why InitOpenGl only work in the app loop
+                ////Why InitOpenGl only work in the app loop
             
                 int MaxControllerCount = XUSER_MAX_COUNT;
 /*
@@ -895,56 +820,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                 //Window = SetCapture(Window);
 
-                model_shader_->use();
-                model_shader_->setFloat("material.shininess", 32.0f);
-                //
-                model_shader_->setMat4( "projection", BackBuffer.camera.projection);
-                model_shader_->setMat4( "view", BackBuffer.camera.view);
-                model_shader_->setVec3( "ViewPos", BackBuffer.camera.Position);
-                //model_shader_->setVec3( "lightPos", glm::vec3(4.0f, 3.0f, 0.0f));                
-
-                // directional light
-                model_shader_->setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-                model_shader_->setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-                model_shader_->setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-                model_shader_->setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
-
-                
-                //Model_Shader_->Set point light
-                model_shader_->setVec3("pointLights[0].position", pointLightPositions[0]);
-                model_shader_->setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
-                model_shader_->setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
-                model_shader_->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-                model_shader_->setFloat("pointLights[0].constant", 1.0f);
-                model_shader_->setFloat("pointLights[0].linearTerm", 0.09f);
-                model_shader_->setFloat("pointLights[0].quadraticTerm", 0.032f);
-
-                 //point light 2
-                model_shader_->setVec3("pointLights[1].position", pointLightPositions[1]);
-                model_shader_->setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
-                model_shader_->setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
-                model_shader_->setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
-                model_shader_->setFloat("pointLights[1].constant", 1.0f);
-                model_shader_->setFloat("pointLights[1].linearTerm", 0.09f);
-                model_shader_->setFloat("pointLights[1].quadraticTerm", 0.032f);
-
-                // point light 3
-                 //model_shader_->setVec3("pointLights[2].position", pointLightPositions[2]);
-                 //model_shader_->setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
-                 //model_shader_->setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
-                 //model_shader_->setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
-                 //model_shader_->setFloat("pointLights[2].constant", 1.0f);
-                 //model_shader_->setFloat("pointLights[2].linear", 0.09f);
-                 //model_shader_->setFloat("pointLights[2].quadratic", 0.032f);
-
-                // point light 4
-                 //model_shader_->setVec3("pointLights[3].position", pointLightPositions[3]);
-                 //model_shader_->setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
-                 //model_shader_->setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
-                 //model_shader_->setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
-                 //model_shader_->setFloat("pointLights[3].constant", 1.0f);
-                 //model_shader_->setFloat("pointLights[3].linear", 0.09f);
-                 //model_shader_->setFloat("pointLights[3].quadratic", 0.032f);
+//// Set light environment here
+                tempSetEnviLight(model_shader_);
                 animating_shader_->use();
                 animating_shader_->setMat4( "projection", BackBuffer.camera.projection);
                 
@@ -958,6 +835,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                   if(first_announce) {
                       QueryPerformanceCounter(&LastCounter);
+                      previous_collided = LastCounter;
                       LastCycleCounts = __rdtsc();
                   } else {
                     // NOTE: Why this stay the same over and equal to zero the
@@ -998,14 +876,9 @@ LARGE_INTEGER PerfCountFrequencyResult;
                   }
 
                     //printf("Count from start of frame: %I64d\n",LastCycleCounts);
-
-                    // NOTE: Thing went wrong inside this function
-                    // whether the waittimecounter or the function itself
-                    // produce bugs
                   MSG Message;
                     //NOTE: This is where receiving the message to change
                     // for any change in window
-                    //
                     //INPUT
                     while(PeekMessageA(&Message, 0, 0, 0, PM_REMOVE)) {
                         if(Message.message == WM_QUIT){
@@ -1035,8 +908,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                              printf("fail to free current lib %s\n", GetLastError());
                         }
 
-                        //FreeLibrary(AniLib);
-//
                         if (CopyFile("skeletalAni32.dll",
                                      "skeletalAni32_copy.dll", false)) {
 
@@ -1062,7 +933,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
 
                           check_collision = (check_collision_)GetProcAddress(AniLib, "check_collision_wrapper");
 //setupMesh =
-                              //(setupMeshh)GetProcAddress(AniLib, "setMesh");
+                          //(setupMeshh)GetProcAddress(AniLib, "setMesh");
                           //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
                           }
 
@@ -1076,9 +947,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //UPDATE
                     // ================================================================
                     // NOTE: Sounding Part
-                    WriteSoundToBuffer(&SoundBuffer, &SoundOutPut, SSamples);
+                    //WriteSoundToBuffer(&SoundBuffer, &SoundOutPut, SSamples);
                     //=====================================================================
-                    //WHY????
                     //Update here                
                     //printf("Just before Game update and render\n");                
                     // Attach VAO
@@ -1096,16 +966,10 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     }
 
                     DeviceContext = GetDC(Window);
-                    // use shader program
-                    //printf("texture id:%d\n", ScreenBuffer.glDatatextureHandle[0]);
-                    //DeviceContext = GetDC(Window);
                     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);             
-                    //printf("Program ID:%d \n", ScreenBuffer.glData.ProgramID);
-                    //else {
-                    //printf("NO program object created before\n");
-                    //}
 
-                    GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);                
+                    //GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);
+                    
                     // camera/view transformation
                     //Model = glm::rotate(Model, glm::radians(fov)*0.5f, glm::vec3(1.0f, 0.0f, 0.5f));
 
@@ -1149,36 +1013,31 @@ LARGE_INTEGER PerfCountFrequencyResult;
                             ColorOffset -= 1.0f;  
                         };
                         //RatioCalculated = false;
-                    //}
-
-                    // Wait to 17 milli s perframe for model to rotate
-
-                    // Update animating model based on frame time
-                    // => calculate finalTransformmatrices and set to
-                    
+                    //}                    
                     
                     //if(BackBuffer.camera.moved || BackBuffer.camera.mouse.moved){
                     UpdateCamera(&BackBuffer.camera, DelayedRatio);
-                    WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
                     //}
                     
                     if(BackBuffer.camera.mouse.Wheeled)
                     {
                         BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
 
-                        glUseProgram(basic_shader_->GetProgramID());
-                        basic_shader_->setMat4("projection", BackBuffer.camera.projection);
-
-                        glUseProgram(model_shader_->GetProgramID());
-                        model_shader_->setMat4("projection", BackBuffer.camera.projection);
-
-                        glUseProgram(animating_shader_->GetProgramID());
-                        animating_shader_->setMat4( "projection", BackBuffer.camera.projection);
-
-                        glUseProgram(0);
                         BackBuffer.camera.mouse.Wheeled = false;
                     }
 
+                    basic_shader_->use();
+                    basic_shader_->setMat4("projection", BackBuffer.camera.projection);
+
+                    quad_shader_->use();
+                    quad_shader_->setMat4("projection", BackBuffer.camera.projection);
+
+                    model_shader_->use();
+                    model_shader_->setMat4("projection", BackBuffer.camera.projection);
+
+                    animating_shader_->use();
+                    animating_shader_->setMat4("projection", BackBuffer.camera.projection);
+                    
                     basic_shader_->use();
                     basic_shader_->setMat4("view", BackBuffer.camera.view);
 
@@ -1189,13 +1048,14 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     model_shader_->setMat4("view", BackBuffer.camera.view);
 
                     animating_shader_->use();
+                    WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
                     animating_shader_->setMat4("WorldToCamera", WorldToCamera);
                     
                     glUseProgram(0);
-                    // Start to add some basic lighting to the model
-                    //setMat4(ScreenBuffer.glData.ProgramIDs[0], "model", Model);
-                    //glBindVertexArray(ScreenBuffer.glData.VAOs);
-                    //glDrawArrays(GL_TRIANGLES, 0, 36);
+                    Set_Projection_View(&BackBuffer);
+
+                    //// Start to add some basic lighting to the model
+
 
                     if (first_size) {
                         printf("counter: %f\n", WaitTimeCounter);
@@ -1208,13 +1068,6 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         WaitTimeCounter += (float)MsPerFrame;
                         //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
                     }
-                        //else {
-                        //ViewRotateCount++;
-                        //float CamX = sin(ViewRotateCount)*10.0f;
-                        //float CamZ = cos(ViewRotateCount)*10.0f;
-                        //BackBuffer.camera.view = glm::lookAt(glm::vec3(CamX, 0.0f, CamZ), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-                        //setMat4(ScreenBuffer.glData.ProgramID, "view", BackBuffer.camera.view);
-                        //}
                         // Update animation
 
                         //Set vectices and color for plane
@@ -1265,6 +1118,15 @@ LARGE_INTEGER PerfCountFrequencyResult;
                         }
 
                         if(collided_){
+                            QueryPerformanceCounter(&current_collided);
+                            if(current_collided.QuadPart > previous_collided.QuadPart)
+                                collided_time = ((float)(current_collided.QuadPart - previous_collided.QuadPart))/PerfCountFrequency;
+
+                            if(first_announce){
+                                printf("Time from begin to first time collide is:%f\n", collided_time);
+                            }
+                                previous_collided = current_collided;
+
                             obj1.position = glm::translate(obj1.position, (*obj1.collide_list)[0].space);
                             obj1.collide_list->pop_back();
 
@@ -1287,13 +1149,11 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //RENDER =====================================
                     quad_shader_->use();
                     glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
-                    quad_shader_->setMat4("projection", BackBuffer.camera.projection);
                     quad_shader_->setFloat("colorOffset", ColorOffset);
                     quad_shader_->setMat4("model", Plane);
-                    //why it only show half the plane
-                    //glDrawArrays(GL_TRIANGLES, 0, 6);
                     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
                     //===============================================
+
                     basic_shader_->use();
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
 
@@ -1301,29 +1161,26 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     basic_shader_->setBool("short_color_change_", dummyflag);
                     basic_shader_->setFloat("colorOffset", ColorOffset);
                     basic_shader_->setMat4("model", basic_cube_core);
-                    //glDrawArrays(GL_TRIANGLES, 0, 36);
+                    
                     //Draw colliding objects here
                     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
                     
                     //drawTile(ScreenBuffer.glData.VAOs, basic_shader_->GetProgramID(), DelayedRatio, &UpdatedAngle, TimeToChangeAxis, &rollCubeMap);
 
-                    if(!collided_ && color_switch_dur > 0.045f){
-                        if(short_color_change_)
-                        short_color_change_ != short_color_change_ ;
-
-                        if(color_switch_dur > 0.045f){
-                            color_switch_dur = 0.0f;
-                        }                        
-                    }else if(collided_ || color_switch_dur < 0.05f){
-
+                    if(collided_){
                         if(!short_color_change_)
-                        short_color_change_ = !short_color_change_;
-
-                        if(color_switch_dur > 0.05f){
-                            color_switch_dur = 0.0f;
-                        }
-                        color_switch_dur += SPerFrame;
+                            short_color_change_=!short_color_change_;
                     }
+
+                    if(short_color_change_){
+                        if(color_switch_dur >= 0.0f && color_switch_dur < 0.1f){
+                            color_switch_dur += SPerFrame;
+                        }else if(color_switch_dur > 0.094f){
+                            short_color_change_=!short_color_change_;
+                            color_switch_dur = 0.0f;   
+                        }
+                    }
+
                     
                     basic_shader_->setBool("short_color_change_", short_color_change_);
                     basic_shader_->setMat4("model", obj1.position);
@@ -1338,7 +1195,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                    obj1.position[3][0],
                                    obj1.position[3][1],
                                    obj1.position[3][2]);
-                            printf("Color switch: %s, duration: %f\n", short_color_change_?"true":"false", color_switch_dur );
+                            printf("Collided time: %f, Color switch: %s, duration: %f\n",collided_time, short_color_change_?"true":"false", color_switch_dur );
                         }
 
                     
@@ -1360,21 +1217,10 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //glBindVertexArray(ScreenBuffer.glData.VAOs);
                     model_shader_->setMat4("model", backpack_core);
                     DDraw(backpack, &brushID);
-
                     glUseProgram(0);
-// Now Draw the vampire
-
 
                     //printf("Count by the end of frame: %I64d\n", EndCycleCounts);
-                    // Why this produce same result
-//Two different approaching ways
 
-                      //brushID = model_shader_->GetProgramID();
-                      //model_shader_->use();
-
-//Weird behaviour may happened close to this part
-
-//The model is no longer drawable after these lines
 // animation update and render ================================================
 
                     animating_shader_->use();
@@ -1399,7 +1245,7 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     //float* Transform;
                     std::vector<glm::mat4>* Transform_;
 
-                    if(is_moving){
+                    if(is_moving || first_announce){
                         if(animator->GetCurrentTime() > danceAnimation->GetDuration() )
                         {
                             PlayAnimation(animator, danceAnimation);
@@ -1469,25 +1315,8 @@ LARGE_INTEGER PerfCountFrequencyResult;
                                 };
                             };
 
-//
-                    //if(showMsPF){
-                        //for(int i = 0 ; i < 52; i++){
-                            //printf("Bone Matrix [%d]: \n", i);
-                            //for(int j = 0 ; j < 16 ; j++){
-                                //if(j%4==0)
-                                    //printf("[");
-//
-                                //((j%4)!=3)?printf("%f, ", Transform[(16*i) + j]):printf("%f", Transform[(16*i) + j]);
-//
-                                //if((j%4)==3)
-                                //printf("], ");
-//
-                            //}
-                            //printf("\n");
-                        //}                        
-                    //}
-
 */
+
                             //if(is_moving){
                                 WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
                                 animating_shader_->setMat4("WorldToCamera", WorldToCamera);                                
@@ -1500,87 +1329,15 @@ LARGE_INTEGER PerfCountFrequencyResult;
                     DDraw(dancing_vampire, &brushID);
 
                       if(showMsPF){
-
                           glm::vec2 TexCoordToShow;
                           int TextureID;
                           showUniformVarValuePerVertex(&UBO, &brushID, &dancing_vampire->meshes[0], false, false, false, false, false, false);
-                          //for(int i = 0; i < dancing_vampire->meshes[0].vertices.size(); i++){
-                              //int TexCoordoffset = (i*sizeof(Vertex)) + offsetof(Vertex, TexCoords);
-                              //glGetBufferSubData(GL_ARRAY_BUFFER, TexCoordoffset, sizeof(glm::vec2), &TexCoordToShow);
-                              //printf("TexCoord %d: %s\n", i, glm::to_string(TexCoordToShow).c_str());
-                          //
-                          //};
 
-                                  glGetUniformiv(brushID, glGetUniformLocation(brushID, "material.texture_diffused1"), &TextureID);
-                                  printf("material.texture_diffused1 got from animating shader id is: %d\n", TextureID);
-                                  glGetUniformiv(brushID, glGetUniformLocation(brushID, "material.texture_specular1"), &TextureID);
-                                  printf("material.texture_specular1 got from animating shader id is: %d\n", TextureID);                              
-
-                                  if(glIsTexture((GLint)dancing_vampire->meshes[0].textures[0].id)){
-                                      printf("Texture %d is created before and can be used", dancing_vampire->meshes[0].textures[0].id);
-                                          }else{
-                                      printf("Texture %d isn't created before or something cause it's not valid\n", dancing_vampire->meshes[0].textures[0].id);
-};
-                                  if(glIsTexture((GLint)dancing_vampire->meshes[0].textures[1].id)){
-                                      printf("Texture %d is created before and can be used\n", dancing_vampire->meshes[0].textures[1].id);
-                                          }else{
-                                      printf("Texture %d isn't created before or something cause it's not valid\n", dancing_vampire->meshes[0].textures[1].id);                                        
-};
-
-                                  GLint loc = glGetUniformLocation(brushID, "material.texture_diffused1");
-
-                                  printf("diffuse texture sampler location on model shader : %d\n", loc);
-                                  loc =                                      glGetUniformLocation(model_shader_->GetProgramID(), "material.texture_diffused1");
-
-                                  printf("diffuse texture sampler location on animating  shader : %d\n", loc);
-                      }
+                      };
 
 // animation update and render ================================================
 
                           //}
-
-                          if (showMsPF) {
-                          //printf("[LastFrameCount:%f,EndFrameCount:%f, "
-                                 //"CounterPerFrame : %I64d], MiliS per frame: "
-                                 //"%f, real FPS: %I64d \n",
-                                 //(real32)LastCounter.QuadPart,
-                                 //(real32)EndCounter.QuadPart, CountsPerFrame,
-                                 //MsPerFrame, FPS);
-
-                              bool isfinite = true;
-                              glm::mat4& inverse_Trans = glm::inverse(danceAnimation->getRootNode()->transformation);
-
-                              for(int i = 0; i < 4; i++)
-                              {
-                                  if(glm::all(glm::isfinite(inverse_Trans[i]))){
-                                      continue;  
-                                  }else{
-                                      isfinite=false;
-                                      break;
-                                  }
-                              }
-                              
-                              isfinite?printf("Global Inverse Transform matrix is finite"):printf("Global Inverse Transform matrix is not finite");
-                              printf(" : %s\n", glm::to_string(inverse_Trans).c_str());
-//
-                          printf("Delay Ratio: %f, msPerframe: %f, SPerFrame: %f\n",
-                                 DelayedRatio, MsPerFrame, SPerFrame);
-                          printf("WaitTimeCounter: %f, Axis changing counter: %f\n", WaitTimeCounter, ChangeAxisCounter);
-                          printf("ColorOffset is:%f\n", ColorOffset);
-
-                          printf("updated angle :%f\n", UpdatedAngle);
-                          std::cout<<"Center Cube Matrix is: "<<glm::to_string(basic_cube_core)<<std::endl;
-                          std::cout<<"Current rotating axis is: "<<glm::to_string(randomRotateAxis)<<std::endl;
-
-                          GLint loc = glGetAttribLocation(animating_shader_->GetProgramID(), "TexCoordd");
-                          printf("TexCoord location: %d\n", loc);
-//char Buffers[256];
-                          //sprintf(Buffers,
-                          //"[LastFrameCount: %f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame,MsPerFrame, FPS);
-                          //OutputDebugStringA(Buffers);
-
-                          showMsPF = false;
-                      };
 
                     if (first_announce) {
                        first_announce = false;
@@ -1613,19 +1370,6 @@ MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per registerMULPS -> re
           glDeleteBuffers(1, &BackBuffer.glData.VBO);
 
           ResetGLState(&BackBuffer, Window);
-
-          delete basic_shader_;
-          basic_shader_ = nullptr;
-
-          delete quad_shader_;
-          quad_shader_ = nullptr;
-
-          delete model_shader_;
-          model_shader_ = nullptr;
-
-          delete animating_shader_;
-          animating_shader_ = nullptr;
-
         }
         else{
             //TODO: Logging

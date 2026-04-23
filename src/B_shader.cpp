@@ -304,4 +304,87 @@ GLuint B_shader_program::setupGLprogram(const char* programName){
     glDeleteShader(shaders[fragment_].GetShaderID());
 
     return tempProgramID;
-}
+};
+
+void CheckShader(GLuint shaderId, GLuint programId, char* name){
+    if(glIsProgram(shaderId)){
+        //useProgram(ScreenBuffer.glData.ProgramIDs[0]);
+        printf("Program ID: %d\n", shaderId);
+    } else {
+        glDebugMessageCallback(MessageCallback, 0);
+        checkCompileErrors(shaderId, programId, name);
+        printf("NO program object created before\n");
+    }    
+};
+
+void tempSetEnviLight(B_shader_program* shader){;
+    shader->use();
+
+    // positions of the point lights
+    glm::vec3 pointLightPositions[] = {
+        glm::vec3( 0.7f,  0.2f,  2.0f),
+        glm::vec3( 2.3f, -3.3f, -4.0f),
+        glm::vec3(-4.0f,  2.0f, -12.0f),
+        glm::vec3( 0.0f,  0.0f, -3.0f)
+    };
+
+    shader->setFloat("material.shininess", 32.0f);
+    //
+    shader->setMat4( "projection", BackBuffer.camera.projection);
+    shader->setMat4( "view", BackBuffer.camera.view);
+    shader->setVec3( "ViewPos", BackBuffer.camera.Position);
+    //shader->setVec3( "lightPos", glm::vec3(4.0f, 3.0f, 0.0f));                
+
+    // directional light
+    shader->setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+    shader->setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+    shader->setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+    shader->setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+
+                
+    //Shader->Set point light
+    shader->setVec3("pointLights[0].position", pointLightPositions[0]);
+    shader->setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+    shader->setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+    shader->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+    shader->setFloat("pointLights[0].constant", 1.0f);
+    shader->setFloat("pointLights[0].linearTerm", 0.09f);
+    shader->setFloat("pointLights[0].quadraticTerm", 0.032f);
+
+    //point light 2
+    shader->setVec3("pointLights[1].position", pointLightPositions[1]);
+    shader->setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+    shader->setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
+    shader->setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+    shader->setFloat("pointLights[1].constant", 1.0f);
+    shader->setFloat("pointLights[1].linearTerm", 0.09f);
+    shader->setFloat("pointLights[1].quadraticTerm", 0.032f);
+
+    // point light 3
+    //shader->setVec3("pointLights[2].position", pointLightPositions[2]);
+    //shader->setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
+    //shader->setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
+    //shader->setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
+    //shader->setFloat("pointLights[2].constant", 1.0f);
+    //shader->setFloat("pointLights[2].linear", 0.09f);
+    //shader->setFloat("pointLights[2].quadratic", 0.032f);
+
+    // point light 4
+    //shader->setVec3("pointLights[3].position", pointLightPositions[3]);
+    //shader->setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
+    //shader->setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
+    //shader->setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
+    //shader->setFloat("pointLights[3].constant", 1.0f);
+    //shader->setFloat("pointLights[3].linear", 0.09f);
+    //shader->setFloat("pointLights[3].quadratic", 0.032f);
+};
+
+void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer){;
+    for(const GLuint& shader:BackBuffer->glData.ProgramIDs){
+        glUseProgram(shader);
+        setMat4(shader, "projection", BackBuffer->camera.projection);
+        setMat4(shader, "view", BackBuffer->camera.view);
+    };
+    glUseProgram(0);
+        //basic_shader_->setMat4("projection", BackBuffer.camera.projection);
+};

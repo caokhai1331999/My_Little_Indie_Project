@@ -29,6 +29,7 @@ struct OpenGLData{
     unsigned int PlaneVBO;  
 
     std::vector<GLuint> ProgramIDs = {};
+    //std::vector<*B_shader_program> ProgramIDs = {};
     
     HGLRC openglRC;
     HGLRC defaultContext;
@@ -106,7 +107,7 @@ global_variable Game_State State = {};
 global_variable imagee_content* BMPContent;
 global_variable real32 WaitTimeCounter = 0.0f;
 
-void GetWindowDimension(HWND Window);
+void GetWindowDimension(HWND Window, Win32_OffScreen_Buffer* BackBuffer);
 void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Height);
 
 //void RenderSplendidGradient(Win32_Front_Buffer* OBuffer, imagee_content* BMPContent, int XOffset, int YOffset);
@@ -129,6 +130,8 @@ void APIENTRY MessageCallback(GLenum source,
                               const GLchar* message,
                               const void* userParam);
 void ResetGLState(Win32_OffScreen_Buffer* BackBuffer = nullptr, HWND window = 0);
+void SetEnvironmentLights();
+void InitCamera(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 void ErrorExit();
 
 #define WIN32GAME_H

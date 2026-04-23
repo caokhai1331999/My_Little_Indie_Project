@@ -33,10 +33,12 @@ void OpenConsole() {
     // freopen("CONIN$", "r", stdin);              // Redirect stdin (optional)
 }
 
-void GetWindowDimension(HWND Window) {
+void GetWindowDimension(HWND Window, Win32_OffScreen_Buffer* BackBuffer) {
     GetClientRect(Window, &ClientRect);
     Dimens.Width = ClientRect.right - ClientRect.left;
     Dimens.Height= ClientRect.bottom - ClientRect.top;
+    BackBuffer->BitmapWidth = Dimens.Width;
+    BackBuffer->BitmapHeight = Dimens.Height;
 }
 
 void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Height) {
@@ -960,4 +962,21 @@ void ResetGLState(Win32_OffScreen_Buffer* BackBuffer, HWND window){
     wglMakeCurrent(windowContext, BackBuffer->glData.defaultContext);
 
     wglDeleteContext(BackBuffer->glData.openglRC);
+};
+
+
+void InitCamera(Win32_OffScreen_Buffer* BackBuffer){;
+
+    glm::vec3 Position = glm::vec3(-3.0f, -10.0f, -12.0f);
+    glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    glm::vec3 Right =  glm::vec3(1.0f, 0.0f, 0.0f);
+    glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    //set camera view here
+    //std::cout<<"View matrix from camera: "<<glm::to_string(BackBuffer.camera.view)<<std::endl;
+
+    BackBuffer->camera = Camera(BackBuffer->BitmapWidth, BackBuffer->BitmapHeight, Position, Front, Right, Up);    
+    BackBuffer->camera.fov = 45.0f;
 };

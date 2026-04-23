@@ -162,4 +162,8 @@ private:
         }
     }
 };
+
+void CheckShader(GLuint shaderId = 0, GLuint programId = 0, char* name = nullptr);
+void tempSetEnviLight(B_shader_program* shader = nullptr);
+
 #endif

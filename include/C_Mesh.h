@@ -105,4 +105,62 @@ void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
 void setupMesh(Mesh* mesh = nullptr);
 void Draw(Mesh* mesh = nullptr, GLuint* progID = nullptr);
 
+/*
+if(glIsTexture((GLint)dancing_vampire->meshes[0].textures[0].id)){
+                                      printf("Texture %d is created before and can be used", dancing_vampire->meshes[0].textures[0].id);
+                                          }else{
+                                      printf("Texture %d isn't created before or something cause it's not valid\n", dancing_vampire->meshes[0].textures[0].id);
+};
+                                  if(glIsTexture((GLint)dancing_vampire->meshes[0].textures[1].id)){
+                                      printf("Texture %d is created before and can be used\n", dancing_vampire->meshes[0].textures[1].id);
+                                          }else{
+                                      printf("Texture %d isn't created before or something cause it's not valid\n", dancing_vampire->meshes[0].textures[1].id);
+
+                          if (showMsPF) {
+                          //printf("[LastFrameCount:%f,EndFrameCount:%f, "
+                                 //"CounterPerFrame : %I64d], MiliS per frame: "
+                                 //"%f, real FPS: %I64d \n",
+                                 //(real32)LastCounter.QuadPart,
+                                 //(real32)EndCounter.QuadPart, CountsPerFrame,
+                                 //MsPerFrame, FPS);
+
+                              bool isfinite = true;
+                              glm::mat4& inverse_Trans = glm::inverse(danceAnimation->getRootNode()->transformation);
+
+                              for(int i = 0; i < 4; i++)
+                              {
+                                  if(glm::all(glm::isfinite(inverse_Trans[i]))){
+                                      continue;  
+                                  }else{
+                                      isfinite=false;
+                                      break;
+                                  }
+                              }
+                              
+                              isfinite?printf("Global Inverse Transform matrix is finite"):printf("Global Inverse Transform matrix is not finite");
+                              printf(" : %s\n", glm::to_string(inverse_Trans).c_str());
+//
+                          printf("Delay Ratio: %f, msPerframe: %f, SPerFrame: %f\n",
+                                 DelayedRatio, MsPerFrame, SPerFrame);
+                          printf("WaitTimeCounter: %f, Axis changing counter: %f\n", WaitTimeCounter, ChangeAxisCounter);
+                          printf("ColorOffset is:%f\n", ColorOffset);
+
+                          printf("updated angle :%f\n", UpdatedAngle);
+                          std::cout<<"Center Cube Matrix is: "<<glm::to_string(basic_cube_core)<<std::endl;
+                          std::cout<<"Current rotating axis is: "<<glm::to_string(randomRotateAxis)<<std::endl;
+
+                          GLint loc = glGetAttribLocation(animating_shader_->GetProgramID(), "TexCoordd");
+                          printf("TexCoord location: %d\n", loc);
+//char Buffers[256];
+                          //sprintf(Buffers,
+                          //"[LastFrameCount: %f,EndFrameCount:%f, CounterPerFrame : %I64d], MiliS per frame: %I64d, real FPS: %I64d \n",(real32)LastCounter.QuadPart,(real32)EndCounter.QuadPart, CountsPerFrame,MsPerFrame, FPS);
+                          //OutputDebugStringA(Buffers);
+
+                          showMsPF = false;
+                      };
+
+*/
+
 #endif
+
+

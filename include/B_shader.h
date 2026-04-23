@@ -119,6 +119,23 @@ void setFloat(GLuint ShaderID, const std::string name, const float value);
 void setMat3(GLuint ShaderID, const char *name, const glm::mat3 &value);
 void setMat4(GLuint ShaderID, const std::string name, const glm::mat4 &value);
 
+void CheckShader(GLuint shaderId = 0, GLuint programId = 0, char* name = nullptr);
+void tempSetEnviLight(B_shader_program* shader = nullptr);
+void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer = nullptr);
+
+/*
+          delete basic_shader_;
+          basic_shader_ = nullptr;
+
+          delete quad_shader_;
+          quad_shader_ = nullptr;
+
+          delete model_shader_;
+          model_shader_ = nullptr;
+
+          delete animating_shader_;
+          animating_shader_ = nullptr;
+ */
 
 #define SHADER_H
 #endif

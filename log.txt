@@ -1555,3 +1555,19 @@ The position adjust function of mine is buggy, instead of bring obj back to it
 positon before collided. it swap the bring back vector's directions between 2
 objects which is used to bring object back. Thus incidentally swap two object position.
 Which confused the bound check wherein just check one side. 
+
+---------------- Thu, 23 Apr 26: 09:57AM
+
+DONE! collided checking
+
+TODO: 0. Modulize main.cpp first
+         .3. Create clock struct
+         .1. First, Move light set up out of main
+         .2. Second, Move window set up out of main 
+      1. TileDrawing
+      2. Find out why vampire model just showup after hit move button first time
+      (DONE!)
+      NOTE: We have a very common issue that is we forgot/exclude doing things
+      at the first frame
+
+Think on a scale of one loop and type difference is a major issue

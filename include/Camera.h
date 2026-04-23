@@ -119,6 +119,7 @@ struct Camera{
 
 void UpdateCamera (Camera* camera = NULL, float DelayRatio = 0.0f);
 void Zoom (Camera* camera, float offset);
+void ViewCamera(Camera* camera = nullptr);
 
 #define CAMERA_H
 #endif
