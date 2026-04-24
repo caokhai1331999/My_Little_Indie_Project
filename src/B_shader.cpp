@@ -306,18 +306,7 @@ GLuint B_shader_program::setupGLprogram(const char* programName){
     return tempProgramID;
 };
 
-void CheckShader(GLuint shaderId, GLuint programId, char* name){
-    if(glIsProgram(shaderId)){
-        //useProgram(ScreenBuffer.glData.ProgramIDs[0]);
-        printf("Program ID: %d\n", shaderId);
-    } else {
-        glDebugMessageCallback(MessageCallback, 0);
-        checkCompileErrors(shaderId, programId, name);
-        printf("NO program object created before\n");
-    }    
-};
-
-void tempSetEnviLight(B_shader_program* shader){;
+void tempSetEnviLight(B_shader_program* shader, Camera* camera){
     shader->use();
 
     // positions of the point lights
@@ -330,9 +319,9 @@ void tempSetEnviLight(B_shader_program* shader){;
 
     shader->setFloat("material.shininess", 32.0f);
     //
-    shader->setMat4( "projection", BackBuffer.camera.projection);
-    shader->setMat4( "view", BackBuffer.camera.view);
-    shader->setVec3( "ViewPos", BackBuffer.camera.Position);
+    shader->setMat4( "projection", camera->projection);
+    shader->setMat4( "view", camera->view);
+    shader->setVec3( "ViewPos", camera->Position);
     //shader->setVec3( "lightPos", glm::vec3(4.0f, 3.0f, 0.0f));                
 
     // directional light
@@ -379,12 +368,14 @@ void tempSetEnviLight(B_shader_program* shader){;
     //shader->setFloat("pointLights[3].quadratic", 0.032f);
 };
 
-void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer){;
-    for(const GLuint& shader:BackBuffer->glData.ProgramIDs){
-        glUseProgram(shader);
-        setMat4(shader, "projection", BackBuffer->camera.projection);
-        setMat4(shader, "view", BackBuffer->camera.view);
-    };
-    glUseProgram(0);
-        //basic_shader_->setMat4("projection", BackBuffer.camera.projection);
+
+void CheckShader(GLuint shaderId, GLuint programId, char* name){
+    if(glIsProgram(shaderId)){
+        //useProgram(ScreenBuffer.glData.ProgramIDs[0]);
+        printf("Program ID: %d\n", shaderId);
+    } else {
+        //glDebugMessageCallback(MessageCallback, 0);
+        checkCompileErrors(shaderId, programId, name);
+        printf("NO program object created before\n");
+    }    
 };

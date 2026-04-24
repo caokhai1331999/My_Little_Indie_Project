@@ -842,6 +842,9 @@ void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* Scre
         ScreenBuffer->BitmapMemory = BackBuffer->BitmapMemory;
     }
 
+    //if(ScreenBuffer->shaders_list != BackBuffer->shaders_list && BackBuffer->shaders_list.size()>0){
+        //;
+    //}
         //ScreenBuffer->Bitmapinfo = BackBuffer->Bitmapinfo;
 //
         //if(ScreenBuffer->BitmapHandle != BackBuffer->BitmapHandle && BackBuffer->BitmapHandle != NULL){
@@ -914,7 +917,6 @@ void PassGLData(OpenGLData* BackData, OpenGLData* FrontData)
         if(FrontData->textureHandle != BackData->textureHandle && !isNull(&BackData->textureHandle)){
             FrontData->textureHandle = BackData->textureHandle; 
         }
-    
 
 }
 bool isNull(unsigned int* member){
@@ -979,4 +981,25 @@ void InitCamera(Win32_OffScreen_Buffer* BackBuffer){;
 
     BackBuffer->camera = Camera(BackBuffer->BitmapWidth, BackBuffer->BitmapHeight, Position, Front, Right, Up);    
     BackBuffer->camera.fov = 45.0f;
+};
+
+
+void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer){;
+    for(const GLuint& shader:BackBuffer->glData.ProgramIDs){
+        glUseProgram(shader);
+        setMat4(shader, "projection", BackBuffer->camera.projection);
+        setMat4(shader, "view", BackBuffer->camera.view);
+    };
+    glUseProgram(0);
+        //basic_shader_->setMat4("projection", BackBuffer.camera.projection);
+};
+
+
+void CalDelayedRatio(float* DelayedRatio, Clock_Set* Time_Set, Win32_OffScreen_Buffer* BackBuffer){
+    
+    //if (RatioCalculated) {
+    *DelayedRatio = (float)(Time_Set->MsPerFrame/Time_Set->StandardMSperFrame);
+    *DelayedRatio>0.0f?BackBuffer->camera.speed = (2.5f * (*DelayedRatio)):BackBuffer->camera.speed = (2.5f  * 0.17f);                
+    //RatioCalculated = false;
+    //}                    
 };

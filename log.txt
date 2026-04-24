@@ -1571,3 +1571,18 @@ TODO: 0. Modulize main.cpp first
       at the first frame
 
 Think on a scale of one loop and type difference is a major issue
+
+---------------- Fri, 24 Apr 26: 01:54PM
+
+NOTE: New learnt things : The auto inside the :
+//for(const auto &shader: BackBuffer.shaders_list){
+is actually a reference to a const pointer to B_shader_program class
+
+So what we actually misunderstood is the position of const
+it is not for the reference itself it is merely for the pointers
+inside
+
+---------------- Fri, 24 Apr 26: 04:01PM
+
+DONE! Relocate the time and shader part to modulized part
+

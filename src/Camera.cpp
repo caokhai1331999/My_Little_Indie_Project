@@ -7,7 +7,7 @@
    ======================================================================== */
 #include "Camera.h"
 
-void UpdateCamera (Camera* camera, float DelayRatio) {
+void UpdateCamera (Camera* camera, float* DelayRatio) {
     //Update the camera front based on yaw/bearing (around the y axe), pitch/elevation (around the x axe), roll (around the z axe)
 
     // First take the perspective from above we have the x is sin(yaw) and z is

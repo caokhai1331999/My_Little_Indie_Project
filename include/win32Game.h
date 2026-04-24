@@ -6,12 +6,13 @@
    $Creator: Cao Khai(Casey disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
-#include "Camera.h"
+#include "B_shader.h"
 #include "handmade.h"
 #include "SoundMaker.h"
 
 #include "utility"
 #include <vector>
+
 
 struct win32Dimension{
     int PosX{0};
@@ -19,6 +20,7 @@ struct win32Dimension{
     int Height{720};
     int Width{1280};
 }Dimens;
+
 
 struct OpenGLData{
     unsigned int VAOs;
@@ -59,6 +61,8 @@ struct Win32_OffScreen_Buffer{
     int BitmapHeight;
     int Pitch;
     int BitmapMemorySize;
+
+    std::vector<B_shader_program*> shaders_list;
     
     bool transferNeed;    
     bool GLImageRendered = false;
@@ -69,11 +73,24 @@ struct Win32_OffScreen_Buffer{
     const int BytesPerPixel = 4;
 };
 
+
 LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
                                     LPARAM Lparam);
 
 bool isNull(GLuint* member = nullptr);
 void PassGLData(OpenGLData* BackData, OpenGLData* FrontData);
+
+global_variable bool  GlobalRunning;
+global_variable HWND Window;
+global_variable RECT ClientRect;
+global_variable HDC DeviceContext;
+// global_variable int  XOffset{0}, YOffset{0};
+global_variable Win32_OffScreen_Buffer BackBuffer = {};
+global_variable Game_State State = {};
+global_variable imagee_content* BMPContent;
+global_variable real32 WaitTimeCounter = 0.0f;
+
+
 struct Win32_Front_Buffer{  
     //BITMAPINFO Bitmapinfo;
     //HBITMAP BitmapHandle;
@@ -83,6 +100,8 @@ struct Win32_Front_Buffer{
     int BitmapWidth;
     int BitmapHeight;
     int Pitch;
+
+    std::vector<B_shader_program* > shaders_list;
 
     bool GLDataPassed = false;
     OpenGLData glData;
@@ -97,15 +116,7 @@ struct Win32_Front_Buffer{
     
 };
 
-global_variable bool  GlobalRunning;
-global_variable HWND Window;
-global_variable RECT ClientRect;
-global_variable HDC DeviceContext;
-// global_variable int  XOffset{0}, YOffset{0};
-global_variable Win32_OffScreen_Buffer BackBuffer = {};
-global_variable Game_State State = {};
-global_variable imagee_content* BMPContent;
-global_variable real32 WaitTimeCounter = 0.0f;
+
 
 void GetWindowDimension(HWND Window, Win32_OffScreen_Buffer* BackBuffer);
 void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Height);
@@ -132,6 +143,10 @@ void APIENTRY MessageCallback(GLenum source,
 void ResetGLState(Win32_OffScreen_Buffer* BackBuffer = nullptr, HWND window = 0);
 void SetEnvironmentLights();
 void InitCamera(Win32_OffScreen_Buffer* BackBuffer = nullptr);
+void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer = nullptr);
+
+void CalDelayedRatio(float* DelayedRatio = nullptr, Clock_Set* Time_Set = nullptr, Win32_OffScreen_Buffer* BackBuffer = nullptr);
+
 void ErrorExit();
 
 #define WIN32GAME_H

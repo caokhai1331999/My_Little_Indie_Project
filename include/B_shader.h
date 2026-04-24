@@ -20,7 +20,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "win32Game.h"
+#include "handmade.h"
+#include "Camera.h"
 #include <vector>
 #include <stdio.h>
 #include <string>
@@ -50,9 +51,14 @@ public:
 class B_shader_program{
 private:
     GLuint ProgramID;
+    char* programName_;
 public:
     B_shader shaders[2];
-    B_shader_program(char* vertex_file_name, char* fragment_file_name, const char* programName = nullptr){
+    B_shader_program(char* vertex_file_name, char* fragment_file_name, char* programName = nullptr){
+        programName_ = nullptr;
+        programName_ = new char;
+        programName_ = programName;
+
         ProgramID = 0;
         shaders[vertex_].loadShader(vertex_file_name, vertex_);
         shaders[fragment_].loadShader(fragment_file_name, fragment_);
@@ -61,6 +67,8 @@ public:
 
     ~B_shader_program(){
         GLint result;
+        delete programName_;
+        programName_ = nullptr;
         glDeleteProgram(ProgramID);
         glGetProgramiv(ProgramID, GL_DELETE_STATUS, &result);
         if(result == GL_TRUE){
@@ -91,7 +99,8 @@ public:
 // Use the shader
     void use();
 
-    GLuint GetProgramID(){return ProgramID;};
+    GLuint GetProgramID() const {return ProgramID;};
+    char* GetShaderName() const {return programName_;};
 // Attaching shader to program
     GLuint setupGLprogram(const char* programName);
 
@@ -120,8 +129,7 @@ void setMat3(GLuint ShaderID, const char *name, const glm::mat3 &value);
 void setMat4(GLuint ShaderID, const std::string name, const glm::mat4 &value);
 
 void CheckShader(GLuint shaderId = 0, GLuint programId = 0, char* name = nullptr);
-void tempSetEnviLight(B_shader_program* shader = nullptr);
-void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer = nullptr);
+void tempSetEnviLight(B_shader_program* shader = nullptr, Camera* camera = nullptr);
 
 /*
           delete basic_shader_;

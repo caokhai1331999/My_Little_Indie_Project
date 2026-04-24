@@ -243,8 +243,47 @@ struct Game_State{
     int Hz = 256;    
 };
 
-//struct Clock_Set{
-//};
+
+
+struct Clock_Set{
+  // This one is how many count per Second
+    LARGE_INTEGER PerfCountFrequencyResult = {};
+    int64 PerfCountFrequency = 0;
+
+    LARGE_INTEGER LastCounter = {};
+    LARGE_INTEGER EndCounter = {};
+
+    LARGE_INTEGER previous_collided = {};
+    LARGE_INTEGER current_collided = {};
+    float collided_time = 0.0f;
+    float color_switch_dur = 0.0f;
+
+    uint64 LastCycleCounts = 0;
+    uint64 EndCycleCounts = 0;
+
+
+    float TimeCounter = 0.0f;
+    float WaitTimeCounter = 0.0f;
+
+    uint64 TicksPerFrame = 0;
+    uint64 TicksPerS = 0;
+
+    int64 CountsPerFrame = 0;
+    //So what will be less than 0 must be float type
+    float MsPerFrame = 0.0f;
+    float SPerFrame = 0.0f;
+    float FramePerS = 0.0f;
+    // Time elapsed of one cycle/frame in second
+
+    //bool RatioCalculated = false;
+
+    float DelayedRatio = 0.0f;
+    float StandardMSperFrame = 16.67f;
+
+    float ChangeAxisCounter = 0.0f;
+    float TimeToChangeAxis = 0.0f;
+    int64 ViewRotateCount = 0;
+};
 
 struct Per_Win_Properties{
     WNDCLASSEXA WindowClass;
@@ -260,6 +299,10 @@ uint32 safetruncateUint64(uint64 value);
 real32 saferatioN(real32 numerator, real32 divisor);
 real32 saferatio0(real32 numerator, real32 divisor);
 real32 saferatio1(real32 numerator, real32 divisor);
+
+void CalEarlyFrameTime(Clock_Set* Time_Set = nullptr);
+void CalColliInterv(Clock_Set* Time_Set = nullptr);
+void CalStaticColorDur(Clock_Set* Time_Set, const bool32 On_Flag);
 
 void* PlatformLoadFile(char* FileName);
 debug_read_file_result* DEBUGReadFileWhole(char* filename);

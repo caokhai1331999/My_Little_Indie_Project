@@ -31,6 +31,58 @@ real32 saferatio1(real32 numberator, real32 divisor){
     return result;        
 }
 
+void CalEarlyFrameTime(Clock_Set* Time_Set){
+                    // NOTE: Why this stay the same over and equal to zero the
+                    // the next 8 frames
+                    // This one is buggy somehow
+                    if (Time_Set->EndCounter.QuadPart > Time_Set->LastCounter.QuadPart) {
+                          // We got how many count per frame
+                        Time_Set->CountsPerFrame = (int64)(Time_Set->EndCounter.QuadPart - Time_Set->LastCounter.QuadPart);
+                      }
+
+                    Time_Set->MsPerFrame = (real64)((1000.0f * (real64)Time_Set->CountsPerFrame) / Time_Set->PerfCountFrequency);
+
+                    // The value of s per frame is too small for float to hold
+                    Time_Set->FramePerS = 1000.0f/((real64)Time_Set->MsPerFrame);
+
+                    //Time_Set->SPerFrame = (Time_Set->SPerFrame>0.0f)?Time_Set->SPerFrame:0.0167;
+
+                      if (Time_Set->MsPerFrame > 0.0f) {
+                          //SPerFrame = MsPerFrame / 1000;
+                          // deltaTime = (float)(1 / 60);
+                          Time_Set->SPerFrame = (float)(Time_Set->MsPerFrame/1000);
+                      }
+
+                      //Cause the ms per frame is always less than 1000ms that mean it will be less than 0 after being converted to second then;
+                      Time_Set->TicksPerFrame = Time_Set->EndCycleCounts - Time_Set->LastCycleCounts;
+
+                      if(Time_Set->SPerFrame > 0.0f){
+                          Time_Set->TicksPerS = Time_Set->TicksPerFrame/Time_Set->SPerFrame;
+                      }else{
+                          Time_Set->TicksPerS = Time_Set->TicksPerFrame*Time_Set->FramePerS;                          
+                      };
+
+                      Time_Set->LastCycleCounts = Time_Set->EndCycleCounts;
+                      Time_Set->LastCounter = Time_Set->EndCounter;
+}
+
+void CalColliInterv(Clock_Set* Time_Set){
+    if(Time_Set->current_collided.QuadPart > Time_Set->previous_collided.QuadPart){
+        Time_Set->collided_time = ((float)(Time_Set->current_collided.QuadPart - Time_Set->previous_collided.QuadPart))/Time_Set->PerfCountFrequency;
+        Time_Set->previous_collided = Time_Set->current_collided;
+    }
+};
+
+void CalStaticColorDur(Clock_Set* Time_Set, const bool32 On_Flag){
+    if(On_Flag){
+        if(Time_Set->color_switch_dur >= 0.0f && Time_Set->color_switch_dur < 0.1f){
+            Time_Set->color_switch_dur += Time_Set->SPerFrame;
+        }else if(Time_Set->color_switch_dur > 0.094f){
+            Time_Set->color_switch_dur = 0.0f;   
+        }
+    }
+}
+
 // NOTE: Remember premature api optimization is a destructive way to code an api
 // because is will cause difficulties for shipping code or changing platform
 // and u will waste alot of time in a unnecessary big chunk of code
