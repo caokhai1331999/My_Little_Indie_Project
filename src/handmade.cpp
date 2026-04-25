@@ -78,7 +78,7 @@ void CalStaticColorDur(Clock_Set* Time_Set, const bool32 On_Flag){
         if(Time_Set->color_switch_dur >= 0.0f && Time_Set->color_switch_dur < 0.1f){
             Time_Set->color_switch_dur += Time_Set->SPerFrame;
         }else if(Time_Set->color_switch_dur > 0.094f){
-            Time_Set->color_switch_dur = 0.0f;   
+            Time_Set->color_switch_dur = 0.0f;
         }
     }
 }
@@ -352,5 +352,3 @@ bool32 string_contain(std::string* string, char* substr){
     };
     return true;
 };
-
-

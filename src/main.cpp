@@ -496,14 +496,12 @@ int CALLBACK WinMain
 
 
   win32LoadXInput();
-  WNDCLASSEXA WindowClass = {};
-  WindowClass.cbSize = sizeof(WNDCLASSEXA);
-  WindowClass.style = CS_HREDRAW|CS_VREDRAW;
+
+  WNDCLASSEXA WindowClass = SetUpWindowClass(&BackBuffer, Instance);
+
   HWND Window = {};
-  WindowClass.lpfnWndProc = MainWindowCallBack;
-  WindowClass.hInstance = Instance;
-  WindowClass.lpszClassName = "First Game Window Class";
-  Win32ResizeDIBSection(&BackBuffer, Dimens.Height, Dimens.Width);
+
+  
   // NOTE: I forgot to init window
   HMODULE AniLib;
   

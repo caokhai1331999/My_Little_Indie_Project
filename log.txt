@@ -1586,3 +1586,17 @@ inside
 
 DONE! Relocate the time and shader part to modulized part
 
+
+---------------- Sat, 25 Apr 26: 09:06AM
+
+What to do: Create the rough version/demo of game logic
+REMEMBER! : It's a top-down looking adverturous game
+          General des
+          so modify a bool type argument is a bad idea maybe I would cause
+          memory leak somewhere
+
+
+TODO: 1. ignore the plane/background. Start to make entity interact with each
+other
+      2. learn and design simple physic models. Only one we just did that work
+      is collision.

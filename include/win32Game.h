@@ -146,7 +146,7 @@ void InitCamera(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 
 void CalDelayedRatio(float* DelayedRatio = nullptr, Clock_Set* Time_Set = nullptr, Win32_OffScreen_Buffer* BackBuffer = nullptr);
-
+WNDCLASSEXA SetUpWindowClass(Win32_OffScreen_Buffer* BackBuffer, HINSTANCE Instance);
 void ErrorExit();
 
 #define WIN32GAME_H

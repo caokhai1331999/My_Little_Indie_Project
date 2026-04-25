@@ -1003,3 +1003,14 @@ void CalDelayedRatio(float* DelayedRatio, Clock_Set* Time_Set, Win32_OffScreen_B
     //RatioCalculated = false;
     //}                    
 };
+
+WNDCLASSEXA SetUpWindowClass(Win32_OffScreen_Buffer* BackBuffer, HINSTANCE Instance){
+    WNDCLASSEXA WindowClass = {};
+  WindowClass.cbSize = sizeof(WNDCLASSEXA);
+  WindowClass.style = CS_HREDRAW|CS_VREDRAW;
+  WindowClass.lpfnWndProc = MainWindowCallBack;
+  WindowClass.hInstance = Instance;
+  WindowClass.lpszClassName = "First Game Window Class";
+  Win32ResizeDIBSection(BackBuffer, Dimens.Height, Dimens.Width);
+  return WindowClass;
+};
