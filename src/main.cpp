@@ -742,8 +742,12 @@ int CALLBACK WinMain
                 std::string backpack_path = "./media/backpack.obj";
                 loadModel_(backpack, backpack_path);
 
-                //std::string path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
-
+                //std::string Mname = "terrain";                
+                //Model_* land = nullptr;
+                //land = new Model_(false, &Mname);
+                //std::string terrain_path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
+                //loadModel_(land, terrain_path);
+                
 //NOW THE ANIMATING PART
 
                 Model_* dancing_vampire = nullptr;

@@ -13,10 +13,6 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-const int MAX_BONES = 100;
-const int MAX_BONE_INFLUENCE = 4;
-uniform mat4 finalBoneMatrices[MAX_BONES];
-
 out vec3 Normal;
 out vec3 FragPos;
 out vec2 TexCoord;
@@ -24,7 +20,7 @@ out vec2 TexCoord;
 void main()
 {
 
-       gl_Position = projection * view * model * vec4(-aPos, 1.0f);
+    gl_Position = projection * view * model * vec4(-aPos, 1.0f);
 
 	//aPos is the vertex position so the Fragment position is
 	//the dot product of model and vertex Position (plus two vector)

@@ -1600,3 +1600,8 @@ TODO: 1. ignore the plane/background. Start to make entity interact with each
 other
       2. learn and design simple physic models. Only one we just did that work
       is collision.
+
+---------------- Sun, 26 Apr 26: 10:53AM
+
+TODO: Make land/background
+
