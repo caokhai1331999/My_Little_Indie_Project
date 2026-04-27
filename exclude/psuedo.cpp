@@ -79,11 +79,10 @@ private:
     // This matrix will contain anything about
     //the entity in the made-up world like:
     //position, rotation, scale
-    //
     glm::mat4 world_present_model;
     
-    is_moving;
-    is_dead;
+    bool32 is_moving;
+    bool32 is_dead;
 
     int current_level;
     int storage;
@@ -91,8 +90,36 @@ private:
     int stregth;
 
     int Heath_Bar;
-
+//
     controller driver;
 };
 
 // Handshake cross check for collision between entities and entities with background
+
+// TileMap contain array of positions in xz plane
+// wherein x is analogous to y and z is similar to x in 2D coordinates
+//
+
+
+void drawTile(const unsigned int VaoID = 0, const B_shader_program* Brush = nullptr, const Tile_Map* Map);
+
+// In order to save performance we just draw tile that is in viewing space
+std::vector<Tile*>ConstructTileMap(int width, int length, int height){
+    for(int h = 0; h < height; h++){
+        for(int l = 0; l < length; l+=TILE_WIDTH)
+            
+        };
+    }
+;}
+
+void drawTile(const unsigned int VaoID = 0, const B_shader_program* Brush = nullptr, const Tile_Map* Map){
+    glBindVertexArray(VaoID);
+    Brush->use();
+    for(*Tile const &tile: Map->map){
+        
+    };
+};
+
+class Tile_Map{
+    std::vector<*Tile>map;
+}

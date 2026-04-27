@@ -8,6 +8,7 @@
 #include "Tile.h"
 
 Tile* LoadTileMap();
+
 void drawTile(unsigned int VaoID, unsigned int shaderID, float speed, float* updatedDegree, bool32 changeAxis, std::vector<rollCubeInfo>* rollCubemap){
 
     glUseProgram(shaderID);
@@ -108,4 +109,3 @@ void drawTile(unsigned int VaoID, unsigned int shaderID, float speed, float* upd
     //}
     // Repeatedly drawing a half cube as a tile
 }
-    

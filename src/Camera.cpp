@@ -46,9 +46,16 @@ void UpdateCamera (Camera* camera, float* DelayRatio) {
         // Direction based on mouse
         // yaw is formed by x and x1
 // similarly Pitch formed by y and y1
+    //glm::vec3 newDirection ={};
+        //
+    //newDirection.x = glm::cos((glm::radians(camera->Yaw)));  
+    //newDirection.z = glm::sin(glm::radians(camera->Yaw)) + glm::sin(glm::radians(camera->Pitch));
+    //newDirection.y = glm::cos((glm::radians(camera->Pitch)));
+//
     camera->Direction.x = glm::cos((glm::radians(camera->Yaw)));  
     camera->Direction.z = glm::sin(glm::radians(camera->Yaw)) + glm::sin(glm::radians(camera->Pitch));
-    camera->Direction.y = glm::cos((glm::radians(camera->Pitch)));  
+    camera->Direction.y = glm::cos((glm::radians(camera->Pitch)));
+
     //std::cout<<"Direction is: "<<glm::to_string(camera->Direction)<<std::endl;
 //Camera->LastFrameTime = FrameTime; ?? ??
     camera->mouse.moved = false;

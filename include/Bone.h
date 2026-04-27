@@ -17,7 +17,7 @@ struct KeyPosition{
 };
 
 struct KeyRotation{
-    glm::quat Orientation;
+    glm::fquat Orientation;
     float timestamp;
 };
 

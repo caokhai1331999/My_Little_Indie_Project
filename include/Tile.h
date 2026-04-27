@@ -40,24 +40,31 @@ struct rollCubeInfo{
     int axisIndex_;
 };
 
+// We loop over the tiles array and check for collision every frame
+
 struct Tile{
-    glm::vec3 position = {};
-    int TextureIndex = 0;
+    glm::vec2 position;
+    glm::vec3 size;
+    // Position, scale
+    glm::mat4 tileContainer;
+    unsigned int TextureID = 0;
+
     // Tile indices
     Tile(){
-        if (position!= glm::vec3(0.0f)){
-            position = glm::vec3(0.0f);
+        if (position!= glm::vec2(0.0f)){
+            position = glm::vec2(0.0f);
         }
 
-        if (TextureIndex!= 0){
-            TextureIndex = 0;
+        if (TextureID!= 0){
+            TextureID = 0;
         }
+
+        glm::mat4 tileContainer = glm::mat4(1.0f);
     };
 };
 
 Tile* LoadTileMap();
 void drawTile(unsigned int VaoID = 0, unsigned int shaderID = 0, float speed = 1.0, float* updatedDegree = nullptr, bool32 changeAxis = false, std::vector<rollCubeInfo>* rollCubemap = nullptr);
-
 #define TILE_H
 #endif
 

@@ -1603,5 +1603,15 @@ other
 
 ---------------- Sun, 26 Apr 26: 10:53AM
 
-TODO: Make land/background
+TODO: Time to build up land/background
+Think about tiling.
 
+IDMat structure(specific role value position) T: translate, R: Rotation, S:scale
+(Column Major type)
+                             1*S.x*R, R*      , R      , T.x
+                             R      , 1*S.y*R , R      , T.y
+                             R      , R       , 1*S.z*R, T.z
+                             0      , 0       , 0      , 1
+
+So the Position of object represented by id Matrix is at [3].x/y/z
+So the Scale of object is at [0][0], [1][1], [2][2]

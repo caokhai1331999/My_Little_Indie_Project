@@ -630,6 +630,16 @@ int CALLBACK WinMain
                 BackBuffer.BitmapWidth, BackBuffer.BitmapHeight,
                 &BackBuffer.glData, BackBuffer.BitmapMemory);
 
+              glm::mat4 fooMat = glm::mat4(1.0f); 
+              fooMat = glm::translate(fooMat, glm::vec3(1.0f, 2.0f, 3.0f));
+              std::cout<<"ID mat after translate: "<<glm::to_string(fooMat)<<std::endl;
+
+              fooMat = glm::scale(fooMat, glm::vec3(4.0f, 5.0f, 6.0f));
+              std::cout<<"ID mat after scale: "<<glm::to_string(fooMat)<<std::endl;
+
+              fooMat = glm::rotate(fooMat, 90.0f, glm::vec3(7.0f, 8.0f, 9.0f));
+              std::cout<<"ID mat after rotate: "<<glm::to_string(fooMat)<<std::endl;
+              
             // Randomize cube direction
             std::srand(std::time(0));
 
@@ -730,9 +740,6 @@ int CALLBACK WinMain
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
                     CheckShader(shader->GetProgramID(), programme_, shader->GetShaderName());
                 }
-
-                BackBuffer.shaders_list[1]->use();
-                BackBuffer.shaders_list[1]->setMat4("projection", BackBuffer.camera.projection);
                 
                 Set_Projection_View(&BackBuffer);
 
@@ -785,6 +792,7 @@ int CALLBACK WinMain
 // Set light environment here
 
                 tempSetEnviLight(BackBuffer.shaders_list[3], &(BackBuffer.camera));
+
                 BackBuffer.shaders_list[0]->use();
                 BackBuffer.shaders_list[0]->setMat4( "projection", BackBuffer.camera.projection);
                 
@@ -953,11 +961,17 @@ int CALLBACK WinMain
                         shader->setMat4("view", BackBuffer.camera.view);
                     }
 
+                    for(B_shader_program* const &shader: BackBuffer.shaders_list){
+                        shader->use();
+                        shader->setMat4("projection", BackBuffer.camera.projection);
+                    }
+
                     BackBuffer.shaders_list[0]->use();
                     WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
                     BackBuffer.shaders_list[0]->setMat4("WorldToCamera", WorldToCamera);
                     glUseProgram(0);
-                    Set_Projection_View(&BackBuffer);
+
+                    //Set_Projection_View(&BackBuffer);
 
                     // Start to add some basic lighting to the model
                     if (first_size) {
@@ -1051,10 +1065,9 @@ int CALLBACK WinMain
                     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
                     //===============================================
 
+                    bool32 dummyflag = false;
                     BackBuffer.shaders_list[1]->use();
                     glBindVertexArray(ScreenBuffer.glData.VAOs);
-
-                    bool32 dummyflag = false;
                     
                     BackBuffer.shaders_list[1]->setBool("short_color_change_", dummyflag);
                     BackBuffer.shaders_list[1]->setFloat("colorOffset", ColorOffset);
