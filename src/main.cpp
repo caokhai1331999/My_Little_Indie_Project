@@ -516,6 +516,7 @@ int CALLBACK WinMain
   PlayAni__ PlayAnimation = NULL;
   ShowInfo_ showUniformVarValuePerVertex = NULL;
   check_collision_ check_collision = NULL;
+  load_bin_map_ load_bin_map = NULL;
 
   //setUpUBO__ setUpUBO = NULL;
   //updateUBOData__ updateUBOData = NULL;
@@ -569,6 +570,8 @@ int CALLBACK WinMain
 
           showUniformVarValuePerVertex = (ShowInfo_)GetProcAddress(AniLib, "ShowInfo");
           check_collision = (check_collision_)GetProcAddress(AniLib, "check_collision_wrapper");
+          load_bin_map = (load_bin_map_)GetProcAddress(AniLib, "__load_bin_map_wrapper");
+          
           //setUpUBO = (setUpUBO__)GetProcAddress(AniLib, "setupUBO_");
           //updateUBOData = (updateUBOData__)GetProcAddress(AniLib, "updateUBOData_");
 
@@ -801,7 +804,10 @@ int CALLBACK WinMain
 
                 GLuint id = BackBuffer.shaders_list[0]->GetProgramID();
                 showUniformVarValuePerVertex(&UBO, &id, &dancing_vampire->meshes[0], false, false, false, false, false, false);
-                
+
+                std::string* map_content = load_bin_map("level.map");
+                std::cout<<map_content->data()<<std::endl;
+
                 while (GlobalRunning) {
 
                   if(first_announce) {
@@ -869,6 +875,8 @@ int CALLBACK WinMain
                           showUniformVarValuePerVertex = (ShowInfo_)GetProcAddress(AniLib, "ShowInfo");
 
                           check_collision = (check_collision_)GetProcAddress(AniLib, "check_collision_wrapper");
+                          load_bin_map = (load_bin_map_)GetProcAddress(AniLib, "__load_bin_map_wrapper");
+                          
 //setupMesh =
                           //(setupMeshh)GetProcAddress(AniLib, "setMesh");
                           //Draw = (MDraw)GetProcAddress(AniLib, "Draw");

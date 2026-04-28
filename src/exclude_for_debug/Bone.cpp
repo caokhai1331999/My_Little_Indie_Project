@@ -198,3 +198,36 @@ bool32 check_collision(space_box* box1, space_box* box2){
 bool32 __cdecl check_collision_wrapper(space_box* box1, space_box* box2){
     return check_collision(box1, box2);  
 };
+
+
+std::string* load_bin_map(const char* name){
+    std::string map_name = name;
+    std::fstream bin_map {map_name, bin_map.in};
+
+    //std::string str;
+    //this is an array of pointer
+    std::string* map_content;
+    char cursor;
+    map_content->reserve(120);
+    if(bin_map.is_open()){
+        //bin_map.read(&(*map_content)[0], 120);
+        int loop_count = 0;
+        while(bin_map >> cursor){
+            (*map_content)[loop_count] = cursor;
+            loop_count++;
+        };
+        if(bin_map.eof()){
+            //printf("Succeed read end of file, loop counted:%d\n", loop_count);
+            printf("Succeed read end of file,\n");
+        }
+        printf("Succeed loading map content\n");
+    }else{
+        printf("Failed loading map content\n");
+    } 
+    return map_content;
+}
+
+
+std::string* __load_bin_map_wrapper(const char* name){
+    return load_bin_map(name);
+}

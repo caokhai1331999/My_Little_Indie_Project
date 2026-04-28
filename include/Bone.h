@@ -8,7 +8,7 @@
    ======================================================================== */
 
 #include <assimp_glm_helpers.h>
-
+#include <fstream>
 #include "C_Model.h"
 
 struct KeyPosition{
@@ -146,6 +146,10 @@ public:
 
 
 bool32 check_collision(space_box* box1 = nullptr, space_box* box2 = nullptr);
+std::string* load_bin_map(const char* name = nullptr);
+
+extern "C" __declspec(dllexport) std::string* __load_bin_map_wrapper(const char* name = nullptr);
+typedef std::string* (__cdecl * load_bin_map_) (const char*);
 
 extern "C" __declspec(dllexport) bool32 __cdecl check_collision_wrapper(space_box* box1 = nullptr, space_box* box2 = nullptr);
 //declare a function pointer;

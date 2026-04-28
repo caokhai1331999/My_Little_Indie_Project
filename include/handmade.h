@@ -320,6 +320,5 @@ void* LoadFunctionFromDLL(const char* DLLName = nullptr, const char* FuncName = 
 void SetUpWindow();
 glm::vec3 randomRotateAxis_(int rollIndex);
 bool32 string_contain(std::string* string = nullptr, char* substr = nullptr);
-
 #define HANDMADE_H
 #endif

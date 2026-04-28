@@ -1615,3 +1615,16 @@ IDMat structure(specific role value position) T: translate, R: Rotation, S:scale
 
 So the Position of object represented by id Matrix is at [3].x/y/z
 So the Scale of object is at [0][0], [1][1], [2][2]
+
+NOTE: May using GetProcAddress instead of wglGetProcAddress will solve gl extension
+issues on Little Beast
+
+What to add first :
+     1. binary map loading
+        whether to use microsoft one or just c++ one
+     2. Map loading
+     3. Draw
+
+---------------- Tue, 28 Apr 26: 03:36PM
+
+char* just to be assigned and can not be used to modify
