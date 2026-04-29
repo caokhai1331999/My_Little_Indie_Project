@@ -8,7 +8,6 @@
    ======================================================================== */
 
 #include <assimp_glm_helpers.h>
-#include <fstream>
 #include "C_Model.h"
 
 struct KeyPosition{
@@ -31,35 +30,7 @@ struct AssimpNodeData{
     std::string name;
     std::vector<AssimpNodeData>children;
 };
-// Test zone=====================
-struct collided_space{
-// How to store direction
-    glm::vec3 space;
-    //glm::ivec3 direction;
-    collided_space(glm::vec3 sp):space{sp}{};
-};
 
-struct space_box{
-    // We have to spawn the unique id for every object in order not to confuse with other one
-    glm::mat4 position;
-    glm::vec3 size;
-
-    std::vector<collided_space>* collide_list;
-
-    space_box(glm::vec3* first_pos = nullptr, glm::vec3* size_ = nullptr){
-        size = *size_; 
-        
-        position = glm::mat4(1.0f);
-        position = glm::translate(position, (*first_pos));
-
-        collide_list = new std::vector<collided_space>;
-        collide_list->reserve(10);
-    }
-//NOTE: How to define direction for both box
-    // question is do we need to store it on one general list or each object space box list
-    // animation for each motions;
-};
-// Test zone=====================
 class Bone{
 
 private:
@@ -143,18 +114,6 @@ public:
         return m_Positions[index].timestamp;
     }
 };
-
-
-bool32 check_collision(space_box* box1 = nullptr, space_box* box2 = nullptr);
-std::string* load_bin_map(const char* name = nullptr);
-
-extern "C" __declspec(dllexport) std::string* __load_bin_map_wrapper(const char* name = nullptr);
-typedef std::string* (__cdecl * load_bin_map_) (const char*);
-
-extern "C" __declspec(dllexport) bool32 __cdecl check_collision_wrapper(space_box* box1 = nullptr, space_box* box2 = nullptr);
-//declare a function pointer;
-typedef bool32 (__cdecl *check_collision_) (space_box*, space_box*);
-
 
 #define BONE_H
 #endif

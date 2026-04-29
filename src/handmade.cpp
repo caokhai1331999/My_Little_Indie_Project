@@ -352,3 +352,30 @@ bool32 string_contain(std::string* string, char* substr){
     };
     return true;
 };
+
+std::string* load_bin_map(const char* name){
+
+    std::string map_name = name;
+    std::ifstream bin_map_reader;
+    std::string* map_content = new string;
+
+    bin_map_reader.open(map_name, std::ios::binary | std::ios::ate);
+    
+    if(bin_map_reader.is_open()){
+        int file_size = bin_map_reader.tellg();
+        printf("The size of the stream: %d\n", file_size);
+        
+        bin_map_reader.seekg(bin_map_reader.std::ios::beg);
+        map_content->reserve(file_size);
+        bin_map_reader.read(&(*map_content)[0], file_size);
+
+        printf("Succeed loading map content\n");
+    }else{
+        printf("Failed opening map content\n");
+    }
+
+    bin_map_reader.close();
+
+    return map_content;
+}
+

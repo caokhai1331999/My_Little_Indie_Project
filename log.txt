@@ -1621,10 +1621,13 @@ issues on Little Beast
 
 What to add first :
      1. binary map loading
-        whether to use microsoft one or just c++ one
+        whether to use microsoft one or just c++ one DONE!
      2. Map loading
      3. Draw
 
 ---------------- Tue, 28 Apr 26: 03:36PM
 
 char* just to be assigned and can not be used to modify
+
+---------------- Wed, 29 Apr 26: 11:21AM
+

@@ -10,6 +10,7 @@
 #include "SoundMaker.h"
 #include "Tile.h"
 //#include "handmade.h"
+#include "physics.h"
 #include "animator.h"
 
 bool32 first_size = true;
@@ -515,8 +516,6 @@ int CALLBACK WinMain
   AniTimeUpdater AniUpdate = NULL;
   PlayAni__ PlayAnimation = NULL;
   ShowInfo_ showUniformVarValuePerVertex = NULL;
-  check_collision_ check_collision = NULL;
-  load_bin_map_ load_bin_map = NULL;
 
   //setUpUBO__ setUpUBO = NULL;
   //updateUBOData__ updateUBOData = NULL;
@@ -568,10 +567,7 @@ int CALLBACK WinMain
           AniUpdate = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTime_");
           PlayAnimation = (PlayAni__)GetProcAddress(AniLib, "PlayAni_");
 
-          showUniformVarValuePerVertex = (ShowInfo_)GetProcAddress(AniLib, "ShowInfo");
-          check_collision = (check_collision_)GetProcAddress(AniLib, "check_collision_wrapper");
-          load_bin_map = (load_bin_map_)GetProcAddress(AniLib, "__load_bin_map_wrapper");
-          
+          showUniformVarValuePerVertex = (ShowInfo_)GetProcAddress(AniLib, "ShowInfo");          
           //setUpUBO = (setUpUBO__)GetProcAddress(AniLib, "setupUBO_");
           //updateUBOData = (updateUBOData__)GetProcAddress(AniLib, "updateUBOData_");
 
@@ -805,7 +801,8 @@ int CALLBACK WinMain
                 GLuint id = BackBuffer.shaders_list[0]->GetProgramID();
                 showUniformVarValuePerVertex(&UBO, &id, &dancing_vampire->meshes[0], false, false, false, false, false, false);
 
-                std::string* map_content = load_bin_map("level.map");
+                std::string* map_content = new std::string ;
+                map_content = load_bin_map("level.map");
                 std::cout<<map_content->data()<<std::endl;
 
                 while (GlobalRunning) {
@@ -873,9 +870,6 @@ int CALLBACK WinMain
                           PlayAnimation = (PlayAni__)GetProcAddress(AniLib, "PlayAni_");                          
 
                           showUniformVarValuePerVertex = (ShowInfo_)GetProcAddress(AniLib, "ShowInfo");
-
-                          check_collision = (check_collision_)GetProcAddress(AniLib, "check_collision_wrapper");
-                          load_bin_map = (load_bin_map_)GetProcAddress(AniLib, "__load_bin_map_wrapper");
                           
 //setupMesh =
                           //(setupMeshh)GetProcAddress(AniLib, "setMesh");

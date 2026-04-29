@@ -29,6 +29,7 @@
 #include <Windows.h>
 #include <Windowsx.h>
 #include <xinput.h>
+#include <fstream>
 #include <stdio.h>
 #include <cmath>
 #include <iostream>
@@ -320,5 +321,7 @@ void* LoadFunctionFromDLL(const char* DLLName = nullptr, const char* FuncName = 
 void SetUpWindow();
 glm::vec3 randomRotateAxis_(int rollIndex);
 bool32 string_contain(std::string* string = nullptr, char* substr = nullptr);
+std::string* load_bin_map(const char* name = nullptr);
+
 #define HANDMADE_H
 #endif
