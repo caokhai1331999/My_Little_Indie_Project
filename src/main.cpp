@@ -709,6 +709,7 @@ int CALLBACK WinMain
                 mouseEventVar.dwFlags = TME_HOVER|TME_LEAVE;
                 mouseEventVar.hwndTrack = Window;
                 mouseEventVar.dwHoverTime = 1000;
+
                 BackBuffer.camera.mouse.mouseEvent = &mouseEventVar;
 
                 //if(BackBuffer.camera.mouse.mouseEvent == NULL){

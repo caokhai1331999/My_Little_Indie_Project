@@ -318,7 +318,8 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
     // and create alternative function if there is no way to fix this
 
      unsigned char *data = (unsigned char*)stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-        if (data)
+
+     if (data)
         {
             glGenTextures(1, &textureID);
 

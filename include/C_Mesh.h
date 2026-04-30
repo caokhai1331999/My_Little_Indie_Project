@@ -76,6 +76,7 @@ struct Bone_Info{
 
 struct Texture{
     unsigned int id;
+
     string type;
     string path;
 };

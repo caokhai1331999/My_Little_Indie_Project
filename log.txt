@@ -1622,8 +1622,8 @@ issues on Little Beast
 What to add first :
      1. binary map loading
         whether to use microsoft one or just c++ one DONE!
-     2. Map loading
-     3. Draw
+     2. Figure out how to construct a reasonable enough looking map
+     3. Draw (IN WORKING)
 
 ---------------- Tue, 28 Apr 26: 03:36PM
 
@@ -1631,3 +1631,20 @@ char* just to be assigned and can not be used to modify
 
 ---------------- Wed, 29 Apr 26: 11:21AM
 
+
+---------------- Thu, 30 Apr 26: 10:18AM
+
+Start to draw tileMap today
+
+---------------- Thu, 30 Apr 26: 11:58AM
+
+How to efficient apply view and projection to every shaders. Maybe loop setting
+is the only way.
+
+
+Plus, we have to understand the size system relativity in world
+TODO: After done loading tile map.
+            1. It is time to build up global light set up
+with sun and other lights. There will be day and night light.
+            2. Construct a profiler for bettter debugging and faster building
+            speed
