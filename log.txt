@@ -1622,8 +1622,9 @@ issues on Little Beast
 What to add first :
      1. binary map loading
         whether to use microsoft one or just c++ one DONE!
-     2. Figure out how to construct a reasonable enough looking map
-     3. Draw (IN WORKING)
+     3. Draw (IN WORKING) (DONE!)
+     2. Figure out how to construct randomly a reasonable
+     enough looking map. (WORKING)
 
 ---------------- Tue, 28 Apr 26: 03:36PM
 
@@ -1648,3 +1649,10 @@ TODO: After done loading tile map.
 with sun and other lights. There will be day and night light.
             2. Construct a profiler for bettter debugging and faster building
             speed
+
+---------------- Fri, 01 May 26: 11:11AM
+
+One important thing that we learnt is that. We need to prototype thing to find
+out which is the most suitable one before bring them out to work.
+
+May be the wglGetprocaddress wasn't really call in little beast's environment.

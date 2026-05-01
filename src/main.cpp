@@ -642,21 +642,21 @@ int CALLBACK WinMain
             // Randomize cube direction
             std::srand(std::time(0));
 
-            std::vector<rollCubeInfo>rollCubeMap;
-            float direction = 0.0f;
-
-            for (int x = 0; x < 100; x++) {
-              direction = ((std::rand() % 3) * 1.0f);
-              fluxY[x + 100] = direction;
-              if ((float)fluxY[x + 100] == (float)ROLL_) {
-                  rollCubeMap.push_back({x, std::rand() % 3});
-                }
-              printf("cube index %d Y: %f, with direction %f %s\n", x, fluxY[x],
-                     fluxY[x + 100],
-                     fluxY[x + 100] == UPP_     ? "UP"
-                     : fluxY[x + 100] == DOWNN_ ? "DOWNN"
-                                                : "ROLL");
-            }
+            //std::vector<rollCubeInfo>rollCubeMap;
+            //float direction = 0.0f;
+//
+            //for (int x = 0; x < 100; x++) {
+              //direction = ((std::rand() % 3) * 1.0f);
+              //fluxY[x + 100] = direction;
+              //if ((float)fluxY[x + 100] == (float)ROLL_) {
+                  //rollCubeMap.push_back({x, std::rand() % 3});
+                //}
+              //printf("cube index %d Y: %f, with direction %f %s\n", x, fluxY[x],
+                     //fluxY[x + 100],
+                     //fluxY[x + 100] == UPP_     ? "UP"
+                     //: fluxY[x + 100] == DOWNN_ ? "DOWNN"
+                                                //: "ROLL");
+            //}
                 
 // Cause the ScreenData will be deleted out of the loop so
                 // We have to assign address of memory and glData to
@@ -1066,6 +1066,8 @@ int CALLBACK WinMain
                     BackBuffer.shaders_list[2]->setFloat("colorOffset", ColorOffset);
                     BackBuffer.shaders_list[2]->setMat4("model", Plane);                    
                     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+                    drawTile(BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[2]);
+
                     //===============================================
 
                     bool32 dummyflag = false;
@@ -1081,7 +1083,6 @@ int CALLBACK WinMain
                     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
                     
                     //drawTile(ScreenBuffer.glData.VAOs, basic_shader_->GetProgramID(), DelayedRatio, &UpdatedAngle, TimeToChangeAxis, &rollCubeMap);
-
                     if(collided_){
 
                         if(!short_color_change_)
@@ -1097,7 +1098,7 @@ int CALLBACK WinMain
                         if(short_color_change_)
                             short_color_change_=!short_color_change_;
                     }
-                    
+
                     BackBuffer.shaders_list[1]->setBool("short_color_change_", short_color_change_);
 
                     BackBuffer.shaders_list[1]->setMat4("model", obj1.position);

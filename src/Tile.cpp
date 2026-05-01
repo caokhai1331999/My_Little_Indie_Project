@@ -109,3 +109,23 @@ void drawTile(unsigned int VaoID, unsigned int shaderID, float speed, float* upd
     //}
     // Repeatedly drawing a half cube as a tile
 }
+
+void drawTile(const unsigned int VaoID, B_shader_program* const Brush){
+
+    glBindVertexArray(VaoID);
+    Brush->use();
+    glm::mat4 tile_container;
+
+    for(int w = 0; w < 10; w++){
+        for(int l = 0; l < 30; l++){
+            // If in range
+            tile_container = glm::mat4(1.0f);
+            tile_container = glm::translate(tile_container, glm::vec3((float)w,0.0f,(float)l));
+
+            //Brush->setInt("material.diffused1", tile->TextureID);
+            Brush->setMat4("model", tile_container);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        }
+    }
+    glUseProgram(0);
+};

@@ -391,7 +391,7 @@ HDC windowDC = GetDC(window);
         // success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
 
 #ifdef ON_LITTLE_BEAST
-                success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
+                success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
 #else 
                 success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
 #endif
@@ -403,17 +403,7 @@ HDC windowDC = GetDC(window);
                     //printf("GLAD load successfully\n");
                     printf("VERSION: %s", glGetString(GL_VERSION));
                     printf("Renderer: %s\n", glGetString(GL_RENDERER));
-                    //
-                //float trianglesVerticles [] = {
-                    //FRONT FACE
-                   //-0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
-                    //0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
-                   //-0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f,
-                    //0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,
-                    //0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
-                   //-0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f
-                //};
-             //
+
                 const float Vertices[] = {
                    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,// 0
                     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -535,19 +525,6 @@ HDC windowDC = GetDC(window);
                    -1.0f, -1.0f,  3.0f,
                    -1.0f, -1.0f, -3.0f
                 };
-//The second part of this vertices buffer is wrong somewhere
-/*  0.0f, 0.0f, -1.0f, 0.0f, 2.0f,
-  0.0f, 0.0f, -1.0f, 0.0f, 2.0f,
-  0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-                                
-  0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
-  0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
-  0.0f, 0.0f, -1.0f, 0.0f, 0.0f,                
-                                
-  0.0f, 0.0f, -1.0f, 2.0f, 0.0f,
-  0.0f, 0.0f, -1.0f, 2.0f, 2.0f,
-  0.0f, 0.0f, -1.0f, 2.0f, 0.0f 
-*/
 
                 static const GLfloat g_color_buffer_data[] = {
                     0.583f,  0.771f,  0.014f,
@@ -682,45 +659,6 @@ HDC windowDC = GetDC(window);
                     FBuffer->BitmapWidth = OBuffer->BitmapWidth;
                 }
                 glViewport(0, 0, FBuffer->BitmapWidth, FBuffer->BitmapHeight);
-                
-                //if(OBuffer->BitmapMemory != NULL){
-                    //printf("We have Image content but somehow it wasn't shown on screen\n");                    
-                //} else {
-                    //RenderSplendidGradient(OBuffer, NULL, BMPContent, 0, 0, 3);                    
-                    //printf("Image content is NULL\n");
-                //}
-
-// NOTE: Focus on this
-
-                //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, OBuffer->BitmapWidth, OBuffer->BitmapHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, OBuffer->BitmapMemory);
- 
-                //glPixelStorei(GL_UNPACK_ROW_LENGTH, OBuffer->Pitch / 4);
-                //
-                //glBindTexture(GL_TEXTURE_2D, 4);
-                //glGenerateMipmap(GL_TEXTURE_2D);
-                //
-   //Wrapping
-                //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-   //Filter
-                //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//
-                //GLenum err = glGetError();
-//
-                //if (err != GL_NO_ERROR) {
-                    //printf("OpenGL Error after glTexImage2D: %x\n", err);
-                //}
-//
-                //if(OBuffer->glData.textureHandle!=NULL){
-                    //printf("Texture name is: %d\n", OBuffer->glData.textureHandle);
-                //} else {
-                    //printf("Some How texture is NULL???\n");
-                //}
-
-                //NOTE: The commented part is one that is deprecated when using the
-                // new version of OPENGL
-                //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
                 // Deprecated
  //glEnable(GL_TEXTURE_2D);
