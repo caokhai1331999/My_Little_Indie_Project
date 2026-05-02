@@ -41,12 +41,15 @@ struct rollCubeInfo{
 };
 
 // We loop over the tiles array and check for collision every frame
+// Or Per vertex, Cause this will be more dynamic.
+// So We can use C_Mesh
+// So best way scenario is the Tile contain group of vertices data
+struct Tile{// Or Tile chunk may be
 
-struct Tile{
     glm::vec2 position;
-    glm::vec3 size;
-    // Position, scale
-    glm::mat4 tileContainer;
+    glm::vec3 size;//scale
+
+    std::vector<Vertex>Vertices;
     unsigned int TextureID = 0;
 
     // Tile indices
@@ -58,8 +61,6 @@ struct Tile{
         if (TextureID!= 0){
             TextureID = 0;
         }
-
-        glm::mat4 tileContainer = glm::mat4(1.0f);
     };
 };
 

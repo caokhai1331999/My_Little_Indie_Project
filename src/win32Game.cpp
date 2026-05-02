@@ -24,6 +24,7 @@
 
    Just a partial list if you want to get the game in a complete shipping state
 */ 
+
 #include "win32Game.h"
 
 void OpenConsole() {
@@ -513,17 +514,17 @@ HDC windowDC = GetDC(window);
                     // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
                   // x,    y,     z
 
-                    3.0f, -1.0f, -3.0f,
-                   -1.0f, -1.0f,  3.0f,
-                    3.0f, -1.0f,  3.0f,
+                    1.0f, -1.0f, -1.0f,
+                   -1.0f, -1.0f,  1.0f,
+                    1.0f, -1.0f,  1.0f,
 
-                    3.0f, -1.0f, -3.0f,
-                   -1.0f, -1.0f, -3.0f,
-                   -1.0f, -1.0f,  3.0f,
+                    1.0f, -1.0f, -1.0f,
+                   -1.0f, -1.0f, -1.0f,
+                   -1.0f, -1.0f,  1.0f,
 
-                    3.0f, -1.0f, -3.0f,
-                   -1.0f, -1.0f,  3.0f,
-                   -1.0f, -1.0f, -3.0f
+                    1.0f, -1.0f, -1.0f,
+                   -1.0f, -1.0f,  1.0f,
+                   -1.0f, -1.0f, -1.0f
                 };
 
                 static const GLfloat g_color_buffer_data[] = {

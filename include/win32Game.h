@@ -37,6 +37,7 @@ struct OpenGLData{
     HGLRC defaultContext;
 
     unsigned int textureHandle;
+    std::vector<unsigned int>* texture_id_list;
 
     OpenGLData(){
         //Maybe buggy this part

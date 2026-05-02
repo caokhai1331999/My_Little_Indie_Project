@@ -121,7 +121,9 @@ void drawTile(const unsigned int VaoID, B_shader_program* const Brush){
             // If in range
             tile_container = glm::mat4(1.0f);
             tile_container = glm::translate(tile_container, glm::vec3((float)w,0.0f,(float)l));
+// Scale here
 
+            // Then set textureId here
             //Brush->setInt("material.diffused1", tile->TextureID);
             Brush->setMat4("model", tile_container);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

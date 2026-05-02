@@ -1624,7 +1624,10 @@ What to add first :
         whether to use microsoft one or just c++ one DONE!
      3. Draw (IN WORKING) (DONE!)
      2. Figure out how to construct randomly a reasonable
-     enough looking map. (WORKING)
+     enough looking map.
+            + First, decide which type of data that map contain
+            + Second, Set texture handle/id
+     (WORKING)
 
 ---------------- Tue, 28 Apr 26: 03:36PM
 
@@ -1648,11 +1651,21 @@ TODO: After done loading tile map.
             1. It is time to build up global light set up
 with sun and other lights. There will be day and night light.
             2. Construct a profiler for bettter debugging and faster building
-            speed
+            speed 
 
 ---------------- Fri, 01 May 26: 11:11AM
 
 One important thing that we learnt is that. We need to prototype thing to find
 out which is the most suitable one before bring them out to work.
 
-May be the wglGetprocaddress wasn't really call in little beast's environment.
+May be the wglGetprocaddress didn't really call any glFunction pointers in little beast's environment.
+
+---------------- Sat, 02 May 26: 10:13AM
+
+recall from mesh loading. We have aiMesh(Vertex(pos, normal, texCoord, boneId,
+weight(for animation)))->then we set them up and bind to Mesh.Vaos as state
+storage. As Vertex.data as BufferData source.
+
+
+Next time try to replace draw tile randomly to draw from  available tile
+array/storage
