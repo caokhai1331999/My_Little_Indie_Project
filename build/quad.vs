@@ -1,8 +1,8 @@
 #version 330 core
 
 layout(location = 0) in vec3 aPos;
-layout(location = 1) in vec3 aNormal;
-layout(location = 2) in vec2 aTextCoord;
+// layout(location = 1) in vec3 aNormal;
+layout(location = 1) in vec2 aTextCoord;
 //color per vetex (one point)
 layout(location = 3) in vec3 VertexColor;
 
@@ -32,5 +32,6 @@ void main(){
 // Place Model First -> calculate the local space to World/Perspective space
 //                  -> Then Calculate latest space to clip space
        gl_Position = projection * view * model * vec4(aPos, 1.0f);
-     FragColorr = vec4(VertexColor,1.0f);
+       TextCoord = aTextCoord;
+       FragColorr = vec4(VertexColor,1.0f);
 }

@@ -66,7 +66,9 @@ struct Tile{// Or Tile chunk may be
 
 Tile* LoadTileMap();
 void drawTile(unsigned int VaoID = 0, unsigned int shaderID = 0, float speed = 1.0, float* updatedDegree = nullptr, bool32 changeAxis = false, std::vector<rollCubeInfo>* rollCubemap = nullptr);
-void drawTile(const unsigned int VaoID = 0, B_shader_program* const Brush = nullptr);
+
+unsigned int SetupTileTexture(const char* path = nullptr);
+void drawTile(const unsigned int VaoID = 0, const unsigned int TextureID = 0, B_shader_program* const Brush = nullptr);
 
 #define TILE_H
 #endif

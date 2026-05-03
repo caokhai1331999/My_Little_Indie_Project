@@ -110,10 +110,66 @@ void drawTile(unsigned int VaoID, unsigned int shaderID, float speed, float* upd
     // Repeatedly drawing a half cube as a tile
 }
 
-void drawTile(const unsigned int VaoID, B_shader_program* const Brush){
+unsigned int SetupTileTexture(const char* path){
+
+    int width, height, nrComponents;
+    unsigned char *data = (unsigned char*)stbi_load(path, &width, &height, &nrComponents, 0);
+    
+// NOTE: Focus on this
+    unsigned int textureID;
+
+    if(data){
+        glGenTextures(1, &textureID);
+        glActiveTexture(GL_TEXTURE0+textureID);
+
+        GLenum format;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
+        
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, width);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+
+        glGenerateMipmap(GL_TEXTURE_2D);
+    
+        //Wrapping
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        //Filter
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        GLenum err = glGetError();
+
+        if (err != 0) {
+            printf("OpenGL Error after glTexImage2D: %x\n", err);
+            printf("Succeed load and assign image data to textureID: %d\n", textureID);
+        }
+    } else {
+        printf("image data is NULL\n");
+    }
+
+    glBindTexture(GL_TEXTURE_2D, 0);    
+
+    //if(OBuffer->glData.textureHandle!=NULL){
+    //printf("Texture name is: %d\n", OBuffer->glData.textureHandle);
+    //} else {
+    //printf("Some How texture is NULL???\n");
+    //}
+    
+    return textureID;
+}
+
+void drawTile(const unsigned int VaoID, const unsigned int TextureID, B_shader_program* const Brush){
 
     glBindVertexArray(VaoID);
     Brush->use();
+
     glm::mat4 tile_container;
 
     for(int w = 0; w < 10; w++){
@@ -124,7 +180,7 @@ void drawTile(const unsigned int VaoID, B_shader_program* const Brush){
 // Scale here
 
             // Then set textureId here
-            //Brush->setInt("material.diffused1", tile->TextureID);
+            Brush->setInt("ttexture", TextureID);
             Brush->setMat4("model", tile_container);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         }

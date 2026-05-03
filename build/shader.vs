@@ -1,8 +1,8 @@
 #version 330 core
 
 layout(location = 0) in vec3 aPos;
-layout(location = 1) in vec3 aNormal;
-layout(location = 2) in vec2 aTextCoord;
+// layout(location = 1) in vec3 aNormal;
+layout(location = 1) in vec2 aTextCoord;
 //color per vetex (one point)
 layout(location = 3) in vec3 VertexColor;
 
@@ -33,15 +33,13 @@ void main(){
 //                  -> Then Calculate latest space to clip space
        gl_Position = projection * view * model * vec4(aPos, 1.0f);
 
-        TextCoord = vec2(0.0f);
-	TextCoord = aTextCoord;
-
 // Model Pos for deciding showing texture or mere color
-     ModelPos = vec3(0.0f);
+       ModelPos = vec3(0.0f);
 
-     ModelPos.z = model[1][0];
-     ModelPos.y = model[2][0];
-     ModelPos.x = model[3][0];
+       // ModelPos.z = model[1][0];
+       // ModelPos.y = model[2][0];
+       // ModelPos.x = model[3][0];
 
-     FragColorr = vec4(VertexColor,1.0f);
+       TextCoord = aTextCoord;
+       FragColorr = vec4(VertexColor,1.0f);
 }

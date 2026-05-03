@@ -37,10 +37,11 @@ void resetColor(vec4 color){
 }
 
 void main(){
-     if(ModelPos.x >= 0.0f){
+    vec4 texture_ = texture(ttexture, TextCoord);
+    if(ModelPos.x >= 0.0f){
      // FragColor = interpolateColor(FragColorr, colorOffset);
      // resetColor(FragColor);
-     FragColor = FragColorr;
+     FragColor = texture_;
     } else {
      FragColor = vec4(0.0f);
     }

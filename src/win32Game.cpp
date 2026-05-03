@@ -492,7 +492,7 @@ HDC windowDC = GetDC(window);
                     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
                     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
                    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,    
-                   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+                   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f 
                 };
 
                 static const unsigned int cubeIndices[] = {
@@ -514,17 +514,17 @@ HDC windowDC = GetDC(window);
                     // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
                   // x,    y,     z
 
-                    1.0f, -1.0f, -1.0f,
-                   -1.0f, -1.0f,  1.0f,
-                    1.0f, -1.0f,  1.0f,
+                    1.0f, -1.0f, -1.0f,  0.0f, 1.0f,
+                   -1.0f, -1.0f,  1.0f,  1.0f, 1.0f,
+                    1.0f, -1.0f,  1.0f,  1.0f, 0.0f,
+                                       
+                    1.0f, -1.0f, -1.0f,  1.0f, 0.0f,
+                   -1.0f, -1.0f, -1.0f,  0.0f, 0.0f,
+                   -1.0f, -1.0f,  1.0f,  0.0f, 1.0f,
 
-                    1.0f, -1.0f, -1.0f,
-                   -1.0f, -1.0f, -1.0f,
-                   -1.0f, -1.0f,  1.0f,
-
-                    1.0f, -1.0f, -1.0f,
-                   -1.0f, -1.0f,  1.0f,
-                   -1.0f, -1.0f, -1.0f
+                    1.0f, -1.0f, -1.0f,  0.0f, 1.0f,
+                   -1.0f, -1.0f,  1.0f,  1.0f, 1.0f,
+                   -1.0f, -1.0f, -1.0f,  1.0f, 0.0f
                 };
 
                 static const GLfloat g_color_buffer_data[] = {
@@ -611,15 +611,15 @@ HDC windowDC = GetDC(window);
 
                  //Position
                 glEnableVertexAttribArray(0);
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)0);
 
                  //Normal
                 //glEnableVertexAttribArray(1);
                 //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
                 //
                  //TEXTURE COOR
-                //glEnableVertexAttribArray(2);                
-                //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));
+                glEnableVertexAttribArray(1);                
+                glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(3*sizeof(float)));
 //
                 //Color
                 glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.ColorVBO);                

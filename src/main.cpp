@@ -806,6 +806,8 @@ int CALLBACK WinMain
                 map_content = load_bin_map("level.map");
                 std::cout<<map_content->data()<<std::endl;
 
+                unsigned int TileTexture = SetupTileTexture("./media/images.jpg");
+                
                 while (GlobalRunning) {
 
                   if(first_announce) {
@@ -1066,7 +1068,7 @@ int CALLBACK WinMain
                     BackBuffer.shaders_list[2]->setFloat("colorOffset", ColorOffset);
                     BackBuffer.shaders_list[2]->setMat4("model", Plane);                    
                     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-                    drawTile(BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[2]);
+                    drawTile(BackBuffer.glData.PlaneVAOs, TileTexture, BackBuffer.shaders_list[2]);
 
                     //===============================================
 
