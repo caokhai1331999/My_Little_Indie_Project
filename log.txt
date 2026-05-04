@@ -1673,6 +1673,11 @@ cpp matched Obj file has to be updated every compile time for the sake of proper
 debug information.
 
 NOTE: Don't know why texture is NULL
-      . TextCoord
-      . Or image data
-      . Or Both
+      . TextCoord (✔)
+      . Or image data (✖)
+      . Or Both (✔)
+
+---------------- Mon, 04 May 26: 11:27AM
+
+So we forgot to unbind/reset the texture after set them up which cause the later
+one won't be in affect.

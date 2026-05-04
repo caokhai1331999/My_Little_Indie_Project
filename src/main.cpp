@@ -806,7 +806,7 @@ int CALLBACK WinMain
                 map_content = load_bin_map("level.map");
                 std::cout<<map_content->data()<<std::endl;
 
-                unsigned int TileTexture = SetupTileTexture("./media/images.jpg");
+                unsigned int TileTexture = SetupTileTexture("./media/grass.png");
                 
                 while (GlobalRunning) {
 

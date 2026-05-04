@@ -113,14 +113,13 @@ void drawTile(unsigned int VaoID, unsigned int shaderID, float speed, float* upd
 unsigned int SetupTileTexture(const char* path){
 
     int width, height, nrComponents;
-    unsigned char *data = (unsigned char*)stbi_load(path, &width, &height, &nrComponents, 0);
-    
+    unsigned char *data = new unsigned char;
+    data = stbi_load(path, &width, &height, &nrComponents, 0);    
 // NOTE: Focus on this
-    unsigned int textureID;
+    unsigned int textureID = 0;
 
     if(data){
         glGenTextures(1, &textureID);
-        glActiveTexture(GL_TEXTURE0+textureID);
 
         GLenum format;
         if (nrComponents == 1)
@@ -130,38 +129,37 @@ unsigned int SetupTileTexture(const char* path){
         else if (nrComponents == 4)
             format = GL_RGBA;
         
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, width);
+        glActiveTexture(GL_TEXTURE0+textureID);
         glBindTexture(GL_TEXTURE_2D, textureID);
+        //glPixelStorei(GL_UNPACK_ROW_LENGTH, width);
 
+        printf("image width: %d, height:%d, format:%d", width, height, format);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
         glGenerateMipmap(GL_TEXTURE_2D);
-    
+
         //Wrapping
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
         //Filter
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+                
         GLenum err = glGetError();
 
         if (err != 0) {
             printf("OpenGL Error after glTexImage2D: %x\n", err);
             printf("Succeed load and assign image data to textureID: %d\n", textureID);
-        }
+        }    
+        stbi_image_free(data);
     } else {
         printf("image data is NULL\n");
     }
 
-    glBindTexture(GL_TEXTURE_2D, 0);    
-
-    //if(OBuffer->glData.textureHandle!=NULL){
-    //printf("Texture name is: %d\n", OBuffer->glData.textureHandle);
-    //} else {
-    //printf("Some How texture is NULL???\n");
-    //}
-    
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0);        
     return textureID;
 }
 
@@ -177,6 +175,7 @@ void drawTile(const unsigned int VaoID, const unsigned int TextureID, B_shader_p
             // If in range
             tile_container = glm::mat4(1.0f);
             tile_container = glm::translate(tile_container, glm::vec3((float)w,0.0f,(float)l));
+            tile_container = glm::rotate(tile_container, 45.0f, glm::vec3(0.5f, 0.0f, 0.0f));
 // Scale here
 
             // Then set textureId here

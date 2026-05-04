@@ -22,6 +22,15 @@ vec4 interpolateColor(vec4 color, float colorOffset){
 	  return outColor ;
 }
 
+bool isNULL(vec4 color){
+    for(int i = 0; i < 4; i++){
+        if(color[i] != 0){
+            return false;
+        }
+    };
+    return true;
+}
+
 void resetColor(vec4 color){
    if(color.x >= 1.0f){
       color.x -= 1.0f;      
@@ -38,11 +47,12 @@ void resetColor(vec4 color){
 
 void main(){
     vec4 texture_ = texture(ttexture, TextCoord);
-    if(ModelPos.x >= 0.0f){
-     // FragColor = interpolateColor(FragColorr, colorOffset);
-     // resetColor(FragColor);
-     FragColor = texture_;
-    } else {
-     FragColor = vec4(0.0f);
-    }
+    vec4 test_color = vec4(0.0f, TextCoord, 1.0f);
+    if(texture_.a < 0.1)
+        discard;
+    // if(ModelPos.x >= 0.0f){
+        FragColor = isNULL(texture_)?test_color:texture_;
+    // } else {
+    //  FragColor = vec4(0.0f);
+    // }
 }
