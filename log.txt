@@ -1673,11 +1673,18 @@ cpp matched Obj file has to be updated every compile time for the sake of proper
 debug information.
 
 NOTE: Don't know why texture is NULL
-      . TextCoord (✔)
+      . TextCoord (✔) -> (✖)
       . Or image data (✖)
-      . Or Both (✔)
+      . Or Both (✔) -> (✖) 
 
 ---------------- Mon, 04 May 26: 11:27AM
 
-So we forgot to unbind/reset the texture after set them up which cause the later
+So we forgot to unbind/reset the texture (✔) after set them up which cause the later
 one won't be in affect.
+
+---------------- Tue, 05 May 26: 11:43AM
+
+TODO: Do Tile Collission.
+1. One thing needed to be played with more is the camera space itself
+Why gl display only show right ratio after I resized windows. We need to call
+resizeDIBsection inside the initOpengl function

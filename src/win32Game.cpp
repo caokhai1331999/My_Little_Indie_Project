@@ -34,10 +34,10 @@ void OpenConsole() {
     // freopen("CONIN$", "r", stdin);              // Redirect stdin (optional)
 }
 
-void GetWindowDimension(HWND Window, Win32_OffScreen_Buffer* BackBuffer) {
-    GetClientRect(Window, &ClientRect);
-    Dimens.Width = ClientRect.right - ClientRect.left;
-    Dimens.Height= ClientRect.bottom - ClientRect.top;
+void GetWindowDimension(Win32_OffScreen_Buffer* BackBuffer) {
+    GetClientRect(BackBuffer->Window, &(BackBuffer->ClientRect));
+    Dimens.Width = BackBuffer->ClientRect.right - BackBuffer->ClientRect.left;
+    Dimens.Height= BackBuffer->ClientRect.bottom - BackBuffer->ClientRect.top;
     BackBuffer->BitmapWidth = Dimens.Width;
     BackBuffer->BitmapHeight = Dimens.Height;
 }
@@ -219,7 +219,7 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
 */
 }
 
-bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* bmpContent){
+bool InitOpenGL(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* bmpContent){
     // first device context gotten from current window
     // printf("Start to init OpenGL\n");
         // Create the pixel format features
@@ -229,6 +229,9 @@ bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer
 // Posted by D.G. Redd, modified by community. See post 'Timeline' for change history
 // Retrieved 2026-02-10, License - CC BY-SA 3.0
 
+    GetWindowDimension(OBuffer);
+    Win32ResizeDIBSection(OBuffer, Dimens.Width, Dimens.Height);
+    
 WNDCLASSW wcDummy = {0};
 wcDummy.lpfnWndProc     = +[](HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){return DefWindowProcW(hWnd, message, wParam, lParam);};
 wcDummy.hInstance       = GetModuleHandle(0);
@@ -332,7 +335,7 @@ if (wglCreateContextAttribsARB) {
 
 // succeed enable wgl extension
 // Working window and context
-HDC windowDC = GetDC(window);
+HDC windowDC = GetDC(OBuffer->Window);
     PIXELFORMATDESCRIPTOR desiredPixelFormat = {};
         desiredPixelFormat.nSize = sizeof(desiredPixelFormat);
         desiredPixelFormat.nVersion =  1;
@@ -715,8 +718,9 @@ HDC windowDC = GetDC(window);
             return false;
         }        
 
-    ReleaseDC(window, windowDC);
-    return true;
+        glViewport(OBuffer->ClientRect.left, OBuffer->ClientRect.top, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
+        ReleaseDC(OBuffer->Window, windowDC);
+        return true;
 }
 
 
@@ -789,6 +793,7 @@ void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* Scre
         //if(ScreenBuffer->BitmapHandle != BackBuffer->BitmapHandle && BackBuffer->BitmapHandle != NULL){
         //ScreenBuffer->BitmapHandle = BackBuffer->BitmapHandle;
     //}
+    ScreenBuffer->Window = BackBuffer->Window;
 }
 
 void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* FrontBuffer){
@@ -892,16 +897,15 @@ void ErrorExit()
     ExitProcess(dw); 
 }
 
-void ResetGLState(Win32_OffScreen_Buffer* BackBuffer, HWND window){
+void ResetGLState(Win32_OffScreen_Buffer* BackBuffer){
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEBUG_OUTPUT);
     glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
-    HDC windowContext = GetDC(window);
+    HDC windowContext = GetDC(BackBuffer->Window);
     wglMakeCurrent(windowContext, BackBuffer->glData.defaultContext);
-
     wglDeleteContext(BackBuffer->glData.openglRC);
 };
 
@@ -952,4 +956,16 @@ WNDCLASSEXA SetUpWindowClass(Win32_OffScreen_Buffer* BackBuffer, HINSTANCE Insta
   WindowClass.lpszClassName = "First Game Window Class";
   Win32ResizeDIBSection(BackBuffer, Dimens.Height, Dimens.Width);
   return WindowClass;
+};
+
+void CleanUpandExit(Win32_OffScreen_Buffer* BackBuffer){
+    
+    glDeleteVertexArrays(1, &BackBuffer->glData.VAOs);
+    glDeleteVertexArrays(1, &BackBuffer->glData.PlaneVAOs);
+
+    glDeleteBuffers(1, &BackBuffer->glData.VBO);
+    glDeleteBuffers(1, &BackBuffer->glData.ColorVBO);
+    glDeleteBuffers(1, &BackBuffer->glData.PlaneVBO);
+
+    ResetGLState(BackBuffer);
 };

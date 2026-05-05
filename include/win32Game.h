@@ -58,6 +58,9 @@ struct Win32_OffScreen_Buffer{
     void* BitmapMemory;
     void* BitmapMemoryForDirectBlit;
 
+    HWND Window;
+    RECT ClientRect;
+    
     int BitmapWidth;
     int BitmapHeight;
     int Pitch;
@@ -82,8 +85,6 @@ bool isNull(GLuint* member = nullptr);
 void PassGLData(OpenGLData* BackData, OpenGLData* FrontData);
 
 global_variable bool  GlobalRunning;
-global_variable HWND Window;
-global_variable RECT ClientRect;
 global_variable HDC DeviceContext;
 // global_variable int  XOffset{0}, YOffset{0};
 global_variable Win32_OffScreen_Buffer BackBuffer = {};
@@ -98,6 +99,8 @@ struct Win32_Front_Buffer{
     void* BitmapMemory;
     void* BitmapMemoryForDirectBlit;
 
+    HWND Window;
+    
     int BitmapWidth;
     int BitmapHeight;
     int Pitch;
@@ -106,7 +109,8 @@ struct Win32_Front_Buffer{
 
     bool GLDataPassed = false;
     OpenGLData glData;
-    Win32_Front_Buffer(int PassedWidth, int PassedHeight, OpenGLData* PassedglData, void* PassedMem):BitmapWidth(PassedWidth), BitmapHeight(PassedHeight), BitmapMemory(PassedMem)
+
+    Win32_Front_Buffer(int PassedWidth, int PassedHeight, OpenGLData* PassedglData, void* PassedMem, HWND Window_):BitmapWidth(PassedWidth), BitmapHeight(PassedHeight), BitmapMemory(PassedMem), Window(Window_)
     {
         //isNull(&glData.VAOs)?glData.VAOs=0:printf("Front Buffer VAOs is not NUll\n");
         //isNull(&glData.ColorVAOs)?glData.ColorVAOs=0:printf("Front Buffer ColorVAOs is not NUll\n");
@@ -119,7 +123,7 @@ struct Win32_Front_Buffer{
 
 
 
-void GetWindowDimension(HWND Window, Win32_OffScreen_Buffer* BackBuffer);
+void GetWindowDimension(Win32_OffScreen_Buffer* BackBuffer);
 void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Height);
 
 //void RenderSplendidGradient(Win32_Front_Buffer* OBuffer, imagee_content* BMPContent, int XOffset, int YOffset);
@@ -129,7 +133,7 @@ void Win32DisplayBufferWindow (HDC DeviceContext, int WindowWidth, int WindowHei
 void GameUpdateAndRender(Game_Memory* Memory = nullptr, imagee_content* BMPContent = nullptr ,Game_Input* Input = nullptr, Game_State* State = nullptr ,Win32_Front_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr, HDC DeviceContextt = NULL);
 
 void OpenConsole();
-bool InitOpenGL(HWND window, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* bmpContent);
+bool InitOpenGL(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* bmpContent);
 
 void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
 void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
@@ -141,13 +145,15 @@ void APIENTRY MessageCallback(GLenum source,
                               GLsizei length,
                               const GLchar* message,
                               const void* userParam);
-void ResetGLState(Win32_OffScreen_Buffer* BackBuffer = nullptr, HWND window = 0);
+
+void ResetGLState(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 void SetEnvironmentLights();
 void InitCamera(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 
 void CalDelayedRatio(float* DelayedRatio = nullptr, Clock_Set* Time_Set = nullptr, Win32_OffScreen_Buffer* BackBuffer = nullptr);
 WNDCLASSEXA SetUpWindowClass(Win32_OffScreen_Buffer* BackBuffer, HINSTANCE Instance);
+void CleanUpandExit(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 void ErrorExit();
 
 #define WIN32GAME_H

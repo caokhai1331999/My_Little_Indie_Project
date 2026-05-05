@@ -37,15 +37,16 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
   // of the new window and update a new proper DIB for that
   // DIB is a table where store BIT color infor
   case WM_SIZE: {
-      GetWindowDimension(Window, &BackBuffer);
     if (first_size) {
       first_size = false;
     } else {
+      GetWindowDimension(&BackBuffer);
+      printf("Client Rect left:%d top:%d right:%d bottom:%d\n", (int)BackBuffer.ClientRect.left, (int)BackBuffer.ClientRect.top, (int)BackBuffer.ClientRect.right, (int)BackBuffer.ClientRect.bottom);
       Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
       if (!BackBuffer.transferNeed) {
         BackBuffer.transferNeed = true;
       }
-      glViewport(0, 0, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
+      glViewport(BackBuffer.ClientRect.left, BackBuffer.ClientRect.top, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
       OutputDebugStringA("WM_SIZE\n");
     }
   } break;
@@ -359,7 +360,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
   } break;
 
   case WM_MOUSELEAVE: {
-      GetWindowDimension(Window, &BackBuffer);
+      GetWindowDimension(&BackBuffer);
       
     if (BackBuffer.camera.mouse.LastX != BackBuffer.BitmapWidth / 2) {
       BackBuffer.camera.mouse.LastX = BackBuffer.BitmapWidth / 2;
@@ -500,7 +501,7 @@ int CALLBACK WinMain
 
   WNDCLASSEXA WindowClass = SetUpWindowClass(&BackBuffer, Instance);
 
-  HWND Window = {};
+  //HWND Window = {};
 
   
   // NOTE: I forgot to init window
@@ -514,6 +515,7 @@ int CALLBACK WinMain
   AniUserClassSpawner SpawnAnimator = NULL;
   AniUserClassSlayer SlayAnimator = NULL;
   AniTimeUpdater AniUpdate = NULL;
+
   PlayAni__ PlayAnimation = NULL;
   ShowInfo_ showUniformVarValuePerVertex = NULL;
 
@@ -526,15 +528,16 @@ int CALLBACK WinMain
   Animation* danceAnimation = nullptr;
   Animator* animator = nullptr;
   int delay_count = 0;
+
   if (RegisterClassExA(&WindowClass)) {
 
-    Window = CreateWindowExA(
+    BackBuffer.Window = CreateWindowExA(
         // NOTE: The window didn't show up is because the first argument
         WS_EX_APPWINDOW, WindowClass.lpszClassName, "win32GameWithoutEngine",
         WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT,
         CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, Instance, 0);
 
-    if (Window) {
+    if (BackBuffer.Window) {
 
       OpenConsole();
       int displayCount = ShowCursor(true);
@@ -545,9 +548,9 @@ int CALLBACK WinMain
         GlobalRunning = true;
       }
 
-      HDC DeviceContext = GetDC(Window);
+      HDC DeviceContext = GetDC(BackBuffer.Window);
       int refreshRate = GetDeviceCaps(DeviceContext, VREFRESH);
-      ReleaseDC(Window, DeviceContext);
+      ReleaseDC(BackBuffer.Window, DeviceContext);
 
 
       if (CopyFile("skeletalAni32.dll", "skeletalAni32_copy.dll",
@@ -627,7 +630,7 @@ int CALLBACK WinMain
 
               Win32_Front_Buffer ScreenBuffer = Win32_Front_Buffer(
                 BackBuffer.BitmapWidth, BackBuffer.BitmapHeight,
-                &BackBuffer.glData, BackBuffer.BitmapMemory);
+                &BackBuffer.glData, BackBuffer.BitmapMemory, BackBuffer.Window);
 
               glm::mat4 fooMat = glm::mat4(1.0f); 
               fooMat = glm::translate(fooMat, glm::vec3(1.0f, 2.0f, 3.0f));
@@ -662,16 +665,12 @@ int CALLBACK WinMain
                 // We have to assign address of memory and glData to
                 //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
                 //RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
-                InitOpenGL(Window, &BackBuffer, &ScreenBuffer, BMPContent);
+                InitOpenGL(&BackBuffer, &ScreenBuffer, BMPContent);
 
                 GLenum err = glGetError();
                 if (err != GL_NO_ERROR) {
                     std::cerr << "OpenGL Error: " << err << std::endl;
                 }
-
-                GetWindowDimension(Window, &BackBuffer);
-                glViewport(0, 0, Dimens.Width, Dimens.Height);
-
                 std::string shader_name = "animating sketching brush";
                 BackBuffer.shaders_list.reserve(5);
 
@@ -707,7 +706,7 @@ int CALLBACK WinMain
                 TRACKMOUSEEVENT mouseEventVar = {};
                 mouseEventVar.cbSize = sizeof(TRACKMOUSEEVENT);
                 mouseEventVar.dwFlags = TME_HOVER|TME_LEAVE;
-                mouseEventVar.hwndTrack = Window;
+                mouseEventVar.hwndTrack = BackBuffer.Window;
                 mouseEventVar.dwHoverTime = 1000;
 
                 BackBuffer.camera.mouse.mouseEvent = &mouseEventVar;
@@ -720,7 +719,7 @@ int CALLBACK WinMain
                 
                 // This will be replaced by camera.view matrix
                 //
-                GetWindowDimension(Window, &BackBuffer);
+                GetWindowDimension(&BackBuffer);
                 InitCamera(&BackBuffer);
                 ViewCamera(&BackBuffer.camera);
 
@@ -773,7 +772,7 @@ int CALLBACK WinMain
 
                 //win32_Sound_OutPut SoundOutPut = {};
                 //Game_Sound_OutPut SoundBuffer = {};
-                //InitSoundBuffer(&Window, &SoundOutPut);
+                //InitSoundBuffer(&SoundOutPut);
                 //int16* SSamples = (int16* )VirtualAlloc(0 , SoundOutPut.SecondBufferSize ,MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
 
                 ////Why InitOpenGl only work in the app loop
@@ -903,11 +902,11 @@ int CALLBACK WinMain
                             copyBufferData(&BackBuffer, &ScreenBuffer);
                             BackBuffer.transferNeed = false;                        
                             displayBufferData(&BackBuffer, &ScreenBuffer);
-                            glViewport(0, 0, ScreenBuffer.BitmapWidth, ScreenBuffer.BitmapHeight);
+                            glViewport(BackBuffer.ClientRect.left, BackBuffer.ClientRect.top, ScreenBuffer.BitmapWidth, ScreenBuffer.BitmapHeight);
                         };
                     }
 
-                    DeviceContext = GetDC(Window);
+                    DeviceContext = GetDC(BackBuffer.Window);
                     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);             
 
                     //GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);
@@ -1264,7 +1263,7 @@ int CALLBACK WinMain
                     NewInput = OldInput;  //???? still don't understand
                     OldInput = Temp;
                     SwapBuffers(DeviceContext);
-                    ReleaseDC(Window, DeviceContext);//maybe this one
+                    ReleaseDC(BackBuffer.Window, DeviceContext);//maybe this one
 
                     //End count of frame time
                     if (!QueryPerformanceCounter(&(TimeSet.EndCounter))) {
@@ -1282,15 +1281,12 @@ MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per registerMULPS -> re
           SlayAnimator(animator);
           KillAninmation(danceAnimation);          
 
-          glDeleteVertexArrays(1, &BackBuffer.glData.VAOs);
-          glDeleteBuffers(1, &BackBuffer.glData.VBO);
-
-          ResetGLState(&BackBuffer, Window);
+          CleanUpandExit(&BackBuffer);
         }
         else{
             //TODO: Logging
 
-            if(!IsWindow(Window)){
+            if(!IsWindow(BackBuffer.Window)){
                 printf("Window is NULL\n");
                 DWORD errorCode = GetLastError();
                 char buffer[256] = {};
