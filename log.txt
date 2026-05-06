@@ -1685,6 +1685,12 @@ one won't be in affect.
 ---------------- Tue, 05 May 26: 11:43AM
 
 TODO: Do Tile Collission.
+
 1. One thing needed to be played with more is the camera space itself
 Why gl display only show right ratio after I resized windows. We need to call
 resizeDIBsection inside the initOpengl function
+
+---------------- Wed, 06 May 26: 10:08AM
+
+Tune camera to make it smoothier when moving with mouse and keyboard
+Still one the way to apply quaternion in camera rotation

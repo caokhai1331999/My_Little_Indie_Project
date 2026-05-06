@@ -268,6 +268,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
 
         BackBuffer.camera.mouse.LastX = BackBuffer.camera.mouse.xPos;
         BackBuffer.camera.mouse.LastY = BackBuffer.camera.mouse.yPos;
+
         BackBuffer.camera.mouse.MouseXOffset = 0;
         BackBuffer.camera.mouse.MouseYOffset = 0;
 
@@ -518,6 +519,7 @@ int CALLBACK WinMain
 
   PlayAni__ PlayAnimation = NULL;
   ShowInfo_ showUniformVarValuePerVertex = NULL;
+  updateCa UpdateCamera = NULL;
 
   //setUpUBO__ setUpUBO = NULL;
   //updateUBOData__ updateUBOData = NULL;
@@ -571,6 +573,7 @@ int CALLBACK WinMain
           PlayAnimation = (PlayAni__)GetProcAddress(AniLib, "PlayAni_");
 
           showUniformVarValuePerVertex = (ShowInfo_)GetProcAddress(AniLib, "ShowInfo");          
+          UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");          
           //setUpUBO = (setUpUBO__)GetProcAddress(AniLib, "setupUBO_");
           //updateUBOData = (updateUBOData__)GetProcAddress(AniLib, "updateUBOData_");
 
@@ -870,8 +873,8 @@ int CALLBACK WinMain
                               AniLib, "updateAnimationTime_");
 
                           PlayAnimation = (PlayAni__)GetProcAddress(AniLib, "PlayAni_");                          
-
                           showUniformVarValuePerVertex = (ShowInfo_)GetProcAddress(AniLib, "ShowInfo");
+                          UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");
                           
 //setupMesh =
                           //(setupMeshh)GetProcAddress(AniLib, "setMesh");

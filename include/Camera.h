@@ -10,7 +10,7 @@
 #include "glm/glm.hpp" 
 #include <glm/gtx/string_cast.hpp>
 #include <glm/ext/matrix_transform.hpp>
-/*
+#include <glm/gtc/quaternion.hpp>/*
 
 // Don't know shit about this
 glm::mat4 projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -68,7 +68,7 @@ struct Camera{
     // Euler/Tait-Bryan angles
     float Pitch;
     float Yaw;
-
+    glm::quat orientation;
     //float Roll;// May be this one is unecessary
 
     // Camera attributes
@@ -102,8 +102,10 @@ struct Camera{
             Position + Direction, // Pointed object Position
             Up        // How camera is oriented (Normalized up vector)
                            );
-        fov = 45.0f;
 
+        orientation = glm::quatLookAt(Direction, Up);
+
+        fov = 45.0f;
         Pitch = PITCH;
         Yaw = YAW;
 
@@ -118,8 +120,17 @@ struct Camera{
 };
 
 void UpdateCamera (Camera* camera = nullptr, float* DelayRatio = nullptr);
-void Zoom (Camera* camera, float offset);
-void ViewCamera(Camera* camera = nullptr);
 
+//camera update wrapper
+extern "C" __declspec(dllexport) void updateCamera_ (Camera* camera = nullptr, float* DelayRatio = nullptr);
+typedef void (*updateCa) (Camera*, float*);
+
+void Zoom (Camera* camera, float offset);
+void ViewCamera(Camera* camera = nullptr){
+    std::cout<<"View matrix: "<<glm::to_string(camera->view)<<std::endl;
+    std::cout<<"Front vec: "<<glm::to_string(camera->Front)<<std::endl;
+    std::cout<<"Right vec: "<<glm::to_string(camera->Right)<<std::endl;
+    std::cout<<"Up vec: "<<glm::to_string(camera->Up)<<std::endl;
+};
 #define CAMERA_H
 #endif
