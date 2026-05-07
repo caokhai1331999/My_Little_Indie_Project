@@ -14,77 +14,58 @@ void UpdateCamera (Camera* camera, float* DelayRatio) {
     // cos(yaw)
     // Then do the similar look on pitch(y and z) we have y equal to sin(pitch)
     // and z is cos(pitch)
-    
-    if(camera->mouse.moved && camera->focusCenter){
+        if(camera->mouse.moved){
         
-        //We'll use quaternion here;
-        // by using slerp 
-        // NOTE: Still don't know why we have to do oppositely for Y offset cause of
-        // the y axe go down
-
-         glm::vec2 xy = glm::normalize(glm::vec2(camera->mouse.xPos, camera->mouse.yPos));
-         glm::vec2 xy_ = glm::normalize(glm::vec2(camera->mouse.LastX, camera->mouse.LastY));
-         //glm::vec3 xyz = glm::normalize(glm::vec3(camera->mouse.xPos, camera->mouse.yPos));
-         //glm::vec3 xyz_ = glm::normalize(glm::vec3(camera->mouse.LastX, camera->mouse.LastY));
-         float radAngle = (glm::acos(glm::dot(xy_, xy))) * camera->speed * SENSITIVITY;
-         glm::fquat offsetOrientation = {};
-
-         offsetOrientation.w = glm::cos(radAngle/2.0f);
-         offsetOrientation.x = camera->Direction.x * glm::sin(radAngle/2.0f);
-         offsetOrientation.y = camera->Direction.y * glm::sin(radAngle/2.0f);
-         offsetOrientation.z = camera->Direction.z * glm::sin(radAngle/2.0f);
-
-         camera->orientation = camera->orientation * offsetOrientation;
-
-         camera->Direction.x = camera->orientation.x;
-         camera->Direction.y = camera->orientation.y;
-         camera->Direction.z = camera->orientation.z;
+            //We'll use quaternion here;
+            // by using slerp 
+                // NOTE: Still don't know why we have to do oppositely for Y offset cause of
+                // the y axe go down
          
-        //camera->mouse.MouseXOffset = camera->mouse.LastX - camera->mouse.xPos;
-        //camera->mouse.MouseYOffset = camera->mouse.LastY - camera->mouse.yPos;
-//
-        camera->mouse.LastX = camera->mouse.xPos;
-        camera->mouse.LastY = camera->mouse.yPos;        
+                camera->mouse.MouseXOffset = camera->mouse.LastX - camera->mouse.xPos;
+            camera->mouse.MouseYOffset = camera->mouse.LastY - camera->mouse.yPos;
+
+            camera->mouse.LastX = camera->mouse.xPos;
+            camera->mouse.LastY = camera->mouse.yPos;        
             
-        //camera->Yaw += camera->mouse.MouseXOffset * camera->speed * SENSITIVITY;
-        //camera->Pitch += camera->mouse.MouseYOffset * camera->speed * SENSITIVITY;
+            camera->Yaw += camera->mouse.MouseXOffset * camera->speed * SENSITIVITY;
+            camera->Pitch += camera->mouse.MouseYOffset * camera->speed * SENSITIVITY;
 
-        //if(camera->Pitch > 90.0f){
-            //camera->Pitch = 90.0f;
-        //}
-//
-        //if(camera->Pitch < 0.0f){
-            //camera->Pitch = 0.0f;
-        //}
-//
-        //if(camera->Yaw > 360.0f){
-            //camera->Yaw = 360.0f;
-        //}
-//
-        //if(camera->Yaw < 0.0f){
-            //camera->Yaw = 0.0f;
-        //}
+            if(camera->Pitch > 90.0f){
+                camera->Pitch = 90.0f;
+            }
 
-        // Direction based on mouse
-        // yaw is formed by x and x1
-       // similarly Pitch formed by y and y1
+            if(camera->Pitch < 0.0f){
+                camera->Pitch = 0.0f;
+            }
 
-        
-    //camera->Direction.x = glm::cos((glm::radians(camera->Yaw)));
-    //camera->Direction.z = glm::sin(glm::radians(camera->Yaw)) + glm::sin(glm::radians(camera->Pitch));
-    //camera->Direction.y = glm::cos((glm::radians(camera->Pitch)));
+            if(camera->Yaw > 360.0f){
+                camera->Yaw = 360.0f;
+            }
 
-    //std::cout<<"Direction is: "<<glm::to_string(camera->Direction)<<std::endl;
+            if(camera->Yaw < 0.0f){
+                camera->Yaw = 0.0f;
+            }
+
+            // Direction based on mouse
+            // yaw is formed by x and x1
+            // similarly Pitch formed by y and y1
+
+            //Got to understand this one.
+            camera->Direction.x = glm::cos((glm::radians(camera->Yaw)));
+            camera->Direction.y = glm::cos((glm::radians(camera->Pitch)));
+            camera->Direction.z = glm::sin(glm::radians(camera->Yaw)) + glm::sin(glm::radians(camera->Pitch));
+
+            //std::cout<<"Direction is: "<<glm::to_string(camera->Direction)<<std::endl;
 //Camera->LastFrameTime = FrameTime; ?? ??
 
         
-        //if(camera->moved){
-        // Cross product between the constant Up Vector which pointing upward and
-        // cammera Direction in world space we have camera Right vector
+            //if(camera->moved){
+            // Cross product between the constant Up Vector which pointing upward and
+            // cammera Direction in world space we have camera Right vector
         
-        camera->focusCenter = false;
-        camera->mouse.moved = false;
+            camera->mouse.moved = false;
     }
+
 
         camera->Right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera->Direction));
         camera->Up = glm::normalize(glm::cross(camera->Right, camera->Direction));

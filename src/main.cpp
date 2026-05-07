@@ -387,7 +387,8 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
     uint32 vkCode = Wparam;
     // if(vkCode == VK_LBUTTON) {
     if (!BackBuffer.camera.focusCenter) {
-      BackBuffer.camera.focusCenter = true;
+        if(!BackBuffer.camera.focusCenter)
+      BackBuffer.camera.focusCenter = !BackBuffer.camera.focusCenter;
     }
     printf("Mouse LButton is HIT\n");
     //}
@@ -398,7 +399,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
     // uint32 vkCode = Wparam;
     // if(vkCode == VK_LBUTTON) {
     if (BackBuffer.camera.focusCenter) {
-      BackBuffer.camera.focusCenter = false;
+      BackBuffer.camera.focusCenter = !BackBuffer.camera.focusCenter;
     }
     printf("Mouse LButton is released\n");
     //}
@@ -414,40 +415,15 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
   } break;
 
   case WM_MOUSEMOVE: {
-    //if (fDraw) {
-      //DeviceContext = GetDC(Window);
-      //MoveToEx(DeviceContext, ptPrevious.x, ptPrevious.y, NULL);
-      //LineTo(DeviceContext, ptPrevious.x = LOWORD(Lparam),
-             //ptPrevious.y = HIWORD(Lparam));
-      //ReleaseDC(Window, DeviceContext);
-    //}
-//
-    BackBuffer.camera.mouse.xPos = GET_X_LPARAM(Lparam);
-    //
-    // if(BackBuffer.camera.mouse.xPos > BackBuffer.BitmapWidth){
-    // BackBuffer.camera.mouse.xPos = BackBuffer.BitmapWidth;
-    //}
-    //
-    // if(BackBuffer.camera.mouse.xPos < 0){
-    // BackBuffer.camera.mouse.xPos = 0;
-    //}
-    //
-    BackBuffer.camera.mouse.yPos = GET_Y_LPARAM(Lparam);
-    //
-    // if(BackBuffer.camera.mouse.yPos > BackBuffer.BitmapHeight){
-    // BackBuffer.camera.mouse.yPos = BackBuffer.BitmapHeight;
-    //}
-    //
-    // if(BackBuffer.camera.mouse.yPos < 0){
-    // BackBuffer.camera.mouse.yPos = 0;
-    //}
-    //
-    // printf("Mouse x pos: %d\n", BackBuffer.camera.mouse.xPos);
-    // printf("Mouse y pos: %d\n", BackBuffer.camera.mouse.yPos);
 
-    if (!BackBuffer.camera.mouse.moved) {
-      BackBuffer.camera.mouse.moved = true;
-    }
+      if(BackBuffer.camera.focusCenter){
+          BackBuffer.camera.mouse.xPos = GET_X_LPARAM(Lparam);
+          BackBuffer.camera.mouse.yPos = GET_Y_LPARAM(Lparam);
+
+          if (!BackBuffer.camera.mouse.moved) {
+              BackBuffer.camera.mouse.moved = true;
+          }
+      }
     // return 0L;
 
   } break;
@@ -736,7 +712,7 @@ int CALLBACK WinMain
                 dancing_vampire_core = glm::scale(dancing_vampire_core,glm::vec3( 0.01f));
                 dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-2.0f, 0.0f, 0.0f));
 
-                BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)Dimens.Width / (float)Dimens.Height, 0.1f, 100.0f);
+                BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)BackBuffer.BitmapWidth / (float)BackBuffer.BitmapHeight, 0.1f, 100.0f);
 
                 //for(const auto &shader: BackBuffer.shaders_list){
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){

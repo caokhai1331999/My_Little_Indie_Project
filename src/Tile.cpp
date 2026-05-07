@@ -174,13 +174,20 @@ void drawTile(const unsigned int VaoID, const unsigned int TextureID, B_shader_p
         for(int l = 0; l < 30; l++){
             // If in range
             tile_container = glm::mat4(1.0f);
-            tile_container = glm::translate(tile_container, glm::vec3((float)w,0.0f,(float)l));
+            tile_container = glm::translate(tile_container, glm::vec3((float)w + 0.2 ,0.0f,(float)l + 0.2f));
+
+            Brush->setBool("textPass", false);
+            Brush->setMat4("model", tile_container);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+            tile_container = glm::translate(tile_container, glm::vec3(0.0f, -1.0f, 0.0f));
             tile_container = glm::rotate(tile_container, 45.0f, glm::vec3(0.5f, 0.0f, 0.0f));
 // Scale here
 
             // Then set textureId here
-            Brush->setInt("ttexture", TextureID);
             Brush->setMat4("model", tile_container);
+            Brush->setInt("ttexture", TextureID);
+            Brush->setBool("textPass", true);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         }
     }

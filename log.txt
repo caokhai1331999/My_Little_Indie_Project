@@ -1694,3 +1694,8 @@ resizeDIBsection inside the initOpengl function
 
 Tune camera to make it smoothier when moving with mouse and keyboard
 Still one the way to apply quaternion in camera rotation
+
+---------------- Thu, 07 May 26: 11:14AM
+
+How to efficiently feed number to app whenever I want to debug something.
+NOTE: Try to do drag adjust camera (Basically make it work.)

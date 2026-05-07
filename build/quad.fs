@@ -5,6 +5,7 @@ out vec4 FragColor;
 
 uniform sampler2D ttexture;
 uniform float colorOffset;
+uniform bool textPass;
 
 in vec3 ModelPos;
 in vec2 TextCoord;
@@ -46,13 +47,16 @@ void resetColor(vec4 color){
 }
 
 void main(){
-    vec4 texture_ = texture(ttexture, TextCoord);
-    vec4 test_color = vec4(0.0f, TextCoord, 1.0f);
-    if(texture_.a < 0.1)
-        discard;
-    // if(ModelPos.x >= 0.0f){
-        FragColor = isNULL(texture_)?test_color:texture_;
-    // } else {
-    //  FragColor = vec4(0.0f);
-    // }
+        vec4 texture_ = texture(ttexture, TextCoord);
+    if(textPass){
+        if(texture_.a < 0.1)
+            discard;
+        // if(ModelPos.x >= 0.0f){
+        FragColor = texture_;
+        // } else {
+        //  FragColor = vec4(0.0f);
+        // }        
+    }else{
+        FragColor = FragColorr;
+    };
 }
