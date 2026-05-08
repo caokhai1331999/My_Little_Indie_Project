@@ -60,6 +60,9 @@ struct Win32_OffScreen_Buffer{
 
     HWND Window;
     RECT ClientRect;
+
+    MSG Message;
+    WNDPROC wndproc;
     
     int BitmapWidth;
     int BitmapHeight;
@@ -72,24 +75,21 @@ struct Win32_OffScreen_Buffer{
     bool GLImageRendered = false;
     OpenGLData glData;
 
-    Camera camera;
     
+    Camera camera;
     const int BytesPerPixel = 4;
 };
 
 
-LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam,
-                                    LPARAM Lparam);
-
 bool isNull(GLuint* member = nullptr);
 void PassGLData(OpenGLData* BackData, OpenGLData* FrontData);
 
-global_variable bool  GlobalRunning;
+global_variable bool GlobalRunning = true;
 global_variable HDC DeviceContext;
 // global_variable int  XOffset{0}, YOffset{0};
 global_variable Win32_OffScreen_Buffer BackBuffer = {};
 global_variable Game_State State = {};
-global_variable imagee_content* BMPContent;
+global_variable imagee_content* BMPContent = nullptr;
 global_variable real32 WaitTimeCounter = 0.0f;
 
 
@@ -99,7 +99,7 @@ struct Win32_Front_Buffer{
     void* BitmapMemory;
     void* BitmapMemoryForDirectBlit;
 
-    HWND Window;
+    //HWND Window;
     
     int BitmapWidth;
     int BitmapHeight;
@@ -109,8 +109,8 @@ struct Win32_Front_Buffer{
 
     bool GLDataPassed = false;
     OpenGLData glData;
-
-    Win32_Front_Buffer(int PassedWidth, int PassedHeight, OpenGLData* PassedglData, void* PassedMem, HWND Window_):BitmapWidth(PassedWidth), BitmapHeight(PassedHeight), BitmapMemory(PassedMem), Window(Window_)
+//, Window(Window_)
+    Win32_Front_Buffer(int PassedWidth, int PassedHeight, OpenGLData* PassedglData, void* PassedMem, HWND Window_):BitmapWidth(PassedWidth), BitmapHeight(PassedHeight), BitmapMemory(PassedMem)
     {
         //isNull(&glData.VAOs)?glData.VAOs=0:printf("Front Buffer VAOs is not NUll\n");
         //isNull(&glData.ColorVAOs)?glData.ColorVAOs=0:printf("Front Buffer ColorVAOs is not NUll\n");
@@ -121,6 +121,15 @@ struct Win32_Front_Buffer{
     
 };
 
+
+bool32 first_size = true;
+bool32 first_announce = true;
+bool32 Load_Lib = false;
+bool32 showMsPF = false;
+
+glm::mat4 dancing_vampire_core = glm::mat4(1.0f);
+bool32 is_moving = false;
+float DelayedRatio = 0.5f;
 
 
 void GetWindowDimension(Win32_OffScreen_Buffer* BackBuffer);
@@ -150,6 +159,8 @@ void ResetGLState(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 void SetEnvironmentLights();
 void InitCamera(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer = nullptr);
+
+LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam ,LPARAM Lparam);
 
 void CalDelayedRatio(float* DelayedRatio = nullptr, Clock_Set* Time_Set = nullptr, Win32_OffScreen_Buffer* BackBuffer = nullptr);
 WNDCLASSEXA SetUpWindowClass(Win32_OffScreen_Buffer* BackBuffer, HINSTANCE Instance);

@@ -50,7 +50,7 @@ using namespace std;
 
 #define internal static
 #define local_persist static
-#define global_variable static
+#define global_variable extern
 
 #define Pi32 3.14159265359f
 

@@ -1699,3 +1699,18 @@ Still one the way to apply quaternion in camera rotation
 
 How to efficiently feed number to app whenever I want to debug something.
 NOTE: Try to do drag adjust camera (Basically make it work.)
+
+---------------- Fri, 08 May 26: 10:14AM
+
+After reallocating the MainWindowCallBack, the function does iterate among
+message but the window doesn't reaction to it, may be we didn't specifically
+assign the window. But the important thing is, how???
+
+Thing is window automatically know hwnd and msg address when we call dispatch
+message and assign wndproc function address to wndclass. 
+
+that means we misassign the hwnd address to 
+
+NOTE:All my guess was wrong. The real culprit is I miss define the
+global_variable keyword to static which cause backBuffer data only static inside
+the win32file scope and make it invisible by the app.
