@@ -1242,6 +1242,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
   case WM_SYSKEYDOWN: {
     uint32 vkCode = Wparam;
     bool AltkeyisDown = ((Lparam & (1 << 29)) != 0);
+    // & is and operator that is the produce 1 if two bit is 1
     if ((vkCode == VK_F4) && AltkeyisDown) {
       GlobalRunning = false;
     }

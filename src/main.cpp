@@ -374,12 +374,6 @@ int CALLBACK WinMain
                     }
                     TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent);
 
-                    //if(TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent)){
-                    //printf("Mouse event is being tracked\n");
-                    //} else {
-                    //printf("Can not track Mouse event\n");                
-                    //}
-
                     if (Load_Lib) {
                       if (AniLib != NULL) {
                          if (FreeLibrary(AniLib)) {

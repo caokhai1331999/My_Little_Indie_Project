@@ -1714,3 +1714,17 @@ that means we misassign the hwnd address to
 NOTE:All my guess was wrong. The real culprit is I miss define the
 global_variable keyword to static which cause backBuffer data only static inside
 the win32file scope and make it invisible by the app.
+
+---------------- Sat, 09 May 26: 10:46AM
+
+TODO: Draw
+      . Time to build up xInput and test it.
+      . Then unify game's storage(openGL data, sound....) to one game memory
+      (be careful)
+
+While this:   //bool AltkeyisDown = ((Lparam << 29) == 1);
+this is untrue cause the 1 an interger contain 16 bits not a bit
+
+and 1 is 0x00000001 in binary
+then 1 << 29 will be 1 shift to left 29 digit version
+=> 0x1000000000000000000..
