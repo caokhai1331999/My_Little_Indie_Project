@@ -1718,7 +1718,7 @@ the win32file scope and make it invisible by the app.
 ---------------- Sat, 09 May 26: 10:46AM
 
 TODO: Draw
-      . Time to build up xInput and test it.
+      . Time to build up xInput and test it. (DONE! prototyping)
       . Then unify game's storage(openGL data, sound....) to one game memory
       (be careful)
 
@@ -1728,3 +1728,9 @@ this is untrue cause the 1 an interger contain 16 bits not a bit
 and 1 is 0x00000001 in binary
 then 1 << 29 will be 1 shift to left 29 digit version
 => 0x1000000000000000000..
+
+---------------- Sun, 10 May 26: 10:31AM
+
+      . Time to level up collision checking from AABB to CONVEX HULL one
+      . EFFECT - Do I need to apply impostor/billboard to move texture through
+      space and create effect like fire and light bursting.

@@ -21,7 +21,7 @@ void UpdateCamera (Camera* camera, float* DelayRatio) {
                 // NOTE: Still don't know why we have to do oppositely for Y offset cause of
                 // the y axe go down
          
-                camera->mouse.MouseXOffset = camera->mouse.LastX - camera->mouse.xPos;
+            camera->mouse.MouseXOffset = camera->mouse.LastX - camera->mouse.xPos;
             camera->mouse.MouseYOffset = camera->mouse.LastY - camera->mouse.yPos;
 
             camera->mouse.LastX = camera->mouse.xPos;
