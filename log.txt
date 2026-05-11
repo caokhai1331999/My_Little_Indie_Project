@@ -1734,3 +1734,20 @@ then 1 << 29 will be 1 shift to left 29 digit version
       . Time to level up collision checking from AABB to CONVEX HULL one
       . EFFECT - Do I need to apply impostor/billboard to move texture through
       space and create effect like fire and light bursting.
+
+---------------- Mon, 11 May 26: 09:56AM
+
+NOTE: How to choose what to do next, cause it will cost me alot of time if
+choose so wrong. We have 2 standards to decide whether we will do that part or
+not .
+       1. How important is it. How common it will be used in game
+       2. How long/How hard is it to be implemented
+       3. How I score myself on scoring these standards
+
+ex:                   UnifyMemory    Particles system   Camera orientaion Adjust
+Important             8              6                  8
+Easy to Do            8              6                  4    
+Self Scoring          5              5                  7
+
+Time to write the profiler
+. Then we do the unify Memory first.

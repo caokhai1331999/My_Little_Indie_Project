@@ -1170,13 +1170,13 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
   case WM_MOUSELEAVE: {
       GetWindowDimension(&BackBuffer);
       
-    if (BackBuffer.camera.mouse.LastX != BackBuffer.BitmapWidth / 2) {
-      BackBuffer.camera.mouse.LastX = BackBuffer.BitmapWidth / 2;
-    }
+    //if (BackBuffer.camera.mouse.LastX != BackBuffer.BitmapWidth / 2) {
+      //BackBuffer.camera.mouse.LastX = BackBuffer.BitmapWidth / 2;
+    //}
 
-    if (BackBuffer.camera.mouse.LastY != BackBuffer.BitmapHeight / 2) {
-      BackBuffer.camera.mouse.LastY = BackBuffer.BitmapHeight / 2;
-    }
+    //if (BackBuffer.camera.mouse.LastY != BackBuffer.BitmapHeight / 2) {
+      //BackBuffer.camera.mouse.LastY = BackBuffer.BitmapHeight / 2;
+    //}
 
     // printf("Mouse Pos X: %d, Y: %d\n", BackBuffer.camera.mouse.LastX,
     // BackBuffer.camera.mouse.LastY);
@@ -1215,7 +1215,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 
   case WM_MOUSEHOVER: {
       uint32 vkCode = Wparam;
-      if(vkCode = MK_LBUTTON){
+      if(BackBuffer.camera.focusCenter){
           if (TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent)) {
               printf("Mouse event is being tracked\n");
           } else {
@@ -1226,7 +1226,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 
   case WM_MOUSEMOVE: {
       uint32 vkCode = Wparam;
-      if(vkCode = MK_LBUTTON){
+      //if(vkCode = MK_LBUTTON){
       if(BackBuffer.camera.focusCenter){
           BackBuffer.camera.mouse.xPos = GET_X_LPARAM(Lparam);
           BackBuffer.camera.mouse.yPos = GET_Y_LPARAM(Lparam);
@@ -1236,7 +1236,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
           }
       }
     // return 0L;
-      }
+      //}
   } break;
 
   case WM_SYSKEYDOWN: {

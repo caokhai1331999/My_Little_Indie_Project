@@ -54,7 +54,12 @@ void UpdateCamera (Camera* camera, float* DelayRatio) {
             camera->Direction.x = glm::cos((glm::radians(camera->Yaw)));
             camera->Direction.y = glm::cos((glm::radians(camera->Pitch)));
             camera->Direction.z = glm::sin(glm::radians(camera->Yaw)) + glm::sin(glm::radians(camera->Pitch));
-
+            
+            // How to apply quaternion on this.
+            // our purpose is to reduce accumulated orthormalizing error.
+            //
+            //
+            //
             //std::cout<<"Direction is: "<<glm::to_string(camera->Direction)<<std::endl;
 //Camera->LastFrameTime = FrameTime; ?? ??
 
