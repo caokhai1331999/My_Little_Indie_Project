@@ -1751,3 +1751,7 @@ Self Scoring          5              5                  7
 
 Time to write the profiler
 . Then we do the unify Memory first.
+
+---------------- Tue, 12 May 26: 12:19PM
+
+. Start from tommorrow. Halt major of irrelevant youtube stuff
