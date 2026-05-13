@@ -1755,3 +1755,8 @@ Time to write the profiler
 ---------------- Tue, 12 May 26: 12:19PM
 
 . Start from tommorrow. Halt major of irrelevant youtube stuff
+
+---------------- Wed, 13 May 26: 11:29AM
+NOTE: I have to delve more into building up the ground with the opened facility
+of collision detection. Not just the group of flat type. May be using the chunk
+of meshes is a good way.
