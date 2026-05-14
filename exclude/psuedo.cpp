@@ -384,6 +384,21 @@ class Object_Mesh_Specs{
 
 std::vector<>;
 
+unsigned int LoadCubeMap(const char* path){
+    unsigned int cubemap;
+    glGenTextures(1, &cubemap);
+    // Create and assign the state for cube map texture here
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
+    // Then bind each image data for each texture faces
+    unsigned char* data;
+    unsigned int width, height, nrchannel;
+    for(unsigned int i = 0; i < textures_faces.size(); i++){
+        data = stbi_load(textures_faces[i].c_str(), &width, &height, &nrchannel, 0);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_X + i, 0, nrchannel, width, height, 0, nrchannel, GL_UNSIGNED_BYTE, data);
+    }
+    return cubemap;
+}
+
 // Finds the material of water
 void SetGlobalLight(std::vector<B_shader_program*>* shader_list, global_Light* light, std::vector<Object_Mesh_Specs*>*Object_List){
     for(B_shader_program* &shader const: shader_list){

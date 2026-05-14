@@ -305,7 +305,7 @@ GLuint B_shader_program::setupGLprogram(const char* programName){
 
     return tempProgramID;
 };
-
+// We Will change this function to more dynamic or radical version of it.
 void tempSetEnviLight(B_shader_program* shader, Camera* camera){
     shader->use();
 

@@ -1757,6 +1757,14 @@ Time to write the profiler
 . Start from tommorrow. Halt major of irrelevant youtube stuff
 
 ---------------- Wed, 13 May 26: 11:29AM
+
 NOTE: I have to delve more into building up the ground with the opened facility
 of collision detection. Not just the group of flat type. May be using the chunk
 of meshes is a good way.
+
+---------------- Thu, 14 May 26: 10:36AM
+
+From my current level, Find the appropriate source that help me forward the
+progress.
+
+So time to make moving camera that follow the main character.
