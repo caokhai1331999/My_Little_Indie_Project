@@ -1,4 +1,4 @@
-  /* ========================================================================
+/* ========================================================================
    $File: $
    $Date: $
    $Revision: $
@@ -1228,8 +1228,18 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
       uint32 vkCode = Wparam;
       //if(vkCode = MK_LBUTTON){
       if(BackBuffer.camera.focusCenter){
+
           BackBuffer.camera.mouse.xPos = GET_X_LPARAM(Lparam);
           BackBuffer.camera.mouse.yPos = GET_Y_LPARAM(Lparam);
+
+          int gapX = BackBuffer.camera.mouse.LastX - BackBuffer.camera.mouse.xPos;
+          int gapY = BackBuffer.camera.mouse.LastY - BackBuffer.camera.mouse.yPos;
+
+          // reset last x and y
+          if(gapX > 100 || gapX < -100)
+          BackBuffer.camera.mouse.LastX = GET_X_LPARAM(Lparam);
+          if(gapY > 100 || gapY < -100)
+          BackBuffer.camera.mouse.LastY = GET_Y_LPARAM(Lparam);
 
           if (!BackBuffer.camera.mouse.moved) {
               BackBuffer.camera.mouse.moved = true;

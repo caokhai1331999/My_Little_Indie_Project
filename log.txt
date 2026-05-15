@@ -1768,3 +1768,9 @@ From my current level, Find the appropriate source that help me forward the
 progress.
 
 So time to make moving camera that follow the main character.
+
+---------------- Fri, 15 May 26: 12:45PM
+
+use normal map on moving vampire : later
+
+Next apply global light on every objects. Debug then apply.

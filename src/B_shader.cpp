@@ -347,8 +347,7 @@ void tempSetEnviLight(B_shader_program* shader, Camera* camera){
     shader->setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
     shader->setFloat("pointLights[1].constant", 1.0f);
     shader->setFloat("pointLights[1].linearTerm", 0.09f);
-    shader->setFloat("pointLights[1].quadraticTerm", 0.032f);
-
+    shader->setFloat("pointLights[1].quadraticTerm", 0.032f);              
     // point light 3
     //shader->setVec3("pointLights[2].position", pointLightPositions[2]);
     //shader->setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
