@@ -1774,3 +1774,10 @@ So time to make moving camera that follow the main character.
 use normal map on moving vampire : later
 
 Next apply global light on every objects. Debug then apply.
+
+---------------- Sat, 16 May 26: 12:06PM
+
+So we use cubemap as a cheap way to build up environmental surroundings.
+
+NOTE: How can I contruct up a group of meshes represent the word efficiently.
+Start to collect model and images files for environment construction.
