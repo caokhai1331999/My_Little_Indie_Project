@@ -9,6 +9,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <fstream>
+
 using namespace std;
 
 static const float TILE_Z = 1.0f;
@@ -30,9 +32,9 @@ struct Tile{
     glm::vec3 position = {};
     int TextureIndex = 0;
     // Tile indices
-    Tile(){
-        if (postion!= glm::vec3(0.0f)){
-            postion = glm::vec3(0.0f);
+    Tile(glm::vec3 position_){
+        if (postion_!= glm::vec3(0.0f)){
+            postion = position_;
         }
 
         if (TextureIndex!= 0){

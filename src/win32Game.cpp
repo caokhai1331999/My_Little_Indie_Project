@@ -675,7 +675,7 @@ HDC windowDC = GetDC(OBuffer->Window);
                 glEnable(GL_DEBUG_OUTPUT);
                 glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
                 
-                glClearColor(1.0f, 1.0f, 0.75f, 1.0f);
+                glClearColor(0.179f, 0.179f, 0.179f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
                 const GLubyte* ver = glGetString(GL_VERSION);
