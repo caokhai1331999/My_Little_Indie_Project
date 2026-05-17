@@ -1781,3 +1781,15 @@ So we use cubemap as a cheap way to build up environmental surroundings.
 
 NOTE: How can I contruct up a group of meshes represent the word efficiently.
 Start to collect model and images files for environment construction.
+
+---------------- Sun, 17 May 26: 12:02PM
+
+NOTE: why these tiles pack closely together even after I tried to translate them
+far away
+
+Time to load a character moving on the tiles: what they have
+Consider loading a bit flat ground
+     position;
+     died or not;
+     collided or not;
+     

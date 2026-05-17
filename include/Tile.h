@@ -44,6 +44,9 @@ struct rollCubeInfo{
 // Or Per vertex, Cause this will be more dynamic.
 // So We can use C_Mesh
 // So best way scenario is the Tile contain group of vertices data
+ //enum 
+//
+//
 struct Tile{// Or Tile chunk may be
 
     glm::vec2 position;

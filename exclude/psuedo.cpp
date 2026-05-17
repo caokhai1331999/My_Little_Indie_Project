@@ -369,8 +369,8 @@ struct SpotLight{
 
 #define NR_POINT_LIGHTS 2
 
+    //Material material;
 class global_light{
-    Material material;
     light_in_general light;
     DirLight dirLight;
     PointLight pointLights [NR_POINT_LIGHTS];
@@ -380,42 +380,6 @@ class Object_Mesh_Specs{
     glm::vec3 Position;
     Mesh mesh;
     Material material;
-}
-
-Global_Light EnvironmentLight;
-
-EnvironmentLight.dirLight =
-{
-    glm::vec3(-0.2f, -1.0f, -0.3f),
-    glm::vec3(0.05f, 0.05f, 0.05f),
-    glm::vec3(0.4f, 0.4f, 0.4f),
-    glm::vec3(0.5f, 0.5f, 0.5f)
-}
-
-EnvironmentLight.pointLights[0].position = glm::vec3( 0.7f,  0.2f,  2.0f);
-EnvironmentLight.pointLights[0].ambient = glm::vec3( 0.05f, 0.05f, 0.05f);
-EnvironmentLight.pointLights[0].diffuse = glm::vec3( 0.8f, 0.8f, 0.8f);
-EnvironmentLight.pointLights[0].specular = glm::vec3( 1.0f, 1.0f, 1.0f);
-EnvironmentLight.pointLights[0].constant = 1.0f;
-EnvironmentLight.pointLights[0].linearTerm = 0.09f;
-EnvironmentLight.pointLights[0].quadraticTerm = 0.032f;
-
-EnvironmentLight.pointLights[1].position = glm::vec3(2.3f, -3.3f, -4.0f);    
-EnvironmentLight.pointLights[1].ambient = glm::vec3(0.05f, 0.05f, 0.05f);        
-EnvironmentLight.pointLights[1].diffuse = glm::vec3(0.8f, 0.8f, 0.8f);           
-EnvironmentLight.pointLights[1].specular = glm::vec3(1.0f, 1.0f, 1.0f);          
-EnvironmentLight.pointLights[1].constant =, 1.0f;                     
-EnvironmentLight.pointLights[1].linearTerm = 0.09f;                  
-EnvironmentLight.pointLights[1].quadraticTerm = 0.032f;
-
-for(int i = 0; i < 2; i++){
-    shader->setVec3("pointLights["+(char)i+"].position", EnvironmentLight.pointLights[i].position);
-    shader->setVec3("pointLights["+(char)i+"].diffuse", EnvironmentLight.pointLights[i].diffuse);
-    shader->setVec3("pointLights["+(char)i+"].ambient", EnvironmentLight.pointLights[i].ambient);
-    shader->setVec3("pointLights["+(char)i+"].specular", EnvironmentLight.pointLights[i].specular);
-    shader->setFloat("pointLights["+(char)i+"].constant", 1.0f);
-    shader->setFloat("pointLights["+(char)i+"].linearTerm", 0.09f);
-    shader->setFloat("pointLights["+(char)i+"].quadraticTerm", 0.032f);
 }
 
 unsigned int LoadCubeMap(const char* path){
@@ -446,3 +410,9 @@ void SetGlobalLight(std::vector<B_shader_program*>* shader_list, global_Light* l
 ;
 // TODO: How to apply material property to shader for it to draw.
 //===========================================================================
+
+// Build world including group of mesh chunks.
+//Compute normal map to make surface looked less fake
+// How to arrange it
+global_variable Tile* World = nullptr;
+

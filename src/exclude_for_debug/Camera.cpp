@@ -30,8 +30,8 @@ void UpdateCamera (Camera* camera, float* DelayRatio) {
             camera->Yaw += camera->mouse.MouseXOffset * camera->speed * SENSITIVITY;
             camera->Pitch += camera->mouse.MouseYOffset * camera->speed * SENSITIVITY;
 
-            if(camera->Pitch > 90.0f){
-                camera->Pitch = 90.0f;
+            if(camera->Pitch > 120.0f){
+                camera->Pitch = 120.0f;
             }
 
             if(camera->Pitch < 0.0f){

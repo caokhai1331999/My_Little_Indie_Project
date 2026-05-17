@@ -1094,8 +1094,8 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
           BackBuffer.camera.Yaw -= 360.0f;
         }
 
-        if (BackBuffer.camera.Pitch > 90.0f) {
-          BackBuffer.camera.Yaw -= 90.0f;
+        if (BackBuffer.camera.Pitch > 120.0f) {
+          BackBuffer.camera.Yaw -= 120.0f;
         }
 
         printf("Back to point at the backpack\n");
