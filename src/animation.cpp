@@ -118,13 +118,13 @@ void Animation::ReadHierarchyData(AssimpNodeData& dest, const aiNode* src){
     };
 };
 
-Animation* __cdecl CreateAniClass(const char *animationPath, Model_ *model) {
-    return new Animation(animationPath, model);
-};
-
-void __cdecl DestroysAniClass(Animation *ani) {
-    delete ani;
-}
+//Animation* __cdecl CreateAniClass(const char *animationPath, Model_ *model) {
+    //return new Animation(animationPath, model);
+//};
+//
+//void __cdecl DestroysAniClass(Animation *ani) {
+    //delete ani;
+//}
 
 void showUniformVarValuePerVertex(GLuint* UBO, GLuint* programeId, Mesh* mesh, bool32 showIndices, bool32 showPos, bool32 showTexCoords, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices){
     
@@ -278,6 +278,7 @@ void showUniformVarValuePerVertex(GLuint* UBO, GLuint* programeId, Mesh* mesh, b
     }
 };
 
+/*
 void __cdecl ShowInfo(GLuint* UBO, GLuint* programeId, Mesh* mesh, bool32 showIndices, bool32 showPos, bool32 showTexCoords, bool32 showBoneIds, bool32 showWeights, bool32 showFinalBoneMatrices){
 
     if(wglGetCurrentContext() != NULL){
@@ -291,3 +292,4 @@ void __cdecl ShowInfo(GLuint* UBO, GLuint* programeId, Mesh* mesh, bool32 showIn
 
     showUniformVarValuePerVertex(UBO, programeId, mesh, showIndices, showPos, showTexCoords, showBoneIds, showWeights, showFinalBoneMatrices);
 };
+ */

@@ -136,6 +136,8 @@ void Animator::updateUBOData(){
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 };
 
+/*
+
 Animator* CreateAnimatorClass(Animation *animation) {
   return new Animator(animation);
 };
@@ -159,3 +161,5 @@ void setupUBO_(Animator* ani, GLuint* programeID){
 void updateUBOData_(Animator* ani){
     ani->updateUBOData();
 }
+
+ */

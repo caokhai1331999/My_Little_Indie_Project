@@ -70,27 +70,22 @@ private:
 };
 
 // Class wrapper
-extern "C" __declspec(dllexport) Animator* CreateAnimatorClass(Animation *animation);
-extern "C" __declspec(dllexport) void DestroyAnimatorClass(Animator *ani);
-extern "C" __declspec(dllexport) void updateAnimationTime_(Animator *ani, const float* dt);
-extern "C" __declspec(dllexport) void PlayAni_(Animator* ani, Animation* animation);
-
-extern "C" __declspec(dllexport) void setupUBO_(Animator *ani, GLuint* programID);
-extern "C" __declspec(dllexport) void updateUBOData_(Animator *ani);
+//extern "C" __declspec(dllexport) Animator* CreateAnimatorClass(Animation *animation);
+//extern "C" __declspec(dllexport) void DestroyAnimatorClass(Animator *ani);
+//extern "C" __declspec(dllexport) void updateAnimationTime_(Animator *ani, const float* dt);
+//extern "C" __declspec(dllexport) void PlayAni_(Animator* ani, Animation* animation);
+//
+//extern "C" __declspec(dllexport) void setupUBO_(Animator *ani, GLuint* programID);
+//extern "C" __declspec(dllexport) void updateUBOData_(Animator *ani);
 
 //Assign new name for function here
-typedef Animator* (__cdecl *AniUserClassSpawner) (Animation*);
-typedef void (__cdecl *AniUserClassSlayer) (Animator*);
-typedef void (__cdecl *AniTimeUpdater) (Animator*, const float*);
-typedef void (*PlayAni__)(Animator*, Animation*);
-typedef void (*setUpUBO__)(Animator*, GLuint*);
-typedef void (*updateUBOData__)(Animator*);
+//typedef Animator* (__cdecl *AniUserClassSpawner) (Animation*);
+//typedef void (__cdecl *AniUserClassSlayer) (Animator*);
+//typedef void (__cdecl *AniTimeUpdater) (Animator*, const float*);
+//typedef void (*PlayAni__)(Animator*, Animation*);
+//typedef void (*setUpUBO__)(Animator*, GLuint*);
+//typedef void (*updateUBOData__)(Animator*);
 
-/*
-#pragma comment(linker, "/export:CreateAnimatorClass")
-#pragma comment(linker, "/export:DestroyAnimatorClass")
-#pragma comment(linker, "/export:updateAnimationTime_")
-*/
 #define ANIMATOR_H
 #endif
 

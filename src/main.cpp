@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include "SoundMaker.h"
 #include "Tile.h"
+#include "Light.h"
 //#include "handmade.h"
 #include "physics.h"
 #include "animator.h"
@@ -46,17 +47,8 @@ int CALLBACK WinMain
   
   TimeSet.PerfCountFrequency = (int64)(TimeSet.PerfCountFrequencyResult.QuadPart);  
 
-  AniClassSpawner CreateAnimation = NULL;
-  AniClassSlainer KillAninmation = NULL;
-
-  AniUserClassSpawner SpawnAnimator = NULL;
-  AniUserClassSlayer SlayAnimator = NULL;
-  AniTimeUpdater AniUpdate = NULL;
-
-  PlayAni__ PlayAnimation = NULL;
-  ShowInfo_ showUniformVarValuePerVertex = NULL;
   updateCa UpdateCamera = NULL;
-
+  Set_Light_ Set_environmental_light = NULL;
   //setUpUBO__ setUpUBO = NULL;
   //updateUBOData__ updateUBOData = NULL;
   //setupMeshh setupMesh = NULL;
@@ -91,31 +83,18 @@ int CALLBACK WinMain
       ReleaseDC(BackBuffer.Window, DeviceContext);
 
 
-      if (CopyFile("skeletalAni32.dll", "skeletalAni32_copy.dll",
+      if (CopyFile("Light32.dll", "Light32_copy.dll",
                    false))
       {
-          AniLib = LoadLibraryA("skeletalAni32_copy.dll");
+          AniLib = LoadLibraryA("Light32_copy.dll");
       }
       //
 
       // Animation
       if(AniLib != NULL){
-          CreateAnimation = (AniClassSpawner)GetProcAddress(AniLib, "CreateAniClass");
-          KillAninmation = (AniClassSlainer)GetProcAddress(AniLib, "DestroysAniClass");
 
-          SpawnAnimator = (AniUserClassSpawner)GetProcAddress(AniLib, "CreateAnimatorClass");
-          SlayAnimator = (AniUserClassSlayer)GetProcAddress(AniLib, "DestroyAnimatorClass");
-          AniUpdate = (AniTimeUpdater)GetProcAddress(AniLib, "updateAnimationTime_");
-          PlayAnimation = (PlayAni__)GetProcAddress(AniLib, "PlayAni_");
-
-          showUniformVarValuePerVertex = (ShowInfo_)GetProcAddress(AniLib, "ShowInfo");          
           UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");          
-          //setUpUBO = (setUpUBO__)GetProcAddress(AniLib, "setupUBO_");
-          //updateUBOData = (updateUBOData__)GetProcAddress(AniLib, "updateUBOData_");
-
-          //setupMesh = (setupMeshh)GetProcAddress(AniLib, "setupMesh");
-          //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
-          //Load_Lib = false;
+          Set_environmental_light = (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
       }
 
       
@@ -275,6 +254,7 @@ int CALLBACK WinMain
                 //for(const auto &shader: BackBuffer.shaders_list){
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
                     CheckShader(shader->GetProgramID(), programme_, shader->GetShaderName());
+                    Set_environmental_light_(shader, &envir_light, &BackBuffer.camera);
                 }
                 
                 Set_Projection_View(&BackBuffer);
@@ -299,8 +279,10 @@ int CALLBACK WinMain
                 std::string dancing_vampire_path = "./media/dancing_vampire.dae";
                 loadModel_(dancing_vampire, dancing_vampire_path);
 
-                danceAnimation = CreateAnimation((char* )dancing_vampire_path.c_str(), dancing_vampire);
-                animator = SpawnAnimator(danceAnimation);
+                //danceAnimation = CreateAnimation((char* )dancing_vampire_path.c_str(), dancing_vampire);
+                danceAnimation = new Animation((char* )dancing_vampire_path.c_str(), dancing_vampire);
+                //animator = SpawnAnimator(danceAnimation);
+                animator = new Animator(danceAnimation);
                     
                 Game_Input Input[2] = {};
                 Game_Input* OldInput = &Input[0];
@@ -327,7 +309,7 @@ int CALLBACK WinMain
 
 // Set light environment here
 
-                tempSetEnviLight(BackBuffer.shaders_list[3], &(BackBuffer.camera));
+                //tempSetEnviLight(BackBuffer.shaders_list[3], &(BackBuffer.camera));
 
                 BackBuffer.shaders_list[0]->use();
                 BackBuffer.shaders_list[0]->setMat4( "projection", BackBuffer.camera.projection);
@@ -382,29 +364,19 @@ int CALLBACK WinMain
                              printf("fail to free current lib %s\n", GetLastError());
                         }
 
-                        if (CopyFile("skeletalAni32.dll",
-                                     "skeletalAni32_copy.dll", false)) {
+                        if (CopyFile("Light32.dll",
+                                     "Light32_copy.dll", false)) {
 
                            printf("Succeed copy dll file\n");
-                          AniLib = LoadLibraryA("skeletalAni32_copy.dll");
+                          AniLib = LoadLibraryA("Light32_copy.dll");
                         }
 //
                         // Animation
                         if (AniLib != NULL) {
                             printf("Succeed reload code and opengl function from dll\n");
-                          KillAninmation = (AniClassSlainer)GetProcAddress(
-                              AniLib, "DestroysAniClass");
 
-                          SlayAnimator = (AniUserClassSlayer)GetProcAddress(
-                              AniLib, "DestroyAnimatorClass");
-
-                          AniUpdate = (AniTimeUpdater)GetProcAddress(
-                              AniLib, "updateAnimationTime_");
-
-                          PlayAnimation = (PlayAni__)GetProcAddress(AniLib, "PlayAni_");                          
-                          showUniformVarValuePerVertex = (ShowInfo_)GetProcAddress(AniLib, "ShowInfo");
                           UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");
-                          
+                          Set_environmental_light = (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
 //setupMesh =
                           //(setupMeshh)GetProcAddress(AniLib, "setMesh");
                           //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
@@ -495,11 +467,8 @@ int CALLBACK WinMain
                     for(B_shader_program* const &shader: BackBuffer.shaders_list){
                         shader->use();
                         shader->setMat4("view", BackBuffer.camera.view);
-                    }
-
-                    for(B_shader_program* const &shader: BackBuffer.shaders_list){
-                        shader->use();
                         shader->setMat4("projection", BackBuffer.camera.projection);
+                        shader->setVec3( "ViewPos", BackBuffer.camera.Position);
                     }
 
                     BackBuffer.shaders_list[0]->use();
@@ -694,19 +663,22 @@ int CALLBACK WinMain
                     if(is_moving || first_announce){
                         if(animator->GetCurrentTime() > danceAnimation->GetDuration() )
                         {
-                            PlayAnimation(animator, danceAnimation);
+                            //PlayAnimation(animator, danceAnimation);
+                            animator->playAnimation(danceAnimation);
                             if(showMsPF)
                                 printf("animator current time: %f, animation duration: %f", animator->GetCurrentTime(), danceAnimation->GetDuration());
 
                         } else {
                             if(TimeSet.SPerFrame > 0.0f && TimeSet.SPerFrame < 0.004f ) {
                                 //AniUpdate expect S per frame;
-                                AniUpdate(animator, &(TimeSet.SPerFrame));
+                                //AniUpdate(animator, &(TimeSet.SPerFrame));
+                                animator->updateAnimationTime(&(TimeSet.SPerFrame));
                                 //updateUBOData(animator);
                                 //std::vector<glm::mat4>* Transform = animator->getFinalBoneMatrices();
                             }else{
                                 TimeSet.SPerFrame = 0.0035f;
-                                AniUpdate(animator, &(TimeSet.SPerFrame));                        
+                                //AniUpdate(animator, &(TimeSet.SPerFrame));
+                                animator->updateAnimationTime(&(TimeSet.SPerFrame));                                
                             }                        
 
                         }   
@@ -810,9 +782,12 @@ int CALLBACK WinMain
 /*
 MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per registerMULPS -> real64 ==> 128 bits / 64 bits -> 2 real32 packs per register
 */
-          SlayAnimator(animator);
-          KillAninmation(danceAnimation);          
-
+          //SlayAnimator(animator);
+          //KillAninmation(danceAnimation);          
+          delete animator;
+          animator = nullptr;
+          delete danceAnimation;
+          danceAnimation = nullptr;
           CleanUpandExit(&BackBuffer);
         }
         else{

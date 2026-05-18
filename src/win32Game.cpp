@@ -395,7 +395,7 @@ HDC windowDC = GetDC(OBuffer->Window);
         // success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
 
 #ifdef ON_LITTLE_BEAST
-                success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
+                success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
 #else 
                 success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
 #endif

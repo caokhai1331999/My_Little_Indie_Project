@@ -1788,8 +1788,14 @@ NOTE: why these tiles pack closely together even after I tried to translate them
 far away
 
 Time to load a character moving on the tiles: what they have
-Consider loading a bit flat ground
      position;
      died or not;
      collided or not;
+
+Consider loading a bit flat ground
      
+
+---------------- Mon, 18 May 26: 10:10AM
+DONE! Create simple environmental light setup function.
+NEXT: .DO normal light to create lamp light
+      .create simple land world with allow object interact with it(collision)
