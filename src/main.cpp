@@ -182,7 +182,7 @@ int CALLBACK WinMain
                 //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
                 //RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
                 InitOpenGL(&BackBuffer, &ScreenBuffer, BMPContent);
-
+                set_tile_vertex();
                 GLenum err = glGetError();
                 if (err != GL_NO_ERROR) {
                     std::cerr << "OpenGL Error: " << err << std::endl;

@@ -163,9 +163,37 @@ unsigned int SetupTileTexture(const char* path){
     return textureID;
 }
 
+void set_tile_vertex(){
+
+    glGenVertexArrays(1, &TileObj.TileVAO);
+    glGenBuffers(1, &TileObj.TileEBO);
+    glGenBuffers(1, &TileObj.TileVBO);
+    glGenBuffers(1, &TileObj.TileColorBO);
+
+    glBindVertexArray(TileObj.TileVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, TileObj.TileVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(land_vertices), &land_vertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)0);
+//TexCoords
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)3);
+
+    glBindBuffer(GL_ARRAY_BUFFER, TileObj.TileColorBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), &g_color_buffer_data, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, TileObj.TileEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Tile_Land_Indices), &Tile_Land_Indices, GL_STATIC_DRAW);
+}
+
+
 void drawTile(const unsigned int VaoID, const unsigned int TextureID, B_shader_program* const Brush){
 
-    glBindVertexArray(VaoID);
+    glBindVertexArray(TileObj.TileVAO);
     Brush->use();
 
     glm::mat4 tile_container;
@@ -179,7 +207,7 @@ void drawTile(const unsigned int VaoID, const unsigned int TextureID, B_shader_p
 
             Brush->setBool("textPass", false);
             Brush->setMat4("model", tile_container);
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
             
             //tile_container = glm::translate(tile_container, glm::vec3(0.0f, -1.0f, 0.0f));
             //tile_container = glm::rotate(tile_container, 45.0f, glm::vec3(0.5f, 0.0f, 0.0f));

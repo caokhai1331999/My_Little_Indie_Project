@@ -21,14 +21,15 @@ uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 WorldToCamera;
 
+uniform vec3 lightPos;
+
 uniform bool is_moving;
 
 // uniform mat4[MAX_BONES] finalBoneMatrices;
 
-out vec2 TexCoord_;
+out vec2 TexCoord;
 out vec3 Normal;
-// out vec3 FragPos;
-
+out vec3 FragPos;
 
 void main()
 {
@@ -87,11 +88,14 @@ for (int i = 0; i < 4 ; i++){
 
      // FragPos = vec3(model *vec4(aPos, 1.0f));
      // Actually the model matrix is what carried world's feature
-     
-     TexCoord_ = TexCoordd;
 
      gl_Position = projection * WorldToCamera * totalPosition;     
+     
+     TexCoord = TexCoordd;
+     FragPos = vec3(model *vec4(aPos, 1.0f));
+     Normal = vec3(transpose(inverse(view * model))) * aNormal;
 
       //gl_Position = projection * WorldToCamera * vec4(-aPos, 1.0f);     
     // gl_Position = projection * view * model * vec4(-aPos, 1.0f);
 };
+

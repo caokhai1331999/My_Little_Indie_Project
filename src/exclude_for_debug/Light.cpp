@@ -72,7 +72,7 @@ void set_environmental_light(B_shader_program* shader, global_light* envir_light
         light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
         shader->setFloat(light_name.c_str(), 0.032f);
     }
-
+    glUseProgram(0);
 };
 
 void Set_environmental_light_(B_shader_program* shader, global_light* envir_light, Camera* camera){

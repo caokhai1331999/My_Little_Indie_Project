@@ -871,7 +871,16 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 
           uint32 vkCode = Wparam;
           
-          if (vkCode == VK_UP) {
+          if (vkCode == 'J') {
+              // Actually the front vec is at the back of the camera
+              // State.BlueOffset+= 10;
+                  if(is_moving)
+                  is_moving = !is_moving;
+
+                  printf("j is released\n");
+          }
+
+          else if (vkCode == VK_UP) {
               // Actually the front vec is at the back of the camera
               // State.BlueOffset+= 10;
                   if(is_moving)
@@ -979,7 +988,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
             //}
       }
         //====================================================
-      else  if (vkCode == 'W') {
+      else if (vkCode == 'W') {
         // Actually the front vec is at the back of the camera
         // State.BlueOffset+= 10;
         BackBuffer.camera.Position +=
@@ -1037,6 +1046,22 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
             (float)BackBuffer.camera.speed;
         if (!WasDown) {
             printf("D is HIT\n");
+        }
+        // XOffset += 10;
+      }
+
+      else if (vkCode == 'J') {
+          float jump_time = 0.0f;
+          while(jump_time < 0.2f){
+              dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, DelayedRatio * glm::sin(30.0f/jump_time), -(5.0f * DelayedRatio)));
+              jump_time += 0.02f;
+          };
+
+          if(!is_moving)
+              is_moving = !is_moving;
+
+          if (!WasDown) {
+            printf("J is HIT\n");
         }
         // XOffset += 10;
       }

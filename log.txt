@@ -1799,3 +1799,7 @@ Consider loading a bit flat ground
 DONE! Create simple environmental light setup function.
 NEXT: .DO normal light to create lamp light
       .create simple land world with allow object interact with it(collision)
+      FIRST
+
+---------------- Tue, 19 May 26: 10:54AM
+
