@@ -416,3 +416,136 @@ void SetGlobalLight(std::vector<B_shader_program*>* shader_list, global_Light* l
 // How to arrange it
 global_variable Tile* World = nullptr;
 
+// Land vertices mesh
+float land_vertices[] = 
+{// vertex                    TextCoords
+//BACK   , {0,0},
+  {-0.125f, -0.125f, -0.125f}, {0.0f, -0.25f},
+  { 0.125f, -0.125f, -0.125f}, {0.0f, -0.25f},
+  { 0.125f,  0.125f, -0.125f}, {0.0f, -0.25f},
+  { 0.125f,  0.125f, -0.125f}, {0.0f, -0.25f},
+  {-0.125f,  0.125f, -0.125f}, {0.0f, -0.25f},
+  {-0.125f, -0.125f, -0.125f}, {0.0f, -0.25f},
+//FRONT  , {0,0},
+  {-0.125f, -0.125f,  0.125f}, {0.0f, 0.25f},
+  { 0.125f,  0.125f,  0.125f}, {0.0f, 0.25f},
+  { 0.125f, -0.125f,  0.125f}, {0.0f, 0.25f},
+  { 0.125f,  0.125f,  0.125f}, {0.0f, 0.25f},
+  {-0.125f, -0.125f,  0.125f}, {0.0f, 0.25f},
+  {-0.125f,  0.125f,  0.125f}, {0.0f, 0.25f},
+//LEFT  , {0,0},
+  {-0.125f,  0.125f,  0.125f}, {0.0f, 0.0f},
+  {-0.125f, -0.125f, -0.125f}, {0.0f, 0.0f},
+  {-0.125f,  0.125f, -0.125f}, {0.0f, 0.0f},
+  {-0.125f, -0.125f, -0.125f}, {0.0f, 0.0f},
+  {-0.125f,  0.125f,  0.125f}, {0.0f, 0.0f},
+  {-0.125f, -0.125f,  0.125f}, {0.0f, 0.0f},
+//RIGHT   , {0,0},
+  {0.125f,  0.125f,  0.125f}, {0.0f,  0.0f},
+  {0.125f,  0.125f, -0.125f}, {0.0f,  0.0f},
+  {0.125f, -0.125f, -0.125f}, {0.0f,  0.0f},
+  {0.125f, -0.125f, -0.125f}, {0.0f,  0.0f},
+  {0.125f, -0.125f,  0.125f}, {0.0f,  0.0f},
+  {0.125f,  0.125f,  0.125f}, {0.0f,  0.0f},
+//bottom , {0,0},
+  {-0.5f, -0.5f, -0.5f}, {-1.0f,  0.0f},
+  { 0.5f, -0.5f,  0.5f}, {-1.0f,  0.0f},
+  { 0.5f, -0.5f, -0.5f}, {-1.0f,  0.0f},
+  { 0.5f, -0.5f,  0.5f}, {-1.0f,  0.0f},
+  {-0.5f, -0.5f, -0.5f}, {-1.0f,  0.0f},
+  {-0.5f, -0.5f,  0.5f}, {-1.0f,  0.0f},
+//TOP
+  {-0.5f,  0.5f, -0.5f}, {1.0f,  0.0f},
+  { 0.5f,  0.5f, -0.5f}, {1.0f,  0.0f},
+  { 0.5f,  0.5f,  0.5f}, {1.0f,  0.0f},
+  { 0.5f,  0.5f,  0.5f}, {1.0f,  0.0f},
+  {-0.5f,  0.5f,  0.5f}, {1.0f,  0.0f},
+  {-0.5f,  0.5f, -0.5f}, {1.0f,  0.0f}
+}
+
+
+// Normal Map Lighting
+// Position
+//Top Left Corner
+glm::vec3 pos1(-1.0f, 1.0f, 0.0f);
+// Bottom Left Corner
+glm::vec3 pos2(-1.0f,-1.0f, 0.0f);
+// Bottom Right Corner
+glm::vec3 pos3( 1.0f,-1.0f, 0.0f);
+// Top Right Corner
+glm::vec3 pos4( 1.0f, 1.0f, 0.0f);
+
+// Texture Coordinate
+// Due to the origin/ We start mapping texture is/at the Bottom of the quad
+// so we have 
+glm::vec2 uv1(0.0, 1.0);
+glm::vec2 uv2(0.0, 0.0);
+glm::vec2 uv3(1.0, 0.0);
+glm::vec2 uv4(1.0, 1.0);
+
+glm::vec3 normal(0.0f, 0.0f, 1.0f);
+// Manually calculate Tangent and Bitangent if
+// the there are none available in model/mesh
+void Compute_Tangent_and_Bi(){
+    glm::vec3 edge1 = pos2 - pos1;
+    glm::vec3 edge2 = pos3 - pos1;
+
+    glm::vec2 deltaUV1 = uv2 - uv1;
+    glm::vec2 deltaUV2 = uv3 - uv1;
+
+    float f = 1.0f/(deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+    glm::vec3 tangent1;
+    tangent1.x = f *(deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+    tangent1.y = f *(deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+    tangent1.z = f *(deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+
+    glm::vec3 bitangent1;
+    bitangent1.x = f *(-deltaUV2.y * edge1.x + deltaUV1.x * edge2.x);
+    bitangent1.y = f *(-deltaUV2.y * edge1.y + deltaUV1.x * edge2.y);
+    bitangent1.z = f *(-deltaUV2.y * edge1.z + deltaUV1.x * edge2.z);
+
+    glm::vec3 edge_1 = pos1 - pos3;
+    glm::vec3 edge_2 = pos4 - pos3;
+
+    glm::vec2 deltaUV_1 = uv1 - uv3;
+    glm::vec2 deltaUV_2 = uv4 - uv3;
+
+    f = 1.0f/(deltaUV_1.x * deltaUV_2.y - deltaUV_2.x * deltaUV_1.y);
+
+    glm::vec3 tangent_1;
+    tangent_1.x = f *(deltaUV_2.y * edge_1.x - deltaUV_1.y * edge_2.x);
+    tangent_1.y = f *(deltaUV_2.y * edge_1.y - deltaUV_1.y * edge_2.y);
+    tangent_1.z = f *(deltaUV_2.y * edge_1.z - deltaUV_1.y * edge_2.z);
+
+    glm::vec3 bitangent_1;
+    bitangent_1.x = f *(-deltaUV_2.y * edge_1.x + deltaUV_1.x * edge_2.x);
+    bitangent_1.y = f *(-deltaUV_2.y * edge_1.y + deltaUV_1.x * edge_2.y);
+    bitangent_1.z = f *(-deltaUV_2.y * edge_1.z + deltaUV_1.x * edge_2.z);
+}
+
+// In Vertex Shader
+
+out vs{
+    vec3 T;
+    vec3 B;
+    vec3 N;
+};
+
+void main(){
+    vec3 T = normalize(vec3(model * vec4(tangent, 1.0f)));
+
+out vs{
+    vec3 T;
+    vec3 B;
+    vec3 N;
+};
+
+void main(){
+    // We will ignore the w value;
+    vec3 T = normalize(vec3(model * vec4(tangent, 0.0f)));
+    vec3 B = normalize(vec3(model * vec4(bitangent, 0.0f)));
+    vec3 N = normalize(vec3(model * vec4(anormal, 0.0f)));
+
+    mat3 TBN = mat3(T, B, N);
+};

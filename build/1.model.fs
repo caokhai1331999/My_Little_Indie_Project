@@ -23,6 +23,7 @@ struct Material{
 // Ambient will be the same even with change in input
    sampler2D texture_diffused1;
    sampler2D texture_specular1;
+   sampler2D texture_normal1;
 
    vec3 ambient;
    vec3 diffuse;

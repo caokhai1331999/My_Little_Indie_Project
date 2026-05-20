@@ -1797,9 +1797,13 @@ Consider loading a bit flat ground
 
 ---------------- Mon, 18 May 26: 10:10AM
 DONE! Create simple environmental light setup function.
-NEXT: .DO normal light to create lamp light
+NEXT: .DO normal light to create lamp light (!)
       .create simple land world with allow object interact with it(collision)
       FIRST
 
 ---------------- Tue, 19 May 26: 10:54AM
 
+
+---------------- Wed, 20 May 26: 08:59AM
+
+TODO: Try some cool moving algorithms
