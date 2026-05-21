@@ -5,7 +5,7 @@ const int MAX_BONES = 52;
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
-layout (location = 2) in vec2 TexCoordd;
+layout (location = 2) in vec2 aTexCoord;
 layout (location = 3) in vec3 tangent;
 layout (location = 4) in vec3 bitangent;
 layout (location = 5) in ivec4 boneids;
@@ -21,15 +21,31 @@ uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 WorldToCamera;
 
-uniform vec3 lightPos;
-
+// uniform vec3 lightPos;
 uniform bool is_moving;
+
+#define NR_POINT_LIGHTS 2
+
+uniform vec3 ViewPos;
+uniform vec3 lightPos;
+uniform vec3 pointLight_Pos[NR_POINT_LIGHTS];
+
+out vec2 TexCoord;
+out VS_OUT{
+    vec2 TexCoord;
+    vec3 FragPos;
+    vec3 tangent_light_pos;
+    vec3 tangentViewPos;
+    vec3 tangentpointLight_Pos[NR_POINT_LIGHTS];
+}vs_out;
 
 // uniform mat4[MAX_BONES] finalBoneMatrices;
 
-out vec2 TexCoord;
-out vec3 Normal;
-out vec3 FragPos;
+// out vec2 TexCoord;
+// out vec3 Normal;
+// out vec3 FragPos;
+
+
 
 void main()
 {
@@ -90,10 +106,31 @@ for (int i = 0; i < 4 ; i++){
      // Actually the model matrix is what carried world's feature
 
      gl_Position = projection * WorldToCamera * totalPosition;     
-     
-     TexCoord = TexCoordd;
-     FragPos = vec3(model *vec4(aPos, 1.0f));
-     Normal = vec3(transpose(inverse(view * model))) * aNormal;
+
+    vec3 T = normalize(vec3(model * vec4(tangent, 0.0f)));
+    vec3 N = normalize(vec3(model * vec4(aNormal, 0.0f)));
+
+    vec3 bitangent_ = cross(aNormal, tangent);
+    vec3 B = normalize(vec3(model * vec4(bitangent_, 0.0f)));
+    
+    // inverse of orthogonal matrix is its transpos form
+    mat3 TBN = transpose(mat3(T, B, N));
+    
+    vs_out.TexCoord = aTexCoord;
+    vs_out.FragPos = TBN * (vec3(model * vec4(aPos, 1.0f)));
+    vs_out.tangentViewPos = TBN * ViewPos;
+    vs_out.tangent_light_pos = TBN * lightPos;
+	//aPos is the vertex position so the Fragment position is
+	//the dot product of model and vertex Position (plus two vector)
+	// This is to create a world space coor of fragment
+
+    for(int i = 0; i < NR_POINT_LIGHTS; i++){;
+        vs_out.tangentpointLight_Pos[i] = TBN * pointLight_Pos[i];
+    }
+
+     TexCoord = TexCoord;
+     // FragPos = vec3(model *vec4(aPos, 1.0f));
+     // Normal = vec3(transpose(inverse(view * model))) * aNormal;
 
       //gl_Position = projection * WorldToCamera * vec4(-aPos, 1.0f);     
     // gl_Position = projection * view * model * vec4(-aPos, 1.0f);

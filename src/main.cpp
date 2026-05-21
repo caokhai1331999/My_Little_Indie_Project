@@ -203,6 +203,10 @@ int CALLBACK WinMain
                 BackBuffer.shaders_list.push_back(new B_shader_program("1.model.vs", "1.model.fs", "model drawing brush"));
                 ScreenBuffer.glData.ProgramIDs.push_back(BackBuffer.shaders_list[BackBuffer.shaders_list.size()-1]->GetProgramID());                
 
+                for(B_shader_program* const &shader: BackBuffer.shaders_list){
+                        CheckShader(shader->GetProgramID(), programme_, shader->GetShaderName());
+                    }
+
                 copyBufferData(&BackBuffer, &ScreenBuffer);
                 //????
                 //glm::mat4 View = glm::mat4(1.0f);
@@ -251,12 +255,7 @@ int CALLBACK WinMain
 
                 BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)BackBuffer.BitmapWidth / (float)BackBuffer.BitmapHeight, 0.1f, 100.0f);
 
-                //for(const auto &shader: BackBuffer.shaders_list){
-                for(B_shader_program* const &shader: BackBuffer.shaders_list){
-                    CheckShader(shader->GetProgramID(), programme_, shader->GetShaderName());
-                    Set_environmental_light_(shader, &envir_light, &BackBuffer.camera);
-                }
-                
+                //for(const auto &shader: BackBuffer.shaders_list){                
                 Set_Projection_View(&BackBuffer);
 
                 std::string Mname = "backpack";                
@@ -325,6 +324,15 @@ int CALLBACK WinMain
                 std::cout<<map_content->data()<<std::endl;
 
                 unsigned int TileTexture = SetupTileTexture("./media/grass.png");
+
+                for(B_shader_program* const &shader: BackBuffer.shaders_list){
+                    shader->use();
+                    shader->setMat4("view", BackBuffer.camera.view);
+                    shader->setMat4("projection", BackBuffer.camera.projection);
+                    shader->setVec3( "ViewPos", BackBuffer.camera.Position);
+                    Set_environmental_light_(shader, &envir_light, &BackBuffer.camera);
+                }
+
                 
                 while (GlobalRunning) {
 
@@ -464,12 +472,6 @@ int CALLBACK WinMain
                     }
 
                     //for(const auto &shader: BackBuffer.shaders_list){
-                    for(B_shader_program* const &shader: BackBuffer.shaders_list){
-                        shader->use();
-                        shader->setMat4("view", BackBuffer.camera.view);
-                        shader->setMat4("projection", BackBuffer.camera.projection);
-                        shader->setVec3( "ViewPos", BackBuffer.camera.Position);
-                    }
 
                     BackBuffer.shaders_list[0]->use();
                     WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;

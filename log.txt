@@ -1807,3 +1807,6 @@ NEXT: .DO normal light to create lamp light (!)
 ---------------- Wed, 20 May 26: 08:59AM
 
 TODO: Try some cool moving algorithms
+
+---------------- Thu, 21 May 26: 08:44AM
+

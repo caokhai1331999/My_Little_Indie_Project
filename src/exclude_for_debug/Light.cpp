@@ -40,7 +40,9 @@ void set_environmental_light(B_shader_program* shader, global_light* envir_light
     setup_pointlight(envir_light);    
 
     shader->setFloat("material.shininess", 32.0f);
-    shader->setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+
+    shader->setVec3("lightPos", 10.0f, 5.0f, -3.3f);
+
     shader->setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
     shader->setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
     shader->setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
@@ -49,7 +51,7 @@ void set_environmental_light(B_shader_program* shader, global_light* envir_light
     std::string light_name;
     
     for(int i = 0; i < 2; i++){
-        light_name = "pointLights[].position";
+        light_name = "pointLight_Pos[]";
         light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
         shader->setVec3(light_name.c_str(), envir_light->Point_Lights[i].position);
         light_name = "pointLights[].diffuse";

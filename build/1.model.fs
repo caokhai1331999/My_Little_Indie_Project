@@ -1,10 +1,17 @@
 #version 330 core
 
+#define NR_POINT_LIGHTS 2
 //Set the output color vector first
 
 out vec4 FragColor;
 
-uniform vec3 ViewPos;
+in VS_OUT{
+    vec2 TexCoord;
+    vec3 FragPos;
+    vec3 tangent_light_pos;
+    vec3 tangentViewPos;
+    vec3 tangentpointLight_Pos[NR_POINT_LIGHTS];
+}fs_in;
 
 in vec3 FragPos;
 in vec3 Normal;
@@ -48,7 +55,7 @@ uniform DirLight dirLight;
 
 struct PointLight{
  // Inherent component
- vec3 position;
+ // vec3 position;
 
  // For Phong Shading
  vec3 ambient;
@@ -61,7 +68,6 @@ struct PointLight{
  float quadraticTerm;
 };
 
-#define NR_POINT_LIGHTS 2
 uniform PointLight pointLights [NR_POINT_LIGHTS];
 //uniform PointLight pointlight;
 
@@ -90,34 +96,35 @@ struct SpotLight{
 uniform SpotLight spotlight;
 
 vec3 CalcDirLight(DirLight light, vec3 norm, vec3 viewDir);
-vec3 CalcPointLight(PointLight light, vec3 norm, vec3 viewDir);
+vec3 CalcPointLight(PointLight light, vec3 tangent_light_pos, vec3 norm, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 viewDir);
 
 vec3 CalcDirLight(DirLight light, vec3 norm, vec3 viewDir){
   // Light direction, fragpos, norm
-  vec3 ambient = light.ambient * texture(material.texture_diffused1, TexCoord).rgb;
+    vec3 lightDirection = fs_in.tangentViewPos - fs_in.tangent_light_pos;
+    vec3 ambient = light.ambient * texture(material.texture_diffused1, fs_in.TexCoord).rgb;
 
   // This is represent the angle between lightDir and norm
-  float diff = max(dot(-light.direction, norm), 0.0f);
-  vec3 diffuse = light.diffuse * diff * texture(material.texture_diffused1, TexCoord).rgb;
+  float diff = max(dot(-lightDirection, norm), 0.0f);
+  vec3 diffuse = light.diffuse * diff * texture(material.texture_diffused1, fs_in.TexCoord).rgb;
 
-  vec3 reflecDir  = reflect(-light.direction, norm);
+  vec3 reflecDir  = reflect(-lightDirection, norm);
   float spec = pow(max(dot(reflecDir, viewDir), 0.0f), material.shininess);
 
-  vec3 specular = light.specular * spec * texture(material.texture_diffused1, TexCoord).rgb;
+  vec3 specular = light.specular * spec * texture(material.texture_diffused1, fs_in.TexCoord).rgb;
 
   return (ambient + diffuse + specular);
 }
 
-vec3 CalcPointLight(PointLight light, vec3 norm, vec3 viewDir){
+vec3 CalcPointLight(PointLight light, vec3 tangent_light_pos, vec3 norm, vec3 viewDir){
 
 // Based on light direction(Light Postion), attenuation base on constant, linear and quadratic term, distance 1/(kc + kl * d + kq * d * d)
   // This is represent the angle between lightDir and norm
 
 	//if fragpos is betweeen of viewPos and and lightPos
-	// create line formed by viewPos and LightPos first
-	 vec3 AB = ViewPos - light.position;//Light Dir
-	 vec3 AP = FragPos - ViewPos;//View Dir
+	// create line formed by viewPos and fs_in.tangentLightPos first
+	 vec3 AB = fs_in.tangentViewPos - tangent_light_pos;//Light Dir
+	 vec3 AP = fs_in.FragPos - fs_in.tangentViewPos;//View Dir
 
 	// Check if cross product is close to zero vector (i.e., colinear)
 	 bool colinear = length(cross(AB, AP)) < 1e-5f;
@@ -129,28 +136,29 @@ vec3 CalcPointLight(PointLight light, vec3 norm, vec3 viewDir){
 
 
 	// Wrong at point light 
-	 vec3 lightDir = onSegment?vec3(0.0):normalize(light.position - FragPos);
+	 // vec3 lightDir = onSegment?vec3(0.0):normalize(light.position - fs_in.FragPos);
+	 vec3 lightDir = onSegment?vec3(0.0):normalize(tangent_light_pos - fs_in.FragPos);
 
 
-  //vec3 lightDir = normalize(light.position - FragPos);
+  //vec3 lightDir = normalize(light.position - fs_in.FragPos);
   vec3 reflecDir  = reflect(-lightDir, norm);
 
   // Light direction, fragpos, norm
-  vec3 ambient = light.ambient * texture(material.texture_diffused1, TexCoord).rgb;
+  vec3 ambient = light.ambient * texture(material.texture_diffused1, fs_in.TexCoord).rgb;
 
   float diff = max(dot(lightDir, norm), 0.0f);
-  vec3 diffuse = light.diffuse * diff * texture(material.texture_diffused1, TexCoord).rgb;
+  vec3 diffuse = light.diffuse * diff * texture(material.texture_diffused1, fs_in.TexCoord).rgb;
 
   // Wrong
   float spec = pow(max(dot(reflecDir, viewDir), 0.0f), material.shininess);
-  vec3 specular = light.specular * spec * texture(material.texture_diffused1, TexCoord).rgb;
+  vec3 specular = light.specular * spec * texture(material.texture_diffused1, fs_in.TexCoord).rgb;
 
 
 // Now the attenuation calculation
 // This length is for calculating the distance
    float distance;
    float attenuation;
-   distance = length(light.position - FragPos);
+   distance = length(tangent_light_pos - fs_in.FragPos);
    attenuation = 1.0f / (light.constant + light.linearTerm * distance + light.quadraticTerm * (distance * distance));
 
    ambient *= attenuation;
@@ -176,7 +184,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 viewDir){
 
 // lightDir is the direction from flashlight to the fragment
 //light.direction is light direction while lightDir is alway spot direction while is perpencular with the fragment
-vec3 lightDir = normalize(light.position - FragPos);
+vec3 lightDir = normalize(light.position - fs_in.FragPos);
 //theta is always equal to 180 but why
 float theta = dot(lightDir, normalize(-light.direction));
 
@@ -186,13 +194,13 @@ float theta = dot(lightDir, normalize(-light.direction));
 // Light direction, fragpos, norm
 
    reflecDir  = reflect(-lightDir, norm);
-   float distance = length(light.position - FragPos);
+   float distance = length(light.position - fs_in.FragPos);
 
-   ambient = light.ambient * texture(material.texture_diffused1, TexCoord).rgb;
+   ambient = light.ambient * texture(material.texture_diffused1, fs_in.TexCoord).rgb;
    spec = pow(max(dot(reflecDir, viewDir), 0.0f), material.shininess);
-   specular = light.specular * spec * texture(material.texture_diffused1, TexCoord).rgb;
+   specular = light.specular * spec * texture(material.texture_diffused1, fs_in.TexCoord).rgb;
    diff = max(dot(norm, lightDir), 0.0f);
-   diffuse = light.diffuse * diff * texture(material.texture_diffused1, TexCoord).rgb;
+   diffuse = light.diffuse * diff * texture(material.texture_diffused1, fs_in.TexCoord).rgb;
 
 // Smooth edge calculation
 // This is the cosine value of theta angle
@@ -228,13 +236,16 @@ void main()
 	vec3 result;
 
 	// norm is a vector represent the angle between light ray and fragment
-	vec3 norm = normalize(Normal);	// Turn this into unit vector
-
+	//vec3 norm = normalize(Normal);	// Turn this into unit vector
+	vec3 normal_ = texture(material.texture_normal1, fs_in.TexCoord).rgb;	// Turn this into unit vector
+    // This one is to tranform to tangent space
+    vec3 norm = normalize(normal_ * 2.0 - 1.0);//
+    
 	// FOR POINT LIGHT
 	// The direction from fragment to light source
 
 	// when the light source is blocked how to simulate them
-  	vec3 viewDir = normalize( ViewPos - FragPos);// work
+  	vec3 viewDir = normalize( fs_in.tangentViewPos - fs_in.FragPos);// work
 
 	//vec3 lightDir;
 	//vec3 reflectDir;
@@ -246,17 +257,17 @@ void main()
 	// POINT
 	for (int i = 0; i < NR_POINT_LIGHTS; i++)
 	{	
-	   result += CalcPointLight(pointLights[i], norm, viewDir);
-	}
+        result += CalcPointLight(pointLights[i], fs_in.tangentpointLight_Pos[i], norm, viewDir);
+	};
 
-	// Emission vec3 emission = texture(material.emissionMap, TexCoord).rgb;
+	// Emission vec3 emission = texture(material.emissionMap, fs_in.TexCoord).rgb;
 	    //result += CalcPointLight(pointlight, norm, viewDir);
 	// SPOT
-	//lightDir = normalize(spotlight.position - FragPos);// lightDir is the direction from flashlight to the fragment
+	//lightDir = normalize(spotlight.position - fs_in.FragPos);// lightDir is the direction from flashlight to the fragment
 // NOTHING wrong with the calcspotlight fx. The model messed something else up
 	//result += CalcSpotLight(spotlight, norm, viewDir);
 
 	 FragColor = vec4(result, 1.0f);
-	//FragColor = vec4(texture(material.texture_diffused1, TexCoord).rgb, 1.0f); 
+	//FragColor = vec4(texture(material.texture_diffused1, fs_in.TexCoord).rgb, 1.0f); 
 }
 
