@@ -26,7 +26,7 @@ rem set PDB_name=
 rem Remember exclude out the src files that is used to build dll while building exe
 set src_files_for_dll=..\src\exclude_for_debug\*.cpp
 set glad_src=..\src\glad\*.c
-set dll_name=skeletalAni32
+set dll_name=Light32
 rem set EXPORT_=
 
 set GLFW_INCLUDE_DIR="C:\Users\klove\Downloads\External_Libraries\glfw\glfw-3.4.bin.WIN64\include"
@@ -51,16 +51,16 @@ rem Let alone the hot Loading code later
 rem delete pre-pdb files
 rem=========================================
 
-rem del animation.obj animator.obj Bone.obj
-rem del skeletalAni32__* animation.exp animation.lib
-rem set dll_name_with_time_=%dll_name%__%hr%_%min%_%sec%__%dd%-%mm%-%yr%
-rem cl /D_USRDLL /D_WINDLL /LD /Zi /EHsc /FD %DIRECTIVES_FLAG% %src_files_for_dll% %glad_src% -I%_include% -I%glad_include% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link /PDB:%dll_name_with_time_%.pdb %LIB_% /LIBPATH:%ASSIMP_LIB% /FORCE:MULTIPLE /IGNORE:4006 /OUT:%dll_name%.dll
+del Camera.obj Light.obj
+del Light32__* Light32.exp Light32.lib
+set dll_name_with_time_=%dll_name%__%hr%_%min%_%sec%__%dd%-%mm%-%yr%
+cl /D_USRDLL /D_WINDLL /LD /Zi /EHsc /FD  %DIRECTIVES_FLAG% /DFOR_DLL=1 %src_files_for_dll% %glad_src% -I%_include% -I%glad_include% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link /PDB:%dll_name_with_time_%.pdb %LIB_% /LIBPATH:%ASSIMP_LIB% /FORCE:MULTIPLE /IGNORE:4006 /IMPLIB:%dll_name%.lib /OUT:%dll_name%.dll
 
 rem ====================================== 
 
-del B_shader.obj Camera.obj C_Model.obj  C_Mesh.obj handmade.obj main.obj SoundMaker.obj testOpenGL.obj Tile.obj win32Game.obj
-del win32Game.pdb
-cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES_FOR_EXE% %glad_src% -I%_include% -I%glad_include% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% animation.lib /LIBPATH:%ASSIMP_LIB% /PDB:win32Game.pdb /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /ENTRY:WinMainCRTStartup /subsystem:console
+rem del B_shader.obj C_Model.obj C_Mesh.obj handmade.obj main.obj SoundMaker.obj testOpenGL.obj Tile.obj win32Game.obj Tile.obj animation.obj animator.obj bone.obj
+rem del win32Game.pdb
+rem cl %COMPILE_FLAG% %DIRECTIVES_FLAG% /DFOR_DLL=0 -Fe:"win32Game" %FILES_FOR_EXE% %glad_src% -I%_include% -I%glad_include% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% %dll_name%.lib /LIBPATH:%ASSIMP_LIB% /PDB:win32Game.pdb /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /ENTRY:WinMainCRTStartup /subsystem:console
 
 rem=======================================
 

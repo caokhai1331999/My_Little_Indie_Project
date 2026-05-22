@@ -17,7 +17,7 @@ void setup_pointlight(global_light* envir_light){
             glm::vec3(0.5f, 0.5f, 0.5f)
         };
 
-    envir_light->Point_Lights[0].position = glm::vec3( 0.7f,  0.2f,  2.0f);
+    envir_light->Point_Lights[0].position = glm::vec3(7.0f,  5.0f,  3.0f);
     envir_light->Point_Lights[0].ambient = glm::vec3( 0.05f, 0.05f, 0.05f);
     envir_light->Point_Lights[0].diffuse = glm::vec3( 0.8f, 0.8f, 0.8f);
     envir_light->Point_Lights[0].specular = glm::vec3( 1.0f, 1.0f, 1.0f);
@@ -25,7 +25,7 @@ void setup_pointlight(global_light* envir_light){
     envir_light->Point_Lights[0].linearTerm = 0.09f;
     envir_light->Point_Lights[0].quadraticTerm = 0.032f;
           
-    envir_light->Point_Lights[1].position = glm::vec3(2.3f, -3.3f, -4.0f);    
+    envir_light->Point_Lights[1].position = glm::vec3(-5.0f, 5.0f, 3.0f);    
     envir_light->Point_Lights[1].ambient = glm::vec3(0.05f, 0.05f, 0.05f);        
     envir_light->Point_Lights[1].diffuse = glm::vec3(0.8f, 0.8f, 0.8f);           
     envir_light->Point_Lights[1].specular = glm::vec3(1.0f, 1.0f, 1.0f);          
@@ -39,9 +39,8 @@ void set_environmental_light(B_shader_program* shader, global_light* envir_light
     shader->use();
     setup_pointlight(envir_light);    
 
-    shader->setFloat("material.shininess", 32.0f);
-
-    shader->setVec3("lightPos", 10.0f, 5.0f, -3.3f);
+    shader->setFloat("material.shininess", 15.0f);
+    shader->setVec3("lightPos", -4.0f, 0.0f, -15.0f);
 
     shader->setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
     shader->setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);

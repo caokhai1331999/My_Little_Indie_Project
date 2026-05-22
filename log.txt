@@ -1810,3 +1810,13 @@ TODO: Try some cool moving algorithms
 
 ---------------- Thu, 21 May 26: 08:44AM
 
+
+---------------- Fri, 22 May 26: 12:30PM
+
+Keep building the world
+Exe keep locking unrelated dll file lying inside the same folder of it.
+
+NOTE: uninitialized HMODULE(Anilib) will lead to leak memory and unexpected
+behaviour
+
+May be the copyFile locked it

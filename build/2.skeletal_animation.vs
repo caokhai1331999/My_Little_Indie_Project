@@ -31,6 +31,7 @@ uniform vec3 lightPos;
 uniform vec3 pointLight_Pos[NR_POINT_LIGHTS];
 
 out vec2 TexCoord;
+
 out VS_OUT{
     vec2 TexCoord;
     vec3 FragPos;
@@ -109,7 +110,8 @@ for (int i = 0; i < 4 ; i++){
 
     vec3 T = normalize(vec3(model * vec4(tangent, 0.0f)));
     vec3 N = normalize(vec3(model * vec4(aNormal, 0.0f)));
-
+// re-othorgonalize TBN
+    T = (T - dot(T, N) * N);
     vec3 bitangent_ = cross(aNormal, tangent);
     vec3 B = normalize(vec3(model * vec4(bitangent_, 0.0f)));
     

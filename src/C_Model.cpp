@@ -119,6 +119,7 @@ Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
         // For skeletal animation
         vertex.Position = AssimpGLMHelpers::GetGLMVec(mesh->mVertices[i]);
         vertex.Normal = AssimpGLMHelpers::GetGLMVec(mesh->mNormals[i]);
+        vertex.Tangent = AssimpGLMHelpers::GetGLMVec(mesh->mTangents[i]);
         
         if(mesh->mTextureCoords[0]){
             glm::vec2 vec = AssimpGLMHelpers::GetGLMVec(mesh->mTextureCoords[0][i]);

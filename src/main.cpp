@@ -43,7 +43,7 @@ int CALLBACK WinMain
 
   
   // NOTE: I forgot to init window
-  HMODULE AniLib;
+  HMODULE AniLib = {};
   
   TimeSet.PerfCountFrequency = (int64)(TimeSet.PerfCountFrequencyResult.QuadPart);  
 
@@ -83,19 +83,30 @@ int CALLBACK WinMain
       ReleaseDC(BackBuffer.Window, DeviceContext);
 
 
-      if (CopyFile("Light32.dll", "Light32_copy.dll",
-                   false))
-      {
-          AniLib = LoadLibraryA("Light32_copy.dll");
-      }
-      //
+      if(first_announce){
+          if(AniLib!=NULL)
+              if(FreeLibrary(AniLib)){
+                  printf("Succeed free library\n");
+                      } else {
+                  printf("Failed free library\n");
+              };
 
-      // Animation
-      if(AniLib != NULL){
+          if (CopyFileA("../Light32.dll", "../Light32_copy.dll",
+                       false))
+          {
+              //if (CopyFile("..\Light32.lib",
+                           //"..\Light32_copy.lib", false))
+                  //printf("Succeed copy lib file\n");
+//
+              AniLib = LoadLibraryA("../Light32_copy.dll");
 
-          UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");          
-          Set_environmental_light = (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
+              if(AniLib != NULL){
+                  UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");          
+                  Set_environmental_light = (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
+              }
+          }
       }
+
 
       
       glm::vec3 tempPos = glm::vec3(9.0f, 0.3, 1.0f);
@@ -190,7 +201,7 @@ int CALLBACK WinMain
                 std::string shader_name = "animating sketching brush";
                 BackBuffer.shaders_list.reserve(5);
 
-                BackBuffer.shaders_list.push_back(new B_shader_program("2.skeletal_animation.vs", "2.skeletal_animation.fs", "animating sketching brush"));
+                BackBuffer.shaders_list.push_back(new B_shader_program("2.skeletal_animation.vs", "1.model.fs", "animating sketching brush"));
                 ScreenBuffer.glData.ProgramIDs.push_back(BackBuffer.shaders_list[BackBuffer.shaders_list.size()-1]->GetProgramID());
 
 // Basic shader
@@ -372,11 +383,10 @@ int CALLBACK WinMain
                              printf("fail to free current lib %s\n", GetLastError());
                         }
 
-                        if (CopyFile("Light32.dll",
-                                     "Light32_copy.dll", false)) {
-
+                        if (CopyFileA("../Light32.dll",
+                                     "../Light32_copy.dll", false)) {
                            printf("Succeed copy dll file\n");
-                          AniLib = LoadLibraryA("Light32_copy.dll");
+                          AniLib = LoadLibraryA("../Light32_copy.dll");
                         }
 //
                         // Animation
@@ -384,17 +394,14 @@ int CALLBACK WinMain
                             printf("Succeed reload code and opengl function from dll\n");
 
                           UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");
-                          Set_environmental_light = (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
+                          Set_environmental_light =                      (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
 //setupMesh =
                           //(setupMeshh)GetProcAddress(AniLib, "setMesh");
                           //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
                           }
-
-                        if (Load_Lib) {
+                        }
+                      if(Load_Lib)
                           Load_Lib = false;
-                        }
-
-                        }
                     }
 
                     //UPDATE
@@ -461,7 +468,13 @@ int CALLBACK WinMain
                         ColorOffset -= 1.0f;  
                     };
                     //if(BackBuffer.camera.moved || BackBuffer.camera.mouse.moved){
-                    UpdateCamera(&BackBuffer.camera, &DelayedRatio);
+                   UpdateCamera(&BackBuffer.camera, &DelayedRatio);
+                    for(B_shader_program* const &shader: BackBuffer.shaders_list){
+                        shader->use();
+                        shader->setMat4("view", BackBuffer.camera.view);
+                        shader->setMat4("projection", BackBuffer.camera.projection);
+                        shader->setVec3( "ViewPos", BackBuffer.camera.Position);
+                    }
                     //}
                     
                     if(BackBuffer.camera.mouse.Wheeled)

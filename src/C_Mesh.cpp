@@ -77,6 +77,7 @@ void Draw(Mesh* mesh, GLuint* progID){
     useProgram(0);
         //unsigned int textureID  = vampire_?3:1;
 
+        unsigned int ambientNr  = 1;
         unsigned int diffuseNr  = 1;
         unsigned int specularNr = 1;
         unsigned int normalNr   = 1;
@@ -91,7 +92,11 @@ void Draw(Mesh* mesh, GLuint* progID){
 // retrieve texture number (the N in diffuse_textureN)
             unsigned int number;
             std::string name = mesh->textures[i].type;
-            if(strcmp(name.c_str(),"material.texture_diffused") == 0){
+            if(strcmp(name.c_str(),"material.texture_ambient") == 0){
+                number = ambientNr++;
+
+            }else if(strcmp(name.c_str(),"material.texture_diffused") == 0){
+
                 number = diffuseNr++;
             }else if(strcmp(name.c_str(),"material.texture_specular")==0){
                 

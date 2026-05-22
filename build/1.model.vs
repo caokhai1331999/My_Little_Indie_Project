@@ -37,6 +37,8 @@ void main()
     vec3 T = normalize(vec3(model * vec4(tangent, 0.0f)));
     vec3 N = normalize(vec3(model * vec4(aNormal, 0.0f)));
 
+    T = (T - dot(T, N) * N);
+    
     vec3 bitangent_ = cross(aNormal, tangent);
     vec3 B = normalize(vec3(model * vec4(bitangent_, 0.0f)));
     
