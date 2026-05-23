@@ -1820,3 +1820,13 @@ NOTE: uninitialized HMODULE(Anilib) will lead to leak memory and unexpected
 behaviour
 
 May be the copyFile locked it
+
+---------------- Sat, 23 May 26: 09:18AM
+
+So why I change the fragment shader code. I appear no color at all.
+Assimp didn't found material(textures) inside these two models, So I have to
+manually tell it to load from the external files in folder
+
+Actually we didn't load any normal texture/map before.
+Now we make it on the backpack model but the vampire model stay dark
+. Got to work on that next time.

@@ -15,8 +15,14 @@
 
 #include "C_Mesh.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <io.h>
+#include <time.h>
+
 static bool first_diffuse_time = true;
 static bool first_specular_time = true;
+static bool first_normal_time = true;
 static bool first_time = true;
 
 class Model_{

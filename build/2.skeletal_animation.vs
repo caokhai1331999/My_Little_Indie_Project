@@ -27,10 +27,11 @@ uniform bool is_moving;
 #define NR_POINT_LIGHTS 2
 
 uniform vec3 ViewPos;
+uniform vec3 FragPos;
 uniform vec3 lightPos;
 uniform vec3 pointLight_Pos[NR_POINT_LIGHTS];
 
-out vec2 TexCoord;
+// out vec2 TexCoord;
 
 out VS_OUT{
     vec2 TexCoord;
@@ -41,12 +42,9 @@ out VS_OUT{
 }vs_out;
 
 // uniform mat4[MAX_BONES] finalBoneMatrices;
-
 // out vec2 TexCoord;
-// out vec3 Normal;
+out vec3 Normal;
 // out vec3 FragPos;
-
-
 
 void main()
 {
@@ -130,9 +128,10 @@ for (int i = 0; i < 4 ; i++){
         vs_out.tangentpointLight_Pos[i] = TBN * pointLight_Pos[i];
     }
 
-     TexCoord = TexCoord;
+     // TexCoord = TexCoord;
      // FragPos = vec3(model *vec4(aPos, 1.0f));
-     // Normal = vec3(transpose(inverse(view * model))) * aNormal;
+     // Normal = vec3(transpose(inverse(WorldToCamera))) * aNormal;
+     Normal = vec3(transpose(inverse(WorldToCamera))) * aNormal;
 
       //gl_Position = projection * WorldToCamera * vec4(-aPos, 1.0f);     
     // gl_Position = projection * view * model * vec4(-aPos, 1.0f);

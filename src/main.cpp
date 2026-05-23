@@ -91,14 +91,12 @@ int CALLBACK WinMain
                   printf("Failed free library\n");
               };
 
-          if (CopyFileA("../Light32.dll", "../Light32_copy.dll",
+          if (CopyFileA("../Light32.dll", "Light32_copy.dll",
                        false))
           {
-              //if (CopyFile("..\Light32.lib",
-                           //"..\Light32_copy.lib", false))
                   //printf("Succeed copy lib file\n");
 //
-              AniLib = LoadLibraryA("../Light32_copy.dll");
+              AniLib = LoadLibraryA("Light32_copy.dll");
 
               if(AniLib != NULL){
                   UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");          
@@ -384,9 +382,9 @@ int CALLBACK WinMain
                         }
 
                         if (CopyFileA("../Light32.dll",
-                                     "../Light32_copy.dll", false)) {
+                                     "Light32_copy.dll", false)) {
                            printf("Succeed copy dll file\n");
-                          AniLib = LoadLibraryA("../Light32_copy.dll");
+                          AniLib = LoadLibraryA("Light32_copy.dll");
                         }
 //
                         // Animation

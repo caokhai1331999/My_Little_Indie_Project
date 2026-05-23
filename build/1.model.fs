@@ -5,6 +5,8 @@
 
 out vec4 FragColor;
 
+in vec3 Normal;
+
 in VS_OUT{
     vec2 TexCoord;
     vec3 FragPos;
@@ -13,9 +15,9 @@ in VS_OUT{
     vec3 tangentpointLight_Pos[NR_POINT_LIGHTS];
 }fs_in;
 
-in vec3 FragPos;
-in vec3 Normal;
-in vec2 TexCoord;
+// in vec3 FragPos;
+// in vec3 Normal;
+// in vec2 TexCoord;
 
 struct light_in_general{
        vec3 ambient;
@@ -242,6 +244,10 @@ void main()
 	vec3 normal_ = texture(material.texture_normal1, fs_in.TexCoord).rgb;	// Turn this into unit vector
     // This one is to tranform to tangent space
     vec3 norm = normalize(normal_ * 2.0 - 1.0);//
+
+    // if(norm == vec3(0.0f, 0.0f, 0.0f)){
+    //     norm = Normal;
+    // }
     
 	// FOR POINT LIGHT
 	// The direction from fragment to light source

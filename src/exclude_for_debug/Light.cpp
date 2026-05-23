@@ -39,7 +39,7 @@ void set_environmental_light(B_shader_program* shader, global_light* envir_light
     shader->use();
     setup_pointlight(envir_light);    
 
-    shader->setFloat("material.shininess", 15.0f);
+    shader->setFloat("material.shininess", 25.0f);
     shader->setVec3("lightPos", -4.0f, 0.0f, -15.0f);
 
     shader->setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
