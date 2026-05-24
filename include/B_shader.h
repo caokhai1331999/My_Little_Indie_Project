@@ -52,9 +52,11 @@ class B_shader_program{
 private:
     GLuint ProgramID;
     char* programName_;
+    char* vertex_file_path;
+    char* fragment_file_path;
 public:
     B_shader shaders[2];
-    B_shader_program(char* vertex_file_name, char* fragment_file_name, char* programName = nullptr){
+    B_shader_program(char* vertex_file_name, char* fragment_file_name, char* programName = nullptr):vertex_file_path{vertex_file_name},fragment_file_path{fragment_file_name}{
         programName_ = nullptr;
         programName_ = new char;
         programName_ = programName;
@@ -78,6 +80,11 @@ public:
         };
     };
 
+    char* GetVertexFilePath(){return vertex_file_path;};
+    char* GetFragmentFilePath(){return fragment_file_path;};
+    char* GetProgramName(){return programName_;};
+    GLuint GetProgramID(){return ProgramID;};
+    void ReLoadShaderCode();
 // Set Int, bool, float and Vector
     void setVec2(const char* name, const glm::vec2 &value);
     void setVec2(const char* name, float x, float y);

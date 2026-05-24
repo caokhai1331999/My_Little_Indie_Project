@@ -71,6 +71,7 @@ void loadModel_(Model_* model, string path){
     }else{
         model->Texturedirectory = model->directory;
     }
+
 // NODE
     processNode(model, scene->mRootNode, scene);
 // MESH
@@ -173,6 +174,7 @@ Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
         return Mesh(vertices, indices, textures);
 }
 
+
 vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene){
     vector<Texture>textures;
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++){
@@ -255,29 +257,32 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
             };
 
 // Manually load normal texture here
-            Texture texture_;
-            // Now search for the file
-            std::string filename_;
-            std::string pattern = model->Texturedirectory+"/*normal*";
-            intptr_t searchAgent = {};
-            _finddata64i32_t Normal_Texture_File = {};
+            if(first_normal_time){
+                Texture texture_;
+                // Now search for the file
+                std::string filename_;
+                std::string pattern = model->Texturedirectory+"/*normal*";
+                intptr_t searchAgent = {};
+                _finddata64i32_t Normal_Texture_File = {};
 
-            searchAgent = _findfirst(pattern.c_str(), &Normal_Texture_File);
-            if(searchAgent != -1L){
-                printf("Succeed searching out the file in folder %s\n", model->directory.c_str());
-                filename_ = Normal_Texture_File.name;
+                searchAgent = _findfirst(pattern.c_str(), &Normal_Texture_File);
+                if(searchAgent != -1L){
+                    printf("Succeed searching out the file in folder %s\n", model->directory.c_str());
+                    filename_ = Normal_Texture_File.name;
 
-                texture_.id = TextureFromFile(filename_.c_str(), model->Texturedirectory);
-                //printf("texture path is:%s\n",model->directory.c_str());
-                texture_.type = "material.texture_normal";
-                std::string path_ = model->directory +"/"+ filename_;
-                texture_.path = path_.c_str();
-                textures.push_back(texture_);
-                printf("Start loading texture from external file , model path is :%s \n",model->directory.c_str());
-                model->loaded_textures.push_back(texture_);                    
-            } else {
-                printf("Couldn't find out the file with that pattern: %s\n", pattern.c_str());
-            };
+                    texture_.id = TextureFromFile(filename_.c_str(), model->Texturedirectory);
+                    //printf("texture path is:%s\n",model->directory.c_str());
+                    texture_.type = typeName.c_str();
+                    std::string path_ = model->directory +"/"+ filename_;
+                    texture_.path = path_.c_str();
+                    textures.push_back(texture_);
+                    printf("Start loading texture from external file , model path is :%s \n",model->directory.c_str());
+                    model->loaded_textures.push_back(texture_);                    
+                } else {
+                    printf("Couldn't find out the file with that pattern: %s\n", pattern.c_str());
+                };                
+                first_normal_time = !first_normal_time;
+            }
                                                  
             //=======================
         };                    

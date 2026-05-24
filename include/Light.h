@@ -85,9 +85,12 @@ struct global_light{
 };
 
 global_variable global_light envir_light = {};
+
 void setup_pointlight(global_light* envir_light = nullptr);
 void set_environmental_light(B_shader_program* shader = nullptr, global_light* envir_light = nullptr, Camera* camera = nullptr);
 
+extern "C" __declspec(dllexport) void setup_pointlight_(global_light* envir_light);
+typedef void (*setup_pointlight__)(global_light*);
 extern "C" __declspec(dllexport) void Set_environmental_light_(B_shader_program* shader, global_light* envir_light, Camera* camera);
 typedef void (*Set_Light_) (B_shader_program*, global_light* , Camera*);
 

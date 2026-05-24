@@ -48,6 +48,7 @@ int CALLBACK WinMain
   TimeSet.PerfCountFrequency = (int64)(TimeSet.PerfCountFrequencyResult.QuadPart);  
 
   updateCa UpdateCamera = NULL;
+  setup_pointlight__ setup_pointlight = NULL;
   Set_Light_ Set_environmental_light = NULL;
   //setUpUBO__ setUpUBO = NULL;
   //updateUBOData__ updateUBOData = NULL;
@@ -100,6 +101,7 @@ int CALLBACK WinMain
 
               if(AniLib != NULL){
                   UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");          
+                  setup_pointlight = (setup_pointlight__)GetProcAddress(AniLib, "setup_pointlight_");
                   Set_environmental_light = (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
               }
           }
@@ -199,7 +201,7 @@ int CALLBACK WinMain
                 std::string shader_name = "animating sketching brush";
                 BackBuffer.shaders_list.reserve(5);
 
-                BackBuffer.shaders_list.push_back(new B_shader_program("2.skeletal_animation.vs", "1.model.fs", "animating sketching brush"));
+                BackBuffer.shaders_list.push_back(new B_shader_program("2.skeletal_animation.vs", "2.skeletal_animation.fs", "animating sketching brush"));
                 ScreenBuffer.glData.ProgramIDs.push_back(BackBuffer.shaders_list[BackBuffer.shaders_list.size()-1]->GetProgramID());
 
 // Basic shader
@@ -280,6 +282,8 @@ int CALLBACK WinMain
                 //loadModel_(land, terrain_path);
                 
 //NOW THE ANIMATING PART
+                if(!first_normal_time)
+                first_normal_time = !first_normal_time;
 
                 Model_* dancing_vampire = nullptr;
                 Mname = "vampire";
@@ -333,14 +337,18 @@ int CALLBACK WinMain
                 std::cout<<map_content->data()<<std::endl;
 
                 unsigned int TileTexture = SetupTileTexture("./media/grass.png");
+                setup_pointlight(&envir_light);
 
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
                     shader->use();
                     shader->setMat4("view", BackBuffer.camera.view);
                     shader->setMat4("projection", BackBuffer.camera.projection);
                     shader->setVec3( "ViewPos", BackBuffer.camera.Position);
-                    Set_environmental_light_(shader, &envir_light, &BackBuffer.camera);
                 }
+
+                glUseProgram(0);
+                Set_environmental_light_(BackBuffer.shaders_list[0], &envir_light, &BackBuffer.camera);
+                Set_environmental_light_(BackBuffer.shaders_list[3], &envir_light, &BackBuffer.camera);
 
                 
                 while (GlobalRunning) {
@@ -392,7 +400,9 @@ int CALLBACK WinMain
                             printf("Succeed reload code and opengl function from dll\n");
 
                           UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");
+                          setup_pointlight = (setup_pointlight__)GetProcAddress(AniLib, "setup_pointlight_");
                           Set_environmental_light =                      (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
+                          BackBuffer.shaders_list[0]->ReLoadShaderCode();
 //setupMesh =
                           //(setupMeshh)GetProcAddress(AniLib, "setMesh");
                           //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
@@ -472,9 +482,10 @@ int CALLBACK WinMain
                         shader->setMat4("view", BackBuffer.camera.view);
                         shader->setMat4("projection", BackBuffer.camera.projection);
                         shader->setVec3( "ViewPos", BackBuffer.camera.Position);
+                        Set_environmental_light_(shader, &envir_light, &BackBuffer.camera);
                     }
                     //}
-                    
+//
                     if(BackBuffer.camera.mouse.Wheeled)
                     {
                         BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);

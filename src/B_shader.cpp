@@ -305,6 +305,32 @@ GLuint B_shader_program::setupGLprogram(const char* programName){
 
     return tempProgramID;
 };
+
+void B_shader_program::ReLoadShaderCode(){
+    shaders[vertex_].loadShader(GetVertexFilePath(), vertex_);
+    shaders[fragment_].loadShader(GetFragmentFilePath(), fragment_);
+
+    glAttachShader(GetProgramID(), shaders[vertex_].GetShaderID());
+    glAttachShader(GetProgramID(), shaders[fragment_].GetShaderID());
+
+    glLinkProgram(GetProgramID());
+
+    checkCompileErrors(GetProgramID(), programme_, GetProgramName());
+    printf("Program ID: %d %d\n", ProgramID, GetProgramID());
+    
+    if(glGetError() != GL_NO_ERROR){
+    //printf("OpenGL Error: %d\n", glGetError());
+        cout<<"OpenGL Error: "<< glGetError()<<endl;
+    };
+
+    glDetachShader(GetProgramID(), shaders[vertex_].GetShaderID()); 
+    glDetachShader(GetProgramID(), shaders[fragment_].GetShaderID()); 
+
+    glDeleteShader(shaders[vertex_].GetShaderID());
+    glDeleteShader(shaders[fragment_].GetShaderID());
+
+};
+
 // We Will change this function to more dynamic or radical version of it.
 void tempSetEnviLight(B_shader_program* shader, Camera* camera){
     shader->use();

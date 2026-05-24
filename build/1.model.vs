@@ -8,6 +8,7 @@ layout (location = 5) in ivec4 boneids;
 layout (location = 6) in vec4 weights;
 
 #define NR_POINT_LIGHTS 2
+uniform vec3 ViewPos;
 uniform vec3 lightPos;
 uniform vec3 pointLight_Pos[NR_POINT_LIGHTS];
 
@@ -15,11 +16,10 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-out vec3 Normal;
+// out vec3 Normal;
 // out vec3 FragPos;
-// out vec2 TexCoord;
+out vec2 TexCoord;
 
-uniform vec3 ViewPos;
 out VS_OUT{
     vec2 TexCoord;
     vec3 FragPos;
@@ -58,7 +58,6 @@ void main()
     }
     
      // FragPos = vec3(model *vec4(aPos, 1.0f));
-     Normal = vec3(transpose(inverse(view * model))) * aNormal;
-     // TexCoord = aTexCoord;
-
+     // Normal = vec3(transpose(inverse(view * model))) * aNormal;
+     TexCoord = aTexCoord;
 }

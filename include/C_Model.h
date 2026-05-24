@@ -22,7 +22,7 @@
 
 static bool first_diffuse_time = true;
 static bool first_specular_time = true;
-static bool first_normal_time = true;
+global_variable bool first_normal_time = true;
 static bool first_time = true;
 
 class Model_{

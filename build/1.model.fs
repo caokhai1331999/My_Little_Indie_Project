@@ -5,7 +5,7 @@
 
 out vec4 FragColor;
 
-in vec3 Normal;
+// in vec3 Normal;
 
 in VS_OUT{
     vec2 TexCoord;

@@ -32,19 +32,21 @@ void setup_pointlight(global_light* envir_light){
     envir_light->Point_Lights[1].constant = 1.0f;                     
     envir_light->Point_Lights[1].linearTerm = 0.09f;                  
     envir_light->Point_Lights[1].quadraticTerm = 0.032f;
+
+    envir_light->dirLight.ambient = glm::vec3(0.05f, 0.05f, 0.05f);
+    envir_light->dirLight.diffuse = glm::vec3(0.4f, 0.4f, 0.4f);
+    envir_light->dirLight.specular = glm::vec3(0.5f, 0.5f, 0.5f);
 }
 
 void set_environmental_light(B_shader_program* shader, global_light* envir_light, Camera* camera){
-
     shader->use();
-    setup_pointlight(envir_light);    
 
     shader->setFloat("material.shininess", 25.0f);
-    shader->setVec3("lightPos", -4.0f, 0.0f, -15.0f);
-
-    shader->setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-    shader->setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-    shader->setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+    shader->setVec3("lightPos", -4.0f, 20.0f, -15.0f);
+    
+    shader->setVec3("dirLight.ambient", envir_light->dirLight.ambient);
+    shader->setVec3("dirLight.diffuse", envir_light->dirLight.diffuse);
+    shader->setVec3("dirLight.specular", envir_light->dirLight.specular);
 
     
     std::string light_name;
@@ -75,6 +77,10 @@ void set_environmental_light(B_shader_program* shader, global_light* envir_light
     }
     glUseProgram(0);
 };
+
+void setup_pointlight_(global_light* envir_light){
+    setup_pointlight(envir_light);
+}
 
 void Set_environmental_light_(B_shader_program* shader, global_light* envir_light, Camera* camera){
     bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);

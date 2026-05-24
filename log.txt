@@ -1830,3 +1830,10 @@ manually tell it to load from the external files in folder
 Actually we didn't load any normal texture/map before.
 Now we make it on the backpack model but the vampire model stay dark
 . Got to work on that next time.
+
+---------------- Sun, 24 May 26: 02:55PM
+
+the material is NULL in vampire case, must be something wrong with the texture loading thing
+Actually, the texture loading turn wrong in FIXED
+
+By some reasons, the set light didn't work on vampire shader model
