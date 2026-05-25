@@ -177,119 +177,123 @@ Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
 
 vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene){
     vector<Texture>textures;
-    for(unsigned int i = 0; i < mat->GetTextureCount(type); i++){
-        aiString str;
-        std::string strr = {str.C_Str()};
-        if(mat->GetTexture(type, i, &str) == aiReturn_SUCCESS){
-            if(string_contain(&strr, "specular")) {
-                //if(std::strcmp(str.C_Str(),"specular.jpg") == 0){
-                if(first_specular_time){
-                    printf("Texture successfully retrieved %s\n", str.C_Str());
-                    first_specular_time = false;
-                };
-            } else if(string_contain(&strr, "diffuse")) {
-                if(first_diffuse_time){
-                    printf("Texture successfully retrieved %s\n", str.C_Str());
-                    first_diffuse_time = false;
-                };                    
-            }
-        /*    else if (string_contain(&strr, "normal")){                
-            }*/
-
-        } else {
-            //if(first_diffuse_time){
-            printf("Texture not found or error occured\n");            
-            //first_diffuse_time = false;
-            //};
-        };
-        //printf("Texture path is: %s\n", str.C_Str());
-        // IF mat is null
-        // manually load the texture to mat from png right here
-        bool skip = false;
-        for(unsigned int j = 0; j <model->loaded_textures.size(); j++){
-
-            if(first_time){
-                printf("Loading texture from model\n");
-                first_time = false;
-            }
-
-            // If the path length equal (the texture existed)
-            if(!std::strcmp(model->loaded_textures[j].path.data(), str.C_Str())){
-                //model->loaded_textures.push_back(model->loaded_textures[j]);
-                textures.push_back(model->loaded_textures[j]);
-                skip = true;
-                break;
-            }
-
-        };
-        
-        if(!skip){
-            Texture texture;
-                //This is wrong in fbx case : How to fix this???
-            if(scene->mNumTextures == 0){
-                texture.id = TextureFromFile(str.C_Str(), model->Texturedirectory);
-                //printf("texture path is:%s\n",model->directory.c_str());
-                texture.type = typeName;
-                texture.path = str.C_Str();
-                textures.push_back(texture);
-                printf("Start loading texture from external file , model Texture path is :%s\n",model->Texturedirectory.c_str());
-                model->loaded_textures.push_back(texture);
-            } else {
-                //for(unsigned int i = 0; i < scene->mNumTextures; i++){
-
-                /*
-                  NOTE: Try to assign scene texture to model container
-                  haven't test it yet
-
-                  Things is more complicated than I thought. Actually we load
-                  embbedded one in wrong way. We have to load the texture
-                  matched with the mat index with is produced by atoi
-                  (mat->getTexture().data + 1)
-                */
-
-                printf("Start loading texture from embbedded texture, path is:%s\n",(char* )str.C_Str());
-                // Bug here
-                texture.id = TextureFromMemory(scene, model->directory, false, &str);
-                texture.type = typeName;
-                texture.path = str.C_Str();
-                textures.push_back(texture);
-                model->loaded_textures.push_back(texture);
-            };
-
 // Manually load normal texture here
-            if(first_normal_time){
-                Texture texture_;
-                // Now search for the file
-                std::string filename_;
-                std::string pattern = model->Texturedirectory+"/*normal*";
-                intptr_t searchAgent = {};
-                _finddata64i32_t Normal_Texture_File = {};
+    if(strcmp(typeName.c_str(), "material.texture_normal") == 0){
 
-                searchAgent = _findfirst(pattern.c_str(), &Normal_Texture_File);
-                if(searchAgent != -1L){
-                    printf("Succeed searching out the file in folder %s\n", model->directory.c_str());
-                    filename_ = Normal_Texture_File.name;
+        if(first_normal_time){
+            Texture texture_;
+            // Now search for the file
+            std::string filename_;
+            std::string pattern = model->Texturedirectory+"/*normal*";
+            intptr_t searchAgent = {};
+            _finddata64i32_t Normal_Texture_File = {};
 
-                    texture_.id = TextureFromFile(filename_.c_str(), model->Texturedirectory);
-                    //printf("texture path is:%s\n",model->directory.c_str());
-                    texture_.type = typeName.c_str();
-                    std::string path_ = model->directory +"/"+ filename_;
-                    texture_.path = path_.c_str();
-                    textures.push_back(texture_);
-                    printf("Start loading texture from external file , model path is :%s \n",model->directory.c_str());
-                    model->loaded_textures.push_back(texture_);                    
-                } else {
-                    printf("Couldn't find out the file with that pattern: %s\n", pattern.c_str());
-                };                
-                first_normal_time = !first_normal_time;
+            searchAgent = _findfirst(pattern.c_str(), &Normal_Texture_File);
+            if(searchAgent != -1L){
+                printf("Succeed searching out the file in folder %s\n", model->directory.c_str());
+                filename_ = Normal_Texture_File.name;
+                texture_.id = TextureFromFile(filename_.c_str(), model->Texturedirectory);
+                //printf("texture path is:%s\n",model->directory.c_str());
+                texture_.type = typeName;
+                std::string path_ = model->directory +"/"+ filename_;
+                texture_.path = path_.c_str();
+                textures.push_back(texture_);
+                printf("Start loading texture from external file , model path is :%s \n",model->directory.c_str());
+                //model->loaded_textures.push_back(texture_);                    
+            } else {
+                printf("Couldn't find out the file with that pattern: %s\n", pattern.c_str());
             }
+            first_normal_time = !first_normal_time;
+        }
+ 
+    } else {
+        for(unsigned int i = 0; i < mat->GetTextureCount(type); i++){
+            aiString str;
+            std::string strr = {str.C_Str()};
+            if(mat->GetTexture(type, i, &str) == aiReturn_SUCCESS){
+                    //if(std::strcmp(str.C_Str(),"specular.jpg") == 0){
+                //if(string_contain(&strr, "specular")) {
+                    //if(first_specular_time){
+                        //printf("Texture successfully retrieved %s\n", str.C_Str());
+                        //first_specular_time = false;
+                    //};
+                //} else if(string_contain(&strr, "diffuse")) {
+                    //if(first_diffuse_time){
+                        //printf("Texture successfully retrieved %s\n", str.C_Str());
+                        //first_diffuse_time = false;
+                    //};                    
+                //}
+                /*    else if (string_contain(&strr, "normal")){                
+                      }*/
+
+            } else {
+                //if(first_diffuse_time){
+                printf("Texture not found or error occured\n");            
+                //first_diffuse_time = false;
+                //};
+            };
+            //printf("Texture path is: %s\n", str.C_Str());
+            // IF mat is null
+            // manually load the texture to mat from png right here
+            bool skip = false;
+            for(unsigned int j = 0; j <model->loaded_textures.size(); j++){
+
+                if(first_time){
+                    printf("Loading texture from model\n");
+                    first_time = false;
+                }
+
+                // If the path length equal (the texture existed)
+                if(!std::strcmp(model->loaded_textures[j].path.data(), str.C_Str())){
+                    //model->loaded_textures.push_back(model->loaded_textures[j]);
+                    textures.push_back(model->loaded_textures[j]);
+                    skip = true;
+                    break;
+                }
+
+            };
+        
+            if(!skip){
+                Texture texture;
+                //This is wrong in fbx case : How to fix this???
+                if(scene->mNumTextures == 0){
+                    texture.id = TextureFromFile(str.C_Str(), model->Texturedirectory);
+                    //printf("texture path is:%s\n",model->directory.c_str());
+                    texture.type = typeName;
+                    texture.path = str.C_Str();
+                    textures.push_back(texture);
+                    printf("Start loading texture from external file , model Texture path is :%s\n",model->Texturedirectory.c_str());
+                    model->loaded_textures.push_back(texture);
+                } else {
+                    //for(unsigned int i = 0; i < scene->mNumTextures; i++){
+
+                    /*
+                      NOTE: Try to assign scene texture to model container
+                      haven't test it yet
+
+                      Things is more complicated than I thought. Actually we load
+                      embbedded one in wrong way. We have to load the texture
+                      matched with the mat index with is produced by atoi
+                      (mat->getTexture().data + 1)
+                    */
+
+                    printf("Start loading texture from embbedded texture, path is:%s\n",(char* )str.C_Str());
+                    // Bug here
+                    texture.id = TextureFromMemory(scene, model->directory, false, &str);
+                    texture.type = typeName;
+                    texture.path = str.C_Str();
+                    textures.push_back(texture);
+                    model->loaded_textures.push_back(texture);
+                };
+
                                                  
-            //=======================
-        };                    
+                //=======================
+            };                    
                    
-                   }
+        }
         // This part is responsible for loading image internally or from external file
-    //}
+        //}
+    }
     return textures;        
 }
 

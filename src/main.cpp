@@ -60,6 +60,8 @@ int CALLBACK WinMain
   Animator* animator = nullptr;
   int delay_count = 0;
 
+  std::vector<glm::mat4>*Transform_ = nullptr;
+
   if (RegisterClassExA(&WindowClass)) {
 
     BackBuffer.Window = CreateWindowExA(
@@ -283,7 +285,7 @@ int CALLBACK WinMain
                 
 //NOW THE ANIMATING PART
                 if(!first_normal_time)
-                first_normal_time = !first_normal_time;
+                    first_normal_time = !first_normal_time;
 
                 Model_* dancing_vampire = nullptr;
                 Mname = "vampire";
@@ -410,6 +412,7 @@ int CALLBACK WinMain
                         }
                       if(Load_Lib)
                           Load_Lib = false;
+                      Set_environmental_light_(BackBuffer.shaders_list[0], &envir_light, &BackBuffer.camera);
                     }
 
                     //UPDATE
@@ -681,9 +684,6 @@ int CALLBACK WinMain
                         glBindBufferRange(GL_UNIFORM_BUFFER, 1, UBO, 0, sizeof(glm::mat4)* 52);
                     }
 
-                    //float* Transform;
-                    std::vector<glm::mat4>* Transform_;
-
                     if(is_moving || first_announce){
                         if(animator->GetCurrentTime() > danceAnimation->GetDuration() )
                         {
@@ -705,7 +705,7 @@ int CALLBACK WinMain
                                 animator->updateAnimationTime(&(TimeSet.SPerFrame));                                
                             }                        
 
-                        }   
+                        }
                     }
 
                     if(showMsPF){
@@ -716,7 +716,8 @@ int CALLBACK WinMain
 
                     
                     //Transform = animator->getFinalBoneMatrices();
-                        Transform_ = animator->getFinalBoneMatrices();
+                    if(Transform_ == nullptr || Transform_ != animator->getFinalBoneMatrices())
+                    Transform_ = animator->getFinalBoneMatrices();
                         //glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float) * 16 * 52, Transform);
                         //if(Transform_->size() > 0){
                             glBindBuffer(GL_UNIFORM_BUFFER, UBO);
@@ -726,18 +727,14 @@ int CALLBACK WinMain
                         //}
 
                         int i = 0;
-                            std::string matrixName_;
+                        std::string matrixName_;
 
                             char index[1];
                             char indexx[2];
-//
-                            
-/*                            
+/*
                             if (Transform_ != nullptr){
-                                for(const glm::mat4& matrix_ : (*Transform_)) {
-                                    //matrixName_ = "finalBoneMatrices["+std::to_string(i)+"]";
-
-                                    matrixName_ = "final.finalBoneMatrices[]";
+                            for(const glm::mat4& matrix_ : *Transform_) {
+                                    matrixName_ = "finalBoneMatrices[]";
 
                                     if(i<10){
                                         sprintf(index, "%d", i);
@@ -746,20 +743,21 @@ int CALLBACK WinMain
                                         sprintf(indexx, "%d", i);
                                         matrixName_.insert(matrixName_.size()-1, indexx);                                     
                                     }
-                                    //animating_shader_->setMat4(
-                                        //matrixName_.c_str(), matrix_);
+
+                                    BackBuffer.shaders_list[0]->use();
+                                    BackBuffer.shaders_list[0]->setMat4(
+                  matrixName_.c_str(), matrix_);
 
                                     if(showMsPF){
                                         printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string(matrix_).c_str());
                                     }
 //
-                                    //if(i < Transform->size())
+                                    if(i < Transform_->size())
                                     i++;
+
                                 };
-                            };
-
-*/
-
+                            //};
+                            */
                             //if(is_moving){
                             BackBuffer.shaders_list[0]->use();
                             WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
@@ -774,8 +772,7 @@ int CALLBACK WinMain
                       if(showMsPF){
                           glm::vec2 TexCoordToShow;
                           int TextureID;
-                          showUniformVarValuePerVertex(&UBO, &brushID, &dancing_vampire->meshes[0], false, false, false, false, false, false);
-                          printf("");
+                          showUniformVarValuePerVertex(&UBO, &brushID, &dancing_vampire->meshes[0], false, false, false, false, false, true);
                           showMsPF =!showMsPF;
                       };
 
@@ -808,6 +805,8 @@ MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per registerMULPS -> re
 */
           //SlayAnimator(animator);
           //KillAninmation(danceAnimation);          
+          delete Transform_;
+          Transform_ = nullptr;
           delete animator;
           animator = nullptr;
           delete danceAnimation;

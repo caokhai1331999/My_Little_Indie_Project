@@ -35,6 +35,8 @@ struct Material{
 };
 
 
+uniform Material material;
+
 struct DirLight{
  // Inherent component
  vec3 direction;
@@ -45,6 +47,7 @@ struct DirLight{
  vec3 specular;
 };
 
+uniform DirLight dirLight;
 
 struct PointLight{
  // Inherent component
@@ -61,9 +64,7 @@ struct PointLight{
  float quadraticTerm;
 };
 
-
-uniform DirLight dirLight;
-uniform Material material;
+// These two contain bugs
 uniform PointLight pointLights [NR_POINT_LIGHTS];
 
 vec3 CalcDirLight(DirLight light, vec3 norm, vec3 viewDir);
@@ -72,8 +73,7 @@ vec3 CalcPointLight(PointLight light, vec3 tangent_light_pos, vec3 norm, vec3 vi
 vec3 CalcDirLight(DirLight light, vec3 norm, vec3 viewDir){
   // Light direction, fragpos, norm
     vec3 lightDirection = fs_in.tangentViewPos - fs_in.tangent_light_pos;
-
-    vec3 ambient = light.ambient * texture(material.texture_diffused1, fs_in.TexCoord).rgb;
+    vec3 ambient = light.ambient * texture(material.texture_specular1, fs_in.TexCoord).rgb;
 
   // This is represent the angle between lightDir and norm
   float diff = max(dot(-lightDirection, norm), 0.0f);
@@ -81,10 +81,10 @@ vec3 CalcDirLight(DirLight light, vec3 norm, vec3 viewDir){
 
   vec3 reflecDir  = reflect(-lightDirection, norm);
   float spec = pow(max(dot(reflecDir, viewDir), 0.0f), material.shininess);
-
   vec3 specular = light.specular * spec * texture(material.texture_specular1, fs_in.TexCoord).rgb;
 
   return (ambient + diffuse + specular);
+
 }
 
 vec3 CalcPointLight(PointLight light, vec3 tangent_light_pos, vec3 norm, vec3 viewDir){
@@ -146,32 +146,24 @@ void main(){
     vec3 normal_ = texture(material.texture_normal1, fs_in.TexCoord).rgb;
     vec3 norm = normalize(normal_ * 2.0 - 1.0);
   	vec3 viewDir = normalize( fs_in.tangentViewPos - fs_in.FragPos);
-    if(norm != vec3(0.0f) && viewDir !=vec3(0.0f)){
+//     && viewDir !=vec3(0.0f)
+    if(viewDir != vec3(0.0f)){
         outFrag = CalcDirLight(dirLight, norm, viewDir);
     }else{
         outFrag = texture(material.texture_diffused1, fs_in.TexCoord).rgb;
     }
 
-	for (int i = 0; i < NR_POINT_LIGHTS; i++)
-	{	
-        outFrag += CalcPointLight(pointLights[i], fs_in.tangentpointLight_Pos[i], norm, viewDir);
-	};
-    // if(fs_in.TexCoord != vec2(0.0f) && texture(material.texture_diffused1, fs_in.TexCoord).rgb != vec3(0.0f)){
-    // vec3 norm = texture(material.texture_normal1, fs_in.TexCoord).rgb;
-// vec outFrag = vec4(texture(material.texture_diffused1, fs_in.TexCoord).rgb * dirLight.diffuse, 1.0f);
-        // vec3 ViewDir = normalize(fs_in.tangentViewPos - fs_in.FragPos);
-        // vec3 outFrag = CalcDirLight(dirLight, norm, ViewDir);
-    // vec4 outFrag = vec4(TexCoord_, 0.0, 1.0f);
-     // } else {
-     // FragColorr = vec4(TexCoord_, 0.0, 1.0f);
-//     }else{
-//         if(fs_in.TexCoord == vec2(0.0f))
-//         outFrag = vec4(0.5, 0.4, 0.3, 1.0f);
+    // if(dirLight.specular != vec3(0.0f)){
+    //     FragColorr = vec4(texture(material.texture_diffused1, fs_in.TexCoord).rgb *  dirLight.diffuse, 0.0f);
+    // }else{
+    //     FragColorr = texture(material.texture_diffused1, fs_in.TexCoord);
+    // }
 
-//         outFrag = vec4(0.7, 0.2, 0.1, 1.0f);
-// }
-// outFrag += vec4(texture(material.texture_specular1, fs_in.TexCoord).rgb, 1.0f); 
-        // FragColorr = vec4(outFrag, 1.0f);
+	// for (int i = 0; i < NR_POINT_LIGHTS; i++)
+	// {	
+    //     outFrag += CalcPointLight(pointLights[i], fs_in.tangentpointLight_Pos[i], norm, viewDir);
+	// };
+
+       // FragColorr = texture(material.texture_diffused1, fs_in.TexCoord);
     FragColorr = vec4(outFrag, 1.0f);
-      // FragColorr = vec4(0.3, 0.4, 0.5, 1.0f); 
 };

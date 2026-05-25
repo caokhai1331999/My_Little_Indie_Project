@@ -16,6 +16,7 @@ layout (std140) uniform finalBone{
  mat4 finalBoneMatrices [MAX_BONES];
 };
 
+// uniform mat4 finalBoneMatrices [MAX_BONES];
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
@@ -31,7 +32,6 @@ out vec2 TexCoord;
 uniform vec3 ViewPos;
 uniform vec3 lightPos;
 uniform vec3 pointLight_Pos[NR_POINT_LIGHTS];
-
 
 out VS_OUT{
     vec2 TexCoord;
@@ -68,7 +68,8 @@ totalPosition = vec4(aPos, 1.0f);
 continue;
 }
 
-vec4 localPosition = finalBone.finalBoneMatrices[boneids[i]] * vec4(aPos, 1.0f);
+//vec4 localPosition = finalBone.finalBoneMatrices[boneids[i]] * vec4(aPos, 1.0f);
+vec4 localPosition = finalBoneMatrices[boneids[i]] * vec4(aPos, 1.0f);
 totalPosition += localPosition * weights[i];
 
 // vec3 localNormal = mat3(transpose(inverse(finalBone.finalBoneMatrices[boneids[i]]))) * aNormal;

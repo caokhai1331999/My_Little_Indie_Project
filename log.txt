@@ -1837,3 +1837,11 @@ the material is NULL in vampire case, must be something wrong with the texture l
 Actually, the texture loading turn wrong in FIXED
 
 By some reasons, the set light didn't work on vampire shader model
+
+---------------- Mon, 25 May 26: 01:02PM
+
+I have to know more about how the pointer, the memory arrange and move over
+while the app running.
+
+Why uniform dirLight and pointLight is NULL -> there are some thing wrong with
+set light function
