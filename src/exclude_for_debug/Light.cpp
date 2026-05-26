@@ -40,27 +40,39 @@ void setup_pointlight(global_light* envir_light){
 
 void set_environmental_light(B_shader_program* shader, global_light* envir_light, Camera* camera){
     shader->use();
+    std::string test_name {shader->GetProgramName()};
 
     shader->setFloat("material.shininess", 25.0f);
-    shader->setVec3("lightPos", -4.0f, 20.0f, -15.0f);
-    
-    shader->setVec3("dirLight.ambient", envir_light->dirLight.ambient);
-    shader->setVec3("dirLight.diffuse", envir_light->dirLight.diffuse);
-    shader->setVec3("dirLight.specular", envir_light->dirLight.specular);
+
+    //if(string_contain(&test_name, "animating")){
+        //shader->setVec3("lightPos_", -4.0f, 20.0f, -15.0f);
+        //shader->setVec3("dirLight_.ambient", envir_light->dirLight.ambient);
+        //shader->setVec3("dirLight_.diffuse", envir_light->dirLight.diffuse);
+        //shader->setVec3("dirLight_.specular", envir_light->dirLight.specular);
+    //} else {
+        shader->setVec3("lightPos", -4.0f, 20.0f, -15.0f);
+        shader->setVec3("dirLight.ambient", envir_light->dirLight.ambient);
+        shader->setVec3("dirLight.diffuse", envir_light->dirLight.diffuse);
+        shader->setVec3("dirLight.specular", envir_light->dirLight.specular);
+    //}
 
     
     std::string light_name;
-    
     for(int i = 0; i < 2; i++){
+
         light_name = "pointLight_Pos[]";
         light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
+
         shader->setVec3(light_name.c_str(), envir_light->Point_Lights[i].position);
         light_name = "pointLights[].diffuse";
         light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
+
         shader->setVec3(light_name.c_str(), envir_light->Point_Lights[i].diffuse);
+
         light_name = "pointLights[].ambient";
         light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
         shader->setVec3(light_name.c_str(), envir_light->Point_Lights[i].ambient);
+
         light_name = "pointLights[].specular";
         light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
         shader->setVec3(light_name.c_str(), envir_light->Point_Lights[i].specular);
@@ -68,9 +80,11 @@ void set_environmental_light(B_shader_program* shader, global_light* envir_light
         light_name = "pointLights[].constant";
         light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
         shader->setFloat(light_name.c_str(), 1.0f);
+
         light_name = "pointLights[].linearTerm";
         light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
         shader->setFloat(light_name.c_str(), 0.09f);
+
         light_name = "pointLights[].quadraticTerm";
         light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
         shader->setFloat(light_name.c_str(), 0.032f);

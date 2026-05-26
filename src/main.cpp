@@ -94,6 +94,17 @@ int CALLBACK WinMain
                   printf("Failed free library\n");
               };
 
+          if (CopyFileA("../Light32.lib",
+                        "Light32_copy.lib", false)) {
+              printf("Succeed copy lib file\n");
+          }
+
+          if (CopyFileA("../Light32.exp",
+                        "Light32_copy.exp", false)) {
+              printf("Succeed copy exp file\n");
+          }
+
+          
           if (CopyFileA("../Light32.dll", "Light32_copy.dll",
                        false))
           {
@@ -339,8 +350,8 @@ int CALLBACK WinMain
                 std::cout<<map_content->data()<<std::endl;
 
                 unsigned int TileTexture = SetupTileTexture("./media/grass.png");
-                setup_pointlight(&envir_light);
 
+                setup_pointlight(&envir_light);
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
                     shader->use();
                     shader->setMat4("view", BackBuffer.camera.view);
@@ -349,6 +360,7 @@ int CALLBACK WinMain
                 }
 
                 glUseProgram(0);
+
                 Set_environmental_light_(BackBuffer.shaders_list[0], &envir_light, &BackBuffer.camera);
                 Set_environmental_light_(BackBuffer.shaders_list[3], &envir_light, &BackBuffer.camera);
 
@@ -391,11 +403,22 @@ int CALLBACK WinMain
                              printf("fail to free current lib %s\n", GetLastError());
                         }
 
-                        if (CopyFileA("../Light32.dll",
+                        if (CopyFileA("../Light32.lib",
+                                     "Light32_copy.lib", false)) {
+                           printf("Succeed copy lib file\n");
+                        }
+
+                        if (CopyFileA("../Light32.exp",
+                                     "Light32_copy.exp", false)) {
+                           printf("Succeed copy exp file\n");
+                        }
+
+                         if (CopyFileA("../Light32.dll",
                                      "Light32_copy.dll", false)) {
                            printf("Succeed copy dll file\n");
                           AniLib = LoadLibraryA("Light32_copy.dll");
                         }
+
 //
                         // Animation
                         if (AniLib != NULL) {
@@ -412,7 +435,9 @@ int CALLBACK WinMain
                         }
                       if(Load_Lib)
                           Load_Lib = false;
+
                       Set_environmental_light_(BackBuffer.shaders_list[0], &envir_light, &BackBuffer.camera);
+                      //Set_environmental_light_(BackBuffer.shaders_list[3], &envir_light, &BackBuffer.camera);
                     }
 
                     //UPDATE
@@ -485,10 +510,8 @@ int CALLBACK WinMain
                         shader->setMat4("view", BackBuffer.camera.view);
                         shader->setMat4("projection", BackBuffer.camera.projection);
                         shader->setVec3( "ViewPos", BackBuffer.camera.Position);
-                        Set_environmental_light_(shader, &envir_light, &BackBuffer.camera);
                     }
-                    //}
-//
+
                     if(BackBuffer.camera.mouse.Wheeled)
                     {
                         BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);

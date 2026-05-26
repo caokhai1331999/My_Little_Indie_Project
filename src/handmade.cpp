@@ -341,18 +341,6 @@ void* LoadFunctionFromDLL(const char *DLLName,
 
 };
 
-bool32 string_contain(std::string* string, char* substr){
-    int substrIndex = 0;
-    while (substrIndex < sizeof(*substr)){
-        if (string->find(substr[substrIndex])==string->npos){
-            return false;
-        } else {
-            substrIndex++;
-        }
-    };
-    return true;
-};
-
 std::string* load_bin_map(const char* name){
 
     std::string map_name = name;

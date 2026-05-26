@@ -1845,3 +1845,11 @@ while the app running.
 
 Why uniform dirLight and pointLight is NULL -> there are some thing wrong with
 set light function
+
+---------------- Tue, 26 May 26: 10:11AM
+
+gl specification couldn't find out the location of dirlight vec3 components and
+pointLights one. Some thing off.
+
+Next Time, delve more into how to create physical interaction between
+mesh.vertices of object/model

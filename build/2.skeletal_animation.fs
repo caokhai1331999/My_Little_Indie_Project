@@ -2,22 +2,49 @@
 
 out vec4 FragColorr;
 
-in vec2 TexCoord;
+// in vec2 TexCoord;
 // in vec3 Normal;
 // in vec3 FragPos;
 
-#define NR_POINT_LIGHTS 2
+#define NR_POINT_LIGHTS_ 2
 
-uniform vec3 ViewPos;
-uniform vec3 lightPos;
-uniform vec3 pointLight_Pos[NR_POINT_LIGHTS];
+
+struct DirLight_{
+ // Inherent component
+ vec3 direction;
+
+ // For Phong Shading
+ vec3 ambient;
+ vec3 diffuse;
+ vec3 specular;
+};
+
+uniform DirLight_ dirLight;
+
+struct PointLight_{
+ // Inherent component
+ // vec3 position;
+
+ // For Phong Shading
+ vec3 ambient;
+ vec3 diffuse;
+ vec3 specular;
+
+ // For attenuation (Point Light)
+ float constant;
+ float linearTerm;
+ float quadraticTerm;
+};
+
+// These two contain bugs
+uniform PointLight_ pointLights [NR_POINT_LIGHTS_];
 
 in VS_OUT{
     vec2 TexCoord;
     vec3 FragPos;
     vec3 tangent_light_pos;
     vec3 tangentViewPos;
-    vec3 tangentpointLight_Pos[NR_POINT_LIGHTS];
+    vec3 tangentpointLight_Pos[NR_POINT_LIGHTS_];
 }fs_in;
 
 
@@ -34,43 +61,12 @@ struct Material{
    float shininess;
 };
 
-
 uniform Material material;
 
-struct DirLight{
- // Inherent component
- vec3 direction;
+vec3 CalcDirLight(DirLight_ light, vec3 norm, vec3 viewDir);
+vec3 CalcPointLight(PointLight_ light, vec3 tangent_light_pos, vec3 norm, vec3 viewDir);
 
- // For Phong Shading
- vec3 ambient;
- vec3 diffuse;
- vec3 specular;
-};
-
-uniform DirLight dirLight;
-
-struct PointLight{
- // Inherent component
- // vec3 position;
-
- // For Phong Shading
- vec3 ambient;
- vec3 diffuse;
- vec3 specular;
-
- // For attenuation (Point Light)
- float constant;
- float linearTerm;
- float quadraticTerm;
-};
-
-// These two contain bugs
-uniform PointLight pointLights [NR_POINT_LIGHTS];
-
-vec3 CalcDirLight(DirLight light, vec3 norm, vec3 viewDir);
-vec3 CalcPointLight(PointLight light, vec3 tangent_light_pos, vec3 norm, vec3 viewDir);
-
-vec3 CalcDirLight(DirLight light, vec3 norm, vec3 viewDir){
+vec3 CalcDirLight(DirLight_ light, vec3 norm, vec3 viewDir){
   // Light direction, fragpos, norm
     vec3 lightDirection = fs_in.tangentViewPos - fs_in.tangent_light_pos;
     vec3 ambient = light.ambient * texture(material.texture_specular1, fs_in.TexCoord).rgb;
@@ -87,7 +83,7 @@ vec3 CalcDirLight(DirLight light, vec3 norm, vec3 viewDir){
 
 }
 
-vec3 CalcPointLight(PointLight light, vec3 tangent_light_pos, vec3 norm, vec3 viewDir){
+vec3 CalcPointLight(PointLight_ light, vec3 tangent_light_pos, vec3 norm, vec3 viewDir){
 
 // Based on light direction(Light Postion), attenuation base on constant, linear and quadratic term, distance 1/(kc + kl * d + kq * d * d)
   // This is represent the angle between lightDir and norm
@@ -142,17 +138,21 @@ vec3 CalcPointLight(PointLight light, vec3 tangent_light_pos, vec3 norm, vec3 vi
 
 
 void main(){
+
     vec3 outFrag ;
     vec3 normal_ = texture(material.texture_normal1, fs_in.TexCoord).rgb;
     vec3 norm = normalize(normal_ * 2.0 - 1.0);
   	vec3 viewDir = normalize( fs_in.tangentViewPos - fs_in.FragPos);
+    
 //     && viewDir !=vec3(0.0f)
-    if(viewDir != vec3(0.0f)){
+    if(dirLight.specular != vec3(0.0f)){
         outFrag = CalcDirLight(dirLight, norm, viewDir);
     }else{
         outFrag = texture(material.texture_diffused1, fs_in.TexCoord).rgb;
     }
 
+    outFrag += texture(material.texture_specular1, fs_in.TexCoord).rgb * dirLight.specular;
+    // outFrag += texture(material.texture_diffused1, fs_in.TexCoord).rgb;
     // if(dirLight.specular != vec3(0.0f)){
     //     FragColorr = vec4(texture(material.texture_diffused1, fs_in.TexCoord).rgb *  dirLight.diffuse, 0.0f);
     // }else{
@@ -164,6 +164,6 @@ void main(){
     //     outFrag += CalcPointLight(pointLights[i], fs_in.tangentpointLight_Pos[i], norm, viewDir);
 	// };
 
-       // FragColorr = texture(material.texture_diffused1, fs_in.TexCoord);
+    // FragColorr = texture(material.texture_diffused1, fs_in.TexCoord);
     FragColorr = vec4(outFrag, 1.0f);
 };
