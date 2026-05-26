@@ -1853,3 +1853,7 @@ pointLights one. Some thing off.
 
 Next Time, delve more into how to create physical interaction between
 mesh.vertices of object/model
+
+---------------- Tue, 26 May 26: 11:05PM
+
+Due to the -link Lib of the dll, the exe is hooked up to the dll automatically.
