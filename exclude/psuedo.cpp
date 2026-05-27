@@ -500,10 +500,12 @@ void Compute_Tangent_and_Bi(){
     tangent1.y = f *(deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
     tangent1.z = f *(deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
 
-    glm::vec3 bitangent1;
-    bitangent1.x = f *(-deltaUV2.y * edge1.x + deltaUV1.x * edge2.x);
-    bitangent1.y = f *(-deltaUV2.y * edge1.y + deltaUV1.x * edge2.y);
-    bitangent1.z = f *(-deltaUV2.y * edge1.z + deltaUV1.x * edge2.z);
+    // Cause bitangent = cross(N, T);
+    // So we don't need to calculate it here
+    //glm::vec3 bitangent1;
+    //bitangent1.x = f *(-deltaUV2.y * edge1.x + deltaUV1.x * edge2.x);
+    //bitangent1.y = f *(-deltaUV2.y * edge1.y + deltaUV1.x * edge2.y);
+    //bitangent1.z = f *(-deltaUV2.y * edge1.z + deltaUV1.x * edge2.z);
 
     glm::vec3 edge_1 = pos1 - pos3;
     glm::vec3 edge_2 = pos4 - pos3;
@@ -518,34 +520,43 @@ void Compute_Tangent_and_Bi(){
     tangent_1.y = f *(deltaUV_2.y * edge_1.y - deltaUV_1.y * edge_2.y);
     tangent_1.z = f *(deltaUV_2.y * edge_1.z - deltaUV_1.y * edge_2.z);
 
-    glm::vec3 bitangent_1;
-    bitangent_1.x = f *(-deltaUV_2.y * edge_1.x + deltaUV_1.x * edge_2.x);
-    bitangent_1.y = f *(-deltaUV_2.y * edge_1.y + deltaUV_1.x * edge_2.y);
-    bitangent_1.z = f *(-deltaUV_2.y * edge_1.z + deltaUV_1.x * edge_2.z);
+    //glm::vec3 bitangent_1;
+    //bitangent_1.x = f *(-deltaUV_2.y * edge_1.x + deltaUV_1.x * edge_2.x);
+    //bitangent_1.y = f *(-deltaUV_2.y * edge_1.y + deltaUV_1.x * edge_2.y);
+    //bitangent_1.z = f *(-deltaUV_2.y * edge_1.z + deltaUV_1.x * edge_2.z);
 }
 
 // In Vertex Shader
 
 out vs{
-    vec3 T;
-    vec3 B;
-    vec3 N;
-};
+    vec2 TextCoord;
+    vec3 FragPos;
+    vec3 tangentLightPos;
+    vec3 tangentViewPos;
+}vs_out;
 
 void main(){
     vec3 T = normalize(vec3(model * vec4(tangent, 1.0f)));
-
-out vs{
-    vec3 T;
-    vec3 B;
-    vec3 N;
-};
+}
 
 void main(){
     // We will ignore the w value;
+    vec3 bitangent = cross(anormal, tangent);
+
     vec3 T = normalize(vec3(model * vec4(tangent, 0.0f)));
     vec3 B = normalize(vec3(model * vec4(bitangent, 0.0f)));
     vec3 N = normalize(vec3(model * vec4(anormal, 0.0f)));
 
-    mat3 TBN = mat3(T, B, N);
+    // inverse of orthogonal matrix is its transpos form
+    mat3 TBN = transpose(mat3(T, B, N));
+
+    vs_out.TextCoord = aTextCoord;
+    vs_out.FragPos = TBN * (vec3(model * vec4(aPos, 1.0f)));
+    vs_out.tangentViewPos = TBN * normalize(view);
+    vs_out.tangentLightPos[i] = TBN * lightPos;
+
+    for(int i = 0; i < TOTAL_POINT_LIGHTS){
+        vs_out.tangentLightPos[i] = TBN * POINT_LIGHT_POS[i];
+    }
 };
+
