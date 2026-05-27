@@ -94,18 +94,8 @@ int CALLBACK WinMain
                   printf("Failed free library\n");
               };
 
-          if (CopyFileA("../Light32.lib",
-                        "Light32_copy.lib", false)) {
-              printf("Succeed copy lib file\n");
-          }
-
-          if (CopyFileA("../Light32.exp",
-                        "Light32_copy.exp", false)) {
-              printf("Succeed copy exp file\n");
-          }
-
           
-          if (CopyFileA("../Light32.dll", "Light32_copy.dll",
+          if (CopyFileA("Light32.dll", "Light32_copy.dll",
                        false))
           {
                   //printf("Succeed copy lib file\n");
@@ -361,8 +351,8 @@ int CALLBACK WinMain
 
                 glUseProgram(0);
 
-                Set_environmental_light_(BackBuffer.shaders_list[0], &envir_light, &BackBuffer.camera);
-                Set_environmental_light_(BackBuffer.shaders_list[3], &envir_light, &BackBuffer.camera);
+                Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, &BackBuffer.camera);
+                Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, &BackBuffer.camera);
 
                 
                 while (GlobalRunning) {
@@ -403,17 +393,7 @@ int CALLBACK WinMain
                              printf("fail to free current lib %s\n", GetLastError());
                         }
 
-                        if (CopyFileA("../Light32.lib",
-                                     "Light32_copy.lib", false)) {
-                           printf("Succeed copy lib file\n");
-                        }
-
-                        if (CopyFileA("../Light32.exp",
-                                     "Light32_copy.exp", false)) {
-                           printf("Succeed copy exp file\n");
-                        }
-
-                         if (CopyFileA("../Light32.dll",
+                         if (CopyFileA("Light32.dll",
                                      "Light32_copy.dll", false)) {
                            printf("Succeed copy dll file\n");
                           AniLib = LoadLibraryA("Light32_copy.dll");
@@ -436,8 +416,8 @@ int CALLBACK WinMain
                       if(Load_Lib)
                           Load_Lib = false;
 
-                      Set_environmental_light_(BackBuffer.shaders_list[0], &envir_light, &BackBuffer.camera);
-                      //Set_environmental_light_(BackBuffer.shaders_list[3], &envir_light, &BackBuffer.camera);
+                      Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, &BackBuffer.camera);
+                      //Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, &BackBuffer.camera);
                     }
 
                     //UPDATE
@@ -691,6 +671,7 @@ int CALLBACK WinMain
                     BackBuffer.shaders_list[0]->use();
                     brushID = BackBuffer.shaders_list[0]->GetProgramID();
 
+                    
                     if(first_announce){
                         //setUpUBO(animator, &brushID);
 //Setup UBO

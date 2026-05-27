@@ -1857,3 +1857,14 @@ mesh.vertices of object/model
 ---------------- Tue, 26 May 26: 11:05PM
 
 Due to the -link Lib of the dll, the exe is hooked up to the dll automatically.
+
+---------------- Wed, 27 May 26: 11:16AM
+
+When I turn off UBO feature and comment out the finalbonematrices part
+Light uniform variables still NULL. So we can exclude this component as a
+culprit
+Cause the variables is local inside shader, so no way the name will be
+overlapped and cause memory issues between shaders.
+
+TODO: Time to do glyph/character loading in gl window for the sake of better
+debugging stage.

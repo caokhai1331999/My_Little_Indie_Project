@@ -70,8 +70,9 @@ void main()
     for(int i = 0; i < NR_POINT_LIGHTS; i++){;
         vs_out.tangentpointLight_Pos[i] = TBN * pointLight_Pos[i];
     }
-     // Normal = vec3(0.0f);
-vec4 totalPosition = vec4(0.0f);
+
+    //// Normal = vec3(0.0f);
+    vec4 totalPosition = vec4(0.0f);
 
 mat4 totalBoneMatrices = mat4(1.0f);
 mat4 localBone = mat4(1.0f);
@@ -133,7 +134,7 @@ for (int i = 0; i < 4 ; i++){
      // Normal = vec3(transpose(inverse(WorldToCamera))) * aNormal;
 
       gl_Position = projection * WorldToCamera * totalPosition;     
-      //gl_Position = projection * WorldToCamera * vec4(-aPos, 1.0f);     
+      // gl_Position = projection * WorldToCamera * vec4(-aPos, 1.0f);     
     // gl_Position = projection * view * model * vec4(-aPos, 1.0f);
 };
 

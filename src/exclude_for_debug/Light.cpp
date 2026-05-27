@@ -44,17 +44,11 @@ void set_environmental_light(B_shader_program* shader, global_light* envir_light
 
     shader->setFloat("material.shininess", 25.0f);
 
-    //if(string_contain(&test_name, "animating")){
-        //shader->setVec3("lightPos_", -4.0f, 20.0f, -15.0f);
-        //shader->setVec3("dirLight_.ambient", envir_light->dirLight.ambient);
-        //shader->setVec3("dirLight_.diffuse", envir_light->dirLight.diffuse);
-        //shader->setVec3("dirLight_.specular", envir_light->dirLight.specular);
-    //} else {
-        shader->setVec3("lightPos", -4.0f, 20.0f, -15.0f);
+        shader->setVec3("lightPos", -4.0f, 10.0f, -15.0f);
+
         shader->setVec3("dirLight.ambient", envir_light->dirLight.ambient);
         shader->setVec3("dirLight.diffuse", envir_light->dirLight.diffuse);
         shader->setVec3("dirLight.specular", envir_light->dirLight.specular);
-    //}
 
     
     std::string light_name;

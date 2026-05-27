@@ -1,0 +1,58 @@
+This log is written long after I first follow Joey's materials.
+
+Basically, we all know that the light illusion is the computation of both intensity and color of a pixel or texel. based on position and angle of our imagined light.
+ 
+1. Basics of Light: - presented by Diffuse light
+   All in the form of multiply the basic light to adjutst its intensity
+   Direct Light: using basic normal vector theory of surface
+   Point Light: . distance => attenuation
+   	 	. 
+
+
+This one is the most basic method to simulate the global illumination. presented by Specular light 
+
+    *Ambient Light:
+		. Material specs: ambie, spec, dif, shinniness
+
+
+   We have alot of common term in general for computing this: Phong, Blin, or Gaussians
+      	   	. Phong is limit by the normal angle when come to computing
+		specular
+
+2. Camera view matrix is computing based on this formular
+   	  N : Znear
+	  F : Zfar
+
+   	  zClip = (zCamera*(F - N))/(N - F) + (2NF)/(N - F)
+	 then these are all included in this glm::lookAt(cameraPos, lookpointPos, Up vector);
+
+3. Normal Maps.
+By using technique called Normal Mapping, we trick the light that the surface is consisted of many plane, thus make it looked a lot more complex/detailed instead of a flat plane. We do it with cheap cost cause instead of changing the lighting
+equation, we just need to change the normal of surface.
+
+And the efficient way to do this is to load normal texture from model. To inspect more closely, we will see nearly all of them have the blue-ish looked. That is due to the normal texture mainly store the depth data (,,z) which is correspondent to (,,b) in color.
+
+But there is an issue with this approaching method. Cause we have fixed set of normal vector, it may end up wrong in some special case. For ex: What if we place the plane of brick wall on the ground face up, this time the normal vector need to point upward to the light source(y axis), which it already just can point backward to z axis just liked what it was set.
+Cause prepare six face for a normal is really expensive, especially when we think a about big meshes with thousands position and textcoords.
+Then, We devs came up with a space where all lighting have to follow up everytime
+, this enable us to use the same normal map with normal vector point to positive-z axis. They called this Tangent Space.
+To implement this we use a new coordinate system called TBN(Tangent, Bitangent and Normal) which includes 3 perpencular vector having the same origin just like in Camera. Wherein the UP vector is Normal, the right and forward one is tangent and bitangent respectively, 
+Tangent and Bitangent is not linearly calculatable like normal we do this based on texture coordinate and object position (delta v and u, side E1 and E2) which is as the same space/plane as tangent we end up with formular : T = 1/(delta UV) * (deltaUV) * (matrix of E1 and E2)
+
+Now we have TBN matrix, this clearly for transform vector from tangent space to world space or from word space to tangent one if we inverse it. What we need to transform: vector, sampled normal vector to make it the same space as other lighting one, or use inverse version of it to transform other lighting in the same space as normal(tangent space).
+Cause each axis of the orthogonal matrix is perpencular to its unit vector, transpose it equal to inverse.
+While the second approaching method is required more computations. There are two main reasons why this one is more preferred.
+      1. Cause the ViewDir and LightPos is not update every fragment shader called,
+      it will save us alot of performance to compare with calculating sampled
+      normal vector.
+      2. The second is we don't need to pass the inverse mat3 as referred in theory
+      all we need to do is to pass computed from inverse TBN mat lightPos and
+      ViewDir. Which even more optimized for us cause we don't need to do many
+      matrix multiplications.
+
+We got	LightDir = TBN * normalize(FragPos - lightPos);
+       	FragPos = TBN * vec3(model*vec4(aPos, 1.0f));
+Instead of taking one normal vector as before we use normal texture in this case
+Sometime the tangent vector is averaged to give nice smooth result in a big mesh.
+Result in the TBN is no longer perpendicular. That why this line appear:
+T = normalize(T - dot(T, N) * N) // for the sake of re-othogonalize TBN coordinates

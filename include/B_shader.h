@@ -161,7 +161,7 @@ void B_shader_program::setInt(const std::string name, const int value){
 
 void B_shader_program::setFloat(const std::string name, const float value){
 
-    std::string test_name = name;
+    std::string test_name {GetProgramName()};
    
     if(string_contain(&test_name, "animating")){
 
@@ -185,9 +185,10 @@ void B_shader_program::setFloat(const std::string name, const float value){
 
 void B_shader_program::setFloat(const char* name, const float value){
 
-    std::string test_name{name};
+    std::string test_name{GetProgramName()};
+    std::string uniform_name{name};
    
-    if(string_contain(&test_name, "animating")){
+    if(string_contain(&test_name, "animating")&&string_contain(&uniform_name, "Light")){
         GLint location = glGetUniformLocation(ProgramID, name);
 
         if(location == -1){
@@ -218,9 +219,10 @@ void B_shader_program::setVec2(const char* name, float x, float y){
 
 void B_shader_program::setVec3(const char* name, const glm::vec3 &value){
 
-    std::string test_name{name};
+    std::string test_name{GetProgramName()};
+    std::string uniform_name{name};
    
-    if(string_contain(&test_name, "animating")){
+    if(string_contain(&test_name, "animating") && string_contain(&uniform_name, "Light")){
         GLint location = glGetUniformLocation(ProgramID, name);
 
         if(location == -1){
