@@ -39,12 +39,14 @@ void setup_pointlight(global_light* envir_light){
 }
 
 void set_environmental_light(B_shader_program* shader, global_light* envir_light, Camera* camera){
-    shader->use();
-    std::string test_name {shader->GetProgramName()};
 
+    shader->use();
+
+    std::string test_name {shader->GetProgramName()};
     shader->setFloat("material.shininess", 25.0f);
 
-        shader->setVec3("lightPos", -4.0f, 10.0f, -15.0f);
+    glm::vec3 lightPos (-4.0f, 10.0f, -15.0f);
+        shader->setVec3("lightPos", lightPos);
 
         shader->setVec3("dirLight.ambient", envir_light->dirLight.ambient);
         shader->setVec3("dirLight.diffuse", envir_light->dirLight.diffuse);

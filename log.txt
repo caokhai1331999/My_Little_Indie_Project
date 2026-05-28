@@ -1868,3 +1868,11 @@ overlapped and cause memory issues between shaders.
 
 TODO: Time to do glyph/character loading in gl window for the sake of better
 debugging stage.
+
+---------------- Thu, 28 May 26: 12:25PM
+
+NOTE: So Just like I vaguely was skeptical, If I don't use the uniform in the
+main function of shader, its location won't be found.
+
+so we can narrow down the possible culprits here is not the uniform light itself
+but the fs_in.tangentViewPos and ...

@@ -188,16 +188,6 @@ void B_shader_program::setFloat(const char* name, const float value){
     std::string test_name{GetProgramName()};
     std::string uniform_name{name};
    
-    if(string_contain(&test_name, "animating")&&string_contain(&uniform_name, "Light")){
-        GLint location = glGetUniformLocation(ProgramID, name);
-
-        if(location == -1){
-            printf("This uniform %s in %s is not found\n", name, GetProgramName());
-        }  else {
-            printf("This uniform %s location in %s location is %d\n", name, GetProgramName(), location);
-        };
-    }
-
     glUniform1f(glGetUniformLocation(ProgramID, name), value);
     if(name==""){
         printf("name content is NULL\n");
@@ -205,6 +195,19 @@ void B_shader_program::setFloat(const char* name, const float value){
     if(&value == 0x00){
         printf("value content is NULL\n");        
     }
+
+    if(string_contain(&test_name, "animating")&&string_contain(&uniform_name, "Light")){
+        GLint location = glGetUniformLocation(ProgramID, name);
+
+        if(location == -1){
+            printf("This uniform %s in %s is not found\n", name, GetProgramName());
+        }  else {
+            float readBack_value;
+            glGetUniformfv(ProgramID, location, &readBack_value);
+            printf("This uniform %s location in %s location is %d with the value after being set with input value %f:%f\n", name, GetProgramName(), location, value, readBack_value);
+        };
+    }
+
 };
 
 //Vector 2nd argument is number of vector
@@ -221,17 +224,7 @@ void B_shader_program::setVec3(const char* name, const glm::vec3 &value){
 
     std::string test_name{GetProgramName()};
     std::string uniform_name{name};
-   
-    if(string_contain(&test_name, "animating") && string_contain(&uniform_name, "Light")){
-        GLint location = glGetUniformLocation(ProgramID, name);
-
-        if(location == -1){
-            printf("This uniform %s in %s is not found\n", name, GetProgramName());
-        }  else {
-            printf("This uniform %s location in %s location is %d\n", name, GetProgramName(), location);
-        };
-    }
-    
+      
     if(name == ""){
         printf("name content is NULL\n");
     }
@@ -239,6 +232,20 @@ void B_shader_program::setVec3(const char* name, const glm::vec3 &value){
         printf("value content is NULL\n");        
     }
     glUniform3fv(glGetUniformLocation(ProgramID, name), 1, &value[0]);
+
+
+        if(string_contain(&test_name, "animating") && string_contain(&uniform_name, "Light")){
+        GLint location = glGetUniformLocation(ProgramID, name);
+
+        if(location == -1){
+            printf("This uniform %s in %s is not found\n", name, GetProgramName());
+        }  else {
+            glm::vec3 readBack_value;
+            glGetUniformfv(ProgramID, location, &readBack_value[0]);
+            printf("This uniform %s location in %s location is %d with the value after being set with input value %s: %s\n", name, GetProgramName(), location, glm::to_string(value).c_str(), glm::to_string(readBack_value).c_str());
+        };
+        }
+
 }
 
 void B_shader_program::setVec3(const char* name, float x, float y, float z){

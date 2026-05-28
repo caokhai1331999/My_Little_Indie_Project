@@ -28,13 +28,15 @@ uniform vec3 ViewPos;
 uniform vec3 lightPos;
 uniform vec3 pointLight_Pos[NR_POINT_LIGHTS];
 
-out VS_OUT{
+struct VS_OUT{
     vec2 TexCoord;
     vec3 FragPos;
     vec3 tangent_light_pos;
     vec3 tangentViewPos;
     vec3 tangentpointLight_Pos[NR_POINT_LIGHTS];
-}vs_out;
+};
+
+out VS_OUT fs_in;
 
 // uniform mat4[MAX_BONES] finalBoneMatrices;
 // out vec2 TexCoord;
@@ -59,16 +61,16 @@ void main()
     // inverse of orthogonal matrix is its transpos form
     mat3 TBN = transpose(mat3(T, B, N));
     
-    vs_out.TexCoord = aTexCoord;
-    vs_out.FragPos = TBN * (vec3(model * vec4(aPos, 1.0f)));
-    vs_out.tangentViewPos = TBN * ViewPos;
-    vs_out.tangent_light_pos = TBN * lightPos;
+    fs_in.TexCoord = aTexCoord;
+    fs_in.FragPos = TBN * (vec3(model * vec4(aPos, 1.0f)));
+    fs_in.tangentViewPos = TBN * ViewPos;
+    fs_in.tangent_light_pos = TBN * lightPos;
 	//aPos is the vertex position so the Fragment position is
 	//the dot product of model and vertex Position (plus two vector)
 	// This is to create a world space coor of fragment
 
     for(int i = 0; i < NR_POINT_LIGHTS; i++){;
-        vs_out.tangentpointLight_Pos[i] = TBN * pointLight_Pos[i];
+        fs_in.tangentpointLight_Pos[i] = TBN * pointLight_Pos[i];
     }
 
     //// Normal = vec3(0.0f);

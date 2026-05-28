@@ -342,14 +342,13 @@ int CALLBACK WinMain
                 unsigned int TileTexture = SetupTileTexture("./media/grass.png");
 
                 setup_pointlight(&envir_light);
+
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
                     shader->use();
                     shader->setMat4("view", BackBuffer.camera.view);
                     shader->setMat4("projection", BackBuffer.camera.projection);
                     shader->setVec3( "ViewPos", BackBuffer.camera.Position);
                 }
-
-                glUseProgram(0);
 
                 Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, &BackBuffer.camera);
                 Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, &BackBuffer.camera);
