@@ -91,7 +91,7 @@ global_variable Win32_OffScreen_Buffer BackBuffer = {};
 global_variable Game_State State = {};
 global_variable imagee_content* BMPContent = nullptr;
 global_variable real32 WaitTimeCounter = 0.0f;
-
+global_variable glm::vec3 moving_vector;
 
 struct Win32_Front_Buffer{  
     //BITMAPINFO Bitmapinfo;

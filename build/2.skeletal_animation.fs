@@ -82,7 +82,7 @@ vec3 CalcDirLight(DirLight_ light, vec3 norm, vec3 viewDir){
 
   // This is represent the angle between lightDir and norm
   float diff = max(dot(-lightDirection, norm), 0.0f);
-  vec3 diffuse = light.diffuse * diff * texture(material.texture_diffused1, fs_in.TexCoord).rgb;
+  vec3 diffuse = light.diffuse *  texture(material.texture_diffused1, fs_in.TexCoord).rgb;
 
   vec3 reflecDir  = reflect(-lightDirection, norm);
   float spec = pow(max(dot(reflecDir, viewDir), 0.0f), material.shininess);
@@ -162,7 +162,7 @@ void main(){
         outFrag = texture(material.texture_diffused1, fs_in.TexCoord).rgb;
     }
 
-    outFrag += texture(material.texture_specular1, fs_in.TexCoord).rgb * dirLight.specular;
+    // outFrag += texture(material.texture_specular1, fs_in.TexCoord).rgb * dirLight.specular;
     // outFrag += texture(material.texture_diffused1, fs_in.TexCoord).rgb;
     // if(dirLight.specular != vec3(0.0f)){
     //     FragColorr = vec4(texture(material.texture_diffused1, fs_in.TexCoord).rgb *  dirLight.diffuse, 0.0f);
@@ -173,7 +173,7 @@ void main(){
     vec3 outFragg;
 	for (int i = 0; i < NR_POINT_LIGHTS_; i++)
 	{	
-        outFragg += CalcPointLight(pointLights[i], fs_in.tangentpointLight_Pos[i], norm, viewDir);
+        outFrag += CalcPointLight(pointLights[i], fs_in.tangentpointLight_Pos[i], norm, viewDir);
 	};
 
     // FragColorr = texture(material.texture_diffused1, fs_in.TexCoord);

@@ -10,6 +10,7 @@
 // We used normal map to compenstate for that.
 #include "B_shader.h"
 #include "Camera.h"
+
 #define NR_POINT_LIGHTS 2
 
 struct light_in_general{
@@ -85,9 +86,16 @@ struct global_light{
 };
 
 global_variable global_light envir_light = {};
+// For moving
+void Move(glm::vec3* object_matrix, float delta_time, float DelayedRatio);
+void Jump(glm::vec3* object_matrix, float jump_time, float DelayedRatio);
 
+//=====================================
 void setup_pointlight(global_light* envir_light = nullptr);
 void set_environmental_light(B_shader_program* shader = nullptr, global_light* envir_light = nullptr, Camera* camera = nullptr);
+
+extern "C" __declspec(dllexport) void Move_(glm::mat4* object_matrix, float delta_time, float DelayedRatio);
+typedef void (*Move__)(glm::mat4*, float , float);
 
 extern "C" __declspec(dllexport) void setup_pointlight_(global_light* envir_light);
 typedef void (*setup_pointlight__)(global_light*);

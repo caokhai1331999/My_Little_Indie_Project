@@ -1044,6 +1044,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
             glm::normalize(
                 glm::cross(BackBuffer.camera.Direction, BackBuffer.camera.Up)) *
             (float)BackBuffer.camera.speed;
+        object.
         if (!WasDown) {
             printf("D is HIT\n");
         }
@@ -1051,11 +1052,6 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
       }
 
       else if (vkCode == 'J') {
-          float jump_time = 0.0f;
-          while(jump_time < 0.2f){
-              dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, DelayedRatio * glm::sin(30.0f/jump_time), -(5.0f * DelayedRatio)));
-              jump_time += 0.02f;
-          };
 
           if(!is_moving)
               is_moving = !is_moving;
