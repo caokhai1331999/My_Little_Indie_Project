@@ -1876,3 +1876,13 @@ main function of shader, its location won't be found.
 
 so we can narrow down the possible culprits here is not the uniform light itself
 but the fs_in.tangentViewPos and ...
+
+---------------- Fri, 29 May 26: 09:44AM
+
+The tangent data did transfer from model to layout location 3
+
+We gonna gather necessary moving algorithm for our game engine
+
+NOTE: If I can count the time I spent watching youtube. It'd be more than 50% of
+my free time.
+

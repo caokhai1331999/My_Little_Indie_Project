@@ -560,3 +560,49 @@ void main(){
     }
 };
 
+// motion in
+void set_environment_force_(entity* object){
+    object->position * envir.gravity_on_pos;
+}
+
+void Move((glm::mat4* object_matrix, float delta_time, float DelayedRatio)){
+    switch(basic_motion){
+        case IDLE:
+            // DO NOTHING;
+            break;
+        case MOVING_FORWARD:
+            dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, 5.0f * DelayedRatio));
+            break;
+        case MOVING_BACKWARD:
+            dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, -(5.0f * DelayedRatio)));
+            break;
+        case MOVING_RIGHT:
+            
+            break;
+        case MOVING_LEFT:
+            dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-(5.0f * DelayedRatio), 0.0f, 0.0f));
+            break;
+        default:
+            break;
+    };
+
+    switch(complex_motion){
+        case JUMPING:
+            jump();
+            apply_gravity();
+// apply_acceleration()
+            break;
+        case ROTATE:
+            rotate();
+            apply_gravity();
+// apply_acceleration();
+            break;
+        default:
+            apply_gravity();
+// apply_acceleration();
+            break;
+    };
+}
+
+// How can we show the complex move while not being interfered by other moves
+// so the keypoint here is to gather all the moving algorithm in one object position data every frame.
