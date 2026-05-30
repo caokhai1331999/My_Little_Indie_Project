@@ -13,6 +13,7 @@
 //#include "handmade.h"
 #include "physics.h"
 #include "animator.h"
+#include "entity.h"
 
 // So the when we call just the name of the function we have the pointer of that function
 
@@ -50,6 +51,7 @@ int CALLBACK WinMain
   updateCa UpdateCamera = NULL;
   setup_pointlight__ setup_pointlight = NULL;
   Set_Light_ Set_environmental_light = NULL;
+  move_object_ move_ = NULL;
   //setUpUBO__ setUpUBO = NULL;
   //updateUBOData__ updateUBOData = NULL;
   //setupMeshh setupMesh = NULL;
@@ -106,6 +108,7 @@ int CALLBACK WinMain
                   UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");          
                   setup_pointlight = (setup_pointlight__)GetProcAddress(AniLib, "setup_pointlight_");
                   Set_environmental_light = (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
+                  move_ = (move_object_)GetProcAddress(AniLib, "move_object");
               }
           }
       }
@@ -230,13 +233,22 @@ int CALLBACK WinMain
 
                 glm::mat4 basic_cube_core = glm::mat4(1.0f);
                 glm::mat4 backpack_core = glm::mat4(1.0f);
-
                 
                 glm::mat4 Plane = glm::mat4(1.0f);
                 Plane = glm::translate(Plane, glm::vec3(0.0f));
                 glm::mat4 WorldToCamera = glm::mat4(1.0f);
-                WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
-                
+
+                test_vampire_motion.position = glm::mat4(1.0f);
+                //WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
+                WorldToCamera = BackBuffer.camera.view * test_vampire_motion.position;
+
+                // update position
+                test_vampire_motion.object_speed.acceleration = 2.0f;
+                test_vampire_motion.object_speed.veclocity = 3.0f;
+
+                test_vampire_motion.object_speed.jump_a = 6.0f;
+                test_vampire_motion.object_speed.jump_v = 6.0f;
+
                 TRACKMOUSEEVENT mouseEventVar = {};
                 mouseEventVar.cbSize = sizeof(TRACKMOUSEEVENT);
                 mouseEventVar.dwFlags = TME_HOVER|TME_LEAVE;
@@ -264,8 +276,10 @@ int CALLBACK WinMain
 
                 // Set containing model for dancing vampire
                 
-                dancing_vampire_core = glm::scale(dancing_vampire_core,glm::vec3( 0.01f));
-                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-2.0f, 0.0f, 0.0f));
+                //dancing_vampire_core = glm::scale(dancing_vampire_core,glm::vec3( 0.01f));
+                test_vampire_motion.position = glm::scale(test_vampire_motion.position,glm::vec3( 0.01f));
+                //dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-2.0f, 0.0f, 0.0f));
+                test_vampire_motion.position = glm::translate(test_vampire_motion.position, glm::vec3(-2.0f, 0.0f, 0.0f));
 
                 BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)BackBuffer.BitmapWidth / (float)BackBuffer.BitmapHeight, 0.1f, 100.0f);
 
@@ -382,7 +396,12 @@ int CALLBACK WinMain
                     if( MaxControllerCount > ArrayCount(Input->Controller)) {
                         MaxControllerCount = ArrayCount(Input->Controller);   
                     }
+
                     TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent);
+//After polling event we update the positon of object
+                    if(test_vampire_motion.object_speed.motion_states.basic_move != IDLE || test_vampire_motion.object_speed.motion_states.fancy_move != IDLE){
+                        move_(TimeSet.SPerFrame, &test_vampire_motion);
+                    }
 
                     if (Load_Lib) {
                       if (AniLib != NULL) {
@@ -407,6 +426,7 @@ int CALLBACK WinMain
                           setup_pointlight = (setup_pointlight__)GetProcAddress(AniLib, "setup_pointlight_");
                           Set_environmental_light =                      (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
                           BackBuffer.shaders_list[0]->ReLoadShaderCode();
+                          move_ = (move_object_)GetProcAddress(AniLib, "move_object");                          
 //setupMesh =
                           //(setupMeshh)GetProcAddress(AniLib, "setMesh");
                           //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
@@ -501,7 +521,8 @@ int CALLBACK WinMain
                     //for(const auto &shader: BackBuffer.shaders_list){
 
                     BackBuffer.shaders_list[0]->use();
-                    WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
+                    //WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
+                    WorldToCamera = BackBuffer.camera.view * test_vampire_motion.position;
                     BackBuffer.shaders_list[0]->setMat4("WorldToCamera", WorldToCamera);
                     glUseProgram(0);
 
@@ -687,7 +708,7 @@ int CALLBACK WinMain
                         glBindBufferRange(GL_UNIFORM_BUFFER, 1, UBO, 0, sizeof(glm::mat4)* 52);
                     }
 
-                    if(is_moving || first_announce){
+                    if(test_vampire_motion.object_speed.motion_states.basic_move != IDLE || first_announce){
                         if(animator->GetCurrentTime() > danceAnimation->GetDuration() )
                         {
                             //PlayAnimation(animator, danceAnimation);
@@ -763,8 +784,9 @@ int CALLBACK WinMain
                             */
                             //if(is_moving){
                             BackBuffer.shaders_list[0]->use();
-                            WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
-                                BackBuffer.shaders_list[0]->setMat4("WorldToCamera", WorldToCamera);                                
+                            //WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
+                            WorldToCamera = BackBuffer.camera.view * test_vampire_motion.position;
+                            BackBuffer.shaders_list[0]->setMat4("WorldToCamera", WorldToCamera);                                
                             //}
 
                     BackBuffer.shaders_list[0]->setBool("is_moving", is_moving);

@@ -7,7 +7,8 @@
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
 #include "B_shader.h"
-#include "handmade.h"
+//#include "handmade.h"
+#include "entity.h"
 #include "SoundMaker.h"
 
 #include "utility"

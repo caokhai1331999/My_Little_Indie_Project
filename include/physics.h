@@ -26,6 +26,7 @@ struct space_box{
     std::vector<collided_space>* collide_list;
 
     space_box(glm::vec3* first_pos = nullptr, glm::vec3* size_ = nullptr){
+        if(size_ != nullptr)
         size = *size_; 
         
         position = glm::mat4(1.0f);

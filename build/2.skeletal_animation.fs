@@ -162,7 +162,7 @@ void main(){
         outFrag = texture(material.texture_diffused1, fs_in.TexCoord).rgb;
     }
 
-    // outFrag += texture(material.texture_specular1, fs_in.TexCoord).rgb * dirLight.specular;
+    outFrag += texture(material.texture_specular1, fs_in.TexCoord).rgb * dirLight.specular;
     // outFrag += texture(material.texture_diffused1, fs_in.TexCoord).rgb;
     // if(dirLight.specular != vec3(0.0f)){
     //     FragColorr = vec4(texture(material.texture_diffused1, fs_in.TexCoord).rgb *  dirLight.diffuse, 0.0f);

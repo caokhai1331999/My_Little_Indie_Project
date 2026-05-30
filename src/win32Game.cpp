@@ -874,44 +874,48 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
           if (vkCode == 'J') {
               // Actually the front vec is at the back of the camera
               // State.BlueOffset+= 10;
-                  if(is_moving)
-                  is_moving = !is_moving;
+                  //if(is_moving)
+                  //is_moving = !is_moving;
 
-                  printf("j is released\n");
+              printf("j is released\n");
           }
 
           else if (vkCode == VK_UP) {
               // Actually the front vec is at the back of the camera
               // State.BlueOffset+= 10;
-                  if(is_moving)
-                  is_moving = !is_moving;
-
-                  printf("Up is released\n");
+                  //if(is_moving)
+                  //is_moving = !is_moving;
+//
+              test_vampire_motion.object_speed.motion_states.basic_move = IDLE;
+              printf("Up is released\n");
           }
 
           else if (vkCode == VK_DOWN) {
               // Actually the front vec is at the back of the camera
               // State.BlueOffset+= 10;
-                  if(is_moving){
-                      is_moving = !is_moving;
-                  }
+                  //if(is_moving){
+                      //is_moving = !is_moving;
+                  //}
+              test_vampire_motion.object_speed.motion_states.basic_move = IDLE;
               printf("DOWN is released\n");
           }
 
           else if (vkCode == VK_LEFT) {
               // Actually the front vec is at the back of the camera
               // State.BlueOffset+= 10;
+              test_vampire_motion.object_speed.motion_states.basic_move = IDLE;
               printf("LEFT is released\n");
-              if(is_moving)
-                is_moving = !is_moving;
-
+              //if(is_moving)
+                //is_moving = !is_moving;
+//
           }
 
           else if (vkCode == VK_RIGHT) {
               // Actually the front vec is at the back of the camera
               // State.BlueOffset+= 10;
-              if(is_moving)
-                is_moving = !is_moving;
+              //if(is_moving)
+                //is_moving = !is_moving;
+              test_vampire_motion.object_speed.motion_states.basic_move = IDLE;
               printf("RIGHT is released\n");
           }          
 
@@ -944,10 +948,10 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
         // Actually the front vec is at the back of the camera
         // State.BlueOffset+= 10;
             //if (WasUp) {
-                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, 5.0f * DelayedRatio));
-
-                if(!is_moving)
-                    is_moving = !is_moving;
+                //dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, 5.0f * DelayedRatio));
+          test_vampire_motion.object_speed.motion_states.basic_move = MOVING_FORWARD;
+                //if(!is_moving)
+                    //is_moving = !is_moving;
 
                 printf("Up is hit\n");
             //}
@@ -957,10 +961,11 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
         // Actually the front vec is at the back of the camera
         // State.BlueOffset+= 10;
             //if (WasUp) {
-                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, -(5.0f * DelayedRatio)));
-                if(!is_moving)
-                    is_moving = !is_moving;
-                printf("DOWN is HIT\n");
+                //dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, -(5.0f * DelayedRatio)));
+                //if(!is_moving)
+                    //is_moving = !is_moving;
+          test_vampire_motion.object_speed.motion_states.basic_move = MOVING_BACKWARD;
+          printf("DOWN is HIT\n");
             //}
 
       }
@@ -969,10 +974,10 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
         // Actually the front vec is at the back of the camera
         // State.BlueOffset+= 10;
             //if (WasUp) {
-                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-(5.0f * DelayedRatio), 0.0f, 0.0f));
-                if(!is_moving)
-                    is_moving = !is_moving;
-
+                //dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-(5.0f * DelayedRatio), 0.0f, 0.0f));
+                //if(!is_moving)
+                    //is_moving = !is_moving;
+          test_vampire_motion.object_speed.motion_states.basic_move = MOVING_LEFT;
                 printf("LEFT is HIT\n");
         //}
       }
@@ -981,10 +986,11 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
         // Actually the front vec is at the back of the camera
         // State.BlueOffset+= 10;
             //if (WasUp) {
-                dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(5.0f * DelayedRatio, 0.0f, 0.0f));
-                if(!is_moving)
-                    is_moving = !is_moving;
-                printf("RIGHT is HIT\n");
+                //dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(5.0f * DelayedRatio, 0.0f, 0.0f));
+                //if(!is_moving)
+                    //is_moving = !is_moving;
+          test_vampire_motion.object_speed.motion_states.basic_move = MOVING_RIGHT;
+          printf("RIGHT is HIT\n");
             //}
       }
         //====================================================
@@ -1044,7 +1050,6 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
             glm::normalize(
                 glm::cross(BackBuffer.camera.Direction, BackBuffer.camera.Up)) *
             (float)BackBuffer.camera.speed;
-        object.
         if (!WasDown) {
             printf("D is HIT\n");
         }
@@ -1053,8 +1058,10 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 
       else if (vkCode == 'J') {
 
-          if(!is_moving)
-              is_moving = !is_moving;
+          //if(!is_moving)
+              //is_moving = !is_moving;
+          if(test_vampire_motion.object_speed.motion_states.fancy_move != JUMPING)
+          test_vampire_motion.object_speed.motion_states.fancy_move = JUMPING;
 
           if (!WasDown) {
             printf("J is HIT\n");

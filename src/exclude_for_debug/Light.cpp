@@ -97,25 +97,3 @@ void Set_environmental_light_(B_shader_program* shader, global_light* envir_ligh
     assert(success);
     set_environmental_light(shader, envir_light, camera);
 };
-
-void Jump(glm::mat4* object_matrix, float jump_time, float DelayedRatio, glm::vec3 moving_vector){
-    if(Is_Jumping)
-    float jump_time = 0.0f;
-          float distance = 2.0f;
-          //float endpoint_in_z = dancing_vampire_core[2][3] + distance;
-          moving_vector = glm::vec3(0.0f, 2.0f, -5.0f);
-
-              if(moving_vector.y > 0.0f){
-              object_matrix = glm::translate(dancing_vampire_core, moving_vector);
-              printf("Curren vampire matrix: %s\n", glm::to_string(dancing_vampire_core).c_str());
-              moving_vector.y = moving_vector.y * glm::cos(30.0f * jump_time);
-              moving_vector = moving_vector * DelayedRatio;
-              jump_time += 0.02f;
-    *object_matrix = glm::translate(*object_matrix, glm::sin(30.0f/jump_time) * glm::vec3(0.0f, 2.0f * DelayedRatio, -5.0f * DelayedRatio));
-}
-}
-
-void Move_(glm::mat4* object_matrix, float delta_time, float DelayedRatio){
-    Move(object_matrix, delta_time, DelayedRatio);
-}
-              

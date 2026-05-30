@@ -86,10 +86,6 @@ struct global_light{
 };
 
 global_variable global_light envir_light = {};
-// For moving
-void Move(glm::vec3* object_matrix, float delta_time, float DelayedRatio);
-void Jump(glm::vec3* object_matrix, float jump_time, float DelayedRatio);
-
 //=====================================
 void setup_pointlight(global_light* envir_light = nullptr);
 void set_environmental_light(B_shader_program* shader = nullptr, global_light* envir_light = nullptr, Camera* camera = nullptr);
