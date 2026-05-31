@@ -30,22 +30,26 @@ void UpdateCamera (Camera* camera, float* DelayRatio) {
             camera->Yaw += camera->mouse.MouseXOffset * camera->speed * SENSITIVITY;
             camera->Pitch += camera->mouse.MouseYOffset * camera->speed * SENSITIVITY;
 
+            // Lock pitch at 120 degree
             if(camera->Pitch > 120.0f){
                 camera->Pitch = 120.0f;
             }
 
             if(camera->Pitch < 0.0f){
-                camera->Pitch = 0.0f;
+                camera->Pitch = 1.0f;
             }
 
+            //  But Yaw is all round degree
+            // we can dynamically convert the degree by +- for 360
             if(camera->Yaw > 360.0f){
-                camera->Yaw = 360.0f;
+                camera->Yaw -= 360.0f;
             }
-
+//
             if(camera->Yaw < 0.0f){
-                camera->Yaw = 0.0f;
+                camera->Yaw += 360.0f;
             }
 
+            printf("Pitch is %f, Yaw is %f\n", camera->Pitch, camera->Yaw);
             // Direction based on mouse
             // yaw is formed by x and x1
             // similarly Pitch formed by y and y1

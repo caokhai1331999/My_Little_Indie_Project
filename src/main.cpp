@@ -708,7 +708,7 @@ int CALLBACK WinMain
                         glBindBufferRange(GL_UNIFORM_BUFFER, 1, UBO, 0, sizeof(glm::mat4)* 52);
                     }
 
-                    if(test_vampire_motion.object_speed.motion_states.basic_move != IDLE || first_announce){
+                    if(test_vampire_motion.object_speed.motion_states.basic_move != IDLE || test_vampire_motion.object_speed.motion_states.fancy_move != IDLE || first_announce){
                         if(animator->GetCurrentTime() > danceAnimation->GetDuration() )
                         {
                             //PlayAnimation(animator, danceAnimation);

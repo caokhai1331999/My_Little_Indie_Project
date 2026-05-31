@@ -1890,3 +1890,20 @@ my free time.
 
 ---------------- Sat, 30 May 26: 09:37AM
 
+
+---------------- Sun, 31 May 26: 10:39AM
+
+Just realize that the handedness that I'm using is opposite to what assimp is
+using
+
+
+TODO: Why yaw is locked when I tried to drag left
+solved.
+
+TODO: Next time apply momentum
+
+up until now we still can't produce the curve trajectory but just the straight
+one.
+
+May be we used the product to calculate the final vector from jump and gravity
+vector
