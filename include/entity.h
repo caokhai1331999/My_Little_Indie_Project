@@ -28,12 +28,18 @@ struct object_motion_state_group{
 };
 
 struct motion_spec{
+    float base_veclocity;
     float acceleration;
     float veclocity;
 
+    float base_jump_v;
     float jump_v;
     float jump_a;
-    object_motion_state_group motion_states;
+
+    float falling_v;
+    
+    object_motion_state_group current_states;
+    object_motion_state_group previous_states;
 };
 
 //void apply_gravity(float mass);
@@ -44,18 +50,23 @@ class rigid_body{
 // For rigid body
 public:
     glm::mat4 position;
+    float mass;
     motion_spec object_speed;
     void move(float delta_t);
 };
 
 float based_a_v_Pos_calc(float a, float v, float p, float delta_t){
-    return ((a/2)*std::pow(delta_t,2))+(v*delta_t)+p;
+    float a_ = a - (0.5*v);
+    return ((a_/2)*std::pow(delta_t,2))+(v*delta_t)+p;
 }
 
 global_variable rigid_body test_vampire_motion = {};
 
 void CalcNewPos(float FrameTime = 0, rigid_body* object = nullptr);
+void CalcNewV(float FrameTime = 0,  float* veclo = nullptr, float* accel = nullptr);
 void ApplyGravity(float delta_t, rigid_body* object);
+
+void CalcMomentumSpeed(float FrameTime = 0,  rigid_body* object = nullptr);
 void ApplyMomentum(float delta_t, rigid_body* object);
 // Need to have fomular for this.
 void Jump(float delta_t, rigid_body* object);

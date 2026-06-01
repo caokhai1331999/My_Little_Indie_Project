@@ -243,11 +243,15 @@ int CALLBACK WinMain
                 WorldToCamera = BackBuffer.camera.view * test_vampire_motion.position;
 
                 // update position
+                test_vampire_motion.object_speed.base_veclocity = 3.0f;
                 test_vampire_motion.object_speed.acceleration = 2.0f;
                 test_vampire_motion.object_speed.veclocity = 3.0f;
 
-                test_vampire_motion.object_speed.jump_a = 6.0f;
+                test_vampire_motion.object_speed.base_jump_v = 6.0f;
+                test_vampire_motion.object_speed.jump_a = 14.0f;
                 test_vampire_motion.object_speed.jump_v = 6.0f;
+
+                test_vampire_motion.object_speed.falling_v = 0.0f;
 
                 TRACKMOUSEEVENT mouseEventVar = {};
                 mouseEventVar.cbSize = sizeof(TRACKMOUSEEVENT);
@@ -399,7 +403,7 @@ int CALLBACK WinMain
 
                     TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent);
 //After polling event we update the positon of object
-                    if(test_vampire_motion.object_speed.motion_states.basic_move != IDLE || test_vampire_motion.object_speed.motion_states.fancy_move != IDLE){
+                    if(test_vampire_motion.object_speed.current_states.basic_move != IDLE || test_vampire_motion.object_speed.current_states.fancy_move != IDLE){
                         move_(TimeSet.SPerFrame, &test_vampire_motion);
                     }
 
@@ -708,7 +712,7 @@ int CALLBACK WinMain
                         glBindBufferRange(GL_UNIFORM_BUFFER, 1, UBO, 0, sizeof(glm::mat4)* 52);
                     }
 
-                    if(test_vampire_motion.object_speed.motion_states.basic_move != IDLE || test_vampire_motion.object_speed.motion_states.fancy_move != IDLE || first_announce){
+                    if(test_vampire_motion.object_speed.current_states.basic_move != IDLE || test_vampire_motion.object_speed.current_states.fancy_move != IDLE || first_announce){
                         if(animator->GetCurrentTime() > danceAnimation->GetDuration() )
                         {
                             //PlayAnimation(animator, danceAnimation);
