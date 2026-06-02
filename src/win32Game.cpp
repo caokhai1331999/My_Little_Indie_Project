@@ -1066,9 +1066,24 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
               //is_moving = !is_moving;
               test_vampire_motion.object_speed.previous_states.fancy_move = test_vampire_motion.object_speed.current_states.fancy_move;
 
-              if(test_vampire_motion.object_speed.current_states.fancy_move != JUMPING)
-              test_vampire_motion.object_speed.current_states.fancy_move = JUMPING;
+              if(test_vampire_motion.object_speed.current_states.fancy_move != JUMPING_FORWARD)
+              test_vampire_motion.object_speed.current_states.fancy_move = JUMPING_FORWARD;
 
+
+          if (!WasDown) {
+            printf("J is HIT\n");
+        }
+        // XOffset += 10;
+      }
+
+      else if (vkCode == 'K') {
+
+          //if(!is_moving)
+              //is_moving = !is_moving;
+              test_vampire_motion.object_speed.previous_states.fancy_move = test_vampire_motion.object_speed.current_states.fancy_move;
+
+              if(test_vampire_motion.object_speed.current_states.fancy_move != JUMPING_BACKWARD)
+              test_vampire_motion.object_speed.current_states.fancy_move = JUMPING_BACKWARD;
 
           if (!WasDown) {
             printf("J is HIT\n");

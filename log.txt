@@ -1900,7 +1900,7 @@ using
 TODO: Why yaw is locked when I tried to drag left
 solved.
 
-TODO: Next time apply momentum
+TODO: Next time apply momentum: DONE!
 
 up until now we still can't produce the curve trajectory but just the straight
 one.
@@ -1908,5 +1908,12 @@ one.
 May be we used the product to calculate the final vector from jump and gravity
 vector
 
----------------- Mon, 01 Jun 26: 10:42AM
+---------------- Tue, 02 Jun 26: 11:31AM
 
+TODO: Read/Delve more into Height map and tesselation 
+Now I Found that method, it is called instancing. I can use it to repeatedly
+draw same textures based on tile/world map pointer based on camera and main
+character position.
+
+NEXT: Next interesting thing is we use the normal map and apply it on the tiles where
+the only light source is the vampire position

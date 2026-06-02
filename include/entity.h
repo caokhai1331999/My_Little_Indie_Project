@@ -18,8 +18,9 @@ typedef int complex_motion;
 #define MOVING_BACKWARD (basic_motion)2//(basic_motion)
 #define MOVING_RIGHT    (basic_motion)3//(basic_motion)
 #define MOVING_LEFT     (basic_motion)4//(basic_motion)
-#define JUMPING         (complex_motion)5//(complex_motion)
-#define FALLING         (complex_motion)6//(complex_motion)
+#define JUMPING_FORWARD (complex_motion)5//(complex_motion)
+#define JUMPING_BACKWARD (complex_motion)6//(complex_motion)
+#define FALLING         (complex_motion)7//(complex_motion)
 // how can gravity affect object
 
 struct object_motion_state_group{

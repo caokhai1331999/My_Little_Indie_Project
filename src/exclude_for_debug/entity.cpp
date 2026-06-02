@@ -45,8 +45,8 @@ void CalcNewPos(float delta_time, rigid_body* object){
             //break;
     };
 
-    if(object->position[3][1] < -4.5f){
-        if(object->object_speed.current_states.fancy_move == JUMPING){
+    if(object->position[3][1] < -15.5f){
+        if(object->object_speed.current_states.fancy_move == JUMPING_FORWARD || object->object_speed.current_states.fancy_move == JUMPING_BACKWARD){
             object->object_speed.previous_states.fancy_move = object->object_speed.current_states.fancy_move;
             object->object_speed.current_states.fancy_move = FALLING;
         }
@@ -56,7 +56,12 @@ void CalcNewPos(float delta_time, rigid_body* object){
 
     
     switch(object->object_speed.current_states.fancy_move){
-        case JUMPING:
+        case JUMPING_FORWARD:
+            Jump(delta_time, object);
+            ApplyGravity(delta_time, object);
+            break;
+
+        case JUMPING_BACKWARD:
             Jump(delta_time, object);
             ApplyGravity(delta_time, object);
             break;
@@ -97,13 +102,24 @@ void ApplyGravity(float delta_t, rigid_body* object){
 void ApplyMomentum(float delta_t, rigid_body* object){
     if(object->object_speed.jump_v > 1.0f)
         object->object_speed.jump_v -= 0.5f;
+    if(object->object_speed.jump_v < 0.0f)
+        object->object_speed.jump_v += 0.5f;
 
-    object->position[3][2] = based_a_v_Pos_calc(0.0f, -object->object_speed.jump_v, object->position[3][2], delta_t);
+    if(object->object_speed.previous_states.fancy_move == JUMPING_FORWARD){
+        object->position[3][2] = based_a_v_Pos_calc(0.0f, -object->object_speed.jump_v, object->position[3][2], delta_t);
+    }else if(object->object_speed.previous_states.fancy_move == JUMPING_BACKWARD){
+        object->position[3][2] = based_a_v_Pos_calc(0.0f, object->object_speed.jump_v, object->position[3][2], delta_t);
+    }
+
 };
 
 void Jump(float delta_t, rigid_body* object){
-          object->position[3][1] = based_a_v_Pos_calc(-object->object_speed.jump_a, -object->object_speed.jump_v, object->position[3][1], delta_t);
+    object->position[3][1] = based_a_v_Pos_calc(-object->object_speed.jump_a, -object->object_speed.jump_v, object->position[3][1], delta_t);
+    if(object->object_speed.current_states.fancy_move == JUMPING_FORWARD){
           object->position[3][2] = based_a_v_Pos_calc(-object->object_speed.jump_a * 0.4f, -object->object_speed.jump_v * 0.7, object->position[3][2], delta_t);
+    }else if(object->object_speed.current_states.fancy_move == JUMPING_BACKWARD){
+          object->position[3][2] = based_a_v_Pos_calc(object->object_speed.jump_a * 0.4f, object->object_speed.jump_v * 0.7, object->position[3][2], delta_t);
+    }
 }
 
 void CalcNewV(float FrameTime, float* veclo, float* accel){;
