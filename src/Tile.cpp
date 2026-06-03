@@ -163,7 +163,7 @@ unsigned int SetupTileTexture(const char* path){
     return textureID;
 }
 
-void set_tile_vertex(){
+void set_tile_vertex(B_shader_program* shader){
 
     glGenVertexArrays(1, &TileObj.TileVAO);
     glGenBuffers(1, &TileObj.TileEBO);
@@ -188,6 +188,20 @@ void set_tile_vertex(){
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, TileObj.TileEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Tile_Land_Indices), &Tile_Land_Indices, GL_STATIC_DRAW);
+
+    // Set position for instanced draw
+    shader->use();
+    glm::vec2 offset;
+    std::string name;
+        for(int l = 0; l < 10; l++){
+            for(int w = 0; w < 30; w++){
+            offset.x = (float)l;
+            offset.y = (float)w;
+            name = "offsets["+std::to_string(w + 30*l)+"]";
+            shader->setVec2(name.c_str(), offset);
+        }
+    }
+    glUseProgram(0);
 }
 
 
@@ -195,22 +209,7 @@ void drawTile(const unsigned int VaoID, const unsigned int TextureID, B_shader_p
 
     glBindVertexArray(TileObj.TileVAO);
     Brush->use();
-
-    glm::mat4 tile_container;
-
-    for(int w = 0; w < 10; w++){
-        for(int l = 0; l < 30; l++){
-            // If in range
-            tile_container = glm::mat4(1.0f);
-            tile_container = glm::translate(tile_container, glm::vec3((float)w, 0.0f, (float)l));
-            //tile_container = glm::scale(tile_container, glm::vec3(0.5f));
-
-            Brush->setBool("textPass", false);
-            Brush->setMat4("model", tile_container);
-            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-            
-            //tile_container = glm::translate(tile_container, glm::vec3(0.0f, -1.0f, 0.0f));
-            //tile_container = glm::rotate(tile_container, 45.0f, glm::vec3(0.5f, 0.0f, 0.0f));
+    glDrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, 300);
 // Scale here
 
             // Then set textureId here
@@ -218,7 +217,7 @@ void drawTile(const unsigned int VaoID, const unsigned int TextureID, B_shader_p
             //Brush->setInt("ttexture", TextureID);
             //Brush->setBool("textPass", true);
             //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        }
-    }
+        //}
+    //}
     glUseProgram(0);
 };

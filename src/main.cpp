@@ -199,7 +199,6 @@ int CALLBACK WinMain
                 //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
                 //RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
                 InitOpenGL(&BackBuffer, &ScreenBuffer, BMPContent);
-                set_tile_vertex();
                 GLenum err = glGetError();
                 if (err != GL_NO_ERROR) {
                     std::cerr << "OpenGL Error: " << err << std::endl;
@@ -220,6 +219,7 @@ int CALLBACK WinMain
                 BackBuffer.shaders_list.push_back(new B_shader_program("1.model.vs", "1.model.fs", "model drawing brush"));
                 ScreenBuffer.glData.ProgramIDs.push_back(BackBuffer.shaders_list[BackBuffer.shaders_list.size()-1]->GetProgramID());                
 
+                set_tile_vertex(BackBuffer.shaders_list[2]);
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
                         CheckShader(shader->GetProgramID(), programme_, shader->GetShaderName());
                     }
@@ -353,9 +353,9 @@ int CALLBACK WinMain
                 GLuint id = BackBuffer.shaders_list[0]->GetProgramID();
                 showUniformVarValuePerVertex(&UBO, &id, &dancing_vampire->meshes[0], false, false, false, false, false, false);
 
-                std::string* map_content = new std::string ;
-                map_content = load_bin_map("level.map");
-                std::cout<<map_content->data()<<std::endl;
+                //std::string* map_content = new std::string ;
+                //map_content = load_bin_map("level.map");
+                //std::cout<<map_content->data()<<std::endl;
 
                 unsigned int TileTexture = SetupTileTexture("./media/grass.png");
 
@@ -369,11 +369,10 @@ int CALLBACK WinMain
                 }
 
                 Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, &BackBuffer.camera);
+                Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, &BackBuffer.camera);
                 Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, &BackBuffer.camera);
-
                 
                 while (GlobalRunning) {
-
                   if(first_announce) {
                       QueryPerformanceCounter(&(TimeSet.LastCounter));
                       TimeSet.previous_collided = TimeSet.LastCounter;
@@ -429,9 +428,10 @@ int CALLBACK WinMain
                           UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");
                           setup_pointlight = (setup_pointlight__)GetProcAddress(AniLib, "setup_pointlight_");
                           Set_environmental_light =                      (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
-                          BackBuffer.shaders_list[0]->ReLoadShaderCode();
                           move_ = (move_object_)GetProcAddress(AniLib, "move_object");                          
 //setupMesh =
+                          BackBuffer.shaders_list[0]->ReLoadShaderCode();
+                          BackBuffer.shaders_list[2]->ReLoadShaderCode();
                           //(setupMeshh)GetProcAddress(AniLib, "setMesh");
                           //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
                           }
@@ -439,6 +439,7 @@ int CALLBACK WinMain
                       if(Load_Lib)
                           Load_Lib = false;
 
+                      
                       Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, &BackBuffer.camera);
                       //Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, &BackBuffer.camera);
                     }

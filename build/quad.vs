@@ -9,12 +9,16 @@ layout(location = 3) in vec3 VertexColor;
 out vec2 TextCoord;
 out vec4 FragColorr;
 out vec3 ModelPos;
+out vec3 ViewPos_;
 
 uniform vec3 insertColor;
+uniform vec3 ViewPos;
 
 uniform mat4 view;
 uniform mat4 model;
 uniform mat4 projection;
+
+uniform vec2 offsets[300];
 
 bool notNUll(mat4 matrix){
  for(int i = 0; i < 4; i++){
@@ -31,7 +35,9 @@ void main(){
 
 // Place Model First -> calculate the local space to World/Perspective space
 //                  -> Then Calculate latest space to clip space
-       gl_Position = projection * view * model * vec4(aPos, 1.0f);
+       vec2 offset = offsets[gl_InstanceID];
+       gl_Position = projection * view * vec4(vec3(aPos.x + offset.x, aPos.y, aPos.z + offset.y), 1.0f);
+       ViewPos_ = ViewPos;
        TextCoord = aTextCoord;
        FragColorr = vec4(VertexColor,1.0f);
 }

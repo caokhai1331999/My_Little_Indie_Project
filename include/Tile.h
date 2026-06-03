@@ -165,7 +165,7 @@ struct TileGLObject{
     unsigned int TileColorBO;
 }TileObj;
 
-void set_tile_vertex(); 
+void set_tile_vertex(B_shader_program* shader = nullptr); 
 
 Tile* LoadTileMap();
 void drawTile(unsigned int VaoID = 0, unsigned int shaderID = 0, float speed = 1.0, float* updatedDegree = nullptr, bool32 changeAxis = false, std::vector<rollCubeInfo>* rollCubemap = nullptr);

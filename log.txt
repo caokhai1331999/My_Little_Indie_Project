@@ -1917,3 +1917,11 @@ character position.
 
 NEXT: Next interesting thing is we use the normal map and apply it on the tiles where
 the only light source is the vampire position
+
+---------------- Wed, 03 Jun 26: 08:46AM
+
+Now I learned something new: I can create a string just by combining char* with
+std::to_string(var) without declaring any variable at all. Maybe std::to_string
+do the part.
+
+Succeed using Instancing in basic level.
