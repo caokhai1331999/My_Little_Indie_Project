@@ -10,22 +10,40 @@
 #include "handmade.h"
 #include "physics.h"
 
-typedef int basic_motion;
-typedef int complex_motion;
+typedef bool motion_state;
+typedef bool motion_type;
+typedef int direction_;
 
-#define IDLE            (basic_motion)0//(basic_motion)
-#define MOVING_FORWARD  (basic_motion)1//(basic_motion)
-#define MOVING_BACKWARD (basic_motion)2//(basic_motion)
-#define MOVING_RIGHT    (basic_motion)3//(basic_motion)
-#define MOVING_LEFT     (basic_motion)4//(basic_motion)
-#define JUMPING_FORWARD (complex_motion)5//(complex_motion)
-#define JUMPING_BACKWARD (complex_motion)6//(complex_motion)
-#define FALLING         (complex_motion)7//(complex_motion)
+typedef int motion;
+
+enum {
+FORWARD,
+RIGHT,
+BACKWARD,
+LEFT,
+UP,
+DOWN,
+NONE
+};
+
+#define complex (motion_type)1
+#define basic (motion_type)0
+
+#define moving (motion_state)1
+#define IDLE (motion_type)0
+
+// \ is + in macro language
+#define MOVING_(x)\
+    moving+x
+
+#define JUMPING_FORWARD (motion)5//(complex_motion)
+#define JUMPING_BACKWARD (motion)6//(complex_motion)
+#define FALLING         (motion)7//(complex_motion)
 // how can gravity affect object
 
 struct object_motion_state_group{
-    basic_motion basic_move;
-    complex_motion fancy_move;
+    motion basic_move;
+    motion fancy_move;
 };
 
 struct motion_spec{
@@ -50,8 +68,10 @@ class rigid_body{
     //space_box box_;
 // For rigid body
 public:
-    glm::mat4 position;
     float mass;
+    glm::mat4 position;
+    direction_ current_face;
+    direction_ previous_face;
     motion_spec object_speed;
     void move(float delta_t);
 };
@@ -59,11 +79,13 @@ public:
 float based_a_v_Pos_calc(float a, float v, float p, float delta_t){
     float a_ = a - (0.5*v);
     return ((a_/2)*std::pow(delta_t,2))+(v*delta_t)+p;
-}
+};
 
 global_variable rigid_body test_vampire_motion = {};
 
 void CalcNewPos(float FrameTime = 0, rigid_body* object = nullptr);
+void OrientFace(rigid_body* object = nullptr);
+void Orient_Around_Y(glm::mat4* matrix = nullptr, float angle = 0);
 void CalcNewV(float FrameTime = 0,  float* veclo = nullptr, float* accel = nullptr);
 void ApplyGravity(float delta_t, rigid_body* object);
 

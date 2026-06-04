@@ -949,8 +949,12 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
         // State.BlueOffset+= 10;
             //if (WasUp) {
                 //dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, 5.0f * DelayedRatio));
+          if(test_vampire_motion.previous_face != test_vampire_motion.current_face)
+          test_vampire_motion.previous_face =           test_vampire_motion.current_face;
+          test_vampire_motion.current_face = FORWARD;          
+
           test_vampire_motion.object_speed.previous_states.basic_move = test_vampire_motion.object_speed.current_states.basic_move;
-          test_vampire_motion.object_speed.current_states.basic_move = MOVING_FORWARD;
+          test_vampire_motion.object_speed.current_states.basic_move = MOVING_(FORWARD);
                 //if(!is_moving)
                     //is_moving = !is_moving;
 
@@ -965,8 +969,12 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
                 //dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, -(5.0f * DelayedRatio)));
                 //if(!is_moving)
                     //is_moving = !is_moving;
+          if(test_vampire_motion.previous_face != test_vampire_motion.current_face)
+          test_vampire_motion.previous_face =           test_vampire_motion.current_face;
+          test_vampire_motion.current_face = BACKWARD;
+
           test_vampire_motion.object_speed.previous_states.basic_move = test_vampire_motion.object_speed.current_states.basic_move;
-          test_vampire_motion.object_speed.current_states.basic_move = MOVING_BACKWARD;
+          test_vampire_motion.object_speed.current_states.basic_move = MOVING_(BACKWARD);
           printf("DOWN is HIT\n");
             //}
 
@@ -979,8 +987,12 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
                 //dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-(5.0f * DelayedRatio), 0.0f, 0.0f));
                 //if(!is_moving)
                     //is_moving = !is_moving;
+          if(test_vampire_motion.previous_face != test_vampire_motion.current_face)
+          test_vampire_motion.previous_face =           test_vampire_motion.current_face;
+          test_vampire_motion.current_face = LEFT;
+
           test_vampire_motion.object_speed.previous_states.basic_move = test_vampire_motion.object_speed.current_states.basic_move;
-          test_vampire_motion.object_speed.current_states.basic_move = MOVING_LEFT;
+          test_vampire_motion.object_speed.current_states.basic_move = MOVING_(LEFT);
                 printf("LEFT is HIT\n");
         //}
       }
@@ -992,8 +1004,12 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
                 //dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(5.0f * DelayedRatio, 0.0f, 0.0f));
                 //if(!is_moving)
                     //is_moving = !is_moving;
+          if(test_vampire_motion.previous_face != test_vampire_motion.current_face)
+          test_vampire_motion.previous_face =           test_vampire_motion.current_face;
+          test_vampire_motion.current_face = RIGHT;
+
           test_vampire_motion.object_speed.previous_states.basic_move = test_vampire_motion.object_speed.current_states.basic_move;
-          test_vampire_motion.object_speed.current_states.basic_move = MOVING_RIGHT;
+          test_vampire_motion.object_speed.current_states.basic_move = MOVING_(RIGHT);
           printf("RIGHT is HIT\n");
             //}
       }
@@ -1064,7 +1080,11 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 
           //if(!is_moving)
               //is_moving = !is_moving;
-              test_vampire_motion.object_speed.previous_states.fancy_move = test_vampire_motion.object_speed.current_states.fancy_move;
+          if(test_vampire_motion.previous_face != test_vampire_motion.current_face)
+          test_vampire_motion.previous_face =           test_vampire_motion.current_face;
+
+          test_vampire_motion.current_face = FORWARD;
+          test_vampire_motion.object_speed.previous_states.fancy_move = test_vampire_motion.object_speed.current_states.fancy_move;
 
               if(test_vampire_motion.object_speed.current_states.fancy_move != JUMPING_FORWARD)
               test_vampire_motion.object_speed.current_states.fancy_move = JUMPING_FORWARD;
@@ -1080,7 +1100,11 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 
           //if(!is_moving)
               //is_moving = !is_moving;
-              test_vampire_motion.object_speed.previous_states.fancy_move = test_vampire_motion.object_speed.current_states.fancy_move;
+          if(test_vampire_motion.previous_face != test_vampire_motion.current_face)
+          test_vampire_motion.previous_face =           test_vampire_motion.current_face;
+
+          test_vampire_motion.current_face = BACKWARD;
+          test_vampire_motion.object_speed.previous_states.fancy_move = test_vampire_motion.object_speed.current_states.fancy_move;
 
               if(test_vampire_motion.object_speed.current_states.fancy_move != JUMPING_BACKWARD)
               test_vampire_motion.object_speed.current_states.fancy_move = JUMPING_BACKWARD;

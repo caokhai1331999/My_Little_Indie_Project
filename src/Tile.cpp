@@ -191,13 +191,16 @@ void set_tile_vertex(B_shader_program* shader){
 
     // Set position for instanced draw
     shader->use();
+    //Tile Object here
+    // Then we have something like trees, monsters, ....
     glm::vec2 offset;
     std::string name;
-        for(int l = 0; l < 10; l++){
+        for(int l = 0; l < 30; l++){
             for(int w = 0; w < 30; w++){
             offset.x = (float)l;
             offset.y = (float)w;
-            name = "offsets["+std::to_string(w + 30*l)+"]";
+            int ID = w + (30 * l);
+            name = "offsets["+std::to_string(ID)+"]";
             shader->setVec2(name.c_str(), offset);
         }
     }
@@ -209,7 +212,7 @@ void drawTile(const unsigned int VaoID, const unsigned int TextureID, B_shader_p
 
     glBindVertexArray(TileObj.TileVAO);
     Brush->use();
-    glDrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, 300);
+    glDrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, 900);
 // Scale here
 
             // Then set textureId here

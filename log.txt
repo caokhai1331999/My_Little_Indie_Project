@@ -1608,9 +1608,9 @@ Think about tiling.
 
 IDMat structure(specific role value position) T: translate, R: Rotation, S:scale
 (Column Major type)
-                             1*S.x*R, R*      , R      , T.x
-                             R      , 1*S.y*R , R      , T.y
-                             R      , R       , 1*S.z*R, T.z
+                             1*S.x*R, R*      , R      , ?
+                             R      , 1*S.y*R , R      , ?
+                             R      , R       , 1*S.z*R, ?
                              T.x    , T.y     , T.y      , 1
 
 So the Position of object represented by id Matrix is at [3].x/y/z
@@ -1925,3 +1925,20 @@ std::to_string(var) without declaring any variable at all. Maybe std::to_string
 do the part.
 
 Succeed using Instancing in basic level.
+
+---------------- Thu, 04 Jun 26: 11:24AM
+So we basically have 30x30 plane with to randomize object on it.
+
+Remember, Think about what make player interested about it?
+GamePlay(new or unique, hard enough), good art style, 
+
+TODO: To enable a unique game, we need a decent physicx systems
+. Check Collision (DONE! AABB)
+. Basic moving(with acceleration)(DONE! at2 + vt + p)
+. Complex Moving: Jump (DONE!).
+                  Sprint:
+. Handicap object(??)
+. Push thing.()
+
+- Techniques:
+    . Render things in groups (Learnt from Casey)

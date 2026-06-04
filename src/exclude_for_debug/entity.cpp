@@ -9,6 +9,10 @@
 #include "entity.h"
 
 void rigid_body::move(float delta_t){
+
+    if(this->current_face != this->previous_face)
+    OrientFace(this);
+
     CalcNewPos(delta_t, this);
 }
 
@@ -23,21 +27,55 @@ void move_object(float delta_t, rigid_body* object){
     object->move(delta_t);
 }
 
+void Orient_Around_Y(glm::mat4* matrix, float angle){
+    //(*matrix)[0][0] = -glm::sin(glm::radians(angle));
+    //(*matrix)[0][2] = glm::cos(glm::radians(angle));
+    //(*matrix)[2][2] = glm::sin(glm::radians(angle));
+    //(*matrix)[2][2] = glm::cos(glm::radians(angle));
+
+    *matrix = glm::rotate(*matrix, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+};
+
+void OrientFace(rigid_body* object){
+/*
+    switch(object->current_face){
+        case FORWARD:
+            Orient_Around_Y(&object->position, 0);
+            break;
+        case BACKWARD:
+            Orient_Around_Y(&object->position, 180.0f);
+            break;
+        case RIGHT:
+            Orient_Around_Y(&object->position, 90.0f);
+            break;
+        case LEFT:
+            Orient_Around_Y(&object->position, -90.0f);
+            break;
+        default:
+            Orient_Around_Y(&object->position, 0);
+            break;
+    };
+*/
+
+    float deg = 90.0f * (object->current_face - object->previous_face);
+    Orient_Around_Y(&object->position, deg);
+}
+
 void CalcNewPos(float delta_time, rigid_body* object){
     float value;
     //add a little friction(opposed force here)
    //
     switch(object->object_speed.current_states.basic_move){
-        case MOVING_FORWARD:
+        case MOVING_(FORWARD):
             object->position[3][2] = based_a_v_Pos_calc(object->object_speed.acceleration, object->object_speed.veclocity, object->position[3][2], delta_time);            
             break;
-        case MOVING_BACKWARD:
+        case MOVING_(BACKWARD):
             object->position[3][2] = based_a_v_Pos_calc(-object->object_speed.acceleration, -object->object_speed.veclocity, object->position[3][2], delta_time);
             break;
-        case MOVING_RIGHT:
+        case MOVING_(RIGHT):
             object->position[3][0] = based_a_v_Pos_calc(object->object_speed.acceleration, object->object_speed.veclocity, object->position[3][0], delta_time);            
             break;
-        case MOVING_LEFT:
+        case MOVING_(LEFT):
             object->position[3][0] = based_a_v_Pos_calc(-object->object_speed.acceleration, -object->object_speed.veclocity, object->position[3][0], delta_time);
             break;
         //default:

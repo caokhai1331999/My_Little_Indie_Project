@@ -253,6 +253,8 @@ int CALLBACK WinMain
 
                 test_vampire_motion.object_speed.falling_v = 0.0f;
 
+                test_vampire_motion.current_face = FORWARD;
+                
                 TRACKMOUSEEVENT mouseEventVar = {};
                 mouseEventVar.cbSize = sizeof(TRACKMOUSEEVENT);
                 mouseEventVar.dwFlags = TME_HOVER|TME_LEAVE;

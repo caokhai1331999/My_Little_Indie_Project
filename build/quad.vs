@@ -18,7 +18,7 @@ uniform mat4 view;
 uniform mat4 model;
 uniform mat4 projection;
 
-uniform vec2 offsets[300];
+uniform vec2 offsets[900];
 
 bool notNUll(mat4 matrix){
  for(int i = 0; i < 4; i++){
