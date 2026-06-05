@@ -16,11 +16,27 @@ typedef int direction_;
 
 typedef int motion;
 
+// Must be clockwise
+
+// This one is righthanded coor sys
+/*
 enum {
 FORWARD,
+LEFT,
+BACKWARD,
 RIGHT,
+UP,
+DOWN,
+NONE
+};
+*/
+
+// This one is lefthanded coor sys
+enum {
 BACKWARD,
 LEFT,
+FORWARD,
+RIGHT,
 UP,
 DOWN,
 NONE

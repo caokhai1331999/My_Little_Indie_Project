@@ -1932,7 +1932,7 @@ So we basically have 30x30 plane with to randomize object on it.
 Remember, Think about what make player interested about it?
 GamePlay(new or unique, hard enough), good art style, 
 
-TODO: To enable a unique game, we need a decent physicx systems
+TODO: To enable a unique game, we need a decent physic systems
 . Check Collision (DONE! AABB)
 . Basic moving(with acceleration)(DONE! at2 + vt + p)
 . Complex Moving: Jump (DONE!).
@@ -1942,3 +1942,12 @@ TODO: To enable a unique game, we need a decent physicx systems
 
 - Techniques:
     . Render things in groups (Learnt from Casey)
+
+---------------- Fri, 05 Jun 26: 10:56AM
+Now I know where the bug is, actually the angles value must be radians
+One more bug that I just found out that I forgot the scale factor. I shrink the
+model 100 down before so the model standard value must be 0.01 not 1
+The only one thing remain is the direction currently set wrong by me
+
+I don't know the true handedness of it.
+so 270 degree rotate make object face right in scene

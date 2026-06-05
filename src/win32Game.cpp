@@ -943,6 +943,8 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
     bool WasUp = ((Lparam & (1 << 30)) == 0);
 
     uint32 vkCode = Wparam;
+    printf("current face: %d, previous face: %d\n", test_vampire_motion.current_face, test_vampire_motion.previous_face);
+
     if (IsDown) {
       if (vkCode == VK_UP) {
         // Actually the front vec is at the back of the camera
@@ -951,6 +953,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
                 //dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, 5.0f * DelayedRatio));
           if(test_vampire_motion.previous_face != test_vampire_motion.current_face)
           test_vampire_motion.previous_face =           test_vampire_motion.current_face;
+
           test_vampire_motion.current_face = FORWARD;          
 
           test_vampire_motion.object_speed.previous_states.basic_move = test_vampire_motion.object_speed.current_states.basic_move;
@@ -971,6 +974,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
                     //is_moving = !is_moving;
           if(test_vampire_motion.previous_face != test_vampire_motion.current_face)
           test_vampire_motion.previous_face =           test_vampire_motion.current_face;
+
           test_vampire_motion.current_face = BACKWARD;
 
           test_vampire_motion.object_speed.previous_states.basic_move = test_vampire_motion.object_speed.current_states.basic_move;
@@ -989,6 +993,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
                     //is_moving = !is_moving;
           if(test_vampire_motion.previous_face != test_vampire_motion.current_face)
           test_vampire_motion.previous_face =           test_vampire_motion.current_face;
+
           test_vampire_motion.current_face = LEFT;
 
           test_vampire_motion.object_speed.previous_states.basic_move = test_vampire_motion.object_speed.current_states.basic_move;
@@ -1006,6 +1011,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
                     //is_moving = !is_moving;
           if(test_vampire_motion.previous_face != test_vampire_motion.current_face)
           test_vampire_motion.previous_face =           test_vampire_motion.current_face;
+
           test_vampire_motion.current_face = RIGHT;
 
           test_vampire_motion.object_speed.previous_states.basic_move = test_vampire_motion.object_speed.current_states.basic_move;
@@ -1080,10 +1086,11 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 
           //if(!is_moving)
               //is_moving = !is_moving;
-          if(test_vampire_motion.previous_face != test_vampire_motion.current_face)
-          test_vampire_motion.previous_face =           test_vampire_motion.current_face;
+          //if(test_vampire_motion.previous_face != test_vampire_motion.current_face)
+          //test_vampire_motion.previous_face =           test_vampire_motion.current_face;
+//
+          //test_vampire_motion.current_face = FORWARD;
 
-          test_vampire_motion.current_face = FORWARD;
           test_vampire_motion.object_speed.previous_states.fancy_move = test_vampire_motion.object_speed.current_states.fancy_move;
 
               if(test_vampire_motion.object_speed.current_states.fancy_move != JUMPING_FORWARD)
@@ -1100,10 +1107,11 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 
           //if(!is_moving)
               //is_moving = !is_moving;
-          if(test_vampire_motion.previous_face != test_vampire_motion.current_face)
-          test_vampire_motion.previous_face =           test_vampire_motion.current_face;
-
-          test_vampire_motion.current_face = BACKWARD;
+          //if(test_vampire_motion.previous_face != test_vampire_motion.current_face)
+          //test_vampire_motion.previous_face =           test_vampire_motion.current_face;
+//
+          //test_vampire_motion.current_face = BACKWARD;
+//
           test_vampire_motion.object_speed.previous_states.fancy_move = test_vampire_motion.object_speed.current_states.fancy_move;
 
               if(test_vampire_motion.object_speed.current_states.fancy_move != JUMPING_BACKWARD)

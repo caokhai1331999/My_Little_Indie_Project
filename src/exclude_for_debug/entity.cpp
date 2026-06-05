@@ -10,9 +10,18 @@
 
 void rigid_body::move(float delta_t){
 
-    if(this->current_face != this->previous_face)
-    OrientFace(this);
+    if(this->current_face != this->previous_face){
+        OrientFace(this);
+    }
 
+    glm::vec3 UpAxis = glm::vec3(this->position[1]);
+    glm::vec3 xAxis = glm::vec3(this->position[0]);
+    glm::vec3 zAxis = glm::vec3(this->position[2]);
+    printf("object current position is %s\n", glm::to_string(this->position).c_str());
+    printf("object current up axis is %s\n", glm::to_string(UpAxis).c_str());
+    printf("object current x axis is %s\n", glm::to_string(xAxis).c_str());
+    printf("object current z axis is %s\n", glm::to_string(zAxis).c_str());    
+    
     CalcNewPos(delta_t, this);
 }
 
@@ -28,12 +37,19 @@ void move_object(float delta_t, rigid_body* object){
 }
 
 void Orient_Around_Y(glm::mat4* matrix, float angle){
-    //(*matrix)[0][0] = -glm::sin(glm::radians(angle));
-    //(*matrix)[0][2] = glm::cos(glm::radians(angle));
-    //(*matrix)[2][2] = glm::sin(glm::radians(angle));
-    //(*matrix)[2][2] = glm::cos(glm::radians(angle));
+// We forgot the Scale factor here
+    //1st col
+    (*matrix)[0][0] = (float)glm::cos(glm::radians(angle))/100;
+    (*matrix)[0][2] = (float)-glm::sin(glm::radians(angle))/100;
+    //2nd col
+    (*matrix)[1][0] = 0;
+    (*matrix)[1][2] = (float)1/100;
+    (*matrix)[1][3] = 0;
+    //3rd col
+    (*matrix)[2][0] = (float)glm::sin(glm::radians(angle))/100;
+    (*matrix)[2][2] = (float)glm::cos(glm::radians(angle))/100;
 
-    *matrix = glm::rotate(*matrix, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+    //*matrix = glm::rotate(*matrix, glm::radians(angle), glm::vec3(0, 1, 0));
 };
 
 void OrientFace(rigid_body* object){
@@ -56,8 +72,17 @@ void OrientFace(rigid_body* object){
             break;
     };
 */
-
-    float deg = 90.0f * (object->current_face - object->previous_face);
+    float deg ;
+    if(object->current_face != object->previous_face){
+         //deg = 90.0f * -float(object->current_face - object->previous_face);
+         deg = 90.0f * float(object->current_face);
+        if(deg > 360.0f)
+            deg -= 360.0f;
+        if(deg < -360.0f)
+            deg += 360.0f;
+    }else{
+        deg = 0;
+    }
     Orient_Around_Y(&object->position, deg);
 }
 
@@ -123,6 +148,7 @@ void CalcNewPos(float delta_time, rigid_body* object){
     }
 
     printf("object current position is %s\n", glm::to_string(object->position).c_str());
+
     //for (float& axis const: *vector){
         //if(axis != 0,0f)
             //object_pos[3][i] = based_a_v_Pos_calc(object.acceleration, object.veclocity, object_pos[3][i], delta_time);
