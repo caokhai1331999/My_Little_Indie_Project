@@ -52,12 +52,13 @@ int CALLBACK WinMain
   setup_pointlight__ setup_pointlight = NULL;
   Set_Light_ Set_environmental_light = NULL;
   move_object_ move_ = NULL;
+  InitCamera__ InitCamera_ = NULL;
   //setUpUBO__ setUpUBO = NULL;
   //updateUBOData__ updateUBOData = NULL;
   //setupMeshh setupMesh = NULL;
   //MDraw Draw = NULL;
       //AniTimeUpdater AniUpdate_;
-  
+
   Animation* danceAnimation = nullptr;
   Animator* animator = nullptr;
   int delay_count = 0;
@@ -109,11 +110,12 @@ int CALLBACK WinMain
                   setup_pointlight = (setup_pointlight__)GetProcAddress(AniLib, "setup_pointlight_");
                   Set_environmental_light = (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
                   move_ = (move_object_)GetProcAddress(AniLib, "move_object");
+                  InitCamera_ = (InitCamera__)GetProcAddress(AniLib, "InitCamera_");
               }
           }
       }
-
-
+// Camera here
+      BackBuffer.camera_set.push_back(new Camera);
       
       glm::vec3 tempPos = glm::vec3(9.0f, 0.3, 1.0f);
       glm::vec3 size = glm::vec3(1.0f);
@@ -272,8 +274,14 @@ int CALLBACK WinMain
                 // This will be replaced by camera.view matrix
                 //
                 GetWindowDimension(&BackBuffer);
+                //InitCamera(&BackBuffer.camera, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, glm::vec3(-3.0f, -10.0f, -12.0f));
                 InitCamera(&BackBuffer);
+                InitCamera_(BackBuffer.camera_set[0], BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, glm::vec3(10.0f, -10.0f, -5.0f));
+
+                //Camera* ChosenCamera = BackBuffer.SwithCamera?BackBuffer.camera_set[0]:&BackBuffer.camera;
+                
                 ViewCamera(&BackBuffer.camera);
+                ViewCamera(BackBuffer.camera_set[0]);
 
                 basic_cube_core = glm::translate(basic_cube_core, glm::vec3(2.0f, -4.0f, 0.0f));
                 //std::cout<<"Central rotating model is"<<glm::to_string(basic_cube_core)<<std::endl;
@@ -287,10 +295,11 @@ int CALLBACK WinMain
                 //dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-2.0f, 0.0f, 0.0f));
                 test_vampire_motion.position = glm::translate(test_vampire_motion.position, glm::vec3(-2.0f, 0.0f, 0.0f));
 
+                // Bug is here
                 BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)BackBuffer.BitmapWidth / (float)BackBuffer.BitmapHeight, 0.1f, 100.0f);
 
                 //for(const auto &shader: BackBuffer.shaders_list){                
-                Set_Projection_View(&BackBuffer);
+                //Set_Projection_View(&BackBuffer);
 
                 std::string Mname = "backpack";                
                 Model_* backpack = nullptr;
@@ -383,6 +392,7 @@ int CALLBACK WinMain
                       CalEarlyFrameTime(&TimeSet);
                   }
 
+                  //ChosenCamera = BackBuffer.SwithCamera?BackBuffer.camera_set[0]:&BackBuffer.camera;
                     //printf("Count from start of frame: %I64d\n",LastCycleCounts);
                   //MSG Message;
                     //NOTE: This is where receiving the message to change
@@ -471,17 +481,6 @@ int CALLBACK WinMain
                     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);             
 
                     //GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);
-                    
-                    // camera/view transformation
-                    //Model = glm::rotate(Model, glm::radians(fov)*0.5f, glm::vec3(1.0f, 0.0f, 0.5f));
-
-
-                    // Display on the screen
-                    // The glitching sound driven me nearly crazy so I decided to turn it off                
-                    // We define that through setInt
-                    //Why the &ScreenBuffer data doesn't show on the direct screen
-
-
  
                     //__rdtsc() is an intrinsict (the one which looked like a function call
                     //but it actually a hint to the compiler to a specific dissembly language intstruction)
@@ -511,7 +510,9 @@ int CALLBACK WinMain
                     };
                     //if(BackBuffer.camera.moved || BackBuffer.camera.mouse.moved){
                    UpdateCamera(&BackBuffer.camera, &DelayedRatio);
-                    for(B_shader_program* const &shader: BackBuffer.shaders_list){
+                   UpdateCamera(BackBuffer.camera_set[0], &DelayedRatio);
+
+                   for(B_shader_program* const &shader: BackBuffer.shaders_list){
                         shader->use();
                         shader->setMat4("view", BackBuffer.camera.view);
                         shader->setMat4("projection", BackBuffer.camera.projection);

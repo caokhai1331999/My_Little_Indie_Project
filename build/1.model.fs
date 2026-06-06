@@ -100,6 +100,7 @@ uniform SpotLight spotlight;
 
 vec3 CalcDirLight(DirLight light, vec3 norm, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 tangent_light_pos, vec3 norm, vec3 viewDir);
+
 vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 viewDir);
 
 vec3 CalcDirLight(DirLight light, vec3 norm, vec3 viewDir){
@@ -263,10 +264,10 @@ void main()
 	result = CalcDirLight(dirLight, norm, viewDir);
 
 	// POINT
-	for (int i = 0; i < NR_POINT_LIGHTS; i++)
-	{	
-        result += CalcPointLight(pointLights[i], fs_in.tangentpointLight_Pos[i], norm, viewDir);
-	};
+	// for (int i = 0; i < NR_POINT_LIGHTS; i++)
+	// {	
+    //     result += CalcPointLight(pointLights[i], fs_in.tangentpointLight_Pos[i], norm, viewDir);
+	// };
 
 	// Emission vec3 emission = texture(material.emissionMap, fs_in.TexCoord).rgb;
 	    //result += CalcPointLight(pointlight, norm, viewDir);

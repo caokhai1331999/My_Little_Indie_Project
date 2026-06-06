@@ -40,13 +40,15 @@ void Orient_Around_Y(glm::mat4* matrix, float angle){
 // We forgot the Scale factor here
     //1st col
     (*matrix)[0][0] = (float)glm::cos(glm::radians(angle))/100;
+    (*matrix)[0][1] = 0.0f;
     (*matrix)[0][2] = (float)-glm::sin(glm::radians(angle))/100;
     //2nd col
-    (*matrix)[1][0] = 0;
-    (*matrix)[1][2] = (float)1/100;
-    (*matrix)[1][3] = 0;
+    (*matrix)[1][0] = 0.0f;
+    (*matrix)[1][1] = (float)1/100;
+    (*matrix)[1][2] = 0.0f;
     //3rd col
     (*matrix)[2][0] = (float)glm::sin(glm::radians(angle))/100;
+    (*matrix)[2][1] = 0.0f;
     (*matrix)[2][2] = (float)glm::cos(glm::radians(angle))/100;
 
     //*matrix = glm::rotate(*matrix, glm::radians(angle), glm::vec3(0, 1, 0));

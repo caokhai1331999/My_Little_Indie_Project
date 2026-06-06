@@ -94,7 +94,7 @@ struct Camera{
     {
         // We just could take Front as default
         // The Up have to be calculated from Right(Which is calculated from Direction)
-        Direction = glm::vec3(-6.0f, 0.3f, 1.0f) - Position;
+        Direction = glm::vec3(-2.0f, 0.0f, 0.0f) - Position;
         WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
         
         view = glm::lookAt(
@@ -119,13 +119,21 @@ struct Camera{
     }
 };
 
-void UpdateCamera (Camera* camera = nullptr, float* DelayRatio = nullptr);
+void InitCamera(Camera* camera = nullptr, int width = 0, int height = 0, glm::vec3& Position_ = glm::vec3(0.0f));
+void UpdateCamera(Camera* camera = nullptr, float* DelayRatio = nullptr);
+void Zoom (Camera* camera, float offset);
 
+// On working
+//void AutoAdjustCameraPos(Camera* camera = nullptr, const glm::vec3& Object_Pos = glm::vec3(0), float frameTime = 0);
+//extern "C" __declspec(dllexport) void AutoAdjustCameraPos_ (Camera* camera = nullptr, const glm::vec3& Object_Pos = glm::vec3(0), const float frameTime = 0);
+//typedef void (*AutoAdjustCameraPos__) (Camera*, const glm::vec3&, const float);
+//
+extern "C" __declspec(dllexport) void InitCamera_ (Camera* camera = nullptr, int width = 0, int height = 0, glm::vec3& Position_ = glm::vec3(0.0f));
+typedef void (*InitCamera__) (Camera*, int, int, glm::vec3&);
 //camera update wrapper
 extern "C" __declspec(dllexport) void updateCamera_ (Camera* camera = nullptr, float* DelayRatio = nullptr);
 typedef void (*updateCa) (Camera*, float*);
 
-void Zoom (Camera* camera, float offset);
 void ViewCamera(Camera* camera = nullptr){
     std::cout<<"View matrix: "<<glm::to_string(camera->view)<<std::endl;
     std::cout<<"Front vec: "<<glm::to_string(camera->Front)<<std::endl;

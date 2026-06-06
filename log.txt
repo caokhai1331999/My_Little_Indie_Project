@@ -1951,3 +1951,17 @@ The only one thing remain is the direction currently set wrong by me
 
 I don't know the true handedness of it.
 so 270 degree rotate make object face right in scene
+
+---------------- Sat, 06 Jun 26: 08:35AM
+
+TODO: Things to do today:
+              . Draw scene using instancing or scene graph
+              . Adjust the camera zooming and position based on main
+              character.
+              . Burst of force.
+
+Consider reallocate source code for the sake of easy maintain and improve.
+Wonder why on main camera there are giant moving vampire, while with the issued
+camera stuck under there are camera the vampire having normal size
+
+Be careful with camera matrix

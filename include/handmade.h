@@ -244,6 +244,12 @@ struct Game_State{
     int Hz = 256;    
 };
 
+struct win32Dimension{
+    int PosX{0};
+    int PosY{0};
+    int Height{720};
+    int Width{1280};
+}Dimens;
 
 
 struct Clock_Set{

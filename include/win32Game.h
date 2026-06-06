@@ -14,15 +14,6 @@
 #include "utility"
 #include <vector>
 
-
-struct win32Dimension{
-    int PosX{0};
-    int PosY{0};
-    int Height{720};
-    int Width{1280};
-}Dimens;
-
-
 struct OpenGLData{
     unsigned int VAOs;
     unsigned int PlaneVAOs;
@@ -71,13 +62,14 @@ struct Win32_OffScreen_Buffer{
     int BitmapMemorySize;
 
     std::vector<B_shader_program*> shaders_list;
-    
+
+    bool SwithCamera = false;
     bool transferNeed;    
     bool GLImageRendered = false;
     OpenGLData glData;
 
-    
     Camera camera;
+    std::vector<Camera*> camera_set;
     const int BytesPerPixel = 4;
 };
 

@@ -1032,6 +1032,10 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
       }
 
       else if (vkCode == 'S') {
+          if((GetKeyState(VK_CONTROL) & (1 << 15)) > 0){
+              BackBuffer.SwithCamera = !BackBuffer.SwithCamera;
+          }
+          
         State.GreenOffset += 10;
         BackBuffer.camera.Position -=
             glm::normalize(BackBuffer.camera.Direction) *
@@ -1459,12 +1463,11 @@ void InitCamera(Win32_OffScreen_Buffer* BackBuffer){;
     BackBuffer->camera.fov = 45.0f;
 };
 
-
 void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer){;
     for(const GLuint& shader:BackBuffer->glData.ProgramIDs){
         glUseProgram(shader);
-        setMat4(shader, "projection", BackBuffer->camera.projection);
-        setMat4(shader, "view", BackBuffer->camera.view);
+        setMat4(shader, "projection", !BackBuffer->SwithCamera?BackBuffer->camera.projection:BackBuffer->camera_set[0]->projection);
+        setMat4(shader, "view", !BackBuffer->SwithCamera?BackBuffer->camera.view:BackBuffer->camera_set[0]->view);
     };
     glUseProgram(0);
         //basic_shader_->setMat4("projection", BackBuffer.camera.projection);
@@ -1501,6 +1504,18 @@ void CleanUpandExit(Win32_OffScreen_Buffer* BackBuffer){
     glDeleteBuffers(1, &BackBuffer->glData.VBO);
     glDeleteBuffers(1, &BackBuffer->glData.ColorVBO);
     glDeleteBuffers(1, &BackBuffer->glData.PlaneVBO);
+
+    for(B_shader_program* shader: BackBuffer->shaders_list){
+        delete shader;
+        shader = nullptr;
+    }
+    BackBuffer->shaders_list.clear();
+
+    for(Camera* camera: BackBuffer->camera_set){
+        delete camera;
+        camera = nullptr;
+    }
+    BackBuffer->camera_set.clear();
 
     ResetGLState(BackBuffer);
 };
