@@ -51,22 +51,17 @@ rem Let alone the hot Loading code later
 rem delete pre-pdb files
 rem=========================================
 
-rem del Camera.obj Light.obj
+rem del Camera.obj Light.obj entity.obj
 rem del %dll_name%__* ../Light32.exp ../Light32.lib
 rem set dll_name_with_time_=%dll_name%__%hr%_%min%_%sec%__%dd%-%mm%-%yr%
-rem cl /LD /Zi /EHsc /FD  %DIRECTIVES_FLAG% %src_files_for_dll% %glad_src% -I%_include% -I%glad_include% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link /PDB:%dll_name_with_time_%.pdb %LIB_% /LIBPATH:%ASSIMP_LIB% /FORCE:MULTIPLE /IGNORE:4006 /IMPLIB:../%dll_name%.lib /OUT:../%dll_name%.dll
-
-del Camera.obj Light.obj
-del %dll_name%__* Light32.exp Light32.lib
-set dll_name_with_time_=%dll_name%__%hr%_%min%_%sec%__%dd%-%mm%-%yr%
-cl /LD /Zi /EHsc /FD  %DIRECTIVES_FLAG% %src_files_for_dll% %glad_src% -I%_include% -I%glad_include% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link /PDB:%dll_name_with_time_%.pdb %LIB_% /LIBPATH:%ASSIMP_LIB% /FORCE:MULTIPLE /IGNORE:4006 /IMPLIB:%dll_name%.lib /OUT:%dll_name%.dll
+rem cl /LD /Zi /EHsc /FD  %DIRECTIVES_FLAG% %src_files_for_dll% %glad_src% -I%_include% -I%glad_include% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link /PDB:%dll_name_with_time_%.pdb %LIB_% /LIBPATH:%ASSIMP_LIB% /FORCE:MULTIPLE /IGNORE:4006 /IMPLIB:%dll_name%.lib /OUT:%dll_name%.dll
 
 rem ====================================== 
 
-rem del B_shader.obj C_Model.obj C_Mesh.obj handmade.obj main.obj SoundMaker.obj testOpenGL.obj Tile.obj win32Game.obj Tile.obj animation.obj animator.obj bone.obj
-rem del win32Game.pdb win32Game__*
-rem set exe_name_with_time=win32Game__%hr%_%min%_%sec%__%dd%-%mm%-%yr%
-rem cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES_FOR_EXE% %glad_src% -I%_include% -I%glad_include% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% %dll_name%_copy.lib /LIBPATH:%ASSIMP_LIB% /PDB:%exe_name_with_time%.pdb /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /ENTRY:WinMainCRTStartup /subsystem:console
+del B_shader.obj C_Model.obj C_Mesh.obj handmade.obj main.obj SoundMaker.obj testOpenGL.obj Tile.obj win32Game.obj Tile.obj animation.obj animator.obj bone.obj
+del win32Game.pdb win32Game__*
+set exe_name_with_time=win32Game__%hr%_%min%_%sec%__%dd%-%mm%-%yr%
+cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES_FOR_EXE% %glad_src% -I%_include% -I%glad_include% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% /LIBPATH:%ASSIMP_LIB% /PDB:%exe_name_with_time%.pdb /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /ENTRY:WinMainCRTStartup /subsystem:console
   
 rem %dll_name%_copy.lib
 rem=======================================
