@@ -124,10 +124,15 @@ void UpdateCamera(Camera* camera = nullptr, float* DelayRatio = nullptr);
 void Zoom (Camera* camera, float offset);
 
 // On working
-//void AutoAdjustCameraPos(Camera* camera = nullptr, const glm::vec3& Object_Pos = glm::vec3(0), float frameTime = 0);
-//extern "C" __declspec(dllexport) void AutoAdjustCameraPos_ (Camera* camera = nullptr, const glm::vec3& Object_Pos = glm::vec3(0), const float frameTime = 0);
-//typedef void (*AutoAdjustCameraPos__) (Camera*, const glm::vec3&, const float);
-//
+void AutoAdjustCameraPos(Camera* camera = nullptr, const glm::vec3& Object_Pos = glm::vec3(0), float frameTime = 0);
+void Set_Mouse_Event_Tracker(TRACKMOUSEEVENT* mouseEventVar = nullptr, HWND window = NULL);
+
+extern "C" __declspec(dllexport) void Set_Mouse_Event_Tracker_(TRACKMOUSEEVENT* mouseEventVar = nullptr, HWND window = NULL);
+typedef void (*Set_Mouse_Event_Tracker__)(TRACKMOUSEEVENT*, HWND);
+
+extern "C" __declspec(dllexport) void AutoAdjustCameraPos_ (Camera* camera = nullptr, const glm::vec3& Object_Pos = glm::vec3(0), const float frameTime = 0);
+typedef void (*AutoAdjustCameraPos__) (Camera*, const glm::vec3&, const float);
+
 extern "C" __declspec(dllexport) void InitCamera_ (Camera* camera = nullptr, int width = 0, int height = 0, glm::vec3& Position_ = glm::vec3(0.0f));
 typedef void (*InitCamera__) (Camera*, int, int, glm::vec3&);
 //camera update wrapper

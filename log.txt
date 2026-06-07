@@ -1957,7 +1957,7 @@ so 270 degree rotate make object face right in scene
 TODO: Things to do today:
               . Draw scene using instancing or scene graph
               . Adjust the camera zooming and position based on main
-              character.
+              character. DONE!
               . Burst of force.
 
 Consider reallocate source code for the sake of easy maintain and improve.
@@ -1965,3 +1965,10 @@ Wonder why on main camera there are giant moving vampire, while with the issued
 camera stuck under there are camera the vampire having normal size
 
 Be careful with camera matrix
+
+---------------- Sun, 07 Jun 26: 12:22PM
+
+DONE! create one more camera and switch between two. Time to make the second
+move along with main character.
+
+NEXT: Load Glyph and characters for use and debug

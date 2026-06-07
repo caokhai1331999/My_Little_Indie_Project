@@ -53,6 +53,7 @@ int CALLBACK WinMain
   Set_Light_ Set_environmental_light = NULL;
   move_object_ move_ = NULL;
   InitCamera__ InitCamera_ = NULL;
+  AutoAdjustCameraPos__ AutoAdjustCameraPos = NULL;
   //setUpUBO__ setUpUBO = NULL;
   //updateUBOData__ updateUBOData = NULL;
   //setupMeshh setupMesh = NULL;
@@ -62,7 +63,7 @@ int CALLBACK WinMain
   Animation* danceAnimation = nullptr;
   Animator* animator = nullptr;
   int delay_count = 0;
-
+  Camera* Chosen_Camera;
   std::vector<glm::mat4>*Transform_ = nullptr;
 
   if (RegisterClassExA(&WindowClass)) {
@@ -106,11 +107,21 @@ int CALLBACK WinMain
               AniLib = LoadLibraryA("Light32_copy.dll");
 
               if(AniLib != NULL){
+
+                  bool success = gladLoadGLLoader((GLADloadproc)GetAllFunctionPointerFromLib);
+
+                  if(success){
+                      printf("Success load function pointer from AniLib\n");
+                  }else{
+                      printf("Falied loading function pointer from AniLib\n");
+                  }
+
                   UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");          
                   setup_pointlight = (setup_pointlight__)GetProcAddress(AniLib, "setup_pointlight_");
                   Set_environmental_light = (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
                   move_ = (move_object_)GetProcAddress(AniLib, "move_object");
                   InitCamera_ = (InitCamera__)GetProcAddress(AniLib, "InitCamera_");
+                  AutoAdjustCameraPos = (AutoAdjustCameraPos__)GetProcAddress(AniLib, "AutoAdjustCameraPos_");
               }
           }
       }
@@ -153,6 +164,7 @@ int CALLBACK WinMain
               debug_read_file_result result2;
               debug_read_file_result result;
              BMPContent = new imagee_content;
+
             // BMPContent = DEBUGReadBMP("Harry_and_Accomplices_rescaled.bmp",
             // &result);
             //  =============================================
@@ -166,35 +178,9 @@ int CALLBACK WinMain
               Win32_Front_Buffer ScreenBuffer = Win32_Front_Buffer(
                 BackBuffer.BitmapWidth, BackBuffer.BitmapHeight,
                 &BackBuffer.glData, BackBuffer.BitmapMemory, BackBuffer.Window);
-
-              glm::mat4 fooMat = glm::mat4(1.0f); 
-              fooMat = glm::translate(fooMat, glm::vec3(1.0f, 2.0f, 3.0f));
-              std::cout<<"ID mat after translate: "<<glm::to_string(fooMat)<<std::endl;
-
-              fooMat = glm::scale(fooMat, glm::vec3(4.0f, 5.0f, 6.0f));
-              std::cout<<"ID mat after scale: "<<glm::to_string(fooMat)<<std::endl;
-
-              fooMat = glm::rotate(fooMat, 90.0f, glm::vec3(7.0f, 8.0f, 9.0f));
-              std::cout<<"ID mat after rotate: "<<glm::to_string(fooMat)<<std::endl;
               
             // Randomize cube direction
             std::srand(std::time(0));
-
-            //std::vector<rollCubeInfo>rollCubeMap;
-            //float direction = 0.0f;
-//
-            //for (int x = 0; x < 100; x++) {
-              //direction = ((std::rand() % 3) * 1.0f);
-              //fluxY[x + 100] = direction;
-              //if ((float)fluxY[x + 100] == (float)ROLL_) {
-                  //rollCubeMap.push_back({x, std::rand() % 3});
-                //}
-              //printf("cube index %d Y: %f, with direction %f %s\n", x, fluxY[x],
-                     //fluxY[x + 100],
-                     //fluxY[x + 100] == UPP_     ? "UP"
-                     //: fluxY[x + 100] == DOWNN_ ? "DOWNN"
-                                                //: "ROLL");
-            //}
                 
 // Cause the ScreenData will be deleted out of the loop so
                 // We have to assign address of memory and glData to
@@ -206,6 +192,8 @@ int CALLBACK WinMain
                     std::cerr << "OpenGL Error: " << err << std::endl;
                 }
                 std::string shader_name = "animating sketching brush";
+// Set up Shader program here
+                // Consider move them somewhere
                 BackBuffer.shaders_list.reserve(5);
 
                 BackBuffer.shaders_list.push_back(new B_shader_program("2.skeletal_animation.vs", "2.skeletal_animation.fs", "animating sketching brush"));
@@ -278,7 +266,7 @@ int CALLBACK WinMain
                 InitCamera(&BackBuffer);
                 InitCamera_(BackBuffer.camera_set[0], BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, glm::vec3(10.0f, -10.0f, -5.0f));
 
-                //Camera* ChosenCamera = BackBuffer.SwithCamera?BackBuffer.camera_set[0]:&BackBuffer.camera;
+                Chosen_Camera = BackBuffer.SwithCamera?BackBuffer.camera_set[0]:&BackBuffer.camera;
                 
                 ViewCamera(&BackBuffer.camera);
                 ViewCamera(BackBuffer.camera_set[0]);
@@ -296,7 +284,9 @@ int CALLBACK WinMain
                 test_vampire_motion.position = glm::translate(test_vampire_motion.position, glm::vec3(-2.0f, 0.0f, 0.0f));
 
                 // Bug is here
-                BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)BackBuffer.BitmapWidth / (float)BackBuffer.BitmapHeight, 0.1f, 100.0f);
+                BackBuffer.camera.projection = glm::perspective(glm::radians(Chosen_Camera->fov), (float)BackBuffer.BitmapWidth / (float)BackBuffer.BitmapHeight, 0.1f, 100.0f);
+                // By some unknown dark magic, The set projection matrix part didn't work in that function
+                BackBuffer.camera_set[0]->projection = glm::perspective(glm::radians(Chosen_Camera->fov), (float)BackBuffer.BitmapWidth / (float)BackBuffer.BitmapHeight, 0.1f, 100.0f);
 
                 //for(const auto &shader: BackBuffer.shaders_list){                
                 //Set_Projection_View(&BackBuffer);
@@ -356,7 +346,7 @@ int CALLBACK WinMain
                 //tempSetEnviLight(BackBuffer.shaders_list[3], &(BackBuffer.camera));
 
                 BackBuffer.shaders_list[0]->use();
-                BackBuffer.shaders_list[0]->setMat4( "projection", BackBuffer.camera.projection);
+                BackBuffer.shaders_list[0]->setMat4( "projection", Chosen_Camera->projection);
                 
                 GLuint UBO;
                 int k = 0;                
@@ -374,14 +364,14 @@ int CALLBACK WinMain
 
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
                     shader->use();
-                    shader->setMat4("view", BackBuffer.camera.view);
-                    shader->setMat4("projection", BackBuffer.camera.projection);
-                    shader->setVec3( "ViewPos", BackBuffer.camera.Position);
+                    shader->setMat4("view", Chosen_Camera->view);
+                    shader->setMat4("projection", Chosen_Camera->projection);
+                    shader->setVec3( "ViewPos", Chosen_Camera->Position);
                 }
 
-                Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, &BackBuffer.camera);
-                Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, &BackBuffer.camera);
-                Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, &BackBuffer.camera);
+                Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
+                Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
+                Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
                 
                 while (GlobalRunning) {
                   if(first_announce) {
@@ -392,7 +382,7 @@ int CALLBACK WinMain
                       CalEarlyFrameTime(&TimeSet);
                   }
 
-                  //ChosenCamera = BackBuffer.SwithCamera?BackBuffer.camera_set[0]:&BackBuffer.camera;
+                  Chosen_Camera = BackBuffer.SwithCamera?BackBuffer.camera_set[0]:&BackBuffer.camera;
                     //printf("Count from start of frame: %I64d\n",LastCycleCounts);
                   //MSG Message;
                     //NOTE: This is where receiving the message to change
@@ -412,7 +402,7 @@ int CALLBACK WinMain
                         MaxControllerCount = ArrayCount(Input->Controller);   
                     }
 
-                    TrackMouseEvent(BackBuffer.camera.mouse.mouseEvent);
+                    TrackMouseEvent(Chosen_Camera->mouse.mouseEvent);
 //After polling event we update the positon of object
                     if(test_vampire_motion.object_speed.current_states.basic_move != IDLE || test_vampire_motion.object_speed.current_states.fancy_move != IDLE){
                         move_(TimeSet.SPerFrame, &test_vampire_motion);
@@ -436,11 +426,19 @@ int CALLBACK WinMain
                         // Animation
                         if (AniLib != NULL) {
                             printf("Succeed reload code and opengl function from dll\n");
+                            bool success = gladLoadGLLoader((GLADloadproc)GetAllFunctionPointerFromLib);
+
+                            if(success){
+                             printf("Success load function pointer from AniLib\n");
+                            }else{
+                             printf("Falied loading function pointer from AniLib\n");
+                            }
 
                           UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");
                           setup_pointlight = (setup_pointlight__)GetProcAddress(AniLib, "setup_pointlight_");
                           Set_environmental_light =                      (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
-                          move_ = (move_object_)GetProcAddress(AniLib, "move_object");                          
+                          move_ = (move_object_)GetProcAddress(AniLib, "move_object");
+                          AutoAdjustCameraPos = (AutoAdjustCameraPos__)GetProcAddress(AniLib, "AutoAdjustCameraPos_");
 //setupMesh =
                           BackBuffer.shaders_list[0]->ReLoadShaderCode();
                           BackBuffer.shaders_list[2]->ReLoadShaderCode();
@@ -452,8 +450,8 @@ int CALLBACK WinMain
                           Load_Lib = false;
 
                       
-                      Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, &BackBuffer.camera);
-                      //Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, &BackBuffer.camera);
+                      Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
+                      //Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
                     }
 
                     //UPDATE
@@ -508,29 +506,29 @@ int CALLBACK WinMain
                     if(ColorOffset > 1.0f){
                         ColorOffset -= 1.0f;  
                     };
-                    //if(BackBuffer.camera.moved || BackBuffer.camera.mouse.moved){
+                    //if(Chosen_Camera->moved || Chosen_Camera->mouse.moved){
                    UpdateCamera(&BackBuffer.camera, &DelayedRatio);
                    UpdateCamera(BackBuffer.camera_set[0], &DelayedRatio);
 
                    for(B_shader_program* const &shader: BackBuffer.shaders_list){
                         shader->use();
-                        shader->setMat4("view", BackBuffer.camera.view);
-                        shader->setMat4("projection", BackBuffer.camera.projection);
-                        shader->setVec3( "ViewPos", BackBuffer.camera.Position);
+                        shader->setMat4("view", Chosen_Camera->view);
+                        shader->setMat4("projection", Chosen_Camera->projection);
+                        shader->setVec3( "ViewPos", Chosen_Camera->Position);
                     }
 
-                    if(BackBuffer.camera.mouse.Wheeled)
+                    if(Chosen_Camera->mouse.Wheeled)
                     {
-                        BackBuffer.camera.projection = glm::perspective(glm::radians(BackBuffer.camera.fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
+                        Chosen_Camera->projection = glm::perspective(glm::radians(Chosen_Camera->fov), (float)ScreenBuffer.BitmapWidth / (float)ScreenBuffer.BitmapHeight, 0.1f, 100.0f);
 
-                        BackBuffer.camera.mouse.Wheeled = false;
+                        Chosen_Camera->mouse.Wheeled = false;
                     }
 
                     //for(const auto &shader: BackBuffer.shaders_list){
 
                     BackBuffer.shaders_list[0]->use();
-                    //WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
-                    WorldToCamera = BackBuffer.camera.view * test_vampire_motion.position;
+                    //WorldToCamera = Chosen_Camera->view * dancing_vampire_core;
+                    WorldToCamera = Chosen_Camera->view * test_vampire_motion.position;
                     BackBuffer.shaders_list[0]->setMat4("WorldToCamera", WorldToCamera);
                     glUseProgram(0);
 
@@ -736,8 +734,8 @@ int CALLBACK WinMain
                                 //AniUpdate(animator, &(TimeSet.SPerFrame));
                                 animator->updateAnimationTime(&(TimeSet.SPerFrame));                                
                             }                        
-
                         }
+                        AutoAdjustCameraPos(BackBuffer.camera_set[0], glm::vec3(test_vampire_motion.position[3]), TimeSet.SPerFrame);
                     }
 
                     if(showMsPF){
@@ -792,8 +790,8 @@ int CALLBACK WinMain
                             */
                             //if(is_moving){
                             BackBuffer.shaders_list[0]->use();
-                            //WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
-                            WorldToCamera = BackBuffer.camera.view * test_vampire_motion.position;
+                            //WorldToCamera = Chosen_Camera->view * dancing_vampire_core;
+                            WorldToCamera = Chosen_Camera->view * test_vampire_motion.position;
                             BackBuffer.shaders_list[0]->setMat4("WorldToCamera", WorldToCamera);                                
                             //}
 

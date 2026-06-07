@@ -310,6 +310,13 @@ glm::vec3 randomRotateAxis_(int rollIndex) {
   return randomRotateAxis;
 }
 
+void* GetAllFunctionPointerFromLib(const HMODULE lib, const char* name){
+    void* p;
+    static HMODULE module = LoadLibraryA("Light32_copy.dll");
+    p = (void*)GetProcAddress(lib, name);
+    return p;
+}
+
 // NOTE: Why this function can replace the wglGetProcaddress
 void* GetAnyGLFuncAddress(const char* name)
 {

@@ -322,6 +322,7 @@ void win32LoadXInput(void);
 void ProcessXinputDigitalButton(DWORD XInputButtonState ,Game_Button_State* OldState ,DWORD ButtonBit, Game_Button_State* NewState);
 void ProcessInput(int maxControllerCount, Game_Input* OldInput, Game_Input* NewInput);
 
+void* GetAllFunctionPointerFromLib(HMODULE lib = NULL, const char* name = nullptr);
 void* GetAnyGLFuncAddress(const char* name);
 void* LoadFunctionFromDLL(const char* DLLName = nullptr, const char* FuncName = nullptr);
 void SetUpWindow();

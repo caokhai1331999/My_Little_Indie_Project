@@ -124,6 +124,7 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
     } else {
         DirectRow = ((uint8 *)FBuffer->BitmapMemoryForDirectBlit);
     }
+    
     //Change the image row order upside down
     //uint8* imageRow = (uint8*)BMPContent->ImageContent;
     //uint8* imageRowForDirectBlit = (uint8*)BMPContent->ImageContent;

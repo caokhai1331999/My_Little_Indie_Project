@@ -147,12 +147,23 @@ void Zoom(Camera* camera, float offset){
     };
 }
 
-//void AutoAdjustCameraPos(Camera* camera, const glm::vec3& Object_Pos, float frameTime){
-    //camera->Position = glm::mix(camera->Position, Object_Pos, 2.5f* frameTime);
-    //camera->Direction = Object_Pos - camera->Position;
-//};
+void AutoAdjustCameraPos(Camera* camera, const glm::vec3& Object_Pos, float frameTime){
+// Delve more about this.
+    camera->Position = glm::mix(camera->Position, Object_Pos + glm::vec3(5.0f, -2.0f, 0.0f), 2.5f* frameTime);
+    camera->Direction = Object_Pos - camera->Position;
+};
 
-//void AutoAdjustCameraPos_(Camera* camera, const glm::vec3& Object_Pos, const float frameTime){
-    //AutoAdjustCameraPos(camera, Object_Pos, frameTime);
-//};
-//
+void AutoAdjustCameraPos_(Camera* camera, const glm::vec3& Object_Pos, const float frameTime){
+    AutoAdjustCameraPos(camera, Object_Pos, frameTime);
+};
+
+void Set_Mouse_Event_Tracker(TRACKMOUSEEVENT* mouseEventVar, HWND Window){
+    mouseEventVar->cbSize = sizeof(TRACKMOUSEEVENT);
+    mouseEventVar->dwFlags = TME_HOVER|TME_LEAVE;
+    mouseEventVar->hwndTrack = Window;
+    mouseEventVar->dwHoverTime = 1000;
+};
+
+void Set_Mouse_Event_Tracker_(TRACKMOUSEEVENT* mouseEventVar){
+    Set_Mouse_Event_Tracker(mouseEventVar);
+};
