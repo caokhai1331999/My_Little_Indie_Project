@@ -453,7 +453,7 @@ int CALLBACK WinMain
                       Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
                       //Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
                     }
-
+                    
                     //UPDATE
                     // ================================================================
                     // NOTE: Sounding Part
@@ -798,6 +798,7 @@ int CALLBACK WinMain
                     BackBuffer.shaders_list[0]->setBool("is_moving", is_moving);
 
 //Why the later shader texture drawing work but not the one above
+                    //Render
                     DDraw(dancing_vampire, &brushID);
 
                       if(showMsPF){

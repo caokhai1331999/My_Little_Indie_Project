@@ -1972,3 +1972,23 @@ DONE! create one more camera and switch between two. Time to make the second
 move along with main character.
 
 NEXT: Load Glyph and characters for use and debug
+
+---------------- Mon, 08 Jun 26: 10:30AM
+Thing is we have to update per shader in order to not miss feeding data among
+these before order it to draw something.
+
+PollEvent(inside other files)
+Update(update, character):
+          . set projection, view, model matrix(position)
+          . texture
+          . set light
+      For every shader
+          . CameraPos
+Render(draw, render in group):
+          . GLDrawArrays
+          . Draw/DDraw(for model)
+
+What we need for the simple spot light on texture.
+ . LampLight position -> light intensity
+ . cutout angle - do I need it???
+ 

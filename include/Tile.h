@@ -163,6 +163,7 @@ struct TileGLObject{
     unsigned int TileEBO;
     unsigned int TileVBO;
     unsigned int TileColorBO;
+    unsigned int TextureID;
 }TileObj;
 
 void set_tile_vertex(B_shader_program* shader = nullptr); 

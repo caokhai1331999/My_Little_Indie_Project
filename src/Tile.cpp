@@ -191,6 +191,8 @@ void set_tile_vertex(B_shader_program* shader){
 
     // Set position for instanced draw
     shader->use();
+    TileObj.TextureID = SetupTileTexture(".\media\");
+    
     //Tile Object here
     // Then we have something like trees, monsters, ....
     glm::vec2 offset;
@@ -204,15 +206,20 @@ void set_tile_vertex(B_shader_program* shader){
             shader->setVec2(name.c_str(), offset);
         }
     }
-    glUseProgram(0);
+
+glUseProgram(0);
 }
 
 
 void drawTile(const unsigned int VaoID, const unsigned int TextureID, B_shader_program* const Brush){
-
+    
     glBindVertexArray(TileObj.TileVAO);
     Brush->use();
+// Set Texture ID here
+    Brush->setInt(TileObj.TextureID, "material.diffused_texture");
+// Set Light Position based on Texture Coordinated
     glDrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, 900);
+
 // Scale here
 
             // Then set textureId here
