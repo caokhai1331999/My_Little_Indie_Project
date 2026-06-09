@@ -48,47 +48,47 @@ struct rollCubeInfo{
 float land_vertices[] = 
 {// vertex                    TextCoords
 //BACK   , {0,0},
--0.5f,  0.375f, -0.5f, 0.0f, -1.0f,
- 0.5f,  0.375f, -0.5f, 0.0f, -1.0f,
- 0.5f,  0.5f, -0.5f, 0.0f, -1.0f,
- 0.5f,  0.5f, -0.5f, 0.0f, -1.0f,
--0.5f,  0.5f, -0.5f, 0.0f, -1.0f,
--0.5f,  0.375f, -0.5f, 0.0f, -1.0f,
- //FRONT FACE       
--0.5f,  0.375f,  0.5f, 0.0f, 1.0f,
- 0.5f,  0.5f,  0.5f, 0.0f, 1.0f,
- 0.5f,  0.375f,  0.5f, 0.0f, 1.0f,
- 0.5f,  0.5f,  0.5f, 0.0f, 1.0f,
--0.5f,  0.375f,  0.5f, 0.0f, 1.0f,
--0.5f,  0.5f,  0.5f, 0.0f, 1.0f,
- // LEFT0.375CE       
--0.5f,  0.5f,  0.5f, 0.0f, 0.0f,
--0.5f,  0.375f, -0.5f, 0.0f, 0.0f,
--0.5f,  0.5f, -0.5f, 0.0f, 0.0f,
--0.5f,  0.375f, -0.5f, 0.0f, 0.0f,
--0.5f,  0.5f,  0.5f, 0.0f, 0.0f,
--0.5f,  0.375f,  0.5f, 0.0f, 0.0f,
- // RIGH0.375ACE      
- 0.5f,  0.5f,  0.5f, 0.0f,  0.0f,
- 0.5f,  0.5f, -0.5f, 0.0f,  0.0f,
- 0.5f,  0.375f, -0.5f, 0.0f,  0.0f,
- 0.5f,  0.375f, -0.5f, 0.0f,  0.0f,
- 0.5f,  0.375f,  0.5f, 0.0f,  0.0f,
- 0.5f,  0.5f,  0.5f, 0.0f,  0.0f,
- // BOTT0.375FACE     
--0.5f,  0.375f, -0.5f,  0.0f,  0.0f,
- 0.5f,  0.375f,  0.5f,  0.0f,  0.0f,
- 0.5f,  0.375f, -0.5f,  0.0f,  0.0f,
- 0.5f,  0.375f,  0.5f,  0.0f,  0.0f,
--0.5f,  0.375f, -0.5f,  0.0f,  0.0f,
--0.5f,  0.375f,  0.5f,  0.0f,  0.0f,
-//TOP                 , 
-  -0.5f,  0.5f, -0.5f, 1.0f,  0.0f,
-   0.5f,  0.5f, -0.5f, 1.0f,  0.0f,
-   0.5f,  0.5f,  0.5f, 1.0f,  0.0f,
-   0.5f,  0.5f,  0.5f, 1.0f,  0.0f,
-  -0.5f,  0.5f,  0.5f, 1.0f,  0.0f,
-  -0.5f,  0.5f, -0.5f, 1.0f,  0.0f,
+-0.5f,  0.375f, -0.5f,     0.0f, 0.0f,
+ 0.5f,  0.375f, -0.5f,     1.0f, 0.0f,
+ 0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
+ 0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
+-0.5f,  0.5f,   -0.5f,     0.0f, 1.0f,
+-0.5f,  0.375f, -0.5f,     0.0f, 0.0f,
+ //FRONT FACE                         
+-0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
+ 0.5f,  0.5f,    0.5f,     1.0f, 1.0f,
+ 0.5f,  0.375f,  0.5f,     1.0f, 0.0f,
+ 0.5f,  0.5f,    0.5f,     1.0f, 1.0f,
+-0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
+-0.5f,  0.5f,    0.5f,     0.0f, 1.0f,
+ // LEFT0.375CE                       
+-0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+-0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+-0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
+-0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+-0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+-0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
+ // RIGH0.375ACE                      
+ 0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+ 0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
+ 0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+ 0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+ 0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
+ 0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+ // BOTT0.375FACE                     
+-0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+ 0.5f,  0.375f,  0.5f,     1.0f, 0.0f,
+ 0.5f,  0.375f, -0.5f,     1.0f, 1.0f,
+ 0.5f,  0.375f,  0.5f,     1.0f, 0.0f,
+-0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+-0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
+//TOP                 ,               
+-0.5f,  0.5f,   -0.5f,     0.0f, 1.0f,
+ 0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
+ 0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+ 0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+-0.5f,  0.5f,    0.5f,     0.0f, 0.0f,
+-0.5f,  0.5f,   -0.5f,     0.0f, 1.0f 
 }; 
 
 float g_color_buffer_data[] = {
@@ -172,7 +172,7 @@ Tile* LoadTileMap();
 void drawTile(unsigned int VaoID = 0, unsigned int shaderID = 0, float speed = 1.0, float* updatedDegree = nullptr, bool32 changeAxis = false, std::vector<rollCubeInfo>* rollCubemap = nullptr);
 
 unsigned int SetupTileTexture(const char* path = nullptr);
-void drawTile(const unsigned int VaoID = 0, const unsigned int TextureID = 0, B_shader_program* const Brush = nullptr);
+void drawTile(const TileGLObject* obj = nullptr, B_shader_program* const Brush = nullptr);
 
 #define TILE_H
 #endif

@@ -179,7 +179,7 @@ void set_tile_vertex(B_shader_program* shader){
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)0);
 //TexCoords
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)3);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(3*sizeof(float)));
 
     glBindBuffer(GL_ARRAY_BUFFER, TileObj.TileColorBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), &g_color_buffer_data, GL_STATIC_DRAW);
@@ -191,7 +191,7 @@ void set_tile_vertex(B_shader_program* shader){
 
     // Set position for instanced draw
     shader->use();
-    TileObj.TextureID = SetupTileTexture(".\media\");
+    TileObj.TextureID = SetupTileTexture("./media/rock.png");
     
     //Tile Object here
     // Then we have something like trees, monsters, ....
@@ -211,12 +211,12 @@ glUseProgram(0);
 }
 
 
-void drawTile(const unsigned int VaoID, const unsigned int TextureID, B_shader_program* const Brush){
+void drawTile(const TileGLObject* obj, B_shader_program* const Brush){
     
     glBindVertexArray(TileObj.TileVAO);
     Brush->use();
 // Set Texture ID here
-    Brush->setInt(TileObj.TextureID, "material.diffused_texture");
+    Brush->setInt("material.diffused_texture", TileObj.TextureID);
 // Set Light Position based on Texture Coordinated
     glDrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, 900);
 

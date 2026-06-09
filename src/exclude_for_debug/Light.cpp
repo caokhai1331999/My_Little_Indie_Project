@@ -84,6 +84,44 @@ void set_environmental_light(B_shader_program* shader, global_light* envir_light
         light_name = "pointLights[].quadraticTerm";
         light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
         shader->setFloat(light_name.c_str(), 0.032f);
+
+        light_name = "spotlight[0].direction";
+        //light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
+        shader->setVec3(light_name.c_str(), glm::vec3(0.0f, 1.0f, 0.0f));
+
+        light_name = "spotlight[].ambient";
+        light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
+        // Pointlight[0] data  is wrong somewhere
+        //shader->setVec3(light_name.c_str(), envir_light->Point_Lights[0].ambient);
+        shader->setVec3(light_name.c_str(), glm::vec3(0.5f));
+
+        light_name = "spotlight[].diffuse";
+        light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
+        shader->setVec3(light_name.c_str(), envir_light->Point_Lights[0].diffuse);
+
+        light_name = "spotlight[].specular";
+        light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
+        shader->setVec3(light_name.c_str(), envir_light->Point_Lights[0].specular);
+
+        light_name = "spotlight[].constant";
+        light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
+        shader->setFloat(light_name.c_str(), 1.0f);
+
+        light_name = "spotlight[].linearTerm";
+        light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
+        shader->setFloat(light_name.c_str(), 0.09f);
+
+        light_name = "spotlight[].quadraticTerm";
+        light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
+        shader->setFloat(light_name.c_str(), 0.032f);
+
+        light_name = "spotlight[].CutOff";
+        light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
+        shader->setFloat(light_name.c_str(), 0.3f);
+
+        light_name = "spotlight[].OuterCutOff";
+        light_name.insert(light_name.cbegin() + light_name.find_first_of('[') + 1, '0'+i);
+        shader->setFloat(light_name.c_str(), 0.4f);
     }
     glUseProgram(0);
 };

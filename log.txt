@@ -1992,3 +1992,14 @@ What we need for the simple spot light on texture.
  . LampLight position -> light intensity
  . cutout angle - do I need it???
  
+
+---------------- Tue, 09 Jun 26: 10:17AM
+
+NOTE: So this bug : w:\src\Tile.cpp(194): warning C4129: 'm': unrecognized
+character escape sequence is referring to the typo mistake that '\' is path link
+is not accepted but /
+
+Why textCoord bound to tile VAO is static
+
+Time to set up some position to test the light, by the way, why I just see the
+light on the sub camera that following the character

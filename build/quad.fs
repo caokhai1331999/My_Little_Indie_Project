@@ -3,9 +3,9 @@
 in vec4 FragColorr;
 out vec4 FragColor;
 
-uniform sampler2D ttexture;
 uniform float colorOffset;
 uniform bool textPass;
+uniform vec3 lightPosition;
 
 in vec3 ModelPos;
 in vec3 ViewPos_;
@@ -60,7 +60,7 @@ struct SpotLight{
  float OuterCutOff;
 };
 
-uniform SpotLight spotlight;
+uniform SpotLight spotlight[1];
 
 vec3 CalcPointLight(PointLight light, vec3 tangent_light_pos, vec3 norm, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 viewDir);
@@ -71,7 +71,7 @@ vec3 CalcPointLight(PointLight light, vec3 tangent_light_pos, vec3 norm, vec3 vi
   // This is represent the angle between lightDir and norm
 
 	//if fragpos is betweeen of viewPos and and lightPos
-	// create line formed by viewPos and fs_in.tangentLightPos first
+	// create line formed by viewPos and tangentLightPos first
 	 vec3 AB = ViewPos_ - tangent_light_pos;//Light Dir
 	 vec3 AP = ModelPos - ViewPos_;//View Dir
 
@@ -85,11 +85,11 @@ vec3 CalcPointLight(PointLight light, vec3 tangent_light_pos, vec3 norm, vec3 vi
 
 
 	// Wrong at point light 
-	 // vec3 lightDir = onSegment?vec3(0.0):normalize(light.position - fs_in.FragPos);
+	 // vec3 lightDir = onSegment?vec3(0.0):normalize(light.position - FragPos);
 	 vec3 lightDir = onSegment?vec3(0.0):normalize(tangent_light_pos - ModelPos);
 
 
-  //vec3 lightDir = normalize(light.position - fs_in.FragPos);
+  //vec3 lightDir = normalize(light.position - FragPos);
   vec3 reflecDir  = reflect(-lightDir, norm);
 
   // Light direction, fragpos, norm
@@ -179,13 +179,13 @@ float theta = dot(lightDir, normalize(-light.direction));
 // Light direction, fragpos, norm
 
    reflecDir  = reflect(-lightDir, norm);
-   float distance = length(light.position - FragPos);
+   float distance = length(lightPosition - FragPos);
 
-   ambient = light.ambient * texture(material.texture_diffused, fs_in.TexCoord).rgb;
+   ambient = light.ambient * texture(material.diffused_texture, TextCoord).rgb;
    spec = pow(max(dot(reflecDir, viewDir), 0.0f), material.shininess);
-   specular = light.specular * spec * texture(material.texture_diffused1, fs_in.TexCoord).rgb;
+   specular = light.specular * spec * texture(material.diffused_texture, TextCoord).rgb;
    diff = max(dot(norm, lightDir), 0.0f);
-   diffuse = light.diffuse * diff * texture(material.texture_diffused, fs_in.TexCoord).rgb;
+   diffuse = light.diffuse * diff * texture(material.diffused_texture, TextCoord).rgb;
 
 // Smooth edge calculation
 // This is the cosine value of theta angle
@@ -235,7 +235,9 @@ void main(){
     vec3 viewDir = normalize(ModelPos - ViewPos_);
     vec3 defaultNormal =  vec3(0.0f, 1.0f, 0.0f);
     //vec3 pointlight = CalcPointLight(pointLights[0], ModelPos, defaultNormal, viewDir);
-    FragColor_+= CalcSpotLight(spotlight, norm, viewDir);
-    // FragColor = vec4(FragColor_, 1.0f);
-    FragColor = FragColorr;
+    vec3 FragColor_ = CalcSpotLight(spotlight[0], norm, viewDir);
+    // vec3 FragColor_ = mix(vec3(TextCoord, 1.0f), vec3(1.0f), 0.5f);
+    // vec3 FragColor_ = texture(material.diffused_texture, TextCoord).rgb * spotlight[0].ambient.y;
+    //// FragColor = vec4(FragColor_, 1.0f);
+    FragColor = vec4(FragColor_, 1.0f);
 }

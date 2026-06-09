@@ -210,6 +210,7 @@ int CALLBACK WinMain
                 ScreenBuffer.glData.ProgramIDs.push_back(BackBuffer.shaders_list[BackBuffer.shaders_list.size()-1]->GetProgramID());                
 
                 set_tile_vertex(BackBuffer.shaders_list[2]);
+
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
                         CheckShader(shader->GetProgramID(), programme_, shader->GetShaderName());
                     }
@@ -358,7 +359,7 @@ int CALLBACK WinMain
                 //map_content = load_bin_map("level.map");
                 //std::cout<<map_content->data()<<std::endl;
 
-                unsigned int TileTexture = SetupTileTexture("./media/grass.png");
+                //unsigned int TileTexture = SetupTileTexture("./media/grass.png");
 
                 setup_pointlight(&envir_light);
 
@@ -426,13 +427,14 @@ int CALLBACK WinMain
                         // Animation
                         if (AniLib != NULL) {
                             printf("Succeed reload code and opengl function from dll\n");
-                            bool success = gladLoadGLLoader((GLADloadproc)GetAllFunctionPointerFromLib);
-
-                            if(success){
-                             printf("Success load function pointer from AniLib\n");
-                            }else{
-                             printf("Falied loading function pointer from AniLib\n");
-                            }
+                            
+                            //bool success = gladLoadGLLoader((GLADloadproc)GetAllFunctionPointerFromLib);
+//
+                            //if(success){
+                             //printf("Success load function pointer from AniLib\n");
+                            //}else{
+                             //printf("Falied loading function pointer from AniLib\n");
+                            //}
 
                           UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");
                           setup_pointlight = (setup_pointlight__)GetProcAddress(AniLib, "setup_pointlight_");
@@ -440,8 +442,11 @@ int CALLBACK WinMain
                           move_ = (move_object_)GetProcAddress(AniLib, "move_object");
                           AutoAdjustCameraPos = (AutoAdjustCameraPos__)GetProcAddress(AniLib, "AutoAdjustCameraPos_");
 //setupMesh =
-                          BackBuffer.shaders_list[0]->ReLoadShaderCode();
-                          BackBuffer.shaders_list[2]->ReLoadShaderCode();
+                          // reload and recompile shader code
+                          for(B_shader_program * const &brush: BackBuffer.shaders_list)
+                          {
+                          brush->ReLoadShaderCode();
+                          };
                           //(setupMeshh)GetProcAddress(AniLib, "setMesh");
                           //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
                           }
@@ -451,7 +456,7 @@ int CALLBACK WinMain
 
                       
                       Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
-                      //Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
+                      Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
                     }
                     
                     //UPDATE
@@ -624,7 +629,7 @@ int CALLBACK WinMain
                     BackBuffer.shaders_list[2]->setFloat("colorOffset", ColorOffset);
                     BackBuffer.shaders_list[2]->setMat4("model", Plane);                    
                     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-                    drawTile(BackBuffer.glData.PlaneVAOs, TileTexture, BackBuffer.shaders_list[2]);
+                    drawTile(&TileObj, BackBuffer.shaders_list[2]);
 
                     //===============================================
 
@@ -736,6 +741,7 @@ int CALLBACK WinMain
                             }                        
                         }
                         AutoAdjustCameraPos(BackBuffer.camera_set[0], glm::vec3(test_vampire_motion.position[3]), TimeSet.SPerFrame);
+                        BackBuffer.shaders_list[2]->setVec3("lightPosition", glm::vec3(test_vampire_motion.position[3]));
                     }
 
                     if(showMsPF){
