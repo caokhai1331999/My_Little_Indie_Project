@@ -86,6 +86,7 @@ class rigid_body{
 public:
     float mass;
     glm::mat4 position;
+    glm::vec3 pre_pos;
     direction_ current_face;
     direction_ previous_face;
     motion_spec object_speed;

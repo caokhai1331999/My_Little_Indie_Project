@@ -1095,7 +1095,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
           //test_vampire_motion.previous_face =           test_vampire_motion.current_face;
 //
           //test_vampire_motion.current_face = FORWARD;
-
+            test_vampire_motion.pre_pos = glm::vec3(test_vampire_motion.position[3]);
           test_vampire_motion.object_speed.previous_states.fancy_move = test_vampire_motion.object_speed.current_states.fancy_move;
 
               if(test_vampire_motion.object_speed.current_states.fancy_move != JUMPING_FORWARD)
@@ -1117,6 +1117,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 //
           //test_vampire_motion.current_face = BACKWARD;
 //
+            test_vampire_motion.pre_pos = glm::vec3(test_vampire_motion.position[3]);
           test_vampire_motion.object_speed.previous_states.fancy_move = test_vampire_motion.object_speed.current_states.fancy_move;
 
               if(test_vampire_motion.object_speed.current_states.fancy_move != JUMPING_BACKWARD)

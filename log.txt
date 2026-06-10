@@ -1955,7 +1955,7 @@ so 270 degree rotate make object face right in scene
 ---------------- Sat, 06 Jun 26: 08:35AM
 
 TODO: Things to do today:
-              . Draw scene using instancing or scene graph
+              . Draw scene using instancing and scene graph
               . Adjust the camera zooming and position based on main
               character. DONE!
               . Burst of force.
@@ -2003,3 +2003,12 @@ Why textCoord bound to tile VAO is static
 
 Time to set up some position to test the light, by the way, why I just see the
 light on the sub camera that following the character
+
+why the light disappear when it come down far plane DONE!
+
+TODO: Group of tools/things that interact with each other I have to store loop
+efficiently through
+      . Still, we haven't make any scene graph yet.
+
+Consider create a simple but good enough light set for a decent art style for my
+little indie game.

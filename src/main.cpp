@@ -741,7 +741,9 @@ int CALLBACK WinMain
                             }                        
                         }
                         AutoAdjustCameraPos(BackBuffer.camera_set[0], glm::vec3(test_vampire_motion.position[3]), TimeSet.SPerFrame);
+                        BackBuffer.shaders_list[2]->use();
                         BackBuffer.shaders_list[2]->setVec3("lightPosition", glm::vec3(test_vampire_motion.position[3]));
+                        glUseProgram(0);
                     }
 
                     if(showMsPF){

@@ -17,6 +17,7 @@ void rigid_body::move(float delta_t){
     glm::vec3 UpAxis = glm::vec3(this->position[1]);
     glm::vec3 xAxis = glm::vec3(this->position[0]);
     glm::vec3 zAxis = glm::vec3(this->position[2]);
+
     printf("object current position is %s\n", glm::to_string(this->position).c_str());
     printf("object current up axis is %s\n", glm::to_string(UpAxis).c_str());
     printf("object current x axis is %s\n", glm::to_string(xAxis).c_str());
@@ -55,25 +56,6 @@ void Orient_Around_Y(glm::mat4* matrix, float angle){
 };
 
 void OrientFace(rigid_body* object){
-/*
-    switch(object->current_face){
-        case FORWARD:
-            Orient_Around_Y(&object->position, 0);
-            break;
-        case BACKWARD:
-            Orient_Around_Y(&object->position, 180.0f);
-            break;
-        case RIGHT:
-            Orient_Around_Y(&object->position, 90.0f);
-            break;
-        case LEFT:
-            Orient_Around_Y(&object->position, -90.0f);
-            break;
-        default:
-            Orient_Around_Y(&object->position, 0);
-            break;
-    };
-*/
     float deg ;
     if(object->current_face != object->previous_face){
          //deg = 90.0f * -float(object->current_face - object->previous_face);
@@ -110,10 +92,13 @@ void CalcNewPos(float delta_time, rigid_body* object){
             //break;
     };
 
-    if(object->position[3][1] < -15.5f){
+    if(abs(object->position[3][2] - object->pre_pos.z) >= 3.0f){
+        printf("distance traveled until falling:%f\n", abs(object->position[3][2] - object->pre_pos.z));
         if(object->object_speed.current_states.fancy_move == JUMPING_FORWARD || object->object_speed.current_states.fancy_move == JUMPING_BACKWARD){
             object->object_speed.previous_states.fancy_move = object->object_speed.current_states.fancy_move;
             object->object_speed.current_states.fancy_move = FALLING;
+
+            test_vampire_motion.pre_pos = glm::vec3(test_vampire_motion.position[3]);
         }
     }else{
         CalcNewV(delta_time, &object->object_speed.jump_v, &object->object_speed.jump_a);

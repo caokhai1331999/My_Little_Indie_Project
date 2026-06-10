@@ -7,7 +7,7 @@ uniform float colorOffset;
 uniform bool textPass;
 uniform vec3 lightPosition;
 
-in vec3 ModelPos;
+//in vec3 ModelPos;
 in vec3 ViewPos_;
 in vec2 TextCoord;
 in vec3 FragPos;
@@ -73,7 +73,7 @@ vec3 CalcPointLight(PointLight light, vec3 tangent_light_pos, vec3 norm, vec3 vi
 	//if fragpos is betweeen of viewPos and and lightPos
 	// create line formed by viewPos and tangentLightPos first
 	 vec3 AB = ViewPos_ - tangent_light_pos;//Light Dir
-	 vec3 AP = ModelPos - ViewPos_;//View Dir
+	 vec3 AP = lightPosition - ViewPos_;//View Dir
 
 	// Check if cross product is close to zero vector (i.e., colinear)
 	 bool colinear = length(cross(AB, AP)) < 1e-5f;
@@ -86,7 +86,7 @@ vec3 CalcPointLight(PointLight light, vec3 tangent_light_pos, vec3 norm, vec3 vi
 
 	// Wrong at point light 
 	 // vec3 lightDir = onSegment?vec3(0.0):normalize(light.position - FragPos);
-	 vec3 lightDir = onSegment?vec3(0.0):normalize(tangent_light_pos - ModelPos);
+	 vec3 lightDir = onSegment?vec3(0.0):normalize(lightPosition - FragPos);
 
 
   //vec3 lightDir = normalize(light.position - FragPos);
@@ -107,7 +107,7 @@ vec3 CalcPointLight(PointLight light, vec3 tangent_light_pos, vec3 norm, vec3 vi
 // This length is for calculating the distance
    float distance;
    float attenuation;
-   distance = length(tangent_light_pos - ModelPos);
+   distance = length(lightPosition - FragPos);
    attenuation = 1.0f / (light.constant + light.linearTerm * distance + light.quadraticTerm * (distance * distance));
 
    ambient *= attenuation;
@@ -169,7 +169,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 viewDir){
 
 // lightDir is the direction from flashlight to the fragment
 //light.direction is light direction while lightDir is alway spot direction while is perpencular with the fragment
-vec3 lightDir = normalize(ModelPos - FragPos);
+vec3 lightDir = normalize(lightPosition - FragPos);
 //theta is always equal to 180 but why
 float theta = dot(lightDir, normalize(-light.direction));
 
@@ -232,7 +232,7 @@ void main(){
         float shininesss  = 32.0f;
     };
     vec3 norm = vec3(0.0f, 1.0f, 0.0f);
-    vec3 viewDir = normalize(ModelPos - ViewPos_);
+    vec3 viewDir = normalize(FragPos - ViewPos_);
     vec3 defaultNormal =  vec3(0.0f, 1.0f, 0.0f);
     //vec3 pointlight = CalcPointLight(pointLights[0], ModelPos, defaultNormal, viewDir);
     vec3 FragColor_ = CalcSpotLight(spotlight[0], norm, viewDir);

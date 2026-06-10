@@ -8,7 +8,7 @@ layout(location = 3) in vec3 VertexColor;
 
 out vec2 TextCoord;
 out vec4 FragColorr;
-out vec3 ModelPos;
+//out vec3 ModelPos;
 out vec3 ViewPos_;
 out vec3 FragPos;
 
@@ -38,8 +38,11 @@ void main(){
 //                  -> Then Calculate latest space to clip space
        vec2 offset = offsets[gl_InstanceID];
 
-       ModelPos = vec3(aPos.x + offset.x, aPos.y, aPos.z + offset.y);
-       FragPos = vec3(model * vec4(aPos, 1.0f)); 
+//       ModelPos = vec3(aPos.x + offset.x, aPos.y, aPos.z + offset.y);
+       vec3 modelPos = vec3(aPos.x + offset.x, aPos.y, aPos.z + offset.y);
+       // We transform textCoord to world space
+       // FragPos = vec3(aTextCoord.x * modelPos.x, aPos.y, aTextCoord.y * modelPos.z); 
+       FragPos = modelPos; 
 
        gl_Position = projection * view * vec4(vec3(aPos.x + offset.x, aPos.y, aPos.z + offset.y), 1.0f);
        ViewPos_ = ViewPos;
