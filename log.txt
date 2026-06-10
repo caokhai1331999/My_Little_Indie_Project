@@ -2016,3 +2016,5 @@ little indie game.
 ---------------- Thu, 11 Jun 26: 12:35AM
 
 The Hwinfo and rivatuner make our app froze
+
+DONE! Re-setup build environment on little Beast

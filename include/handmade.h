@@ -28,6 +28,7 @@
 
 #include <Windows.h>
 #include <Windowsx.h>
+#include <wingdi.h>
 #include <xinput.h>
 #include <fstream>
 #include <stdio.h>
@@ -323,7 +324,22 @@ void ProcessXinputDigitalButton(DWORD XInputButtonState ,Game_Button_State* OldS
 void ProcessInput(int maxControllerCount, Game_Input* OldInput, Game_Input* NewInput);
 
 void* GetAllFunctionPointerFromLib(HMODULE lib = NULL, const char* name = nullptr);
-void* GetAnyGLFuncAddress(const char* name);
+void *GetAnyGLFuncAddress(const char *name);
+// NOTE: Why this function can replace the wglGetProcaddress
+void* GetAnyGLFuncAddress(const char* name)
+{
+    void* p = (void*)wglGetProcAddress(name);
+    if (!p)
+    {
+        static HMODULE module =
+           LoadLibraryA("opengl32.dll");
+        p = (void*)GetProcAddress(module, name);
+        //p = (void*)wglGetProcAddress(name);
+    }
+    return p;
+    //May be the wglgetprocaddress doesn't on pc case work I have to use getprocaddress instead
+}
+;
 void* LoadFunctionFromDLL(const char* DLLName = nullptr, const char* FuncName = nullptr);
 void SetUpWindow();
 glm::vec3 randomRotateAxis_(int rollIndex);

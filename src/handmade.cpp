@@ -317,19 +317,6 @@ void* GetAllFunctionPointerFromLib(const HMODULE lib, const char* name){
     return p;
 }
 
-// NOTE: Why this function can replace the wglGetProcaddress
-void* GetAnyGLFuncAddress(const char* name)
-{
-    void* p = (void*)wglGetProcAddress(name);
-    if (!p)
-    {
-        static HMODULE module =
-            LoadLibraryA("opengl32.dll");
-        p = (void*)GetProcAddress(module, name);
-    }
-    return p;
-    //May be the wglgetprocaddress doesn't on pc case work I have to use getprocaddress instead
-}
 
 void* LoadFunctionFromDLL(const char *DLLName,
                           const char *FuncName) {

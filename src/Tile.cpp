@@ -191,7 +191,7 @@ void set_tile_vertex(B_shader_program* shader){
 
     // Set position for instanced draw
     shader->use();
-    TileObj.TextureID = SetupTileTexture("./media/rock.png");
+    TileObj.TextureID = SetupTileTexture("./media/pebbles.jpg");
     
     //Tile Object here
     // Then we have something like trees, monsters, ....

@@ -70,6 +70,8 @@ struct SpotLight{
  // For attenuation (Point Light)
  float constant;
  float linearTerm;
+
+
  float quadraticTerm;
 
  // For spotlight effect

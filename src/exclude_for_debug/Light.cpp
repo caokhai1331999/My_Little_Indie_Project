@@ -132,6 +132,8 @@ void setup_pointlight_(global_light* envir_light){
 
 void Set_environmental_light_(B_shader_program* shader, global_light* envir_light, Camera* camera){
     bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
+    if (!success)
+            success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
     assert(success);
     set_environmental_light(shader, envir_light, camera);
 };

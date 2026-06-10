@@ -702,22 +702,6 @@ int CALLBACK WinMain
                     BackBuffer.shaders_list[0]->use();
                     brushID = BackBuffer.shaders_list[0]->GetProgramID();
 
-                    
-                    if(first_announce){
-                        //setUpUBO(animator, &brushID);
-//Setup UBO
-                        glGenBuffers(1, &UBO);
-                        glBindBuffer(GL_UNIFORM_BUFFER, UBO);
-                        glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)* 52, NULL, GL_STREAM_DRAW);
-                        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-                        // get Uniform location from ProgramID
-                        GLint boneMatricIndex = glGetUniformBlockIndex(brushID, "finalBone");
-                        // bind that location to global binding point (using glUniformBlock binding)
-                        glUniformBlockBinding(brushID, boneMatricIndex, 1);
-                        // then bind the binding point to UBO using glBindbufferrange
-                        glBindBufferRange(GL_UNIFORM_BUFFER, 1, UBO, 0, sizeof(glm::mat4)* 52);
-                    }
 
                     if(test_vampire_motion.object_speed.current_states.basic_move != IDLE || test_vampire_motion.object_speed.current_states.fancy_move != IDLE || first_announce){
                         if(animator->GetCurrentTime() > danceAnimation->GetDuration() )
@@ -752,11 +736,35 @@ int CALLBACK WinMain
                                 printf("Delayed Ratio: %f\n", DelayedRatio);
                             }
 
-                    
-                    //Transform = animator->getFinalBoneMatrices();
-                    if(Transform_ == nullptr || Transform_ != animator->getFinalBoneMatrices())
+                   if(Transform_ == nullptr || Transform_ != animator->getFinalBoneMatrices())
                     Transform_ = animator->getFinalBoneMatrices();
-                        //glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float) * 16 * 52, Transform);
+
+                        int i = 0;
+                        std::string matrixName_;
+
+                            char index[1];
+                            char indexx[2];
+
+                            
+#ifdef STD_140
+                    //printf("Little beast flag on\n");
+                    if(first_announce){
+                        //setUpUBO(animator, &brushID);
+//Setup UBO
+                        glGenBuffers(1, &UBO);
+                        glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+                        glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)* 52, NULL, GL_STREAM_DRAW);
+                        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+                        // get Uniform location from ProgramID
+                        GLint boneMatricIndex = glGetUniformBlockIndex(brushID, "finalBone");
+                        // bind that location to global binding point (using glUniformBlock binding)
+                        glUniformBlockBinding(brushID, boneMatricIndex, 1);
+                        // then bind the binding point to UBO using glBindbufferrange
+                        glBindBufferRange(GL_UNIFORM_BUFFER, 1, UBO, 0, sizeof(glm::mat4)* 52);
+                    }
+
+                    //glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float) * 16 * 52, Transform);
                         //if(Transform_->size() > 0){
                             glBindBuffer(GL_UNIFORM_BUFFER, UBO);
                             glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4)* 52, Transform_->data());
@@ -764,38 +772,41 @@ int CALLBACK WinMain
                             glBindBuffer(GL_UNIFORM_BUFFER, 0);
                         //}
 
-                        int i = 0;
-                        std::string matrixName_;
-
-                            char index[1];
-                            char indexx[2];
-/*
+#else
                             if (Transform_ != nullptr){
-                            for(const glm::mat4& matrix_ : *Transform_) {
-                                    matrixName_ = "finalBoneMatrices[]";
+                                //for(glm::mat4 const &matrix_ : Transform_) {
+                                for(int i = 0; i < 52; i++) {
 
+                                matrixName_ = "finalBoneMatrices[]";
                                     if(i<10){
                                         sprintf(index, "%d", i);
-                                        matrixName_.insert(matrixName_.size()-1, index);
-                                    } else {
-                                        sprintf(indexx, "%d", i);
-                                        matrixName_.insert(matrixName_.size()-1, indexx);                                     
+                                        matrixName_.insert(matrixName_.size()-1,
+index); } else { sprintf(indexx, "%d", i);
+                                        matrixName_.insert(matrixName_.size()-1,
+indexx);
                                     }
 
                                     BackBuffer.shaders_list[0]->use();
-                                    BackBuffer.shaders_list[0]->setMat4(
-                  matrixName_.c_str(), matrix_);
+                                    //BackBuffer.shaders_list[0]->setMat4(matrixName_.c_str(), matrix_);
+                                    BackBuffer.shaders_list[0]->setMat4(matrixName_.c_str(), (*Transform_)[i]);
 
-                                    if(showMsPF){
-                                        printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string(matrix_).c_str());
-                                    }
-//
-                                    if(i < Transform_->size())
-                                    i++;
-
+                                    //if(!showMsPF){
+                                        //printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string(matrix_).c_str());
+                                        //printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string((*Transform_)[i]).c_str());
+                                    //}
+                                        
+                                    //if(i < Transform_->size())
+                                    //i++;
                                 };
-                            //};
-                            */
+                            glUseProgram(0);
+                                }else{
+                                printf("Transform matrices is null\n");
+                                };
+                            
+
+#endif                            
+                    //Transform = animator->getFinalBoneMatrices();
+ 
                             //if(is_moving){
                             BackBuffer.shaders_list[0]->use();
                             //WorldToCamera = Chosen_Camera->view * dancing_vampire_core;
@@ -827,7 +838,17 @@ int CALLBACK WinMain
                     Game_Input* Temp = NewInput;
                     NewInput = OldInput;  //???? still don't understand
                     OldInput = Temp;
-                    SwapBuffers(DeviceContext);
+
+                    bool test_swap_buffer;                    
+                    test_swap_buffer = SwapBuffers(DeviceContext);
+
+                    if (!test_swap_buffer) {
+                       DWORD err = GetLastError();
+                       char buffer[256];
+                       sprintf_s(buffer, "SwapBuffers failed: %lu\n", err);
+                       OutputDebugStringA(buffer);
+                    }
+
                     ReleaseDC(BackBuffer.Window, DeviceContext);//maybe this one
 
                     //End count of frame time

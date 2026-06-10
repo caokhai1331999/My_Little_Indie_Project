@@ -400,7 +400,7 @@ HDC windowDC = GetDC(OBuffer->Window);
 #else 
                 success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
 #endif
-        assert(success);
+                assert(success);
 
         if(success)
                 {
