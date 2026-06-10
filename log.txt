@@ -2012,3 +2012,7 @@ efficiently through
 
 Consider create a simple but good enough light set for a decent art style for my
 little indie game.
+
+---------------- Thu, 11 Jun 26: 12:35AM
+
+The Hwinfo and rivatuner make our app froze
