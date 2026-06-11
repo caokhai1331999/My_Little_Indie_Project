@@ -7,12 +7,44 @@
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
 
+
+typedef int motion_state;
+typedef motion_state basic_motion;
+typedef motion_state complex_motion;
+
+#define (basic_motion)0 IDLE;
+#define (basic_motion)1 MOVING_FORWARD;
+#define (basic_motion)2 MOVING_BACKWARD;
+#define (basic_motion)3 MOVING_RIGHT;
+#define (basic_motion)4 MOVING_LEFT;
+#define (complex_motion)5 JUMPING;
+
+// how can gravity affect object
+
+struct object_motion_state_group{
+    basic_motion;
+    complex_motion;
+}
+
+struct rigid_body{
+    float acceleration;
+    float veclocity;
+
+    object_motion_state_group;
+}
+
+void apply_gravity(float mass);
+
 class object{
 private:
     space_box box_;
     glm::vec3 position;
     bool destroyed_;
     bool collided_;
+// For rigid body
+    float acceleration;
+    float mass;
+    glm::vec3/float veclocity;
 public:
     void move(glm::vec3 offset);
     void Check_Collision(World* world, Object* Monster);
@@ -72,6 +104,8 @@ unsigned int LoadTileTexture(char* path){
     std::string dir = ".\";
     Tile.TextureID = TextureFromFile(path, dir, false);
 }
+
+void Jump
 
 #define PSUEDO_H
 #endif

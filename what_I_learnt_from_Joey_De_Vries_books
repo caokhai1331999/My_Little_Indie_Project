@@ -56,3 +56,4 @@ Instead of taking one normal vector as before we use normal texture in this case
 Sometime the tangent vector is averaged to give nice smooth result in a big mesh.
 Result in the TBN is no longer perpendicular. That why this line appear:
 T = normalize(T - dot(T, N) * N) // for the sake of re-othogonalize TBN coordinates
+

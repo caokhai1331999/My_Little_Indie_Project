@@ -397,17 +397,6 @@ unsigned int LoadCubeMap(const char* path){
     return cubemap;
 }
 
-// Finds the material of water
-void SetGlobalLight(std::vector<B_shader_program*>* shader_list, global_Light* light, std::vector<Object_Mesh_Specs*>*Object_List){
-    for(B_shader_program* &shader const: shader_list){
-        for(Object_Mesh_Specs* &object const: Object_List){
-            shader->propramID = object->programID;
-            //shader->set()....
-        }
-    };
-}
-;
-;
 // TODO: How to apply material property to shader for it to draw.
 //===========================================================================
 
@@ -486,45 +475,6 @@ glm::vec2 uv4(1.0, 1.0);
 glm::vec3 normal(0.0f, 0.0f, 1.0f);
 // Manually calculate Tangent and Bitangent if
 // the there are none available in model/mesh
-void Compute_Tangent_and_Bi(){
-    glm::vec3 edge1 = pos2 - pos1;
-    glm::vec3 edge2 = pos3 - pos1;
-
-    glm::vec2 deltaUV1 = uv2 - uv1;
-    glm::vec2 deltaUV2 = uv3 - uv1;
-
-    float f = 1.0f/(deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-    glm::vec3 tangent1;
-    tangent1.x = f *(deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-    tangent1.y = f *(deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-    tangent1.z = f *(deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-
-    // Cause bitangent = cross(N, T);
-    // So we don't need to calculate it here
-    //glm::vec3 bitangent1;
-    //bitangent1.x = f *(-deltaUV2.y * edge1.x + deltaUV1.x * edge2.x);
-    //bitangent1.y = f *(-deltaUV2.y * edge1.y + deltaUV1.x * edge2.y);
-    //bitangent1.z = f *(-deltaUV2.y * edge1.z + deltaUV1.x * edge2.z);
-
-    glm::vec3 edge_1 = pos1 - pos3;
-    glm::vec3 edge_2 = pos4 - pos3;
-
-    glm::vec2 deltaUV_1 = uv1 - uv3;
-    glm::vec2 deltaUV_2 = uv4 - uv3;
-
-    f = 1.0f/(deltaUV_1.x * deltaUV_2.y - deltaUV_2.x * deltaUV_1.y);
-
-    glm::vec3 tangent_1;
-    tangent_1.x = f *(deltaUV_2.y * edge_1.x - deltaUV_1.y * edge_2.x);
-    tangent_1.y = f *(deltaUV_2.y * edge_1.y - deltaUV_1.y * edge_2.y);
-    tangent_1.z = f *(deltaUV_2.y * edge_1.z - deltaUV_1.y * edge_2.z);
-
-    //glm::vec3 bitangent_1;
-    //bitangent_1.x = f *(-deltaUV_2.y * edge_1.x + deltaUV_1.x * edge_2.x);
-    //bitangent_1.y = f *(-deltaUV_2.y * edge_1.y + deltaUV_1.x * edge_2.y);
-    //bitangent_1.z = f *(-deltaUV_2.y * edge_1.z + deltaUV_1.x * edge_2.z);
-}
 
 // In Vertex Shader
 
@@ -565,44 +515,62 @@ void set_environment_force_(entity* object){
     object->position * envir.gravity_on_pos;
 }
 
-void Move((glm::mat4* object_matrix, float delta_time, float DelayedRatio)){
-    switch(basic_motion){
-        case IDLE:
-            // DO NOTHING;
-            break;
-        case MOVING_FORWARD:
-            dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, 5.0f * DelayedRatio));
-            break;
-        case MOVING_BACKWARD:
-            dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(0.0f, 0.0f, -(5.0f * DelayedRatio)));
-            break;
-        case MOVING_RIGHT:
-            
-            break;
-        case MOVING_LEFT:
-            dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-(5.0f * DelayedRatio), 0.0f, 0.0f));
-            break;
-        default:
-            break;
-    };
 
-    switch(complex_motion){
-        case JUMPING:
-            jump();
-            apply_gravity();
-// apply_acceleration()
-            break;
-        case ROTATE:
-            rotate();
-            apply_gravity();
-// apply_acceleration();
-            break;
-        default:
-            apply_gravity();
-// apply_acceleration();
-            break;
-    };
+void Jump(motion_spec* object, float delta_time){
+          object->position[3][1] = based_a_v_Pos_calc(object->jump_a, object->jump_v, object->position[3][2], delta_time);
+          object->position[3][2] = based_a_v_Pos_calc(object->acceleration, object->veclocity, object->position[3][2], delta_time);          
 }
 
-// How can we show the complex move while not being interfered by other moves
-// so the keypoint here is to gather all the moving algorithm in one object position data every frame.
+              
+
+// GLSL
+
+uniform sampler2D texture;
+
+in vec2 TexCoord;
+
+uniform struct light{
+    vec3 position;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+
+void computLight_intensity_based_on_D(){
+    // attenuation;
+    k * d....
+}
+
+out vec4 fragColor;
+ void main(){
+     vec3 OutFrag = texture(sampler2D, TexCoord);
+     OutFrag *= Light.abient * attenuation;
+     fragColor = vec4(OutFrag, 1.0f);
+ };
+// We may set texture coordinate as inherent data type at the shader creating stage
+//
+
+#if !defined
+#define STB_TRUE_IMPLEMENTATION 1;
+#include "stb_truetype.h"
+#endif
+
+void init_font(char* path, char* , Font* font){
+   fread(ttf_buffer, 1, 1<<20, fopen(, "rb"));
+   // Load font data
+   stbtt_BakeFontBitmap(ttf_buffer,0, 32.0, temp_bitmap,512,512, 32,96, cdata); // no guarantee this fits!
+   // can free ttf_buffer at this point
+   glGenTextures(1, &font->font_texture);
+   glBindTexture(GL_TEXTURE_2D, font->font_texture);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 512,512, 0, GL_ALPHA, GL_UNSIGNED_BYTE, temp_bitmap);
+   // can free temp_bitmap at this point
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+}
+
+void SetSpotLight(B_shader_program* quad_shader, Font* font){
+    quad_shader->used();
+    GLuint font_texture = TextureFromFile(font->path_name,);
+}
+
+// Display Font Buffer.
+// Use bitmap font loading on 2D squad
