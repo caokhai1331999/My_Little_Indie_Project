@@ -2018,3 +2018,7 @@ little indie game.
 The Hwinfo and rivatuner make our app froze
 
 DONE! Re-setup build environment on little Beast
+
+---------------- Thu, 11 Jun 26: 12:20PM
+
+so glm::translate is just +/- operation on the vec3(mat[3])

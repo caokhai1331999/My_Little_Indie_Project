@@ -11,7 +11,7 @@ layout (location = 4) in vec3 bitangent;
 layout (location = 5) in ivec4 boneids;
 layout (location = 6) in vec4 weights;
 
-uniform mat4 finalBoneMatrices [MAX_BONES];
+// uniform mat4 finalBoneMatrices [MAX_BONES];
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
@@ -43,9 +43,9 @@ out VS_OUT fs_in;
 // out vec3 Normal;
 // out vec3 FragPos;
 
-// layout (std140) uniform finalBone{
-//  mat4 finalBoneMatrices [MAX_BONES];
-// };
+layout (std140) uniform finalBone{
+ mat4 finalBoneMatrices [MAX_BONES];
+};
 
 
 void main()
@@ -93,8 +93,8 @@ totalPosition = vec4(aPos, 1.0f);
 continue;
 }
 
-//vec4 localPosition = finalBone.finalBoneMatrices[boneids[i]] * vec4(aPos, 1.0f);
- vec4 localPosition = finalBoneMatrices[boneids[i]] * vec4(aPos, 1.0f);
+vec4 localPosition = finalBone.finalBoneMatrices[boneids[i]] * vec4(aPos, 1.0f);
+ // vec4 localPosition = finalBoneMatrices[boneids[i]] * vec4(aPos, 1.0f);
 totalPosition += localPosition * weights[i];
 
 // vec3 localNormal = mat3(transpose(inverse(finalBone.finalBoneMatrices[boneids[i]]))) * aNormal;

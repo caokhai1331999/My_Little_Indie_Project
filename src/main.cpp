@@ -604,10 +604,10 @@ int CALLBACK WinMain
                                 printf("Time from begin to first time collide is:%f\n", TimeSet.collided_time);
                             }
 
-                            obj1.position = glm::translate(obj1.position, (*obj1.collide_list)[0].space);
+                            GetBackToPosBeforeHit(&obj1.position, &(*obj1.collide_list)[0].space);
                             obj1.collide_list->pop_back();
 
-                            obj2.position = glm::translate(obj2.position, (*obj2.collide_list)[0].space);
+                            GetBackToPosBeforeHit(&obj2.position, &(*obj2.collide_list)[0].space);
                             obj1.collide_list->pop_back();
 
                             if(!along1)
@@ -624,11 +624,13 @@ int CALLBACK WinMain
 
                         
                     //RENDER =====================================
-                    BackBuffer.shaders_list[2]->use();
+                    BackBuffer.shaders_list[2]->use();                    BackBuffer.shaders_list[2]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
                     glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
                     BackBuffer.shaders_list[2]->setFloat("colorOffset", ColorOffset);
                     BackBuffer.shaders_list[2]->setMat4("model", Plane);                    
                     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+                    glUseProgram(0);
+
                     drawTile(&TileObj, BackBuffer.shaders_list[2]);
 
                     //===============================================

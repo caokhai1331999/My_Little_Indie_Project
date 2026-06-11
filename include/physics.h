@@ -41,6 +41,6 @@ struct space_box{
 };
 
 bool32 check_collision(space_box* box1 = nullptr, space_box* box2 = nullptr);
-
+void GetBackToPosBeforeHit(glm::mat4* position = nullptr, const glm::vec3* collided_box = nullptr);
 #define PHYSICS_H
 #endif

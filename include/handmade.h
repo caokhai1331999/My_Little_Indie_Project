@@ -173,9 +173,9 @@ struct BITMAP_HEADER{
 };
 #pragma pack(pop)
 
-#define DEBUG_READ_WHOLE_FILE(name) void* name(char* filename);
+#define DEBUG_READ_WHOLE_FILE(name) void* name(const char* filename);
 typedef DEBUG_READ_WHOLE_FILE(debug_read_whole_file);
-#define DEBUG_WRITE_WHOLE_FILE(name) bool32 name(char* filename, uint32 memorysize, void* memory);
+#define DEBUG_WRITE_WHOLE_FILE(name) bool32 name(const char* filename, uint32 memorysize, void* memory);
 typedef DEBUG_WRITE_WHOLE_FILE(debug_write_whole_file);
 #define DEBUG_FREE_FILE_MEMORY(name) void name(void* memory);
 typedef  DEBUG_FREE_FILE_MEMORY(debug_free_file_memory);
@@ -313,8 +313,8 @@ void CalColliInterv(Clock_Set* Time_Set = nullptr);
 void CalStaticColorDur(Clock_Set* Time_Set, const bool32 On_Flag);
 
 void* PlatformLoadFile(char* FileName);
-debug_read_file_result* DEBUGReadFileWhole(char* filename);
-imagee_content* DEBUGReadBMP(char* filename, debug_read_file_result* result);
+debug_read_file_result* DEBUGReadFileWhole(const char* filename);
+imagee_content* DEBUGReadBMP(const char* filename, debug_read_file_result* result);
 //BMP_content* DEBUGReadJPG(char* filename, debug_read_file_result* result);
 bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory);
 void DEBUGFreeFileMemory(void* memory);

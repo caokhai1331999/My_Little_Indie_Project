@@ -197,6 +197,74 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
 
 }
 
+void ShowGlyphs(Win32_OffScreen_Buffer* OBuffer, Glyph_Map* map) {
+    // RR GG BB
+    // Row is a pointer to every line of bitmapMemory
+    // While pitch is data length of everyline of bitmap
+    int32 BlitWidth =  map->w;
+    int32 BlitHeight = map->h;
+    int32 WidthOffset = 0;
+    int32 ImagePitch = 4 * BlitWidth;    
+
+    int32 Height;
+    int32 Width;
+
+    if (OBuffer!=NULL){
+        Height = OBuffer->BitmapHeight;
+        Width =  OBuffer->BitmapWidth;
+    }
+    
+    //BUG right here
+    if(BlitWidth > Width){
+        WidthOffset = BlitWidth - Width;
+        BlitWidth = Width;
+    }
+
+    if(BlitHeight > Height){
+        BlitHeight = Height;
+    }
+    
+    // We take memory from BitmapMemory of main Bufer to write on it
+    uint8* Row;
+    uint8* DirectRow;
+
+    if (OBuffer!=NULL){
+        Row = ((uint8 *)OBuffer->BitmapMemory);
+    }
+
+    if (OBuffer!=NULL){
+        if(OBuffer->BitmapMemoryForDirectBlit != NULL){
+            DirectRow = ((uint8 *)OBuffer->BitmapMemoryForDirectBlit);
+        } else {
+            printf("Bitmap Memory for direct blit is empty\n");
+        }
+    }
+    
+    //Change the image row order upside down
+    uint8* imageRow = (uint8*)map->bitmap;
+    uint8* imageRowForDirectBlit = (uint8*)map->bitmap;
+//// ???? What todo if the image is bigger than the 
+    imageRowForDirectBlit += 4*((BlitHeight - 1) * BlitWidth);
+
+    for (int32 Y{0}; Y < Height; Y++) {
+        uint32* DirectPixel = (uint32 *)DirectRow;        
+        if(Y == BlitHeight){
+            imageRowForDirectBlit += 4*((BlitHeight - 1) * BlitWidth);            
+        }
+        uint32* imagePixelForDirect = (uint32* )imageRowForDirectBlit;
+
+        for(int32 X{0}; X < Width; X++) {
+            
+            // Why Pixel appear in uint8 not uint32
+            if(X >= BlitWidth){
+            *DirectPixel++ = 0xffffffff;
+            } else {
+            *DirectPixel++ = *imagePixelForDirect++;
+            }
+        }
+    }
+}
+
 
 void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeight, Win32_OffScreen_Buffer* OBuffer ) {
 
@@ -401,15 +469,16 @@ HDC windowDC = GetDC(OBuffer->Window);
                 success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
 #endif
                 assert(success);
-
+                
         if(success)
                 {
                     //OpenConsole();
                     //printf("GLAD load successfully\n");
                     printf("VERSION: %s", glGetString(GL_VERSION));
-                    printf("Renderer: %s\n", glGetString(GL_RENDERER));
+                    printf("Renderer: %s\n", glGetString(GL_RENDERER));;
+                    LoadFont("./media/FiraCode-VariableFont_wght.ttf");                    
 
-                const float Vertices[] = {
+                    const float Vertices[] = {
                    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,// 0
                     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
                     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -845,18 +914,30 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
   // of the new window and update a new proper DIB for that
   // DIB is a table where store BIT color infor
   case WM_SIZE: {
-    if (first_size) {
-      first_size = false;
-    } else {
-      GetWindowDimension(&BackBuffer);
-      printf("Client Rect left:%d top:%d right:%d bottom:%d\n", (int)BackBuffer.ClientRect.left, (int)BackBuffer.ClientRect.top, (int)BackBuffer.ClientRect.right, (int)BackBuffer.ClientRect.bottom);
-      Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
-      if (!BackBuffer.transferNeed) {
-        BackBuffer.transferNeed = true;
+
+      if (first_size) {
+          first_size = false;
+      } else {
+          GetWindowDimension(&BackBuffer);
+          printf("Client Rect left:%d top:%d right:%d bottom:%d\n", (int)BackBuffer.ClientRect.left, (int)BackBuffer.ClientRect.top, (int)BackBuffer.ClientRect.right, (int)BackBuffer.ClientRect.bottom);
+          Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
+          if (!BackBuffer.transferNeed) {
+              BackBuffer.transferNeed = true;
+          }
+
+          if((GetKeyState(VK_CONTROL) & (1 << 15)) > 0){
+              ShowGlyphs(&BackBuffer, &Glyphs_Map);
+              HDC tempDC = GetDC(Window);
+              Win32DisplayBufferWindow(tempDC, 0, 0, &BackBuffer);
+              SwapBuffers(tempDC);
+              printf("Change to display glyphs\n");
+          }else{
+              glViewport(BackBuffer.ClientRect.left, BackBuffer.ClientRect.top, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
+          }
+
+          OutputDebugStringA("WM_SIZE\n");
       }
-      glViewport(BackBuffer.ClientRect.left, BackBuffer.ClientRect.top, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
-      OutputDebugStringA("WM_SIZE\n");
-    }
+
   } break;
 
   case WM_CLOSE: {
@@ -1022,14 +1103,22 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
       }
         //====================================================
       else if (vkCode == 'W') {
-        // Actually the front vec is at the back of the camera
-        // State.BlueOffset+= 10;
-        BackBuffer.camera.Position +=
-            glm::normalize(BackBuffer.camera.Direction) *
-            (float)BackBuffer.camera.speed;
-        if (!WasDown) {
-            printf("W is HIT\n");
-        }
+          // Actually the front vec is at the back of the camera
+          // State.BlueOffset+= 10;
+          if((GetKeyState(VK_CONTROL) & (1 << 15)) > 0){
+              ShowGlyphs(&BackBuffer, &Glyphs_Map);
+              HDC tempDC = GetDC(Window);
+              Win32DisplayBufferWindow(tempDC, 0, 0, &BackBuffer);
+              SwapBuffers(tempDC);
+              printf("Change to display glyphs\n");
+          }else{
+              BackBuffer.camera.Position +=
+                  glm::normalize(BackBuffer.camera.Direction) *
+                  (float)BackBuffer.camera.speed;
+              if (!WasDown) {
+                  printf("W is HIT\n");
+              }
+          }
       }
 
       else if (vkCode == 'S') {
@@ -1518,6 +1607,6 @@ void CleanUpandExit(Win32_OffScreen_Buffer* BackBuffer){
         camera = nullptr;
     }
     BackBuffer->camera_set.clear();
-
+    stbtt_FreeBitmap(Glyphs_Map.bitmap, 0);
     ResetGLState(BackBuffer);
 };

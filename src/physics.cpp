@@ -37,3 +37,9 @@ bool32 check_collision(space_box* box1, space_box* box2){
 
     return collided;
 };
+
+void GetBackToPosBeforeHit(glm::mat4* position, const glm::vec3* collided_box){
+   (*position)[3][0] += collided_box->x;
+   (*position)[3][1] += collided_box->y;
+   (*position)[3][2] += collided_box->z;
+}

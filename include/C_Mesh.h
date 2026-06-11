@@ -21,8 +21,13 @@
 #include "handmade.h"
 
 #if !defined
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+
+#define STB_TRUETYPE_IMPLEMENTATION
+#include "stb_truetype.h"
+
 #endif
 
 //#include <GLFW/glfw3.h>
@@ -43,6 +48,16 @@
 using namespace std;
 
 #define MAX_BONE_INFLUENCE 4
+
+
+struct Glyph_Map{
+    GLuint TextureID;
+    stbtt_fontinfo FontInfo;
+    unsigned char* bitmap;
+    int w,h,i,j,c, Xoffset, Yoffset;
+};
+
+Glyph_Map Glyphs_Map = {};
 
 struct Vertex {
     glm::vec3 Position;
@@ -102,6 +117,9 @@ void SetVertexBoneDataToDefault(Vertex* vertex){
         vertex->m_Weights[i] = 0.0f;
     }
 };
+
+// FONT LOADING
+void LoadFont(const char* path = nullptr);
 
 void SetVertexBoneData(Vertex* vertex, int boneID, float weight);
 void setupMesh(Mesh* mesh = nullptr);

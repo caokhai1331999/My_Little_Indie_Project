@@ -187,7 +187,7 @@ void ProcessInput(int maxControllerCount, Game_Input* OldInput, Game_Input* NewI
     
 };
 
-internal debug_read_file_result* DEBUGReadFileWhole(char* filename){
+global_variable debug_read_file_result* DEBUGReadFileWhole(const char* filename){
     debug_read_file_result* result = nullptr;
     result = (debug_read_file_result*)malloc(sizeof(struct debug_read_file_result));
     HANDLE FileHandle = CreateFileA( filename, GENERIC_READ, 0,  NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
