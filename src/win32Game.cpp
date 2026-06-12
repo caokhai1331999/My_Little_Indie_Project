@@ -927,7 +927,8 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 
           if((GetKeyState(VK_CONTROL) & (1 << 15)) > 0){
               ShowGlyphs(&BackBuffer, &Glyphs_Map);
-              HDC tempDC = GetDC(Window);
+              HDC currentDC = GetDC(Window);
+              HDC tempDC;
               Win32DisplayBufferWindow(tempDC, 0, 0, &BackBuffer);
               SwapBuffers(tempDC);
               printf("Change to display glyphs\n");
@@ -1107,7 +1108,8 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
           // State.BlueOffset+= 10;
           if((GetKeyState(VK_CONTROL) & (1 << 15)) > 0){
               ShowGlyphs(&BackBuffer, &Glyphs_Map);
-              HDC tempDC = GetDC(Window);
+              HDC currentDC = GetDC(Window);
+              HDC tempDC;
               Win32DisplayBufferWindow(tempDC, 0, 0, &BackBuffer);
               SwapBuffers(tempDC);
               printf("Change to display glyphs\n");

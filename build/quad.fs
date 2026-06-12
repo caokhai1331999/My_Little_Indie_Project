@@ -235,9 +235,15 @@ void main(){
     vec3 viewDir = normalize(FragPos - ViewPos_);
     vec3 defaultNormal =  vec3(0.0f, 1.0f, 0.0f);
     //vec3 pointlight = CalcPointLight(pointLights[0], ModelPos, defaultNormal, viewDir);
-    vec3 FragColor_ = CalcSpotLight(spotlight[0], norm, viewDir);
+    vec3 FragColor_;
+    if(spotlight[0].constant != 0.0f){
+        FragColor_ = CalcSpotLight(spotlight[0], norm, viewDir);
+        FragColor = vec4(FragColor_, 1.0f);
+    } else {
+        vec4 sampled = vec4(1.0f, 1.0f, 1.0f,texture(material.diffused_texture, TextCoord).a);
+        FragColor = sampled * FragColorr;
+    }
     // vec3 FragColor_ = mix(vec3(TextCoord, 1.0f), vec3(1.0f), 0.5f);
     // vec3 FragColor_ = texture(material.diffused_texture, TextCoord).rgb * spotlight[0].ambient.y;
-    //// FragColor = vec4(FragColor_, 1.0f);
-    FragColor = vec4(FragColor_, 1.0f);
+                                //// FragColor = vec4(FragColor_, 1.0f);
 }

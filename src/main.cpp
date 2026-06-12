@@ -209,6 +209,9 @@ int CALLBACK WinMain
                 BackBuffer.shaders_list.push_back(new B_shader_program("1.model.vs", "1.model.fs", "model drawing brush"));
                 ScreenBuffer.glData.ProgramIDs.push_back(BackBuffer.shaders_list[BackBuffer.shaders_list.size()-1]->GetProgramID());                
 
+                BackBuffer.shaders_list.push_back(new B_shader_program("quad_glyph.vs", "quad_glyph.fs", "glyph drawing brush"));
+                ScreenBuffer.glData.ProgramIDs.push_back(BackBuffer.shaders_list[BackBuffer.shaders_list.size()-1]->GetProgramID());                
+
                 set_tile_vertex(BackBuffer.shaders_list[2]);
 
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
@@ -362,18 +365,28 @@ int CALLBACK WinMain
                 //unsigned int TileTexture = SetupTileTexture("./media/grass.png");
 
                 setup_pointlight(&envir_light);
-
+                int i = 0;
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
+                    if(i < 4){
                     shader->use();
                     shader->setMat4("view", Chosen_Camera->view);
                     shader->setMat4("projection", Chosen_Camera->projection);
                     shader->setVec3( "ViewPos", Chosen_Camera->Position);
+                    }
+                    i++;
                 }
 
                 Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
                 Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
                 Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
-                
+//=================================================
+                glm::mat4 othorForGlyph = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 1.0f, 1.0f);
+                BackBuffer.shaders_list[4]->use();
+                BackBuffer.shaders_list[4]->setMat4("projection", othorForGlyph);
+                BackBuffer.shaders_list[4]->setInt("material.diffused_texture", TileObj.TextureID);
+                BackBuffer.shaders_list[4]->setMat4("model", Plane);
+                glUseProgram(0);
+
                 while (GlobalRunning) {
                   if(first_announce) {
                       QueryPerformanceCounter(&(TimeSet.LastCounter));
@@ -443,7 +456,7 @@ int CALLBACK WinMain
                           AutoAdjustCameraPos = (AutoAdjustCameraPos__)GetProcAddress(AniLib, "AutoAdjustCameraPos_");
 //setupMesh =
                           // reload and recompile shader code
-                          for(B_shader_program * const &brush: BackBuffer.shaders_list)
+                          for(B_shader_program* const &brush: BackBuffer.shaders_list)
                           {
                           brush->ReLoadShaderCode();
                           };
@@ -514,12 +527,15 @@ int CALLBACK WinMain
                     //if(Chosen_Camera->moved || Chosen_Camera->mouse.moved){
                    UpdateCamera(&BackBuffer.camera, &DelayedRatio);
                    UpdateCamera(BackBuffer.camera_set[0], &DelayedRatio);
-
+                   i = 0;
                    for(B_shader_program* const &shader: BackBuffer.shaders_list){
-                        shader->use();
-                        shader->setMat4("view", Chosen_Camera->view);
-                        shader->setMat4("projection", Chosen_Camera->projection);
-                        shader->setVec3( "ViewPos", Chosen_Camera->Position);
+                       if(i < 4){
+                           shader->use();
+                           shader->setMat4("view", Chosen_Camera->view);
+                           shader->setMat4("projection", Chosen_Camera->projection);
+                           shader->setVec3( "ViewPos", Chosen_Camera->Position);
+                       }
+                       i++;
                     }
 
                     if(Chosen_Camera->mouse.Wheeled)
@@ -624,13 +640,13 @@ int CALLBACK WinMain
 
                         
                     //RENDER =====================================
-                    BackBuffer.shaders_list[2]->use();                    BackBuffer.shaders_list[2]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
+                    BackBuffer.shaders_list[4]->use();
                     glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
-                    BackBuffer.shaders_list[2]->setFloat("colorOffset", ColorOffset);
-                    BackBuffer.shaders_list[2]->setMat4("model", Plane);                    
+                    // BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
+                    ////BackBuffer.shaders_list[4]->setFloat("colorOffset", ColorOffset);
                     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-                    glUseProgram(0);
 
+                    glUseProgram(0);
                     drawTile(&TileObj, BackBuffer.shaders_list[2]);
 
                     //===============================================
