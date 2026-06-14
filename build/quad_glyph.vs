@@ -11,6 +11,7 @@ out vec4 FragColorr;
 
 uniform mat4 projection;
 uniform mat4 model;
+uniform mat4 view;
 
 bool notNUll(mat4 matrix){
  for(int i = 0; i < 4; i++){
@@ -24,12 +25,9 @@ bool notNUll(mat4 matrix){
 }
 
 void main(){
-    if(notNUll(projection)){
-        gl_Position = projection * model * vec4(aPos.x, aPos.z, 0.0f, 1.0f);
-    }else{
-       gl_Position = vec4(0.0f);
-    }
-        gl_Position = projection * model * vec4(aPos, 1.0f);
-        TextCoord = aTextCoord;
+    // so the model is the culprit;
+    gl_Position = projection * view * vec4(aPos, 1.0f);
+    //gl_Position = projection * model * vec4(aPos, 1.0f);
+       TextCoord = aTextCoord;
        FragColorr = vec4(VertexColor,1.0f);
 }

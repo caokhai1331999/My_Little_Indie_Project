@@ -75,7 +75,7 @@ void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Heigh
 
 //void RenderSplendidGradient(Win32_Front_Buffer* OBuffer, imagee_content* BMPContent, int XOffset, int YOffset) {
 
-void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* BMPContent, int XOffset, int YOffset, int ByteCount) {
+void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* BMPContent) {
     // RR GG BB
     // Row is a pointer to every line of bitmapMemory
     // While pitch is data length of everyline of bitmap
@@ -146,8 +146,8 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
         //uint32* imagePixel = (uint32* )imageRow;
         for(int X = 0; X < OBuffer->BitmapWidth; X++) {
 
-            uint8 Blue = ( X + XOffset);
-            uint8 Green = ( Y + YOffset);
+            uint8 Blue = X;
+            uint8 Green = Y;
 
             //NOTE: AA RR GG BB()
             // Because I limit the size of Pixels so it can not add Green color to its storage
@@ -203,6 +203,7 @@ void ShowGlyphs(Win32_OffScreen_Buffer* OBuffer, Glyph_Map* map) {
     // While pitch is data length of everyline of bitmap
     int32 BlitWidth =  map->w;
     int32 BlitHeight = map->h;
+
     int32 WidthOffset = 0;
     int32 ImagePitch = 4 * BlitWidth;    
 
@@ -241,7 +242,7 @@ void ShowGlyphs(Win32_OffScreen_Buffer* OBuffer, Glyph_Map* map) {
     }
     
     //Change the image row order upside down
-    uint8* imageRow = (uint8*)map->bitmap;
+    //uint8* imageRow = (uint8*)map->bitmap;
     uint8* imageRowForDirectBlit = (uint8*)map->bitmap;
 //// ???? What todo if the image is bigger than the 
     imageRowForDirectBlit += 4*((BlitHeight - 1) * BlitWidth);
@@ -259,7 +260,7 @@ void ShowGlyphs(Win32_OffScreen_Buffer* OBuffer, Glyph_Map* map) {
             if(X >= BlitWidth){
             *DirectPixel++ = 0xffffffff;
             } else {
-            *DirectPixel++ = *imagePixelForDirect++;
+            *DirectPixel++ = *imagePixelForDirect--;
             }
         }
     }
@@ -1107,11 +1108,11 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
           // Actually the front vec is at the back of the camera
           // State.BlueOffset+= 10;
           if((GetKeyState(VK_CONTROL) & (1 << 15)) > 0){
+              Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
               ShowGlyphs(&BackBuffer, &Glyphs_Map);
               HDC currentDC = GetDC(Window);
-              HDC tempDC;
-              Win32DisplayBufferWindow(tempDC, 0, 0, &BackBuffer);
-              SwapBuffers(tempDC);
+              Win32DisplayBufferWindow(currentDC, 0, 0, &BackBuffer);
+              SwapBuffers(currentDC);
               printf("Change to display glyphs\n");
           }else{
               BackBuffer.camera.Position +=

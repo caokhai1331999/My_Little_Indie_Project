@@ -18,7 +18,11 @@ uniform Material material;
 
 void main(){
         vec4 sampled = texture(material.diffused_texture, TextCoord);
-        FragColor = sampled;
+        if(sampled != vec4(0.0f)){
+            FragColor = sampled;
+        }else{
+            FragColor = FragColorr;
+        }
         // FragColor = FragColorr;
         //* FragColorr;
 }

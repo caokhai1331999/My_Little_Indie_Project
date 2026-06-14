@@ -40,7 +40,7 @@ void LoadFont(const char* path){
         glActiveTexture(GL_TEXTURE0+Glyphs_Map.TextureID);
         glBindTexture(GL_TEXTURE_2D, Glyphs_Map.TextureID);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, 512, 512, 0, GL_RED, GL_UNSIGNED_BYTE, Glyphs_Map.bitmap);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, Glyphs_Map.w, Glyphs_Map.h, 0, GL_RED, GL_UNSIGNED_BYTE, Glyphs_Map.bitmap);
         glGenerateMipmap(GL_TEXTURE_2D);
         // can free temp_bitmap at this point
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
