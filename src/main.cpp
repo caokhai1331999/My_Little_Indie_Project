@@ -39,8 +39,7 @@ int CALLBACK WinMain
   win32LoadXInput();
 
   WNDCLASSEXA WindowClass = SetUpWindowClass(&BackBuffer, Instance);
-
-  //HWND Window = {};
+    //HWND Window = {};
 
   
   // NOTE: I forgot to init window
@@ -54,6 +53,7 @@ int CALLBACK WinMain
   move_object_ move_ = NULL;
   InitCamera__ InitCamera_ = NULL;
   AutoAdjustCameraPos__ AutoAdjustCameraPos = NULL;
+  LoadFont__ LoadFont = NULL;
   //setUpUBO__ setUpUBO = NULL;
   //updateUBOData__ updateUBOData = NULL;
   //setupMeshh setupMesh = NULL;
@@ -122,6 +122,7 @@ int CALLBACK WinMain
                   move_ = (move_object_)GetProcAddress(AniLib, "move_object");
                   InitCamera_ = (InitCamera__)GetProcAddress(AniLib, "InitCamera_");
                   AutoAdjustCameraPos = (AutoAdjustCameraPos__)GetProcAddress(AniLib, "AutoAdjustCameraPos_");
+                  LoadFont = (LoadFont__)GetProcAddress(AniLib, "LoadFont_");
               }
           }
       }
@@ -163,10 +164,9 @@ int CALLBACK WinMain
               
               debug_read_file_result result2;
               debug_read_file_result result;
-             BMPContent = new imagee_content;
+              BMPContent = new imagee_content;
 
-            // BMPContent = DEBUGReadBMP("Harry_and_Accomplices_rescaled.bmp",
-            // &result);
+              BMPContent =  DEBUGReadBMP("Harry_and_Accomplices_rescaled.bmp",&result);
             //  =============================================
             //BMPContent = DEBUGReadBMP("adventure_.jpg", &result);
             // printf("About to read image\n");
@@ -187,6 +187,7 @@ int CALLBACK WinMain
                 //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
                 //RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
                 InitOpenGL(&BackBuffer, &ScreenBuffer, BMPContent);
+
                 GLenum err = glGetError();
                 if (err != GL_NO_ERROR) {
                     std::cerr << "OpenGL Error: " << err << std::endl;
@@ -219,6 +220,7 @@ int CALLBACK WinMain
                     }
 
                 copyBufferData(&BackBuffer, &ScreenBuffer);
+                LoadFont("./media/FiraCode-VariableFont_wght.ttf");
                 //????
                 //glm::mat4 View = glm::mat4(1.0f);
                 real32 UpdatedAngle = 0.0f;
@@ -377,11 +379,14 @@ int CALLBACK WinMain
                 Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
                 Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
 //=================================================
+
                 glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)Dimens.Width,  (float)Dimens.Height, 0.0f, 1.0f, 100.0f);
                 BackBuffer.shaders_list[4]->use();
                 BackBuffer.shaders_list[4]->setMat4("projection", othorForGlyph);
                 BackBuffer.shaders_list[4]->setMat4("view", BackBuffer.camera.view);
                 BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
+
+//==================================================
                 glUseProgram(0);
 
                 while (GlobalRunning) {
@@ -451,6 +456,7 @@ int CALLBACK WinMain
                           Set_environmental_light =                      (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
                           move_ = (move_object_)GetProcAddress(AniLib, "move_object");
                           AutoAdjustCameraPos = (AutoAdjustCameraPos__)GetProcAddress(AniLib, "AutoAdjustCameraPos_");
+                          LoadFont = (LoadFont__)GetProcAddress(AniLib, "LoadFont_");
 //setupMesh =
                           // reload and recompile shader code
                           for(B_shader_program* const &brush: BackBuffer.shaders_list)
@@ -463,8 +469,7 @@ int CALLBACK WinMain
                         }
                       if(Load_Lib)
                           Load_Lib = false;
-
-                      
+                      LoadFont("./media/FiraCode-VariableFont_wght.ttf");
                       Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
                       Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
                     }
@@ -650,7 +655,6 @@ int CALLBACK WinMain
                     Plane = glm::scale(Plane, glm::vec3(0.1f));
                     BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
 
-                    BackBuffer.shaders_list[4]->setMat4("model", Plane);
                     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
                     glUseProgram(0);

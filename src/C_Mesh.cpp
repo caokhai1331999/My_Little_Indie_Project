@@ -9,53 +9,6 @@
 // Display Font Buffer.
 // Use bitmap font loading on 2D squad
 
-void IncreaseFontAlpha(Glyph_Map* map){
-    uint8 *Source = map->bitmap;
-    for(int y = 0; y < map->h; y++){
-        for(int x = 0; x < map->w; x++){
-            uint8 alpha = *Source;
-            *Source = ((alpha << 24)|
-                       (alpha << 16)|
-                       (alpha << 8)|
-                       (alpha << 0));
-            *Source++; 
-        }
-    };
-}
-
-void LoadFont(const char* path){
-
-    debug_read_file_result* TTFfile = DEBUGReadFileWhole(path);
-    stbtt_InitFont(&Glyphs_Map.FontInfo, (unsigned char*)TTFfile->Content, stbtt_GetFontOffsetForIndex((unsigned char*)TTFfile->Content, 0));
-
-    Glyphs_Map.bitmap = stbtt_GetCodepointBitmap(&Glyphs_Map.FontInfo, 0,stbtt_ScaleForPixelHeight(&Glyphs_Map.FontInfo, 128.0f), 'A', &Glyphs_Map.w, &Glyphs_Map.h, &Glyphs_Map.Xoffset, &Glyphs_Map.Yoffset);
-
-    
-    
-    if(Glyphs_Map.bitmap != nullptr){
-        printf("Load Font successfully\n");
-        IncreaseFontAlpha(&Glyphs_Map);
-        glGenTextures(1, &Glyphs_Map.TextureID);
-
-        glActiveTexture(GL_TEXTURE0+Glyphs_Map.TextureID);
-        glBindTexture(GL_TEXTURE_2D, Glyphs_Map.TextureID);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, Glyphs_Map.w, Glyphs_Map.h, 0, GL_RED, GL_UNSIGNED_BYTE, Glyphs_Map.bitmap);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        // can free temp_bitmap at this point
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);        
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        
-        stbtt_FreeBitmap(Glyphs_Map.bitmap, 0);
-    }else{
-        printf("Failed Loading font\n");
-    }
-
-    
-}
-
 //==================================================================
 // Bone processing step for skeletal animation
 void SetVertexBoneData(Vertex* vertex, int boneID, float weight){

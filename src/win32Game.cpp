@@ -477,7 +477,6 @@ HDC windowDC = GetDC(OBuffer->Window);
                     //printf("GLAD load successfully\n");
                     printf("VERSION: %s", glGetString(GL_VERSION));
                     printf("Renderer: %s\n", glGetString(GL_RENDERER));;
-                    LoadFont("./media/FiraCode-VariableFont_wght.ttf");                    
 
                     const float Vertices[] = {
                    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,// 0
@@ -930,6 +929,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
               ShowGlyphs(&BackBuffer, &Glyphs_Map);
               HDC currentDC = GetDC(Window);
               HDC tempDC;
+              RenderSplendidGradient(&BackBuffer, nullptr, BMPContent);
               Win32DisplayBufferWindow(tempDC, 0, 0, &BackBuffer);
               SwapBuffers(tempDC);
               printf("Change to display glyphs\n");

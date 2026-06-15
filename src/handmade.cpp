@@ -7,12 +7,6 @@
    ======================================================================== */
 #include "handmade.h"
 
-uint32 safetruncateUint64(uint64 value){
-    //Assert(value <= 0xFFFFFFFF);
-    uint32 result = value;
-    return result;
-}
-
 real32 saferatioN(real32 numerator, real32 divisor, real32 N){
     real32 result = N;
     if(divisor!=0.0f){
@@ -186,106 +180,6 @@ void ProcessInput(int maxControllerCount, Game_Input* OldInput, Game_Input* NewI
     XinputSetState(0, &Vibration);
     
 };
-
-global_variable debug_read_file_result* DEBUGReadFileWhole(const char* filename){
-    debug_read_file_result* result = nullptr;
-    result = (debug_read_file_result*)malloc(sizeof(struct debug_read_file_result));
-    HANDLE FileHandle = CreateFileA( filename, GENERIC_READ, 0,  NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-
-    if(FileHandle != INVALID_HANDLE_VALUE){
-        LARGE_INTEGER filesize;
-// NOTE: This should read the right size here
-        if(GetFileSizeEx(FileHandle,  &filesize))
-        {
-            result->Size = safetruncateUint64(filesize.QuadPart);
-            result->Content = VirtualAlloc(0, result->Size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
-            if(result->Content)
-            {
-                DWORD BytesRead;
-                if(ReadFile(FileHandle, result->Content, result->Size, &BytesRead,0) && ( BytesRead == result->Size))
-                {
-                    printf("Read image successfully\n");
-                }
-                else
-                {
-                    // debug                        
-                }
-            }
-            else
-            {
-                DEBUGFreeFileMemory(result->Content);
-                result = nullptr;
-                // debug
-            }
-        }
-        CloseHandle(FileHandle);
-    } else {
-        // logging
-    }
-    return result;
-
-}
-bool32 DEBUGWriteWholeFile(char* filename, uint32 memorysize, void* memory){
-    bool32 result = false;
-    HANDLE FileHandle = CreateFileA(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-    if(FileHandle != INVALID_HANDLE_VALUE){
-            if(result){
-                DWORD bytewritten;
-                    if(WriteFile(FileHandle, memory, memorysize, &bytewritten, 0))
-                    {
-                        result = (memorysize == bytewritten);
-                    } else {
-                        // debug                        
-                    }
-                } else {
-                    // debug
-                }
-        CloseHandle(FileHandle);
-    }else{
-
-        // logging
-    }
-    return result;
-}
-
-void DEBUGFreeFileMemory(void* memory){
-    VirtualFree(memory, 0, MEM_RELEASE);
-}
-
-imagee_content* DEBUGReadBMP(char* filename, debug_read_file_result* ReadResult){
-    imagee_content* result = (imagee_content*)malloc(sizeof(struct imagee_content));
-    ReadResult = DEBUGReadFileWhole(filename);
-     if(ReadResult->Size != 0){
-
-         BITMAP_HEADER *HeadResult = (BITMAP_HEADER*)ReadResult->Content;
-         //Why plus ???
-
-         uint32* pixels = (uint32* )((uint8 *)ReadResult->Content + HeadResult->bfOffBits);
-
-         result->Width = HeadResult->Width;
-         result->Height = HeadResult->Height;
-         result->ImageContent = pixels;
-
-         
-         
-         //uint32* SourceDest = pixels;
-//NOTE: For OpenGL this original arranging order work but not for passing directly to window graphic
-         
-         
-/*
-         //Why Height is inside the width loop
-         for(uint32 Y = 0; Y < HeadResult->Width; ++Y){
-             for(uint32 X = 0; X < HeadResult->Height; ++X){
-                 //How to reverse byte order from AA RR GG BB (image byte order)
-                 //                            => RR GG BB AA (little endiendness order)
-                 *SourceDest = ((*SourceDest) >> 8) | ((*SourceDest) << 24);
-                 ++SourceDest;
-             }
-         };
-*/
-         }
-     return result;
-}
 
 glm::vec3 randomRotateAxis_(int rollIndex) {
     std::srand(std::time(0));

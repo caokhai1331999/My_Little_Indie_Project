@@ -8,6 +8,70 @@
 
 #include "Light.h"
 
+
+void IncreaseFontAlpha(Glyph_Map* map){
+    uint8 *Source = map->bitmap;
+    for(int y = 0; y < map->h; y++){
+        for(int x = 0; x < map->w; x++){
+            uint8 alpha = *Source;
+            *Source = ((alpha << 24)|
+                       (alpha << 16)|
+                       (alpha << 8)|
+                       (alpha << 0));
+            *Source++; 
+        }
+    };
+}
+
+void LoadFont(const char* path){
+    debug_read_file_result* TTFfile = DEBUGReadFileWhole(path);
+    stbtt_InitFont(&Glyphs_Map.FontInfo, (unsigned char*)TTFfile->Content, stbtt_GetFontOffsetForIndex((unsigned char*)TTFfile->Content, 0));
+
+    if(Glyphs_Map.bitmap != nullptr){
+        delete Glyphs_Map.bitmap;
+        Glyphs_Map.bitmap = nullptr;
+        Glyphs_Map.bitmap = new unsigned char;
+    }
+
+   Glyphs_Map.bitmap = stbtt_GetCodepointBitmap(&Glyphs_Map.FontInfo, 0,stbtt_ScaleForPixelHeight(&Glyphs_Map.FontInfo, 128.0f), 'T', &Glyphs_Map.w, &Glyphs_Map.h, &Glyphs_Map.Xoffset, &Glyphs_Map.Yoffset);
+        
+    if(Glyphs_Map.bitmap != nullptr){
+        IncreaseFontAlpha(&Glyphs_Map);
+
+        if(Glyphs_Map.TextureID != 0)
+        glGenTextures(1, &Glyphs_Map.TextureID);
+
+        glActiveTexture(GL_TEXTURE0+Glyphs_Map.TextureID);
+        glBindTexture(GL_TEXTURE_2D, Glyphs_Map.TextureID);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, Glyphs_Map.w, Glyphs_Map.h, 0, GL_RG, GL_UNSIGNED_BYTE, Glyphs_Map.bitmap);
+        // Why there are no pointer of this
+        //glGenerateMipmap(GL_TEXTURE_2D);
+        // can free temp_bitmap at this point
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        
+        stbtt_FreeBitmap(Glyphs_Map.bitmap, 0);
+        printf("Load Font successfully\n");
+    }else{
+        printf("Failed Loading font\n");
+    }       
+    printf("Created Font Texture :%d\n", Glyphs_Map.TextureID);
+    DEBUGFreeFileMemory(TTFfile->Content);
+    delete TTFfile;
+    TTFfile = nullptr;
+}
+
+void LoadFont_(const char* path){
+  bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
+    if (!success)
+            success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
+    assert(success);
+    LoadFont(path);
+}
+
 void setup_pointlight(global_light* envir_light){
     glm::vec3 pointlight_Pos[] =
         {

@@ -8,6 +8,7 @@
    ======================================================================== */
 // First of all we don't use global light
 // We used normal map to compenstate for that.
+#include "handmade.h"
 #include "B_shader.h"
 #include "Camera.h"
 
@@ -88,6 +89,13 @@ struct global_light{
 };
 
 global_variable global_light envir_light = {};
+
+void IncreaseFontAlpha(Glyph_Map* map = nullptr);
+void LoadFont(const char* path = nullptr);
+extern "C" __declspec(dllexport) void IncreaseFontAlpha_(Glyph_Map* map = nullptr);
+typedef void (*IncreaseFontAlpha__)(Glyph_Map*);
+extern "C" __declspec(dllexport) void LoadFont_(const char* path = nullptr);
+typedef void (*LoadFont__)(const char*);
 //=====================================
 void setup_pointlight(global_light* envir_light = nullptr);
 void set_environmental_light(B_shader_program* shader = nullptr, global_light* envir_light = nullptr, Camera* camera = nullptr);
