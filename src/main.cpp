@@ -219,6 +219,7 @@ int CALLBACK WinMain
                         CheckShader(shader->GetProgramID(), programme_, shader->GetShaderName());
                     }
 
+                //wglMakeCurrent(GetDC(BackBuffer.Window), BackBuffer.glData.openglRC);
                 copyBufferData(&BackBuffer, &ScreenBuffer);
                 LoadFont("./media/FiraCode-VariableFont_wght.ttf");
                 //????
@@ -364,14 +365,14 @@ int CALLBACK WinMain
                 //map_content = load_bin_map("level.map");
                 //std::cout<<map_content->data()<<std::endl;
 
-                //unsigned int TileTexture = SetupTileTexture("./media/grass.png");
-
                 setup_pointlight(&envir_light);
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
                     shader->use();
-                    shader->setMat4("view", Chosen_Camera->view);
+                    if(shader->GetProgramID()!=7){
+                        shader->setMat4("view", Chosen_Camera->view);
+                        shader->setVec3( "ViewPos", Chosen_Camera->Position);
+                    }
                     shader->setMat4("projection", Chosen_Camera->projection);
-                    shader->setVec3( "ViewPos", Chosen_Camera->Position);
                 }
                 glUseProgram(0);
 
@@ -380,9 +381,9 @@ int CALLBACK WinMain
                 Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
 //=================================================
 
-                glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)Dimens.Width,  (float)Dimens.Height, 0.0f, 1.0f, 100.0f);
+                glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)ScreenBuffer.BitmapWidth, (float)ScreenBuffer.BitmapHeight, 0.0f);
                 BackBuffer.shaders_list[4]->use();
-                BackBuffer.shaders_list[4]->setMat4("projection", othorForGlyph);
+                BackBuffer.shaders_list[4]->setMat4("projection", BackBuffer.camera.projection);
                 BackBuffer.shaders_list[4]->setMat4("view", BackBuffer.camera.view);
                 BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
 
@@ -530,10 +531,12 @@ int CALLBACK WinMain
                    UpdateCamera(&BackBuffer.camera, &DelayedRatio);
                    UpdateCamera(BackBuffer.camera_set[0], &DelayedRatio);
                    for(B_shader_program* const &shader: BackBuffer.shaders_list){
-                           shader->use();
-                           shader->setMat4("view", Chosen_Camera->view);
-                           shader->setMat4("projection", Chosen_Camera->projection);
+                       shader->use();
+                       shader->setMat4("view", Chosen_Camera->view);
+                       if(shader->GetProgramID() != 7){
                            shader->setVec3( "ViewPos", Chosen_Camera->Position);
+                       }
+                       shader->setMat4("projection", Chosen_Camera->projection);
                     }
 
                     if(Chosen_Camera->mouse.Wheeled)
@@ -654,7 +657,7 @@ int CALLBACK WinMain
 
                     Plane = glm::scale(Plane, glm::vec3(0.1f));
                     BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
-
+                    
                     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
                     glUseProgram(0);

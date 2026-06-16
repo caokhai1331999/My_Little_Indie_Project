@@ -148,6 +148,16 @@ void APIENTRY MessageCallback(GLenum source,
                               const GLchar* message,
                               const void* userParam);
 
+void ReloadGLFunction(Win32_OffScreen_Buffer* BackBuffer = nullptr){
+    //HDC tempDC = GetDC(BackBuffer->Window);
+    //if(wglMakeCurrent(tempDC, BackBuffer->glData.openglRC)){
+        bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
+        if (!success)
+            success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
+        assert(success);
+    //};
+}
+
 void ResetGLState(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 void SetEnvironmentLights();
 void InitCamera(Win32_OffScreen_Buffer* BackBuffer = nullptr);

@@ -17,7 +17,7 @@ struct Material{
 uniform Material material;
 
 void main(){
-        vec4 sampled = texture(material.diffused_texture, TextCoord);
+    vec4 sampled = texture(material.diffused_texture, vec2(TextCoord.x, TextCoord.y/2));
 
         if(sampled != vec4(0.0f)){
 

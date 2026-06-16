@@ -167,12 +167,12 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
         // And this is for passing directly to the window (RIGHT)
         //imageRowForDirectBlit-=ImagePitch;
 // For direct blit
-        if(OBuffer != NULL){
-            DirectRow+=OBuffer->Pitch;
-        } else {
-            DirectRow+=FBuffer->Pitch;            
-        }
-        //NOTE: This incidentally produce right pixel order
+        //if(OBuffer != NULL){
+            //DirectRow+=OBuffer->Pitch;
+        //} else {
+            //DirectRow+=FBuffer->Pitch;            
+        //}
+        ////NOTE: This incidentally produce right pixel order
     }
 
     //if(!OBuffer->GLImageRendered){    
@@ -294,7 +294,7 @@ bool InitOpenGL(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, im
     // printf("Start to init OpenGL\n");
         // Create the pixel format features
 
-    // Dummy window and context here =====================================
+// Dummy window and context here =====================================
 // Source - https://stackoverflow.com/q/45937728
 // Posted by D.G. Redd, modified by community. See post 'Timeline' for change history
 // Retrieved 2026-02-10, License - CC BY-SA 3.0
@@ -397,7 +397,8 @@ wglCreateContextAttribsARB =
 // Delete dummy here
 if (wglCreateContextAttribsARB) {
     printf("Succeed get wglCreateContextAttribsARB function pointer\n");
-    //wglDeleteContext(dummyContext);
+    wglDeleteContext(OBuffer->glData.defaultContext);
+    ReleaseDC(windowDummy, dummyDrawingContext);
     DestroyWindow(windowDummy);
 } else {
     printf("wglCreateContextAttribsARB is NULL\n");    
@@ -405,6 +406,7 @@ if (wglCreateContextAttribsARB) {
 
 // succeed enable wgl extension
 // Working window and context
+
 HDC windowDC = GetDC(OBuffer->Window);
     PIXELFORMATDESCRIPTOR desiredPixelFormat = {};
         desiredPixelFormat.nSize = sizeof(desiredPixelFormat);
@@ -1113,6 +1115,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
               HDC currentDC = GetDC(Window);
               Win32DisplayBufferWindow(currentDC, 0, 0, &BackBuffer);
               SwapBuffers(currentDC);
+              ReleaseDC(BackBuffer.Window, currentDC);
               printf("Change to display glyphs\n");
           }else{
               BackBuffer.camera.Position +=
