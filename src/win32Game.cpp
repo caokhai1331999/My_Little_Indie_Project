@@ -582,26 +582,31 @@ HDC windowDC = GetDC(OBuffer->Window);
                 
                 static const unsigned int planeIndices[] = {
 //Even though the vertex 1, 0 will be reused but we have to feed them name for opengl just like this
-                    2, 0, 1, 1, 0, 4, 1, 7
+                    0, 1, 2, 1, 0, 5
                 };
 
                 static const float PlaneVertices[] = {
                     // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
                   // x,    y,     z
-
+/*
                     1.0f, -1.0f, -1.0f,  0.0f, 1.0f,
                    -1.0f, -1.0f,  1.0f,  1.0f, 1.0f,
                     1.0f, -1.0f,  1.0f,  1.0f, 0.0f,
                                        
                     1.0f, -1.0f, -1.0f,  1.0f, 0.0f,
                    -1.0f, -1.0f, -1.0f,  0.0f, 0.0f,
-                   -1.0f, -1.0f,  1.0f,  0.0f, 1.0f,
+                   -1.0f, -1.0f,  1.0f,  0.0f, 1.0f,*/
 
-                    1.0f, -1.0f, -1.0f,  0.0f, 1.0f,
-                   -1.0f, -1.0f,  1.0f,  1.0f, 1.0f,
-                   -1.0f, -1.0f, -1.0f,  1.0f, 0.0f
+                   -1.0f, -1.0f,  1.0f,  0.0f, 0.0f,
+                    1.0f,  1.0f,  1.0f,  1.0f, 1.0f,
+                    1.0f, -1.0f,  1.0f,  1.0f, 0.0f,
+
+                    1.0f,  1.0f,  1.0f,  1.0f, 1.0f,
+                   -1.0f, -1.0f,  1.0f,  0.0f, 0.0f,
+                   -1.0f,  1.0f,  1.0f,  0.0f, 1.0f
+
                 };
-
+                
                 static const GLfloat g_color_buffer_data[] = {
                     0.583f,  0.771f,  0.014f,
                     0.609f,  0.115f,  0.436f,

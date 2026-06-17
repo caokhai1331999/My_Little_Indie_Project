@@ -367,12 +367,12 @@ int CALLBACK WinMain
 
                 setup_pointlight(&envir_light);
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
-                    shader->use();
                     if(shader->GetProgramID()!=7){
+                        shader->use();
                         shader->setMat4("view", Chosen_Camera->view);
                         shader->setVec3( "ViewPos", Chosen_Camera->Position);
+                        shader->setMat4("projection", Chosen_Camera->projection);
                     }
-                    shader->setMat4("projection", Chosen_Camera->projection);
                 }
                 glUseProgram(0);
 
@@ -381,10 +381,11 @@ int CALLBACK WinMain
                 Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
 //=================================================
 
-                glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)ScreenBuffer.BitmapWidth, (float)ScreenBuffer.BitmapHeight, 0.0f);
+                glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)ScreenBuffer.BitmapWidth, 0.0f, (float)ScreenBuffer.BitmapHeight);
                 BackBuffer.shaders_list[4]->use();
-                BackBuffer.shaders_list[4]->setMat4("projection", BackBuffer.camera.projection);
-                BackBuffer.shaders_list[4]->setMat4("view", BackBuffer.camera.view);
+                BackBuffer.shaders_list[4]->setMat4("projection", othorForGlyph);
+                BackBuffer.shaders_list[4]->setVec2("glyph_size", (float)Glyphs_Map.w, (float)Glyphs_Map.h);
+                //BackBuffer.shaders_list[4]->setMat4("view", BackBuffer.camera.view);
                 BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
 
 //==================================================
@@ -470,11 +471,13 @@ int CALLBACK WinMain
                         }
                       if(Load_Lib)
                           Load_Lib = false;
+
                       LoadFont("./media/FiraCode-VariableFont_wght.ttf");
+
                       Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
                       Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
                     }
-                    
+
                     //UPDATE
                     // ================================================================
                     // NOTE: Sounding Part
@@ -531,12 +534,12 @@ int CALLBACK WinMain
                    UpdateCamera(&BackBuffer.camera, &DelayedRatio);
                    UpdateCamera(BackBuffer.camera_set[0], &DelayedRatio);
                    for(B_shader_program* const &shader: BackBuffer.shaders_list){
-                       shader->use();
-                       shader->setMat4("view", Chosen_Camera->view);
                        if(shader->GetProgramID() != 7){
+                           shader->use();
+                           shader->setMat4("view", Chosen_Camera->view);
                            shader->setVec3( "ViewPos", Chosen_Camera->Position);
+                           shader->setMat4("projection", Chosen_Camera->projection);
                        }
-                       shader->setMat4("projection", Chosen_Camera->projection);
                     }
 
                     if(Chosen_Camera->mouse.Wheeled)
@@ -644,19 +647,21 @@ int CALLBACK WinMain
                     BackBuffer.shaders_list[4]->use();
                     glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
                     // BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
+                BackBuffer.shaders_list[4]->setVec2("glyph_size", (float)Glyphs_Map.w, (float)Glyphs_Map.h);                    ;
                     
                     if(showMsPF){
                         glm::mat4 test_mat;
                         glGetUniformfv(BackBuffer.shaders_list[4]->GetProgramID(), glGetUniformLocation(BackBuffer.shaders_list[4]->GetProgramID(), "projection"),&test_mat[0][0]);
-                        printf("projection matrix: %s\n",glm::to_string(test_mat).c_str());
-                        glGetUniformfv(BackBuffer.shaders_list[4]->GetProgramID(), glGetUniformLocation(BackBuffer.shaders_list[4]->GetProgramID(), "view"),&test_mat[0][0]);
-                        printf("View matrix: %s\n",glm::to_string(test_mat).c_str());
+                        printf("projection: %s\n",glm::to_string(test_mat).c_str());
+                        glm::vec2 glyph_size;
+                        glGetUniformfv(BackBuffer.shaders_list[4]->GetProgramID(), glGetUniformLocation(BackBuffer.shaders_list[4]->GetProgramID(), "glyph_size"),&glyph_size[0]);
+                        printf("glyph size: %s\n",glm::to_string(glyph_size).c_str());
                         glGetUniformfv(BackBuffer.shaders_list[4]->GetProgramID(), glGetUniformLocation(BackBuffer.shaders_list[4]->GetProgramID(), "model"),&test_mat[0][0]);
                         printf("model matrix: %s\n",glm::to_string(test_mat).c_str());
                     }
 
                     Plane = glm::scale(Plane, glm::vec3(0.1f));
-                    BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
+                BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
                     
                     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 

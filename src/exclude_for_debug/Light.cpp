@@ -11,19 +11,19 @@
 
 void IncreaseFontAlpha(Glyph_Map* map){
     uint8 *Source = map->bitmap;
-    uint8 *Upside_Source = map->bitmap;
+    //uint8 *Upside_Source = map->bitmap;
     //Turn the bitmap upside down
-    Upside_Source += sizeof(uint8) * map->w * map->h;
+    //Upside_Source += sizeof(uint8) * map->w * map->h;
     for(uint8 y = 0; y < map->h; y++){
         for(uint8 x = 0; x < map->w; x++){
-            uint8 alpha = *Upside_Source;
-            //uint8 alpha = *Source;
+            //uint8 alpha = *Upside_Source;
+            uint8 alpha = *Source;
             *Source = ((alpha << 24)|
                        (alpha << 16)|
                        (alpha <<  8)|
                        (alpha <<  0));
             Source++;
-            Upside_Source--;
+            //Upside_Source--;
         }
     };
 }
@@ -32,13 +32,13 @@ void LoadFont(const char* path){
     debug_read_file_result* TTFfile = DEBUGReadFileWhole(path);
     stbtt_InitFont(&Glyphs_Map.FontInfo, (unsigned char*)TTFfile->Content, stbtt_GetFontOffsetForIndex((unsigned char*)TTFfile->Content, 0));
 
-    if(Glyphs_Map.bitmap != nullptr){
-        delete Glyphs_Map.bitmap;
-        Glyphs_Map.bitmap = nullptr;
-        Glyphs_Map.bitmap = new unsigned char;
-    }
+    //if(Glyphs_Map.bitmap != nullptr){
+        //delete Glyphs_Map.bitmap;
+        //Glyphs_Map.bitmap = nullptr;
+        //Glyphs_Map.bitmap = new unsigned char;
+    //}
 
-   Glyphs_Map.bitmap = stbtt_GetCodepointBitmap(&Glyphs_Map.FontInfo, 0, stbtt_ScaleForPixelHeight(&Glyphs_Map.FontInfo, 128.0f), 'A', &Glyphs_Map.w, &Glyphs_Map.h, &Glyphs_Map.Xoffset, &Glyphs_Map.Yoffset);
+   Glyphs_Map.bitmap = stbtt_GetCodepointBitmap(&Glyphs_Map.FontInfo, 0, stbtt_ScaleForPixelHeight(&Glyphs_Map.FontInfo, 128.0f), 'B', &Glyphs_Map.w, &Glyphs_Map.h, &Glyphs_Map.Xoffset, &Glyphs_Map.Yoffset);
         
     if(Glyphs_Map.bitmap != nullptr){
         IncreaseFontAlpha(&Glyphs_Map);

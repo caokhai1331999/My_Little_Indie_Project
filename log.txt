@@ -2030,3 +2030,6 @@ Why when I switch to othor matrix the shader the object disappear
 With some temporary tweakings in texture coord I can see what it load from
 ttf. But I lack of knowledge about how ttf store glyphs based on offset, thus I
 find difficulty to load full glyph on texture.
+
+---------------- Wed, 17 Jun 26: 01:54PM
+
