@@ -357,7 +357,7 @@ global_variable debug_read_file_result* DEBUGReadFileWhole(const char* filename)
                 DWORD BytesRead;
                 if(ReadFile(FileHandle, result->Content, result->Size, &BytesRead,0) && ( BytesRead == result->Size))
                 {
-                    printf("Read image successfully\n");
+                    printf("Read file successfully\n");
                 }
                 else
                 {

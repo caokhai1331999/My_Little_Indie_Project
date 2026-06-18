@@ -2033,3 +2033,17 @@ find difficulty to load full glyph on texture.
 
 ---------------- Wed, 17 Jun 26: 01:54PM
 
+
+---------------- Thu, 18 Jun 26: 11:37AM
+
+NOTE: Why the font only show in while I constantly load font in loop
+I got to understand more about memory free and create
+
+the glyphs map passed in the dll file is not one that app is holding
+I have to make sure they cook the same address
+
+Maybe I delete the date before attach it to texture ID
+
+NOTE: So call the global variable in dll code is a suck choice
+
+TODO: Time to load font in opengl

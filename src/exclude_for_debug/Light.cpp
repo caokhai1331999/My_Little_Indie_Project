@@ -13,7 +13,7 @@ void IncreaseFontAlpha(Glyph_Map* map){
     uint8 *Source = map->bitmap;
     //uint8 *Upside_Source = map->bitmap;
     //Turn the bitmap upside down
-    //Upside_Source += sizeof(uint8) * map->w * map->h;
+    //Upside_Source += map->w * map->h;
     for(uint8 y = 0; y < map->h; y++){
         for(uint8 x = 0; x < map->w; x++){
             //uint8 alpha = *Upside_Source;
@@ -28,29 +28,30 @@ void IncreaseFontAlpha(Glyph_Map* map){
     };
 }
 
-void LoadFont(const char* path){
-    debug_read_file_result* TTFfile = DEBUGReadFileWhole(path);
-    stbtt_InitFont(&Glyphs_Map.FontInfo, (unsigned char*)TTFfile->Content, stbtt_GetFontOffsetForIndex((unsigned char*)TTFfile->Content, 0));
+void LoadFont(Glyph_Map* map, const char* path){
 
-    //if(Glyphs_Map.bitmap != nullptr){
-        //delete Glyphs_Map.bitmap;
-        //Glyphs_Map.bitmap = nullptr;
-        //Glyphs_Map.bitmap = new unsigned char;
-    //}
+    debug_read_file_result* TTFfile = nullptr;
 
-   Glyphs_Map.bitmap = stbtt_GetCodepointBitmap(&Glyphs_Map.FontInfo, 0, stbtt_ScaleForPixelHeight(&Glyphs_Map.FontInfo, 128.0f), 'B', &Glyphs_Map.w, &Glyphs_Map.h, &Glyphs_Map.Xoffset, &Glyphs_Map.Yoffset);
+    if(first_announce){
+        TTFfile = new debug_read_file_result;
+        debug_read_file_result* TTFfile = DEBUGReadFileWhole(path);
+        stbtt_InitFont(&map->FontInfo, (unsigned char*)TTFfile->Content, stbtt_GetFontOffsetForIndex((unsigned char*)TTFfile->Content, 0));
+    }
+
+    map->bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 128.0f), 'B', &map->w, &map->h, &map->Xoffset, &map->Yoffset);
         
-    if(Glyphs_Map.bitmap != nullptr){
+    if(map->bitmap){
         IncreaseFontAlpha(&Glyphs_Map);
 
-        if(Glyphs_Map.TextureID != 0){
-            glGenTextures(1, &Glyphs_Map.TextureID);
+        if(first_announce){
+            glGenTextures(1, &map->TextureID);
         }
 
-        glActiveTexture(GL_TEXTURE0+Glyphs_Map.TextureID);
-        glBindTexture(GL_TEXTURE_2D, Glyphs_Map.TextureID);
+        glActiveTexture(GL_TEXTURE0+map->TextureID);
+        glBindTexture(GL_TEXTURE_2D, map->TextureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, map->w, map->h, 0, GL_RG, GL_UNSIGNED_BYTE, map->bitmap);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, Glyphs_Map.w, Glyphs_Map.h, 0, GL_RG, GL_UNSIGNED_BYTE, Glyphs_Map.bitmap);
+        if(first_announce){
         // Why there are no pointer of this
         glGenerateMipmap(GL_TEXTURE_2D);
         // can free temp_bitmap at this point
@@ -58,22 +59,27 @@ void LoadFont(const char* path){
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);        
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        
+        }
+    
         printf("load Font successfully\n");
     }else{
         printf("Failed Loading font\n");
     }       
-    printf("Created Font Texture :%d\n", Glyphs_Map.TextureID);
-    stbtt_FreeBitmap(Glyphs_Map.bitmap, 0);
-    DEBUGFreeFileMemory(TTFfile->Content);
-    delete TTFfile;
-    TTFfile = nullptr;
+    printf("Created Font Texture :%d\n", map->TextureID);
+
+    if(first_announce){
+        if(TTFfile->Content)
+            DEBUGFreeFileMemory(TTFfile->Content);
+
+        delete TTFfile;
+        TTFfile = nullptr;
+    }
 }
 
-void LoadFont_(const char* path){
+void LoadFont_(Glyph_Map* map, const char* path){
 
     ReloadGLFunction(&BackBuffer);
-    LoadFont(path);
+    LoadFont(map, path);
 }
 
 void setup_pointlight(global_light* envir_light){

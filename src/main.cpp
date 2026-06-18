@@ -99,23 +99,13 @@ int CALLBACK WinMain
               };
 
           
-          if (CopyFileA("Light32.dll", "Light32_copy.dll",
+          if (CopyFileA("light32.dll", "light32_copy.dll",
                        false))
           {
-                  //printf("Succeed copy lib file\n");
-//
-              AniLib = LoadLibraryA("Light32_copy.dll");
+              printf("Succeed copy lib file\n");
+              AniLib = LoadLibraryA("light32_copy.dll");
 
               if(AniLib != NULL){
-
-                  bool success = gladLoadGLLoader((GLADloadproc)GetAllFunctionPointerFromLib);
-
-                  if(success){
-                      printf("Success load function pointer from AniLib\n");
-                  }else{
-                      printf("Falied loading function pointer from AniLib\n");
-                  }
-
                   UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");          
                   setup_pointlight = (setup_pointlight__)GetProcAddress(AniLib, "setup_pointlight_");
                   Set_environmental_light = (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
@@ -123,6 +113,8 @@ int CALLBACK WinMain
                   InitCamera_ = (InitCamera__)GetProcAddress(AniLib, "InitCamera_");
                   AutoAdjustCameraPos = (AutoAdjustCameraPos__)GetProcAddress(AniLib, "AutoAdjustCameraPos_");
                   LoadFont = (LoadFont__)GetProcAddress(AniLib, "LoadFont_");
+              }else{
+                  printf("Failed loading library from dll file\n");
               }
           }
       }
@@ -164,8 +156,6 @@ int CALLBACK WinMain
               
               debug_read_file_result result2;
               debug_read_file_result result;
-              BMPContent = new imagee_content;
-
               BMPContent =  DEBUGReadBMP("Harry_and_Accomplices_rescaled.bmp",&result);
             //  =============================================
             //BMPContent = DEBUGReadBMP("adventure_.jpg", &result);
@@ -221,7 +211,7 @@ int CALLBACK WinMain
 
                 //wglMakeCurrent(GetDC(BackBuffer.Window), BackBuffer.glData.openglRC);
                 copyBufferData(&BackBuffer, &ScreenBuffer);
-                LoadFont("./media/FiraCode-VariableFont_wght.ttf");
+                LoadFont(&Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
                 //????
                 //glm::mat4 View = glm::mat4(1.0f);
                 real32 UpdatedAngle = 0.0f;
@@ -434,10 +424,10 @@ int CALLBACK WinMain
                              printf("fail to free current lib %s\n", GetLastError());
                         }
 
-                         if (CopyFileA("Light32.dll",
-                                     "Light32_copy.dll", false)) {
+                         if (CopyFileA("light32.dll",
+                                     "light32_copy.dll", false)) {
                            printf("Succeed copy dll file\n");
-                          AniLib = LoadLibraryA("Light32_copy.dll");
+                          AniLib = LoadLibraryA("light32_copy.dll");
                         }
 
 //
@@ -472,14 +462,13 @@ int CALLBACK WinMain
                       if(Load_Lib)
                           Load_Lib = false;
 
-                      LoadFont("./media/FiraCode-VariableFont_wght.ttf");
-
+                      LoadFont(&Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
                       Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
                       Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
-                    }
-
+                    };
                     //UPDATE
                     // ================================================================
+                    
                     // NOTE: Sounding Part
                     //WriteSoundToBuffer(&SoundBuffer, &SoundOutPut, SSamples);
                     //=====================================================================
@@ -658,6 +647,12 @@ int CALLBACK WinMain
                         printf("glyph size: %s\n",glm::to_string(glyph_size).c_str());
                         glGetUniformfv(BackBuffer.shaders_list[4]->GetProgramID(), glGetUniformLocation(BackBuffer.shaders_list[4]->GetProgramID(), "model"),&test_mat[0][0]);
                         printf("model matrix: %s\n",glm::to_string(test_mat).c_str());
+                        if(Glyphs_Map.bitmap){
+                            printf("font data is existed\n");
+                        }else{
+                            printf("font data is NULL\n");
+                        }
+
                     }
 
                     Plane = glm::scale(Plane, glm::vec3(0.1f));

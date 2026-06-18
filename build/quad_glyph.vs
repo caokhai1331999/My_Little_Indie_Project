@@ -29,8 +29,8 @@ void main(){
     // so the model is the culprit;
     // projection and view made this wrong.
     // how to just use the orthorgraphy with unchange view
-    gl_Position =  projection * vec4(TextCoord.x/2, TextCoord.y/2, 0.0f, 1.0f);
-    //gl_Position = projection * model * vec4(aPos, 1.0f);
+    // gl_Position =  projection * vec4(aTextCoord.x, aTextCoord.y, 0.0f, 1.0f);
+    gl_Position = projection * vec4(aPos.x, aPos.y, 0.0f, 1.0f);
        TextCoord = aTextCoord;
        FragColorr = vec4(VertexColor,1.0f);
 }

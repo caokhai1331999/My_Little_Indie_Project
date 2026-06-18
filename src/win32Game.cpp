@@ -597,13 +597,13 @@ HDC windowDC = GetDC(OBuffer->Window);
                    -1.0f, -1.0f, -1.0f,  0.0f, 0.0f,
                    -1.0f, -1.0f,  1.0f,  0.0f, 1.0f,*/
 
-                   -1.0f, -1.0f,  1.0f,  0.0f, 0.0f,
-                    1.0f,  1.0f,  1.0f,  1.0f, 1.0f,
-                    1.0f, -1.0f,  1.0f,  1.0f, 0.0f,
+                   -1.0f, -1.0f,  1.0f,  0.0f, 1.0f,
+                    1.0f,  1.0f,  1.0f,  1.0f, 0.0f,
+                    1.0f, -1.0f,  1.0f,  1.0f, 1.0f,
 
-                    1.0f,  1.0f,  1.0f,  1.0f, 1.0f,
-                   -1.0f, -1.0f,  1.0f,  0.0f, 0.0f,
-                   -1.0f,  1.0f,  1.0f,  0.0f, 1.0f
+                    1.0f,  1.0f,  1.0f,  1.0f, 0.0f,
+                   -1.0f, -1.0f,  1.0f,  0.0f, 1.0f,
+                   -1.0f,  1.0f,  1.0f,  0.0f, 0.0f
 
                 };
                 
@@ -1618,6 +1618,12 @@ void CleanUpandExit(Win32_OffScreen_Buffer* BackBuffer){
         camera = nullptr;
     }
     BackBuffer->camera_set.clear();
+
+    if(Glyphs_Map.bitmap)
     stbtt_FreeBitmap(Glyphs_Map.bitmap, 0);
+
+    delete Glyphs_Map.bitmap;
+    Glyphs_Map.bitmap = nullptr;
+
     ResetGLState(BackBuffer);
 };
