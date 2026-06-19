@@ -2047,3 +2047,21 @@ Maybe I delete the date before attach it to texture ID
 NOTE: So call the global variable in dll code is a suck choice
 
 TODO: Time to load font in opengl
+
+---------------- Fri, 19 Jun 26: 11:39AM
+
+TODO: Now I need to load what really meaningfull
+          1. debug information
+          2. Time to load game UI
+          3. Create simple shader on text buffer.
+
+*. Time to build render/free in group
+void 
+for(e:string){
+// calculate pos and size(which we called tessellation) of character
+// load and render them
+}
+
+the font bitmap data arrangement is a,b,c,0 in vec4
+
+One thing that I misunderstood is that the uint8 acctually can't contain 4*alpha

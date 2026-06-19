@@ -11,42 +11,56 @@
 
 void IncreaseFontAlpha(Glyph_Map* map){
     uint8 *Source = map->bitmap;
-    //uint8 *Upside_Source = map->bitmap;
+    //uint8 *DestRow = (uint8* )map->upside_down_bitmap + map->h - 1;
     //Turn the bitmap upside down
-    //Upside_Source += map->w * map->h;
     for(uint8 y = 0; y < map->h; y++){
+        // why this
+        //uint32* Dest = (uint32* )map->upside_down_bitmap;
         for(uint8 x = 0; x < map->w; x++){
-            //uint8 alpha = *Upside_Source;
             uint8 alpha = *Source;
-            *Source = ((alpha << 24)|
+            *Source =  ((alpha << 24)|
                        (alpha << 16)|
                        (alpha <<  8)|
                        (alpha <<  0));
             Source++;
-            //Upside_Source--;
         }
+            //DestRow -= map->w;
     };
 }
-
+// Init
+// Load
+// Render
 void LoadFont(Glyph_Map* map, const char* path){
 
     debug_read_file_result* TTFfile = nullptr;
 
     if(first_announce){
+// Load File + Init
         TTFfile = new debug_read_file_result;
         debug_read_file_result* TTFfile = DEBUGReadFileWhole(path);
         stbtt_InitFont(&map->FontInfo, (unsigned char*)TTFfile->Content, stbtt_GetFontOffsetForIndex((unsigned char*)TTFfile->Content, 0));
     }
-
-    map->bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 128.0f), 'B', &map->w, &map->h, &map->Xoffset, &map->Yoffset);
-        
+// This function load every character
+    // For/while
+    //
+    map->bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 128.0f), 'A', &map->w, &map->h, &map->Xoffset, &map->Yoffset);
+    
     if(map->bitmap){
         IncreaseFontAlpha(&Glyphs_Map);
 
+        //if(map->upside_down_bitmap){
+            //printf("upside down bitmap is existed\n");
+        //}else{
+            //printf("upside down bitmap is NULL\n");
+        //}
+//
         if(first_announce){
             glGenTextures(1, &map->TextureID);
         }
 
+//Render
+        // Actually we still don't know the relative size of character to the
+        // screen size
         glActiveTexture(GL_TEXTURE0+map->TextureID);
         glBindTexture(GL_TEXTURE_2D, map->TextureID);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, map->w, map->h, 0, GL_RG, GL_UNSIGNED_BYTE, map->bitmap);

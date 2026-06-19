@@ -311,6 +311,7 @@ struct Glyph_Map{
     GLuint TextureID;
     stbtt_fontinfo FontInfo;
     unsigned char* bitmap;
+    //unsigned char* upside_down_bitmap;
     int w,h,i,j,c, Xoffset, Yoffset;
 };
 

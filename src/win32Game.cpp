@@ -1625,5 +1625,10 @@ void CleanUpandExit(Win32_OffScreen_Buffer* BackBuffer){
     delete Glyphs_Map.bitmap;
     Glyphs_Map.bitmap = nullptr;
 
+    //if(Glyphs_Map.upside_down_bitmap)
+    //stbtt_FreeBitmap(Glyphs_Map.upside_down_bitmap, 0);
+//
+    //delete Glyphs_Map.upside_down_bitmap;
+    //Glyphs_Map.upside_down_bitmap nullptr;
     ResetGLState(BackBuffer);
 };

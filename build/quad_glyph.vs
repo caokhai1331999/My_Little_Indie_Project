@@ -9,10 +9,10 @@ layout(location = 3) in vec3 VertexColor;
 out vec2 TextCoord;
 out vec4 FragColorr;
 
+uniform vec2 Pos_Offset[100];
 uniform vec2 glyph_size;
 uniform mat4 projection;
 uniform mat4 model;
-uniform mat4 view;
 
 bool notNUll(mat4 matrix){
  for(int i = 0; i < 4; i++){
@@ -30,6 +30,7 @@ void main(){
     // projection and view made this wrong.
     // how to just use the orthorgraphy with unchange view
     // gl_Position =  projection * vec4(aTextCoord.x, aTextCoord.y, 0.0f, 1.0f);
+    // map to its size actually
     gl_Position = projection * vec4(aPos.x, aPos.y, 0.0f, 1.0f);
        TextCoord = aTextCoord;
        FragColorr = vec4(VertexColor,1.0f);

@@ -23,10 +23,9 @@ void main(){
 
             if(sampled.rg == vec2(0.0f)){
                 discard;
-            }
+            } 
 
-            FragColor = sampled;
-            
+            FragColor = vec4(sampled.r!=0.0f?1.0f:0.0f, sampled.r!=0.0f?1.0f:0.0f, sampled.r!=0.0f?1.0f:0.0f, 1.0f);
         }else{
             FragColor = FragColorr;
         }
