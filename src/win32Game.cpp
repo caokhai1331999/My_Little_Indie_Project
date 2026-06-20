@@ -597,13 +597,13 @@ HDC windowDC = GetDC(OBuffer->Window);
                    -1.0f, -1.0f, -1.0f,  0.0f, 0.0f,
                    -1.0f, -1.0f,  1.0f,  0.0f, 1.0f,*/
 
-                   -1.0f, -1.0f,  1.0f,  0.0f, 1.0f,
-                    1.0f,  1.0f,  1.0f,  1.0f, 0.0f,
-                    1.0f, -1.0f,  1.0f,  1.0f, 1.0f,
-
-                    1.0f,  1.0f,  1.0f,  1.0f, 0.0f,
-                   -1.0f, -1.0f,  1.0f,  0.0f, 1.0f,
-                   -1.0f,  1.0f,  1.0f,  0.0f, 0.0f
+                    0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 
+                    2.0f, 2.0f, 2.0f, 1.0f, 1.0f,
+                    2.0f, 0.0f, 2.0f, 1.0f, 0.0f,
+                                                   
+                    2.0f, 2.0f, 2.0f, 1.0f, 1.0f,
+                    0.0f, 0.0f, 2.0f, 0.0f, 0.0f,
+                    0.0f, 2.0f, 2.0f, 0.0f, 1.0f 
 
                 };
                 
@@ -1598,7 +1598,7 @@ WNDCLASSEXA SetUpWindowClass(Win32_OffScreen_Buffer* BackBuffer, HINSTANCE Insta
   return WindowClass;
 };
 
-void CleanUpandExit(Win32_OffScreen_Buffer* BackBuffer){
+void CleanUpandExit(Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map){
     
     glDeleteVertexArrays(1, &BackBuffer->glData.VAOs);
     glDeleteVertexArrays(1, &BackBuffer->glData.PlaneVAOs);
@@ -1619,16 +1619,18 @@ void CleanUpandExit(Win32_OffScreen_Buffer* BackBuffer){
     }
     BackBuffer->camera_set.clear();
 
-    if(Glyphs_Map.bitmap)
-    stbtt_FreeBitmap(Glyphs_Map.bitmap, 0);
+    if(map->bitmap)
+    stbtt_FreeBitmap(map->bitmap, 0);
 
-    delete Glyphs_Map.bitmap;
-    Glyphs_Map.bitmap = nullptr;
+    delete map->bitmap;
+    map->bitmap = nullptr;
 
-    //if(Glyphs_Map.upside_down_bitmap)
-    //stbtt_FreeBitmap(Glyphs_Map.upside_down_bitmap, 0);
-//
-    //delete Glyphs_Map.upside_down_bitmap;
-    //Glyphs_Map.upside_down_bitmap nullptr;
+    if(map->upside_down_bitmap){
+        VirtualFree(map->upside_down_bitmap, 0, MEM_RELEASE);
+        //free(map->upside_down_bitmap);
+        delete map->upside_down_bitmap;
+        map->upside_down_bitmap = nullptr;
+    }
+
     ResetGLState(BackBuffer);
 };

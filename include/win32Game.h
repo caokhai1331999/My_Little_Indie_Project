@@ -167,7 +167,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam ,LP
 
 void CalDelayedRatio(float* DelayedRatio = nullptr, Clock_Set* Time_Set = nullptr, Win32_OffScreen_Buffer* BackBuffer = nullptr);
 WNDCLASSEXA SetUpWindowClass(Win32_OffScreen_Buffer* BackBuffer, HINSTANCE Instance);
-void CleanUpandExit(Win32_OffScreen_Buffer* BackBuffer = nullptr);
+void CleanUpandExit(Win32_OffScreen_Buffer* BackBuffer = nullptr, Glyph_Map* map = nullptr);
 void ErrorExit();
 
 #define WIN32GAME_H

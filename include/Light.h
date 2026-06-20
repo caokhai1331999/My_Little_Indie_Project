@@ -91,6 +91,8 @@ struct global_light{
 global_variable global_light envir_light = {};
 
 void IncreaseFontAlpha(Glyph_Map* map = nullptr);
+void InitBitmap(Glyph_Map* map = nullptr);
+
 void LoadFont(Glyph_Map* map = nullptr, const char* path = nullptr);
 extern "C" __declspec(dllexport) void IncreaseFontAlpha_(Glyph_Map* map = nullptr);
 typedef void (*IncreaseFontAlpha__)(Glyph_Map*);

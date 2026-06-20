@@ -2065,3 +2065,15 @@ for(e:string){
 the font bitmap data arrangement is a,b,c,0 in vec4
 
 One thing that I misunderstood is that the uint8 acctually can't contain 4*alpha
+
+---------------- Sat, 20 Jun 26: 10:01AM
+Remember in init/free memory in loop. Just do those once
+So bitmap is just a mono version which is 8 Bytes per pixel
+TODO: arrange code based to avoid mis shader property set
+NOTE: So what we learnt:
+      . Mono bit map have pixel size is 1 byte(size of uint8/unsigned char)
+      . We scale them up by 4 bytes (size of uint32)
+      . So the I didnt fill all the pixel/ or
+      . Try to relate each axis once between different coord
+
+Next: Try to delve more into vertex pos

@@ -31,7 +31,7 @@ void main(){
     // how to just use the orthorgraphy with unchange view
     // gl_Position =  projection * vec4(aTextCoord.x, aTextCoord.y, 0.0f, 1.0f);
     // map to its size actually
-    gl_Position = projection * vec4(aPos.x, aPos.y, 0.0f, 1.0f);
+       gl_Position = projection * vec4(aPos.xy, 0.0f, 1.0f);
        TextCoord = aTextCoord;
        FragColorr = vec4(VertexColor,1.0f);
 }

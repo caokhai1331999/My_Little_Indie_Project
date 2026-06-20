@@ -10,26 +10,35 @@
 
 
 void IncreaseFontAlpha(Glyph_Map* map){
-    uint8 *Source = map->bitmap;
-    //uint8 *DestRow = (uint8* )map->upside_down_bitmap + map->h - 1;
+    uint8 *Source = (uint8*)map->bitmap;
+    // move the destination pointer to the head of the last row
+    uint8* DestRow = (uint8*)map->upside_down_bitmap + (map->w * (map->h - 1));
     //Turn the bitmap upside down
     for(uint8 y = 0; y < map->h; y++){
-        // why this
-        //uint32* Dest = (uint32* )map->upside_down_bitmap;
+        //uint32* Dest = (uint32*)DestRow;
+        uint8* Dest = DestRow;
         for(uint8 x = 0; x < map->w; x++){
-            uint8 alpha = *Source;
-            *Source =  ((alpha << 24)|
-                       (alpha << 16)|
-                       (alpha <<  8)|
-                       (alpha <<  0));
-            Source++;
+            //uint8 alpha = *Source++;
+            //*Dest++ = ((alpha << 24)|
+                       //(alpha << 16)|
+                       //(alpha <<  8)|
+                       //(alpha <<  0));
+             *Dest++ = *Source++;
         }
-            //DestRow -= map->w;
+            DestRow -= map->w;
     };
 }
 // Init
 // Load
 // Render
+void InitBitmap(Glyph_Map* map){
+    //map->upside_down_bitmap = malloc(sizeof(unsigned char) * map->h * map->w);
+    if(!map->upside_down_bitmap){
+        map->upside_down_bitmap = VirtualAlloc(0, sizeof(uint32) * map->h * map->w, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+    }
+    assert(map->upside_down_bitmap);
+}
+
 void LoadFont(Glyph_Map* map, const char* path){
 
     debug_read_file_result* TTFfile = nullptr;
@@ -44,26 +53,25 @@ void LoadFont(Glyph_Map* map, const char* path){
     // For/while
     //
     map->bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 128.0f), 'A', &map->w, &map->h, &map->Xoffset, &map->Yoffset);
-    
-    if(map->bitmap){
-        IncreaseFontAlpha(&Glyphs_Map);
 
-        //if(map->upside_down_bitmap){
-            //printf("upside down bitmap is existed\n");
-        //}else{
-            //printf("upside down bitmap is NULL\n");
-        //}
-//
+    if(map->bitmap){
+
         if(first_announce){
+            InitBitmap(map);
             glGenTextures(1, &map->TextureID);
         }
 
+        IncreaseFontAlpha(map);
 //Render
         // Actually we still don't know the relative size of character to the
         // screen size
         glActiveTexture(GL_TEXTURE0+map->TextureID);
         glBindTexture(GL_TEXTURE_2D, map->TextureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, map->w, map->h, 0, GL_RG, GL_UNSIGNED_BYTE, map->bitmap);
+        if(map->upside_down_bitmap){
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, map->w, map->h, 0, GL_RG, GL_UNSIGNED_BYTE, map->upside_down_bitmap);
+        }else{
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, map->w, map->h, 0, GL_RG, GL_UNSIGNED_BYTE, map->bitmap);
+        }
 
         if(first_announce){
         // Why there are no pointer of this
@@ -71,8 +79,8 @@ void LoadFont(Glyph_Map* map, const char* path){
         // can free temp_bitmap at this point
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);        
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         }
     
         printf("load Font successfully\n");
@@ -91,7 +99,6 @@ void LoadFont(Glyph_Map* map, const char* path){
 }
 
 void LoadFont_(Glyph_Map* map, const char* path){
-
     ReloadGLFunction(&BackBuffer);
     LoadFont(map, path);
 }

@@ -287,13 +287,13 @@ int CALLBACK WinMain
 
                 //for(const auto &shader: BackBuffer.shaders_list){                
                 //Set_Projection_View(&BackBuffer);
-
-                std::string Mname = "backpack";                
-                Model_* backpack = nullptr;
-                backpack = new Model_(false, &Mname);
-                std::string backpack_path = "./media/backpack.obj";
-                loadModel_(backpack, backpack_path);
-
+// MODEL PART === 
+                //std::string Mname = "backpack";                
+                //Model_* backpack = nullptr;
+                //backpack = new Model_(false, &Mname);
+                //std::string backpack_path = "./media/backpack.obj";
+                //loadModel_(backpack, backpack_path);
+//
                 //std::string Mname = "terrain";                
                 //Model_* land = nullptr;
                 //land = new Model_(false, &Mname);
@@ -304,17 +304,17 @@ int CALLBACK WinMain
                 if(!first_normal_time)
                     first_normal_time = !first_normal_time;
 
-                Model_* dancing_vampire = nullptr;
-                Mname = "vampire";
-                dancing_vampire = new Model_(false, &Mname);
-                std::string dancing_vampire_path = "./media/dancing_vampire.dae";
-                loadModel_(dancing_vampire, dancing_vampire_path);
-
+                //Model_* dancing_vampire = nullptr;
+                //Mname = "vampire";
+                //dancing_vampire = new Model_(false, &Mname);
+                //std::string dancing_vampire_path = "./media/dancing_vampire.dae";
+                //loadModel_(dancing_vampire, dancing_vampire_path);
+//
                 //danceAnimation = CreateAnimation((char* )dancing_vampire_path.c_str(), dancing_vampire);
-                danceAnimation = new Animation((char* )dancing_vampire_path.c_str(), dancing_vampire);
+                //danceAnimation = new Animation((char* )dancing_vampire_path.c_str(), dancing_vampire);
                 //animator = SpawnAnimator(danceAnimation);
-                animator = new Animator(danceAnimation);
-                    
+                //animator = new Animator(danceAnimation);
+// MODEL PART=====                
                 Game_Input Input[2] = {};
                 Game_Input* OldInput = &Input[0];
                 Game_Input* NewInput = &Input[1];
@@ -349,13 +349,13 @@ int CALLBACK WinMain
                 int k = 0;                
 
                 GLuint id = BackBuffer.shaders_list[0]->GetProgramID();
-                showUniformVarValuePerVertex(&UBO, &id, &dancing_vampire->meshes[0], false, false, false, false, false, false);
+                //showUniformVarValuePerVertex(&UBO, &id, &dancing_vampire->meshes[0], false, false, false, false, false, false);
 
                 //std::string* map_content = new std::string ;
                 //map_content = load_bin_map("level.map");
                 //std::cout<<map_content->data()<<std::endl;
 
-                setup_pointlight(&envir_light);
+                //setup_pointlight(&envir_light);
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
                     if(shader->GetProgramID()!=7){
                         shader->use();
@@ -366,9 +366,9 @@ int CALLBACK WinMain
                 }
                 glUseProgram(0);
 
-                Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
-                Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
-                Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
+                //Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
+                //Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
+                //Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
 //=================================================
 
                 glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)ScreenBuffer.BitmapWidth, 0.0f, (float)ScreenBuffer.BitmapHeight);
@@ -455,16 +455,14 @@ int CALLBACK WinMain
                           {
                           brush->ReLoadShaderCode();
                           };
-                          //(setupMeshh)GetProcAddress(AniLib, "setMesh");
-                          //Draw = (MDraw)GetProcAddress(AniLib, "Draw");
                           }
                         }
                       if(Load_Lib)
                           Load_Lib = false;
 
                       LoadFont(&Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
-                      Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
-                      Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
+                      //Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
+                      //Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
                     };
                     //UPDATE
                     // ================================================================
@@ -552,7 +550,7 @@ int CALLBACK WinMain
                     //if (first_size) {
                         //printf("counter: %f\n", WaitTimeCounter);
                     //}
-
+//
                     bool TimeToChangeAxis = false;
                     if(WaitTimeCounter >= 16.67f){                        
                         WaitTimeCounter = 0.0f;
@@ -635,8 +633,7 @@ int CALLBACK WinMain
                     //RENDER =====================================
                     BackBuffer.shaders_list[4]->use();
                     glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
-                    // BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
-                BackBuffer.shaders_list[4]->setVec2("glyph_size", (float)Glyphs_Map.w, (float)Glyphs_Map.h);                    ;
+                    BackBuffer.shaders_list[4]->setVec2("glyph_size", (float)Glyphs_Map.w, (float)Glyphs_Map.h);
                     
                     if(showMsPF){
                         glm::mat4 test_mat;
@@ -652,15 +649,14 @@ int CALLBACK WinMain
                         }else{
                             printf("font data is NULL\n");
                         }
-
                     }
 
                     Plane = glm::scale(Plane, glm::vec3(0.1f));
-                BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
-                    
+                    BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);                    
                     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
                     glUseProgram(0);
+
                     drawTile(&TileObj, BackBuffer.shaders_list[2]);
 
                     //===============================================
@@ -722,19 +718,19 @@ int CALLBACK WinMain
                     brushID = BackBuffer.shaders_list[3]->GetProgramID();
                     //Draw the backpack
 
-                    BackBuffer.shaders_list[3]->use();
-                    BackBuffer.shaders_list[3]->setMat4("model", backpack_core);
-                    DDraw(backpack, &brushID);
-                    glUseProgram(0);
+                    //BackBuffer.shaders_list[3]->use();
+                    //BackBuffer.shaders_list[3]->setMat4("model", backpack_core);
+                    //DDraw(backpack, &brushID);
+                    //glUseProgram(0);
 
                     //printf("Count by the end of frame: %I64d\n", EndCycleCounts);
 
 // animation update and render ================================================
                     
-                    BackBuffer.shaders_list[0]->use();
-                    brushID = BackBuffer.shaders_list[0]->GetProgramID();
+                    //BackBuffer.shaders_list[0]->use();
+                    //brushID = BackBuffer.shaders_list[0]->GetProgramID();
 
-
+/*
                     if(test_vampire_motion.object_speed.current_states.basic_move != IDLE || test_vampire_motion.object_speed.current_states.fancy_move != IDLE || first_announce){
                         if(animator->GetCurrentTime() > danceAnimation->GetDuration() )
                         {
@@ -761,15 +757,15 @@ int CALLBACK WinMain
                         BackBuffer.shaders_list[2]->setVec3("lightPosition", glm::vec3(test_vampire_motion.position[3]));
                         glUseProgram(0);
                     }
-
+*/
                     if(showMsPF){
                                 printf("animator current time: %f, animation duration: %f\n", animator->GetCurrentTime(), danceAnimation->GetDuration());
                                 printf("LastCounter: %lld, EndCounter: %Id, SPerFrame: %f\n", TimeSet.LastCounter.QuadPart, TimeSet.EndCounter.QuadPart, TimeSet.SPerFrame);
                                 printf("Delayed Ratio: %f\n", DelayedRatio);
                             }
 
-                   if(Transform_ == nullptr || Transform_ != animator->getFinalBoneMatrices())
-                    Transform_ = animator->getFinalBoneMatrices();
+                   //if(Transform_ == nullptr || Transform_ != animator->getFinalBoneMatrices())
+                    //Transform_ = animator->getFinalBoneMatrices();
 
                         int i = 0;
                         std::string matrixName_;
@@ -777,7 +773,7 @@ int CALLBACK WinMain
                             char index[1];
                             char indexx[2];
 
-                            
+/*                            
 #ifdef STD_140
                     //printf("Little beast flag on\n");
                     if(first_announce){
@@ -837,31 +833,32 @@ indexx);
                             
 
 #endif                            
-                    //Transform = animator->getFinalBoneMatrices();
+*/
+                            //Transform = animator->getFinalBoneMatrices();
  
                             //if(is_moving){
-                            BackBuffer.shaders_list[0]->use();
+                            //BackBuffer.shaders_list[0]->use();
                             //WorldToCamera = Chosen_Camera->view * dancing_vampire_core;
-                            WorldToCamera = Chosen_Camera->view * test_vampire_motion.position;
-                            BackBuffer.shaders_list[0]->setMat4("WorldToCamera", WorldToCamera);                                
+                            //WorldToCamera = Chosen_Camera->view * test_vampire_motion.position;
+                            //BackBuffer.shaders_list[0]->setMat4("WorldToCamera", WorldToCamera);                                
                             //}
 
-                    BackBuffer.shaders_list[0]->setBool("is_moving", is_moving);
+                    //BackBuffer.shaders_list[0]->setBool("is_moving", is_moving);
 
 //Why the later shader texture drawing work but not the one above
                     //Render
-                    DDraw(dancing_vampire, &brushID);
+                    //DDraw(dancing_vampire, &brushID);
 
-                      if(showMsPF){
-                          glm::vec2 TexCoordToShow;
-                          int TextureID;
-                          showUniformVarValuePerVertex(&UBO, &brushID, &dancing_vampire->meshes[0], false, false, false, false, false, true);
-                          showMsPF =!showMsPF;
-                      };
-
+                      //if(showMsPF){
+                          //glm::vec2 TexCoordToShow;
+                          //int TextureID;
+                          //showUniformVarValuePerVertex(&UBO, &brushID, &dancing_vampire->meshes[0], false, false, false, false, false, true);
+                          //showMsPF =!showMsPF;
+                      //};
+//
 // animation update and render ================================================
-
-                          //}
+ 
+                    //}
 
                     if (first_announce) {
                        first_announce = false;
@@ -904,7 +901,7 @@ MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per registerMULPS -> re
           animator = nullptr;
           delete danceAnimation;
           danceAnimation = nullptr;
-          CleanUpandExit(&BackBuffer);
+          CleanUpandExit(&BackBuffer, &Glyphs_Map);
         }
         else{
             //TODO: Logging

@@ -17,7 +17,7 @@ struct Material{
 uniform Material material;
 
 void main(){
-    vec4 sampled = texture(material.diffused_texture, vec2(TextCoord.x, TextCoord.y));
+    vec4 sampled = texture(material.diffused_texture, vec2(TextCoord.x/2, TextCoord.y));
 
         if(sampled != vec4(0.0f)){
 
@@ -25,7 +25,7 @@ void main(){
                 discard;
             } 
 
-            FragColor = vec4(sampled.r!=0.0f?1.0f:0.0f, sampled.r!=0.0f?1.0f:0.0f, sampled.r!=0.0f?1.0f:0.0f, 1.0f);
+            FragColor = vec4(sampled.r!=0.0f?1.0f:0.0f, sampled.g!=0.0f?1.0f:0.0f, sampled.b!=0.0f?1.0f:0.0f, 1.0f);
         }else{
             FragColor = FragColorr;
         }

@@ -240,8 +240,9 @@ void main(){
         FragColor_ = CalcSpotLight(spotlight[0], norm, viewDir);
         FragColor = vec4(FragColor_, 1.0f);
     } else {
-        vec4 sampled = vec4(1.0f, 1.0f, 1.0f,texture(material.diffused_texture, TextCoord).a);
-        FragColor = sampled * FragColorr;
+        // vec4 sampled = vec4(1.0f, 1.0f, 1.0f,texture(material.diffused_texture, TextCoord).a);
+        vec4 sampled = vec4(texture(material.diffused_texture, TextCoord));
+        FragColor = sampled;
     }
     // vec3 FragColor_ = mix(vec3(TextCoord, 1.0f), vec3(1.0f), 0.5f);
     // vec3 FragColor_ = texture(material.diffused_texture, TextCoord).rgb * spotlight[0].ambient.y;
