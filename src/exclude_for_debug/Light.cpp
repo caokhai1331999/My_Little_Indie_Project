@@ -9,10 +9,10 @@
 #include "Light.h"
 
 
-void IncreaseFontAlpha(Glyph_Map* map){
-    uint8 *Source = (uint8*)map->bitmap;
+void IncreaseFontAlpha(const unsigned char* source, void* dest){
+    uint8 *Source = (uint8*)source;
     // move the destination pointer to the head of the last row
-    uint8* DestRow = (uint8*)map->upside_down_bitmap + (map->w * (map->h - 1));
+    uint8* DestRow = (uint8*)dest + (map->w * (map->h - 1));
     //Turn the bitmap upside down
     for(uint8 y = 0; y < map->h; y++){
         //uint32* Dest = (uint32*)DestRow;
@@ -33,10 +33,57 @@ void IncreaseFontAlpha(Glyph_Map* map){
 // Render
 void InitBitmap(Glyph_Map* map){
     //map->upside_down_bitmap = malloc(sizeof(unsigned char) * map->h * map->w);
-    if(!map->upside_down_bitmap){
-        map->upside_down_bitmap = VirtualAlloc(0, sizeof(uint32) * map->h * map->w, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+
+}
+
+void LoadFont(Glyph_Map* map, const char* path){
+// Load File + Init
+        TTFfile = new debug_read_file_result;
+        debug_read_file_result* TTFfile = DEBUGReadFileWhole(path);
+        stbtt_InitFont(&map->FontInfo, (unsigned char*)TTFfile->Content, stbtt_GetFontOffsetForIndex((unsigned char*)TTFfile->Content, 0));
+
+        Glyph_Property glyph = {};
+
+        for(char c  = 'A'; c < 'Z'; c++){
+            unsigned char* bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 128.0f), c, &glyph.w, &glyph.h, &glyph.Xoffset, &glyph.Yoffset);
+            assert(bitmap);
+
+            glyph.upside_down_bitmap = VirtualAlloc(0, sizeof(uint32) * glyph->h * glyph->w, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+            IncreaseFontAlpha(bitmap, glyph.upside_down_bitmap);
+
+            assert(glyph->upside_down_bitmap);
+            map->glyph_list.push_back(&glyph);
+        }
+
+        if(TTFfile->Content)
+            DEBUGFreeFileMemory(TTFfile->Content);
+
+        delete TTFfile;
+        TTFfile = nullptr;        
+}
+
+// How to create pos based on each of glyph was draw before
+void DrawFont(const Gluint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_){
+    shader->use();
+    glBindVertexArray(VAO);
+
+    glActiveTexture(GL_TEXTURE0+map->TextureID);
+    glBindTexture(GL_TEXTURE_2D, map->TextureID);
+
+    int i = 0;
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, map->w, map->h, 0, GL_RG, GL_UNSIGNED_BYTE, map->upside_down_bitmap);
+    int added_up_width;
+    while(string[i] != '\0'){
+        
+        shader->setVec4("Offset", CalcGlypProperty({added_up_width, 0, w, h}, i));
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        // currently here
+        
+        added_up_width += *std::find_if(map->Glyph_list.begin(),map->Glyph_list.end(), map->glyph_list[].c == c);
+        i++;
     }
-    assert(map->upside_down_bitmap);
+
+    glUseProgram(0);
 }
 
 void LoadFont(Glyph_Map* map, const char* path){

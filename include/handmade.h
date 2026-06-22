@@ -307,13 +307,18 @@ struct Per_Win_Properties{
     };
 };
 
-struct Glyph_Map{
-    GLuint TextureID;
-    stbtt_fontinfo FontInfo;
-    unsigned char* bitmap;
+struct Glyph_Property{
+    //unsigned char* bitmap;
     void* upside_down_bitmap;
-    int w,h,i,j,c, Xoffset, Yoffset;
+    int w,h,i,j,c , Xoffset, Yoffset;
 };
+
+struct Glyph_Map{
+    stbtt_fontinfo FontInfo;
+    GLuint TextureID;
+    
+    std::vector<Glyph_Property*>Glyph_list;
+}
 
 Glyph_Map Glyphs_Map = {};
 

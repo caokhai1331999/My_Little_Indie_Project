@@ -14,6 +14,10 @@
 #include "utility"
 #include <vector>
 
+struct Rect_{
+    int x, y, w, h;
+};
+
 struct OpenGLData{
     unsigned int VAOs;
     unsigned int PlaneVAOs;

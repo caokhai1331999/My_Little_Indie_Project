@@ -225,22 +225,10 @@ int CALLBACK WinMain
                 Plane = glm::translate(Plane, glm::vec3(0.0f));
                 glm::mat4 WorldToCamera = glm::mat4(1.0f);
 
-                test_vampire_motion.position = glm::mat4(1.0f);
                 //WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
                 WorldToCamera = BackBuffer.camera.view * test_vampire_motion.position;
 
-                // update position
-                test_vampire_motion.object_speed.base_veclocity = 3.0f;
-                test_vampire_motion.object_speed.acceleration = 2.0f;
-                test_vampire_motion.object_speed.veclocity = 3.0f;
-
-                test_vampire_motion.object_speed.base_jump_v = 6.0f;
-                test_vampire_motion.object_speed.jump_a = 14.0f;
-                test_vampire_motion.object_speed.jump_v = 6.0f;
-
-                test_vampire_motion.object_speed.falling_v = 0.0f;
-
-                test_vampire_motion.current_face = FORWARD;
+                Init_Entity_Specs(&test_vampire_motion);
                 
                 TRACKMOUSEEVENT mouseEventVar = {};
                 mouseEventVar.cbSize = sizeof(TRACKMOUSEEVENT);
@@ -269,16 +257,9 @@ int CALLBACK WinMain
                 ViewCamera(BackBuffer.camera_set[0]);
 
                 basic_cube_core = glm::translate(basic_cube_core, glm::vec3(2.0f, -4.0f, 0.0f));
-                //std::cout<<"Central rotating model is"<<glm::to_string(basic_cube_core)<<std::endl;
                 backpack_core = glm::translate(backpack_core, glm::vec3(-4.0f, 2.0f, 3.0f));
-                //std::cout<<"Stand still model 2 matrix is :"<<glm::to_string(backpack_core)<<std::endl;
-
                 // Set containing model for dancing vampire
                 
-                //dancing_vampire_core = glm::scale(dancing_vampire_core,glm::vec3( 0.01f));
-                test_vampire_motion.position = glm::scale(test_vampire_motion.position,glm::vec3( 0.01f));
-                //dancing_vampire_core = glm::translate(dancing_vampire_core, glm::vec3(-2.0f, 0.0f, 0.0f));
-                test_vampire_motion.position = glm::translate(test_vampire_motion.position, glm::vec3(-2.0f, 0.0f, 0.0f));
 
                 // Bug is here
                 BackBuffer.camera.projection = glm::perspective(glm::radians(Chosen_Camera->fov), (float)BackBuffer.BitmapWidth / (float)BackBuffer.BitmapHeight, 0.1f, 100.0f);
@@ -293,12 +274,6 @@ int CALLBACK WinMain
                 //backpack = new Model_(false, &Mname);
                 //std::string backpack_path = "./media/backpack.obj";
                 //loadModel_(backpack, backpack_path);
-//
-                //std::string Mname = "terrain";                
-                //Model_* land = nullptr;
-                //land = new Model_(false, &Mname);
-                //std::string terrain_path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
-                //loadModel_(land, terrain_path);
                 
 //NOW THE ANIMATING PART
                 if(!first_normal_time)
@@ -315,6 +290,7 @@ int CALLBACK WinMain
                 //animator = SpawnAnimator(danceAnimation);
                 //animator = new Animator(danceAnimation);
 // MODEL PART=====                
+
                 Game_Input Input[2] = {};
                 Game_Input* OldInput = &Input[0];
                 Game_Input* NewInput = &Input[1];
@@ -698,15 +674,15 @@ int CALLBACK WinMain
                     BackBuffer.shaders_list[1]->setMat4("model", obj2.position);
                     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
-                        if(showMsPF){
-                            printf("along1 is %s, along2 is %s\n", along1?"true":"false", along2?"true":"false");
-                            printf("obj1 %f %f %f\n",
-                                   obj1.position[3][0],
-                                   obj1.position[3][1],
-                                   obj1.position[3][2]);
-                            printf("Collided time: %f, Collided switch: %s, Color switch: %s, duration: %f\n",TimeSet.collided_time, collided_?"true":"false", short_color_change_?"true":"false", TimeSet.color_switch_dur );
-                        }
-
+                        //if(showMsPF){
+                            //printf("along1 is %s, along2 is %s\n", along1?"true":"false", along2?"true":"false");
+                            //printf("obj1 %f %f %f\n",
+                                   //obj1.position[3][0],
+                                   //obj1.position[3][1],
+                                   //obj1.position[3][2]);
+                            //printf("Collided time: %f, Collided switch: %s, Color switch: %s, duration: %f\n",TimeSet.collided_time, collided_?"true":"false", short_color_change_?"true":"false", TimeSet.color_switch_dur );
+                        //}
+//
                     glUseProgram(0);
                     glBindVertexArray(0);
                     GLuint brushID;

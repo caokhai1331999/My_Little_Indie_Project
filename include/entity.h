@@ -100,6 +100,26 @@ float based_a_v_Pos_calc(float a, float v, float p, float delta_t){
 
 global_variable rigid_body test_vampire_motion = {};
 
+void Init_Entity_Specs(rigid_body* entity = nullptr){
+    entity->position = glm::mat4(1.0f);
+    entity->position = glm::scale(entity->position,glm::vec3( 0.01f));
+    entity->position = glm::translate(entity->position, glm::vec3(-2.0f, 0.0f, 0.0f));
+
+    // update position
+    entity->object_speed.base_veclocity = 3.0f;
+    entity->object_speed.acceleration = 2.0f;
+    entity->object_speed.veclocity = 3.0f;
+    
+    entity->object_speed.base_jump_v = 6.0f;
+    entity->object_speed.jump_a = 14.0f;
+    entity->object_speed.jump_v = 6.0f;
+    
+    entity->object_speed.falling_v = 0.0f;
+    
+    entity->current_face = FORWARD;
+
+};
+
 void CalcNewPos(float FrameTime = 0, rigid_body* object = nullptr);
 void OrientFace(rigid_body* object = nullptr);
 void Orient_Around_Y(glm::mat4* matrix = nullptr, float angle = 0);

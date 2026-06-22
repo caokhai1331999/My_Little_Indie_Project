@@ -2077,3 +2077,42 @@ NOTE: So what we learnt:
       . Try to relate each axis once between different coord
 
 Next: Try to delve more into vertex pos
+
+---------------- Sun, 21 Jun 26: 10:44AM
+
+main component to do in group:
+    . input
+    . update :  . Move World
+                . Set entity's spec: projection, view, model(position)
+                                 texture, For shader
+                . set (view, texture, projection) for shader(ECS way)
+
+    . render : loop through shader and render it
+               SetShader(useprogram)->use GL's state(VAO,
+               UBO..etc)->DrawElement/polygon
+
+TODO: Load many glyphs calculate pos and property
+.. One main isssue is that the texture data disappear after I reload dll code
+
+Or we will just do the scene graph to draw all the scene we need
+
+---------------- Mon, 22 Jun 26: 10:05AM
+
+how can me max out the generalization for the sake of max dynamical
+Think about game like a set of many inherent groups:
+      Game entity: id, position
+      Render assets:
+      GROUP: .World: entities
+             .Light:
+             .Asset.
+             .
+
+What game do:
+     Poll event
+     Update entity
+     Render
+
+Thing about big group of render/free/clean function
+and group of inherent asset/entity
+
+TODO: Currently working at get data of match character in string.
