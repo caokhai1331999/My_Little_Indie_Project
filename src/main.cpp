@@ -54,6 +54,7 @@ int CALLBACK WinMain
   InitCamera__ InitCamera_ = NULL;
   AutoAdjustCameraPos__ AutoAdjustCameraPos = NULL;
   LoadFont__ LoadFont = NULL;
+  DrawFont__ DrawFont = NULL;
   //setUpUBO__ setUpUBO = NULL;
   //updateUBOData__ updateUBOData = NULL;
   //setupMeshh setupMesh = NULL;
@@ -113,6 +114,7 @@ int CALLBACK WinMain
                   InitCamera_ = (InitCamera__)GetProcAddress(AniLib, "InitCamera_");
                   AutoAdjustCameraPos = (AutoAdjustCameraPos__)GetProcAddress(AniLib, "AutoAdjustCameraPos_");
                   LoadFont = (LoadFont__)GetProcAddress(AniLib, "LoadFont_");
+                  DrawFont = (DrawFont__)GetProcAddress(AniLib, "DrawFont_");
               }else{
                   printf("Failed loading library from dll file\n");
               }
@@ -225,6 +227,9 @@ int CALLBACK WinMain
                 Plane = glm::translate(Plane, glm::vec3(0.0f));
                 glm::mat4 WorldToCamera = glm::mat4(1.0f);
 
+//Font drawing rect
+                Rect_ rect = {0, 100, 100, 400};
+                
                 //WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
                 WorldToCamera = BackBuffer.camera.view * test_vampire_motion.position;
 
@@ -350,7 +355,6 @@ int CALLBACK WinMain
                 glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)ScreenBuffer.BitmapWidth, 0.0f, (float)ScreenBuffer.BitmapHeight);
                 BackBuffer.shaders_list[4]->use();
                 BackBuffer.shaders_list[4]->setMat4("projection", othorForGlyph);
-                BackBuffer.shaders_list[4]->setVec2("glyph_size", (float)Glyphs_Map.w, (float)Glyphs_Map.h);
                 //BackBuffer.shaders_list[4]->setMat4("view", BackBuffer.camera.view);
                 BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
 
@@ -397,7 +401,7 @@ int CALLBACK WinMain
                          if (FreeLibrary(AniLib)) {
                          printf("Succeed free current lib\n");
                         } else {
-                             printf("fail to free current lib %s\n", GetLastError());
+                             printf("fail to free current lib\n");
                         }
 
                          if (CopyFileA("light32.dll",
@@ -425,6 +429,7 @@ int CALLBACK WinMain
                           move_ = (move_object_)GetProcAddress(AniLib, "move_object");
                           AutoAdjustCameraPos = (AutoAdjustCameraPos__)GetProcAddress(AniLib, "AutoAdjustCameraPos_");
                           LoadFont = (LoadFont__)GetProcAddress(AniLib, "LoadFont_");
+                          DrawFont = (DrawFont__)GetProcAddress(AniLib, "DrawFont_");
 //setupMesh =
                           // reload and recompile shader code
                           for(B_shader_program* const &brush: BackBuffer.shaders_list)
@@ -607,9 +612,10 @@ int CALLBACK WinMain
 
                         
                     //RENDER =====================================
-                    BackBuffer.shaders_list[4]->use();
-                    glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
-                    BackBuffer.shaders_list[4]->setVec2("glyph_size", (float)Glyphs_Map.w, (float)Glyphs_Map.h);
+                        //
+                    //BackBuffer.shaders_list[4]->use();
+                    //glBindVertexArray(ScreenBuffer.glData.PlaneVAOs);
+                    //BackBuffer.shaders_list[4]->setVec2("glyph_size", (float)Glyphs_Map.w, (float)Glyphs_Map.h);
                     
                     if(showMsPF){
                         glm::mat4 test_mat;
@@ -620,19 +626,20 @@ int CALLBACK WinMain
                         printf("glyph size: %s\n",glm::to_string(glyph_size).c_str());
                         glGetUniformfv(BackBuffer.shaders_list[4]->GetProgramID(), glGetUniformLocation(BackBuffer.shaders_list[4]->GetProgramID(), "model"),&test_mat[0][0]);
                         printf("model matrix: %s\n",glm::to_string(test_mat).c_str());
-                        if(Glyphs_Map.bitmap){
+                        if(Glyphs_Map.Glyph_list[0]->upside_down_bitmap){
                             printf("font data is existed\n");
                         }else{
                             printf("font data is NULL\n");
                         }
                     }
 
-                    Plane = glm::scale(Plane, glm::vec3(0.1f));
-                    BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);                    
-                    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+//BackBuffer.shaders_list[4]->setInt("material.diffused_texture",  Glyphs_Map.TextureID);                    
+//
+//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-                    glUseProgram(0);
-
+                    //glUseProgram(0);
+                    DrawFont(ScreenBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, "Here is the string\0", &rect);
+//========================================================================
                     drawTile(&TileObj, BackBuffer.shaders_list[2]);
 
                     //===============================================

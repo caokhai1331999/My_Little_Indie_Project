@@ -197,70 +197,73 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
 
 }
 
-void ShowGlyphs(Win32_OffScreen_Buffer* OBuffer, Glyph_Map* map) {
+void ShowGlyphs(Win32_OffScreen_Buffer* OBuffer, Glyph_Map* map){
     // RR GG BB
     // Row is a pointer to every line of bitmapMemory
     // While pitch is data length of everyline of bitmap
-    int32 BlitWidth =  map->w;
-    int32 BlitHeight = map->h;
+    for(Glyph_Property* const &glyph: map->Glyph_list){
 
-    int32 WidthOffset = 0;
-    int32 ImagePitch = 4 * BlitWidth;    
+        int32 BlitWidth =  glyph->w;
+        int32 BlitHeight = glyph->h;
 
-    int32 Height;
-    int32 Width;
+        int32 WidthOffset = 0;
+        int32 ImagePitch = 4 * BlitWidth;    
 
-    if (OBuffer!=NULL){
-        Height = OBuffer->BitmapHeight;
-        Width =  OBuffer->BitmapWidth;
-    }
-    
-    //BUG right here
-    if(BlitWidth > Width){
-        WidthOffset = BlitWidth - Width;
-        BlitWidth = Width;
-    }
+        int32 Height;
+        int32 Width;
 
-    if(BlitHeight > Height){
-        BlitHeight = Height;
-    }
-    
-    // We take memory from BitmapMemory of main Bufer to write on it
-    uint8* Row;
-    uint8* DirectRow;
-
-    if (OBuffer!=NULL){
-        Row = ((uint8 *)OBuffer->BitmapMemory);
-    }
-
-    if (OBuffer!=NULL){
-        if(OBuffer->BitmapMemoryForDirectBlit != NULL){
-            DirectRow = ((uint8 *)OBuffer->BitmapMemoryForDirectBlit);
-        } else {
-            printf("Bitmap Memory for direct blit is empty\n");
+        if (OBuffer!=NULL){
+            Height = OBuffer->BitmapHeight;
+            Width =  OBuffer->BitmapWidth;
         }
-    }
     
-    //Change the image row order upside down
-    //uint8* imageRow = (uint8*)map->bitmap;
-    uint8* imageRowForDirectBlit = (uint8*)map->bitmap;
-//// ???? What todo if the image is bigger than the 
-    imageRowForDirectBlit += 4*((BlitHeight - 1) * BlitWidth);
-
-    for (int32 Y{0}; Y < Height; Y++) {
-        uint32* DirectPixel = (uint32 *)DirectRow;        
-        if(Y == BlitHeight){
-            imageRowForDirectBlit += 4*((BlitHeight - 1) * BlitWidth);            
+        //BUG right here
+        if(BlitWidth > Width){
+            WidthOffset = BlitWidth - Width;
+            BlitWidth = Width;
         }
-        uint32* imagePixelForDirect = (uint32* )imageRowForDirectBlit;
 
-        for(int32 X{0}; X < Width; X++) {
-            
-            // Why Pixel appear in uint8 not uint32
-            if(X >= BlitWidth){
-            *DirectPixel++ = 0xffffffff;
+        if(BlitHeight > Height){
+            BlitHeight = Height;
+        }
+    
+        // We take memory from BitmapMemory of main Bufer to write on it
+        uint8* Row;
+        uint8* DirectRow;
+
+        if (OBuffer!=NULL){
+            Row = ((uint8 *)OBuffer->BitmapMemory);
+        }
+
+        if (OBuffer!=NULL){
+            if(OBuffer->BitmapMemoryForDirectBlit != NULL){
+                DirectRow = ((uint8 *)OBuffer->BitmapMemoryForDirectBlit);
             } else {
-            *DirectPixel++ = *imagePixelForDirect--;
+                printf("Bitmap Memory for direct blit is empty\n");
+            }
+        }
+    
+        //Change the image row order upside down
+        //uint8* imageRow = (uint8*)glyph->bitmap;
+        uint8* imageRowForDirectBlit = (uint8*)glyph->upside_down_bitmap;
+//// ???? What todo if the image is bigger than the 
+                               imageRowForDirectBlit += 4*((BlitHeight - 1) * BlitWidth);
+
+        for (int32 Y{0}; Y < Height; Y++) {
+            uint32* DirectPixel = (uint32 *)DirectRow;        
+            if(Y == BlitHeight){
+                imageRowForDirectBlit += 4*((BlitHeight - 1) * BlitWidth);            
+            }
+            uint32* imagePixelForDirect = (uint32* )imageRowForDirectBlit;
+
+            for(int32 X{0}; X < Width; X++) {
+            
+                // Why Pixel appear in uint8 not uint32
+                if(X >= BlitWidth){
+                    *DirectPixel++ = 0xffffffff;
+                } else {
+                    *DirectPixel++ = *imagePixelForDirect--;
+                }
             }
         }
     }
@@ -1619,18 +1622,15 @@ void CleanUpandExit(Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map){
     }
     BackBuffer->camera_set.clear();
 
-    if(map->bitmap)
-    stbtt_FreeBitmap(map->bitmap, 0);
-
-    delete map->bitmap;
-    map->bitmap = nullptr;
-
-    if(map->upside_down_bitmap){
-        VirtualFree(map->upside_down_bitmap, 0, MEM_RELEASE);
-        //free(map->upside_down_bitmap);
-        delete map->upside_down_bitmap;
-        map->upside_down_bitmap = nullptr;
+    for(Glyph_Property* const &glyph: map->Glyph_list){
+        if(glyph->upside_down_bitmap){
+            //VirtualFree(map->upside_down_bitmap, 0, MEM_RELEASE);
+            free(glyph->upside_down_bitmap);
+            delete glyph->upside_down_bitmap;
+            glyph->upside_down_bitmap = nullptr;
+        }
     }
+
 
     ResetGLState(BackBuffer);
 };

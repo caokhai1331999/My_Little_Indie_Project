@@ -318,7 +318,7 @@ struct Glyph_Map{
     GLuint TextureID;
     
     std::vector<Glyph_Property*>Glyph_list;
-}
+};
 
 Glyph_Map Glyphs_Map = {};
 

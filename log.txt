@@ -2116,3 +2116,6 @@ Thing about big group of render/free/clean function
 and group of inherent asset/entity
 
 TODO: Currently working at get data of match character in string.
+
+---------------- Tue, 23 Jun 26: 12:06PM
+

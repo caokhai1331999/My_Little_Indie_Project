@@ -9,50 +9,52 @@
 #include "Light.h"
 
 
-void IncreaseFontAlpha(const unsigned char* source, void* dest){
+void IncreaseFontAlpha(const unsigned char* source, void* dest, const Glyph_Property* glyp){
     uint8 *Source = (uint8*)source;
     // move the destination pointer to the head of the last row
-    uint8* DestRow = (uint8*)dest + (map->w * (map->h - 1));
+    uint8* DestRow = (uint8*)dest + (glyp->w * (glyp->h - 1));
     //Turn the bitmap upside down
-    for(uint8 y = 0; y < map->h; y++){
+    for(uint8 y = 0; y < glyp->h; y++){
         //uint32* Dest = (uint32*)DestRow;
         uint8* Dest = DestRow;
-        for(uint8 x = 0; x < map->w; x++){
-            //uint8 alpha = *Source++;
-            //*Dest++ = ((alpha << 24)|
+        for(uint8 x = 0; x < glyp->w; x++){
+            //uint32 alpha = *Source++;
+            ////*Dest++ = ((alpha << 24)|
                        //(alpha << 16)|
                        //(alpha <<  8)|
                        //(alpha <<  0));
-             *Dest++ = *Source++;
+            *Dest++ = *Source++;
         }
-            DestRow -= map->w;
+            DestRow -= glyp->w;
     };
 }
 // Init
 // Load
-// Render
-void InitBitmap(Glyph_Map* map){
-    //map->upside_down_bitmap = malloc(sizeof(unsigned char) * map->h * map->w);
-
-}
+// Render}
 
 void LoadFont(Glyph_Map* map, const char* path){
 // Load File + Init
-        TTFfile = new debug_read_file_result;
         debug_read_file_result* TTFfile = DEBUGReadFileWhole(path);
         stbtt_InitFont(&map->FontInfo, (unsigned char*)TTFfile->Content, stbtt_GetFontOffsetForIndex((unsigned char*)TTFfile->Content, 0));
 
-        Glyph_Property glyph = {};
+        Glyph_Property* glyph;
 
         for(char c  = 'A'; c < 'Z'; c++){
-            unsigned char* bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 128.0f), c, &glyph.w, &glyph.h, &glyph.Xoffset, &glyph.Yoffset);
+            glyph = (Glyph_Property*)malloc(sizeof(Glyph_Property));
+            glyph-> i = 0;
+            glyph-> j = 0;
+            glyph->c = c;
+            unsigned char* bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 128.0f), c, &glyph->w, &glyph->h, &glyph->Xoffset, &glyph->Yoffset);
             assert(bitmap);
 
-            glyph.upside_down_bitmap = VirtualAlloc(0, sizeof(uint32) * glyph->h * glyph->w, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
-            IncreaseFontAlpha(bitmap, glyph.upside_down_bitmap);
+            glyph->upside_down_bitmap = VirtualAlloc(0, sizeof(uint32) * glyph->h * glyph->w, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+            IncreaseFontAlpha(bitmap, glyph->upside_down_bitmap, glyph);
 
             assert(glyph->upside_down_bitmap);
-            map->glyph_list.push_back(&glyph);
+            map->Glyph_list.push_back(glyph);
+
+            //free(glyph);
+            stbtt_FreeBitmap(bitmap, nullptr);
         }
 
         if(TTFfile->Content)
@@ -62,8 +64,22 @@ void LoadFont(Glyph_Map* map, const char* path){
         TTFfile = nullptr;        
 }
 
+
+glm::vec2 CalcGlypProperty(const glm::vec4* previous_glyp_specs, const Rect_* rect){
+    glm::vec2 font_specs;
+    if(previous_glyp_specs->x + previous_glyp_specs->w < rect->w){
+        font_specs.x = (float)previous_glyp_specs->x + (float )previous_glyp_specs->w;
+    }else{
+        font_specs.x = 0;
+        // specs.z is h
+        font_specs.y = (float)previous_glyp_specs->y + (float)previous_glyp_specs->z;
+    }
+    return font_specs;
+}
+
+
 // How to create pos based on each of glyph was draw before
-void DrawFont(const Gluint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_){
+void DrawFont(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
     shader->use();
     glBindVertexArray(VAO);
 
@@ -71,23 +87,49 @@ void DrawFont(const Gluint VAO, B_shader_program* shader, const Glyph_Map* map, 
     glBindTexture(GL_TEXTURE_2D, map->TextureID);
 
     int i = 0;
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, map->w, map->h, 0, GL_RG, GL_UNSIGNED_BYTE, map->upside_down_bitmap);
-    int added_up_width;
+
+    int added_up_width = 0;
+    int added_up_height = 0;
+
+    Glyph_Property* glyp_p;
+    glm::vec2 current_glyp_specs;
+    
     while(string[i] != '\0'){
+        // underlying argument is the i (index)
+        for(Glyph_Property* const &iter: map->Glyph_list){
+            if(iter->c==string[i]){
+                glyp_p= iter;
+                break;
+            }else{
+                glyp_p = map->Glyph_list[0];
+            }
+        }
         
-        shader->setVec4("Offset", CalcGlypProperty({added_up_width, 0, w, h}, i));
+        current_glyp_specs = i==0?glm::vec2(rect->x, rect->y):CalcGlypProperty(&glm::vec4((float)added_up_width, (float)added_up_height,(float)glyp_p->w, (float)glyp_p->h), rect);
+
+        shader->setVec2("Pos", current_glyp_specs);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, glyp_p->w, glyp_p->h, 0, GL_RG, GL_UNSIGNED_BYTE, glyp_p->upside_down_bitmap);        
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        // currently here
-        
-        added_up_width += *std::find_if(map->Glyph_list.begin(),map->Glyph_list.end(), map->glyph_list[].c == c);
+        // currently
+        added_up_width += glyp_p->w;
+
+        if(added_up_width >= rect->w){
+            added_up_height += glyp_p->h;
+            added_up_width = 0;
+        }
         i++;
     }
 
     glUseProgram(0);
 }
+ 
+void DrawFont_(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
+    ReloadGLFunction(&BackBuffer);
+    DrawFont(VAO, shader, map, string, rect);
+}
 
+/*
 void LoadFont(Glyph_Map* map, const char* path){
-
     debug_read_file_result* TTFfile = nullptr;
 
     if(first_announce){
@@ -144,6 +186,7 @@ void LoadFont(Glyph_Map* map, const char* path){
         TTFfile = nullptr;
     }
 }
+*/
 
 void LoadFont_(Glyph_Map* map, const char* path){
     ReloadGLFunction(&BackBuffer);
