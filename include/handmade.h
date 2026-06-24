@@ -314,13 +314,17 @@ struct Glyph_Property{
 };
 
 struct Glyph_Map{
-    stbtt_fontinfo FontInfo;
-    GLuint TextureID;
-    
     std::vector<Glyph_Property*>Glyph_list;
+    stbtt_fontinfo FontInfo;
+    unsigned int TextureID;
+    Glyph_Map(){
+        Glyph_list.reserve(100);
+        TextureID = 0;
+        FontInfo = {};
+    }
 };
 
-Glyph_Map Glyphs_Map = {};
+//Glyph_Map Glyphs_Map = {};
 
 
 // TODO: Allow the sample offset here for more robust platform options

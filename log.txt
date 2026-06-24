@@ -2118,4 +2118,17 @@ and group of inherent asset/entity
 TODO: Currently working at get data of match character in string.
 
 ---------------- Tue, 23 Jun 26: 12:06PM
+                 
 
+---------------- Wed, 24 Jun 26: 12:02PM
+
+After calling the function pointer from the gl library, the Glyph_map's memory
+messed up. That's all of the information so far.
+NOTE: Remember to make current and load function pointer from the current gl
+context
+So now I can make sure that the bitmap data is created rightly, or at least it
+worked. The only thing wrong here is coordinate itself.
+
+single vertex: for every triangles
+apply glyph specs based on this...
+How can I interpolate between glyp pos and rect pos

@@ -29,11 +29,12 @@ int CALLBACK WinMain
     QueryPerformanceFrequency(&(TimeSet.PerfCountFrequencyResult));
 
     float ColorOffset = 0.0f;
-    
-  bool32 collided_  = false;
-  bool32 along1 = true;  
-  bool32 along2 = true;  
-  bool32 short_color_change_ = false;
+    Glyph_Map Glyphs_Map = {};    
+
+    bool32 collided_  = false;
+    bool32 along1 = true;  
+    bool32 along2 = true;  
+    bool32 short_color_change_ = false;
 
 
   win32LoadXInput();
@@ -121,7 +122,6 @@ int CALLBACK WinMain
           }
       }
 // Camera here
-      BackBuffer.camera_set.push_back(new Camera);
       
       glm::vec3 tempPos = glm::vec3(9.0f, 0.3, 1.0f);
       glm::vec3 size = glm::vec3(1.0f);
@@ -213,7 +213,8 @@ int CALLBACK WinMain
 
                 //wglMakeCurrent(GetDC(BackBuffer.Window), BackBuffer.glData.openglRC);
                 copyBufferData(&BackBuffer, &ScreenBuffer);
-                LoadFont(&Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
+                LoadFont(&BackBuffer, &Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
+                
                 //????
                 //glm::mat4 View = glm::mat4(1.0f);
                 real32 UpdatedAngle = 0.0f;
@@ -254,6 +255,8 @@ int CALLBACK WinMain
                 GetWindowDimension(&BackBuffer);
                 //InitCamera(&BackBuffer.camera, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, glm::vec3(-3.0f, -10.0f, -12.0f));
                 InitCamera(&BackBuffer);
+
+                BackBuffer.camera_set.push_back(new Camera);
                 InitCamera_(BackBuffer.camera_set[0], BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, glm::vec3(10.0f, -10.0f, -5.0f));
 
                 Chosen_Camera = BackBuffer.SwithCamera?BackBuffer.camera_set[0]:&BackBuffer.camera;
@@ -440,8 +443,6 @@ int CALLBACK WinMain
                         }
                       if(Load_Lib)
                           Load_Lib = false;
-
-                      LoadFont(&Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
                       //Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
                       //Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
                     };
@@ -633,12 +634,15 @@ int CALLBACK WinMain
                         }
                     }
 
-//BackBuffer.shaders_list[4]->setInt("material.diffused_texture",  Glyphs_Map.TextureID);                    
-//
-//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+                    //glActiveTexture(GL_TEXTURE0+Glyphs_Map.TextureID);
+                    //glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0+Glyphs_Map.TextureID);
+                    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, Glyphs_Map.Glyph_list[20]->w, Glyphs_Map.Glyph_list[20]->h, 0, GL_RG, GL_UNSIGNED_BYTE, Glyphs_Map.Glyph_list[20]->upside_down_bitmap);
+        //BackBuffer.shaders_list[4]->setInt("material.diffused_texture",  Glyphs_Map.TextureID);                    
+
+        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
                     //glUseProgram(0);
-                    DrawFont(ScreenBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, "Here is the string\0", &rect);
+                    DrawFont(&BackBuffer, BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, "Here is the string\0", &rect);
 //========================================================================
                     drawTile(&TileObj, BackBuffer.shaders_list[2]);
 

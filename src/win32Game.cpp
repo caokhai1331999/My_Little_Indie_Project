@@ -936,7 +936,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
           }
 
           if((GetKeyState(VK_CONTROL) & (1 << 15)) > 0){
-              ShowGlyphs(&BackBuffer, &Glyphs_Map);
+              //ShowGlyphs(&BackBuffer, &Glyph_Map);
               HDC currentDC = GetDC(Window);
               HDC tempDC;
               RenderSplendidGradient(&BackBuffer, nullptr, BMPContent);
@@ -1119,7 +1119,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
           // State.BlueOffset+= 10;
           if((GetKeyState(VK_CONTROL) & (1 << 15)) > 0){
               Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
-              ShowGlyphs(&BackBuffer, &Glyphs_Map);
+              //ShowGlyphs(&BackBuffer, &Glyph_Map);
               HDC currentDC = GetDC(Window);
               Win32DisplayBufferWindow(currentDC, 0, 0, &BackBuffer);
               SwapBuffers(currentDC);
@@ -1552,7 +1552,7 @@ void ResetGLState(Win32_OffScreen_Buffer* BackBuffer){
 };
 
 
-void InitCamera(Win32_OffScreen_Buffer* BackBuffer){;
+void InitCamera(Win32_OffScreen_Buffer* BackBuffer){
 
     glm::vec3 Position = glm::vec3(-3.0f, -10.0f, -12.0f);
     glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);

@@ -32,22 +32,25 @@ void IncreaseFontAlpha(const unsigned char* source, void* dest, const Glyph_Prop
 // Load
 // Render}
 
-void LoadFont(Glyph_Map* map, const char* path){
+void LoadFont(const Win32_OffScreen_Buffer* Backbuffer, Glyph_Map* map, const char* path){
 // Load File + Init
         debug_read_file_result* TTFfile = DEBUGReadFileWhole(path);
         stbtt_InitFont(&map->FontInfo, (unsigned char*)TTFfile->Content, stbtt_GetFontOffsetForIndex((unsigned char*)TTFfile->Content, 0));
 
         Glyph_Property* glyph;
+        unsigned char* bitmap;
 
         for(char c  = 'A'; c < 'Z'; c++){
             glyph = (Glyph_Property*)malloc(sizeof(Glyph_Property));
             glyph-> i = 0;
             glyph-> j = 0;
-            glyph->c = c;
-            unsigned char* bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 128.0f), c, &glyph->w, &glyph->h, &glyph->Xoffset, &glyph->Yoffset);
+            glyph-> c = c;
+
+            bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 128.0f), c, &glyph->w, &glyph->h, &glyph->Xoffset, &glyph->Yoffset);
             assert(bitmap);
 
-            glyph->upside_down_bitmap = VirtualAlloc(0, sizeof(uint32) * glyph->h * glyph->w, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+            //glyph->upside_down_bitmap = VirtualAlloc(0, sizeof(uint32) * glyph->h * glyph->w, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+            glyph->upside_down_bitmap = (uint32* )malloc(sizeof(uint32) * glyph->h * glyph->w);
             IncreaseFontAlpha(bitmap, glyph->upside_down_bitmap, glyph);
 
             assert(glyph->upside_down_bitmap);
@@ -56,23 +59,41 @@ void LoadFont(Glyph_Map* map, const char* path){
             //free(glyph);
             stbtt_FreeBitmap(bitmap, nullptr);
         }
-
-        if(TTFfile->Content)
+    if(TTFfile->Content)
             DEBUGFreeFileMemory(TTFfile->Content);
+// Set texture config
+            glGenTextures(1, &(map->TextureID));
+            glActiveTexture(GL_TEXTURE0+map->TextureID);
+            glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0+map->TextureID);
+
+            glGenerateMipmap(GL_TEXTURE_2D);
+            // can free temp_bitmap at this point
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);        
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//==========================================
 
         delete TTFfile;
         TTFfile = nullptr;        
 }
 
+void LoadFont_(const Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map , const char* path){
+        if(wglMakeCurrent(GetDC(BackBuffer->Window), BackBuffer->glData.openglRC)){
+            ReloadGLFunction(BackBuffer);
+        }
+        LoadFont(BackBuffer, map, path);
+};
+
 
 glm::vec2 CalcGlypProperty(const glm::vec4* previous_glyp_specs, const Rect_* rect){
     glm::vec2 font_specs;
     if(previous_glyp_specs->x + previous_glyp_specs->w < rect->w){
-        font_specs.x = (float)previous_glyp_specs->x + (float )previous_glyp_specs->w;
+        font_specs.x = (float)((float)previous_glyp_specs->x + (float )previous_glyp_specs->w)/rect->w;
     }else{
         font_specs.x = 0;
         // specs.z is h
-        font_specs.y = (float)previous_glyp_specs->y + (float)previous_glyp_specs->z;
+        font_specs.y = (float)((float)previous_glyp_specs->y + (float)previous_glyp_specs->z)/rect->h;
     }
     return font_specs;
 }
@@ -107,7 +128,10 @@ void DrawFont(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, 
         
         current_glyp_specs = i==0?glm::vec2(rect->x, rect->y):CalcGlypProperty(&glm::vec4((float)added_up_width, (float)added_up_height,(float)glyp_p->w, (float)glyp_p->h), rect);
 
-        shader->setVec2("Pos", current_glyp_specs);
+        shader->setVec2("GlyphPos", current_glyp_specs);
+
+        glActiveTexture(GL_TEXTURE0+map->TextureID);
+        glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0+map->TextureID);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, glyp_p->w, glyp_p->h, 0, GL_RG, GL_UNSIGNED_BYTE, glyp_p->upside_down_bitmap);        
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         // currently
@@ -119,12 +143,12 @@ void DrawFont(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, 
         }
         i++;
     }
-
+    glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0);
     glUseProgram(0);
 }
  
-void DrawFont_(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
-    ReloadGLFunction(&BackBuffer);
+void DrawFont_(const Win32_OffScreen_Buffer* BackBuffer, const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
+    ReloadGLFunction(BackBuffer);
     DrawFont(VAO, shader, map, string, rect);
 }
 
@@ -187,11 +211,6 @@ void LoadFont(Glyph_Map* map, const char* path){
     }
 }
 */
-
-void LoadFont_(Glyph_Map* map, const char* path){
-    ReloadGLFunction(&BackBuffer);
-    LoadFont(map, path);
-}
 
 void setup_pointlight(global_light* envir_light){
     glm::vec3 pointlight_Pos[] =
@@ -312,10 +331,11 @@ void set_environmental_light(B_shader_program* shader, global_light* envir_light
 };
 
 void setup_pointlight_(global_light* envir_light){
+    ReloadGLFunction(&BackBuffer);
     setup_pointlight(envir_light);
 }
 
 void Set_environmental_light_(B_shader_program* shader, global_light* envir_light, Camera* camera){
-    ReloadGLFunction(&BackBuffer);
+    //ReloadGLFunction(&BackBuffer);
     set_environmental_light(shader, envir_light, camera);
 };

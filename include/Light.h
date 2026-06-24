@@ -91,17 +91,19 @@ struct global_light{
 
 global_variable global_light envir_light = {};
 
-void LoadFont(Glyph_Map* map = nullptr, const char* path = nullptr);
+void LoadFont(const Win32_OffScreen_Buffer* Backbuffer = nullptr, Glyph_Map* map = nullptr, const char* path = nullptr);
 void IncreaseFontAlpha(const unsigned char* source, void* dest, const Glyph_Property* glyp);
 void DrawFont(const GLuint VAO = 0, B_shader_program* shader = nullptr, const Glyph_Map* map = nullptr, const char* string = nullptr, const Rect_* rect = nullptr);
 glm::vec2 CalcGlypProperty(const glm::vec2* previous_glyp_specs = nullptr, const Rect_* rect = nullptr);
 
 extern "C" __declspec(dllexport) void IncreaseFontAlpha_(Glyph_Map* map = nullptr);
 typedef void (*IncreaseFontAlpha__)(Glyph_Map*);
-extern "C" __declspec(dllexport) void LoadFont_(Glyph_Map* map = nullptr, const char* path = nullptr);
-typedef void (*LoadFont__)(Glyph_Map*, const char*);
-extern "C" __declspec(dllexport) void DrawFont_(const GLuint VAO = 0, B_shader_program* shader = nullptr, const Glyph_Map* map = nullptr, const char* string = nullptr, const Rect_* rect = nullptr);
-typedef void (*DrawFont__) (const GLuint, B_shader_program*, const Glyph_Map*, const char* , const Rect_*);
+
+extern "C" __declspec(dllexport) void LoadFont_(const Win32_OffScreen_Buffer* BackBuffer = nullptr, Glyph_Map* map = nullptr, const char* path = nullptr);
+typedef void (*LoadFont__)(const Win32_OffScreen_Buffer*, Glyph_Map*, const char*);
+
+extern "C" __declspec(dllexport) void DrawFont_(const Win32_OffScreen_Buffer* BackBuffer = nullptr, const GLuint VAO = 0, B_shader_program* shader = nullptr, const Glyph_Map* map = nullptr, const char* string = nullptr, const Rect_* rect = nullptr);
+typedef void (*DrawFont__) (const Win32_OffScreen_Buffer* ,const GLuint, B_shader_program*, const Glyph_Map*, const char* , const Rect_*);
 //=====================================
 void setup_pointlight(global_light* envir_light = nullptr);
 void set_environmental_light(B_shader_program* shader = nullptr, global_light* envir_light = nullptr, Camera* camera = nullptr);
