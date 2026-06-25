@@ -85,9 +85,8 @@ void LoadFont_(const Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map , const 
         LoadFont(BackBuffer, map, path);
 };
 
-
-glm::vec2 CalcGlypProperty(const glm::vec4* previous_glyp_specs, const Rect_* rect){
-    glm::vec2 font_specs;
+glm::vec4 CalcGlypProperty(const glm::vec4* previous_glyp_specs, const Rect_* rect, const Glyph_Property* glyph){
+    glm::vec4 font_specs;
     if(previous_glyp_specs->x + previous_glyp_specs->w < rect->w){
         font_specs.x = (float)((float)previous_glyp_specs->x + (float )previous_glyp_specs->w)/rect->w;
     }else{
@@ -95,6 +94,8 @@ glm::vec2 CalcGlypProperty(const glm::vec4* previous_glyp_specs, const Rect_* re
         // specs.z is h
         font_specs.y = (float)((float)previous_glyp_specs->y + (float)previous_glyp_specs->z)/rect->h;
     }
+    font_specs.z = glyph->h;
+    font_specs.w = glyph->w;
     return font_specs;
 }
 
@@ -103,6 +104,9 @@ glm::vec2 CalcGlypProperty(const glm::vec4* previous_glyp_specs, const Rect_* re
 void DrawFont(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
     shader->use();
     glBindVertexArray(VAO);
+    // L, R, B, T
+    glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)20.0f, 0.0f, (float)20.0f);
+    shader->setMat4("projection", othorForGlyph);
 
     glActiveTexture(GL_TEXTURE0+map->TextureID);
     glBindTexture(GL_TEXTURE_2D, map->TextureID);
@@ -113,23 +117,25 @@ void DrawFont(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, 
     int added_up_height = 0;
 
     Glyph_Property* glyp_p;
-    glm::vec2 current_glyp_specs;
-    
+    glm::vec4 current_glyp_specs;
+    std::string name;
     while(string[i] != '\0'){
         // underlying argument is the i (index)
         for(Glyph_Property* const &iter: map->Glyph_list){
-            if(iter->c==string[i]){
-                glyp_p= iter;
+            if(iter->c == string[i]){
+                glyp_p = iter;
                 break;
             }else{
                 glyp_p = map->Glyph_list[0];
             }
         }
-        
-        current_glyp_specs = i==0?glm::vec2(rect->x, rect->y):CalcGlypProperty(&glm::vec4((float)added_up_width, (float)added_up_height,(float)glyp_p->w, (float)glyp_p->h), rect);
+        // wrong here
+        current_glyp_specs = i==0?glm::vec4(rect->x, rect->y, glyp_p->h, glyp_p->w):CalcGlypProperty(&glm::vec4((float)added_up_width, (float)added_up_height, (float)glyp_p->h, (float)glyp_p->w), rect, glyp_p);
 
-        shader->setVec2("GlyphPos", current_glyp_specs);
-
+        //name = "GlyphPoses["+to_string(i)+"]";
+        name = "GlyphPos";
+        //printf("glypos %d is %s\n", i, glm::to_string(current_glyp_specs).c_str());
+        shader->setVec4(name.c_str(), current_glyp_specs);        
         glActiveTexture(GL_TEXTURE0+map->TextureID);
         glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0+map->TextureID);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, glyp_p->w, glyp_p->h, 0, GL_RG, GL_UNSIGNED_BYTE, glyp_p->upside_down_bitmap);        

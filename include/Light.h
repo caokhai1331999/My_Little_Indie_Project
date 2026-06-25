@@ -94,7 +94,7 @@ global_variable global_light envir_light = {};
 void LoadFont(const Win32_OffScreen_Buffer* Backbuffer = nullptr, Glyph_Map* map = nullptr, const char* path = nullptr);
 void IncreaseFontAlpha(const unsigned char* source, void* dest, const Glyph_Property* glyp);
 void DrawFont(const GLuint VAO = 0, B_shader_program* shader = nullptr, const Glyph_Map* map = nullptr, const char* string = nullptr, const Rect_* rect = nullptr);
-glm::vec2 CalcGlypProperty(const glm::vec2* previous_glyp_specs = nullptr, const Rect_* rect = nullptr);
+glm::vec4 CalcGlypProperty(const glm::vec4* previous_glyp_specs = nullptr, const Rect_* rect = nullptr, const Glyph_Property* glyph = nullptr);
 
 extern "C" __declspec(dllexport) void IncreaseFontAlpha_(Glyph_Map* map = nullptr);
 typedef void (*IncreaseFontAlpha__)(Glyph_Map*);

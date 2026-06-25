@@ -1,6 +1,7 @@
 #version 330 core
 
 in vec4 FragColorr;
+in vec2 GlypSize;
 out vec4 FragColor;
 
 uniform float colorOffset;

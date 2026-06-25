@@ -354,11 +354,10 @@ int CALLBACK WinMain
                 //Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
                 //Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
 //=================================================
-
-                glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)ScreenBuffer.BitmapWidth, 0.0f, (float)ScreenBuffer.BitmapHeight);
+                // L, R, B, T
+                glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)10.0f, (float)10.0f, 0.0f);
                 BackBuffer.shaders_list[4]->use();
                 BackBuffer.shaders_list[4]->setMat4("projection", othorForGlyph);
-                //BackBuffer.shaders_list[4]->setMat4("view", BackBuffer.camera.view);
                 BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
 
 //==================================================
@@ -622,16 +621,12 @@ int CALLBACK WinMain
                         glm::mat4 test_mat;
                         glGetUniformfv(BackBuffer.shaders_list[4]->GetProgramID(), glGetUniformLocation(BackBuffer.shaders_list[4]->GetProgramID(), "projection"),&test_mat[0][0]);
                         printf("projection: %s\n",glm::to_string(test_mat).c_str());
-                        glm::vec2 glyph_size;
-                        glGetUniformfv(BackBuffer.shaders_list[4]->GetProgramID(), glGetUniformLocation(BackBuffer.shaders_list[4]->GetProgramID(), "glyph_size"),&glyph_size[0]);
-                        printf("glyph size: %s\n",glm::to_string(glyph_size).c_str());
-                        glGetUniformfv(BackBuffer.shaders_list[4]->GetProgramID(), glGetUniformLocation(BackBuffer.shaders_list[4]->GetProgramID(), "model"),&test_mat[0][0]);
-                        printf("model matrix: %s\n",glm::to_string(test_mat).c_str());
                         if(Glyphs_Map.Glyph_list[0]->upside_down_bitmap){
                             printf("font data is existed\n");
                         }else{
                             printf("font data is NULL\n");
                         }
+                        showMsPF = !showMsPF;
                     }
 
                     //glActiveTexture(GL_TEXTURE0+Glyphs_Map.TextureID);
@@ -642,7 +637,7 @@ int CALLBACK WinMain
         //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
                     //glUseProgram(0);
-                    DrawFont(&BackBuffer, BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, "Here is the string\0", &rect);
+                    DrawFont(&BackBuffer, BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, "HERE IS THE STRING\0", &rect);
 //========================================================================
                     drawTile(&TileObj, BackBuffer.shaders_list[2]);
 
@@ -745,11 +740,11 @@ int CALLBACK WinMain
                         glUseProgram(0);
                     }
 */
-                    if(showMsPF){
-                                printf("animator current time: %f, animation duration: %f\n", animator->GetCurrentTime(), danceAnimation->GetDuration());
-                                printf("LastCounter: %lld, EndCounter: %Id, SPerFrame: %f\n", TimeSet.LastCounter.QuadPart, TimeSet.EndCounter.QuadPart, TimeSet.SPerFrame);
-                                printf("Delayed Ratio: %f\n", DelayedRatio);
-                            }
+                    //if(showMsPF){
+                                //printf("animator current time: %f, animation duration: %f\n", animator->GetCurrentTime(), danceAnimation->GetDuration());
+                                //printf("LastCounter: %lld, EndCounter: %Id, SPerFrame: %f\n", TimeSet.LastCounter.QuadPart, TimeSet.EndCounter.QuadPart, TimeSet.SPerFrame);
+                                //printf("Delayed Ratio: %f\n", DelayedRatio);
+                            //}
 
                    //if(Transform_ == nullptr || Transform_ != animator->getFinalBoneMatrices())
                     //Transform_ = animator->getFinalBoneMatrices();

@@ -2132,3 +2132,10 @@ worked. The only thing wrong here is coordinate itself.
 single vertex: for every triangles
 apply glyph specs based on this...
 How can I interpolate between glyp pos and rect pos
+
+---------------- Thu, 25 Jun 26: 03:47PM
+
+NOTE: to make the glyp shown I have to set the w/h of projection is 1
+The smaller the right, and top value in projection matrix the bigger the glyph
+show
+So gl_InstanceID calculate the position of next drawn object for us.
