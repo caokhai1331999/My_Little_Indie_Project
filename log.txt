@@ -2139,3 +2139,7 @@ NOTE: to make the glyp shown I have to set the w/h of projection is 1
 The smaller the right, and top value in projection matrix the bigger the glyph
 show
 So gl_InstanceID calculate the position of next drawn object for us.
+
+---------------- Fri, 26 Jun 26: 03:35PM
+
+I forgot to change construct alternative primitive for quad's vertex position 

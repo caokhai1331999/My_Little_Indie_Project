@@ -87,15 +87,15 @@ void LoadFont_(const Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map , const 
 
 glm::vec4 CalcGlypProperty(const glm::vec4* previous_glyp_specs, const Rect_* rect, const Glyph_Property* glyph){
     glm::vec4 font_specs;
-    if(previous_glyp_specs->x + previous_glyp_specs->w < rect->w){
-        font_specs.x = (float)((float)previous_glyp_specs->x + (float )previous_glyp_specs->w)/rect->w;
+    if(previous_glyp_specs->x - previous_glyp_specs->w > 0){
+        font_specs.x = (float)((float)previous_glyp_specs->x - (float )previous_glyp_specs->w / 1009);
     }else{
         font_specs.x = 0;
         // specs.z is h
-        font_specs.y = (float)((float)previous_glyp_specs->y + (float)previous_glyp_specs->z)/rect->h;
+        font_specs.y = (float)((float)previous_glyp_specs->y - (float)previous_glyp_specs->z)/600;
     }
-    font_specs.z = glyph->h;
-    font_specs.w = glyph->w;
+    font_specs.z = glyph->h/600;
+    font_specs.w = glyph->w/1000;
     return font_specs;
 }
 
@@ -113,8 +113,8 @@ void DrawFont(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, 
 
     int i = 0;
 
-    int added_up_width = 0;
-    int added_up_height = 0;
+    int decreased_width = rect->w/1000;
+    int decreased_height = rect->h/600;
 
     Glyph_Property* glyp_p;
     glm::vec4 current_glyp_specs;
@@ -130,7 +130,9 @@ void DrawFont(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, 
             }
         }
         // wrong here
-        current_glyp_specs = i==0?glm::vec4(rect->x, rect->y, glyp_p->h, glyp_p->w):CalcGlypProperty(&glm::vec4((float)added_up_width, (float)added_up_height, (float)glyp_p->h, (float)glyp_p->w), rect, glyp_p);
+        // w -> 0
+        //current_glyp_specs = i==0?glm::vec4(rect->w, rect->h, glyp_p->h, glyp_p->w):CalcGlypProperty(&glm::vec4((float)decreased_width, (float)decreased_height, (float)glyp_p->h, (float)glyp_p->w), rect, glyp_p);
+        current_glyp_specs = CalcGlypProperty(&glm::vec4((float)decreased_width, (float)decreased_height, (float)glyp_p->h, (float)glyp_p->w), rect, glyp_p);
 
         //name = "GlyphPoses["+to_string(i)+"]";
         name = "GlyphPos";
@@ -141,11 +143,11 @@ void DrawFont(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, glyp_p->w, glyp_p->h, 0, GL_RG, GL_UNSIGNED_BYTE, glyp_p->upside_down_bitmap);        
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         // currently
-        added_up_width += glyp_p->w;
+        decreased_width -= glyp_p->w/1000;
 
-        if(added_up_width >= rect->w){
-            added_up_height += glyp_p->h;
-            added_up_width = 0;
+        if(decreased_width <= 0){
+            decreased_height -= glyp_p->h/600;
+            decreased_width = rect->w/1000;
         }
         i++;
     }
