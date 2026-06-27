@@ -229,7 +229,7 @@ int CALLBACK WinMain
                 glm::mat4 WorldToCamera = glm::mat4(1.0f);
 
 //Font drawing rect
-                Rect_ rect = {0, 100, 100, 400};
+                Rect_ rect = {0, 100, 150, 400};
                 
                 //WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
                 WorldToCamera = BackBuffer.camera.view * test_vampire_motion.position;

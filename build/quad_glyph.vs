@@ -12,6 +12,7 @@ out vec2 GlypSize;
 
 uniform vec4 GlyphPoses[20];
 uniform vec4 GlyphPos;
+// uniform mat4 GlyphPos;
 uniform mat4 projection;
 // uniform mat4 model;
 
@@ -31,10 +32,10 @@ void main(){
     // projection and view made this wrong.
     // how to just use the orthorgraphy with unchange view
     // map to its size actually
-    // vec4 glyph_pos = GlyphPoses[gl_InstanceID];
-    // gl_Position = projection * vec4(glyph_pos.x + aPos.x, glyph_pos.y + aPos.y, 0.0f, 1.0f);
-    gl_Position = projection *  vec4(aPos.x == -1.0f?GlyphPos.x:GlyphPos.x - GlyphPos.w, aPos.y == -1.0f?GlyphPos.y:GlyphPos.y - GlyphPos.z, 0.0f, 1.0f);
-    GlypSize = GlyphPos.zw;
+    // vec4 GlyphPos = GlyphPoses[gl_InstanceID];
+    gl_Position = projection * vec4(aPos.x > -1.0f?(aPos.x + GlyphPos.x + GlyphPos.w):(aPos.x + GlyphPos.x), aPos.y > -1.0f?(aPos.y + GlyphPos.y + GlyphPos.z):(aPos.y + GlyphPos.y), 0.0f, 1.0f);
+    // gl_Position = projection * GlyphPos * vec4(aPos.xy, 0.0f, 1.0f);
+    // GlypSize = GlyphPos.zw;
     // gl_Position = projection * vec4(Pos.x * aPos.x, Pos.y * aPos.y, 0.0f, 1.0f);
        TextCoord = aTextCoord;
        FragColorr = vec4(VertexColor,1.0f);

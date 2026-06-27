@@ -2143,3 +2143,19 @@ So gl_InstanceID calculate the position of next drawn object for us.
 ---------------- Fri, 26 Jun 26: 03:35PM
 
 I forgot to change construct alternative primitive for quad's vertex position 
+
+---------------- Sat, 27 Jun 26: 11:13AM
+
+first, we have to understand why the vertex position data front face
+
+-1.0,  1.0  ==>   x, y
+-1.0, -1.0  ==>   x, y-h
+ 1.0, -1.0  ==> x+w, y-h
+
+-1.0, -1.0  ==>   x, y-h
+ 1.0, -1.0  ==> x+w, y-h
+ 1.0.  1.0  ==> x+w, y
+
+Some how make the shader draw based on glyp pos. with ratio is
+pos.specs/rect.specs.
+But some how the data is overlayed each other
