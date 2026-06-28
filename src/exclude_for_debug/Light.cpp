@@ -87,31 +87,33 @@ void LoadFont_(const Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map , const 
 
 glm::vec4 CalcGlypProperty(const glm::vec4* previous_glyp_specs, const Rect_* rect, const Glyph_Property* glyph){
     glm::vec4 font_specs;
-    if(previous_glyp_specs->x - previous_glyp_specs->w > rect->w){
-        font_specs.x = (float)(((float)previous_glyp_specs->x + (float )previous_glyp_specs->w)/rect->w);
+    if(previous_glyp_specs->x < 7.0f){
+        font_specs.x = (float)(float)previous_glyp_specs->x + (float )(previous_glyp_specs->w);
     }else{
         font_specs.x = 0;
         // specs.z is h
-        font_specs.y = (float)(((float)previous_glyp_specs->y - (float)previous_glyp_specs->z)/rect->h);
+        font_specs.y = (float)(float)previous_glyp_specs->y - (float)(previous_glyp_specs->z/rect->h);
     }
-    font_specs.z = glyph->h/rect->h;
-    font_specs.w = glyph->w/rect->w;
+    //font_specs.z = 1.0f;
+    //font_specs.w = 1.0f;
+    font_specs.z = previous_glyp_specs->z;
+    font_specs.w = previous_glyp_specs->w;
     return font_specs;
 }
 
-glm::mat4 CalcGlypProperty_(const glm::vec4* previous_glyp_specs, const Rect_* rect, const Glyph_Property* glyph){
-    glm::mat4 font_specs = glm::mat4(1.0f);
-    font_specs[3][2] = 0.0f;
-
-    if(previous_glyp_specs->x - previous_glyp_specs->w > rect->w){
-        font_specs[3][0] = (float)(((float)previous_glyp_specs->x + (float )previous_glyp_specs->w)/rect->w);
-    }else{
-        font_specs[3][0] = 0;
-        // specs.z is h
-        font_specs[3][1] = (float)(((float)previous_glyp_specs->y - (float)previous_glyp_specs->z)/rect->h);
-    }
-    return font_specs;
-}
+//glm::mat4 CalcGlypProperty_(const glm::vec4* previous_glyp_specs, const Rect_* rect, const Glyph_Property* glyph){
+    //glm::mat4 font_specs = glm::mat4(1.0f);
+    //font_specs[3][2] = 0.0f;
+//
+    //if(previous_glyp_specs->x - previous_glyp_specs->w > rect->w){
+        //font_specs[3][0] = (float)(((float)previous_glyp_specs->x + (float )previous_glyp_specs->w)/rect->w);
+    //}else{
+        //font_specs[3][0] = 0;
+         //specs.z is h
+        //font_specs[3][1] = (float)(((float)previous_glyp_specs->y - (float)previous_glyp_specs->z)/rect->h);
+    //}
+    //return font_specs;
+//}
 
 // How to create pos based on each of glyph was draw before
 void DrawFont(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
@@ -132,20 +134,27 @@ void DrawFont(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, 
      glm::vec4 current_glyp_specs;
     //glm::mat4 current_glyp_specs_ = glm::mat4(1.0f);
     glm::mat4 test_mat;
-    std::string name;
-    while(string[i] != '\0'){
+    std::string name = "GlyphPos";
+    std::string test_text = "YOU";
+    //while(string[i] != '\0'){
+    while(i < (int)test_text.size()-1){
         // underlying argument is the i (index)
-        for(Glyph_Property* const &iter: map->Glyph_list){
-            if(iter->c == string[i]){
-                glyp_p = iter;
-                break;
-            }else if(iter == *map->Glyph_list.end() && iter->c != string[i]){
-                Glyph_Property Nul_Glyph = {};
-                Nul_Glyph.w = rect->w/10;
-                Nul_Glyph.h = rect->h/10;
-                if(Nul_Glyph.upside_down_bitmap)
-                    Nul_Glyph.upside_down_bitmap = nullptr;
-                glyp_p = &Nul_Glyph;
+        //if(string[i] < 'A' || string[i] > 'Z'){
+        if(test_text[i] < 'A' || test_text[i] > 'Z'){
+            increased_width += 40;
+            if(increased_width >= rect->w){
+                decreased_height -= 30;
+                increased_width = 0;
+            }
+            i++;
+            continue;
+        }else{
+            for(Glyph_Property* const &iter: map->Glyph_list){
+                //if(iter->c == string[i]){
+                if(iter->c == test_text[i]){
+                    glyp_p = iter;
+                    break;
+                }
             }
         }
         // wrong here
@@ -154,28 +163,31 @@ void DrawFont(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, 
         //current_glyp_specs_ = CalcGlypProperty_(&glm::vec4((float)increased_width, (float)decreased_height, (float)glyp_p->h, (float)glyp_p->w), rect, glyp_p);
 
         //name = "GlyphPoses["+to_string(i)+"]";
-        name = "GlyphPos";
         //printf("glypos %d is %s\n", i, glm::to_string(current_glyp_specs).c_str());
-        shader->setVec4(name.c_str(), current_glyp_specs);        
-        //shader->setMat4(name.c_str(), current_glyp_specs_);        
 
         //glGetUniformfv(shader->GetProgramID(), glGetUniformLocation(shader->GetProgramID(), "GlyphPos"), &test_mat[0][0]);
         //printf("fed mat:%s\n", glm::to_string(test_mat).c_str());
-//
-        glActiveTexture(GL_TEXTURE0+map->TextureID);
-        glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0+map->TextureID);
-        if(glyp_p->upside_down_bitmap)
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, glyp_p->w, glyp_p->h, 0, GL_RG, GL_UNSIGNED_BYTE, glyp_p->upside_down_bitmap);        
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        // currently
-        increased_width += glyp_p->w;
+        if(glyp_p->upside_down_bitmap){
+            glActiveTexture(GL_TEXTURE0+map->TextureID);
+            glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0+map->TextureID);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, glyp_p->w, glyp_p->h, 0, GL_RG, GL_UNSIGNED_BYTE, glyp_p->upside_down_bitmap);
+            current_glyp_specs = glm::vec4(current_glyp_specs.x/100, current_glyp_specs.y/100, current_glyp_specs.w/100, current_glyp_specs.z/100);
+            shader->setVec4(name.c_str(), current_glyp_specs);
+            //shader->setMat4(name.c_str(), current_glyp_specs_);        
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        }
 
-        if(increased_width <= 0){
-            decreased_height -= glyp_p->h;
+        // currently
+        increased_width += glyp_p->w + 10;
+
+        if(increased_width >= rect->w){
+            decreased_height -= glyp_p->h + 10;
             increased_width = 0;
         }
+
         i++;
     }
+
     glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0);
     glUseProgram(0);
 }

@@ -36,6 +36,7 @@ int CALLBACK WinMain
     bool32 along2 = true;  
     bool32 short_color_change_ = false;
 
+    std::string test_string = " HE ";
 
   win32LoadXInput();
 
@@ -229,7 +230,7 @@ int CALLBACK WinMain
                 glm::mat4 WorldToCamera = glm::mat4(1.0f);
 
 //Font drawing rect
-                Rect_ rect = {0, 100, 150, 400};
+                Rect_ rect = {0, 100, 700, 700};
                 
                 //WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
                 WorldToCamera = BackBuffer.camera.view * test_vampire_motion.position;
@@ -359,7 +360,6 @@ int CALLBACK WinMain
                 BackBuffer.shaders_list[4]->use();
                 BackBuffer.shaders_list[4]->setMat4("projection", othorForGlyph);
                 BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
-
 //==================================================
                 glUseProgram(0);
 
@@ -632,12 +632,11 @@ int CALLBACK WinMain
                     //glActiveTexture(GL_TEXTURE0+Glyphs_Map.TextureID);
                     //glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0+Glyphs_Map.TextureID);
                     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, Glyphs_Map.Glyph_list[20]->w, Glyphs_Map.Glyph_list[20]->h, 0, GL_RG, GL_UNSIGNED_BYTE, Glyphs_Map.Glyph_list[20]->upside_down_bitmap);
-        //BackBuffer.shaders_list[4]->setInt("material.diffused_texture",  Glyphs_Map.TextureID);                    
-
+        //BackBuffer.shaders_list[4]->setInt("material.diffused_texture",  Glyphs_Map.TextureID);
+                    DrawFont(&BackBuffer, BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
         //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
                     //glUseProgram(0);
-                    DrawFont(&BackBuffer, BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, "HERE IS THE STRING\0", &rect);
 //========================================================================
                     drawTile(&TileObj, BackBuffer.shaders_list[2]);
 

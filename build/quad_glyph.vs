@@ -8,9 +8,9 @@ layout(location = 3) in vec3 VertexColor;
 
 out vec2 TextCoord;
 out vec4 FragColorr;
-out vec2 GlypSize;
+out vec2 GlyphSpecs;
 
-uniform vec4 GlyphPoses[20];
+// uniform vec4 GlyphPoses[20];
 uniform vec4 GlyphPos;
 // uniform mat4 GlyphPos;
 uniform mat4 projection;
@@ -37,6 +37,8 @@ void main(){
     // gl_Position = projection * GlyphPos * vec4(aPos.xy, 0.0f, 1.0f);
     // GlypSize = GlyphPos.zw;
     // gl_Position = projection * vec4(Pos.x * aPos.x, Pos.y * aPos.y, 0.0f, 1.0f);
-       TextCoord = aTextCoord;
-       FragColorr = vec4(VertexColor,1.0f);
+
+    GlyphSpecs = GlyphPos.zw;
+    TextCoord = aTextCoord;
+    FragColorr = vec4(VertexColor,1.0f);
 }

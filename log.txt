@@ -2159,3 +2159,11 @@ first, we have to understand why the vertex position data front face
 Some how make the shader draw based on glyp pos. with ratio is
 pos.specs/rect.specs.
 But some how the data is overlayed each other
+
+---------------- Sun, 28 Jun 26: 01:25PM
+
+Now we can know for sure that the height is upward increase with othor
+projection applied
+
+NOTE: Why the data is messed up.
+report: the shown glyph is at wrong coord and slightly tilt
