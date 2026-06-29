@@ -12,7 +12,7 @@
 #include <ctime>
 
 #include "C_Model.h"
-#include "win32Game.h"
+#include "handmade.h"
 
 #define DOWNN_ 0.0f
 #define UPP_ 1.0f
@@ -139,11 +139,21 @@ int Tile_Land_Indices[] = {
     30, 31, 32, 32, 34, 30
 };
 
+struct TileGLObject{
+    unsigned int TileVAO;
+    unsigned int TileEBO;
+    unsigned int TileVBO;
+    unsigned int TileColorBO;
+    unsigned int TextureID;
+};
+
 struct Tile{// Or Tile chunk may be
 
     glm::vec2 position;
     glm::vec3 size;//scale
 
+    TileGLObject TileObj;
+    
     unsigned int TextureID = 0;
 
     // Tile indices
@@ -155,24 +165,18 @@ struct Tile{// Or Tile chunk may be
         if (TextureID!= 0){
             TextureID = 0;
         }
+
+        TileObj = {};
     };
 };
 
-struct TileGLObject{
-    unsigned int TileVAO;
-    unsigned int TileEBO;
-    unsigned int TileVBO;
-    unsigned int TileColorBO;
-    unsigned int TextureID;
-}TileObj;
-
-void set_tile_vertex(B_shader_program* shader = nullptr); 
+void set_tile_vertex(B_shader_program* shader = nullptr, TileGLObject* TileObj = nullptr); 
 
 Tile* LoadTileMap();
 void drawTile(unsigned int VaoID = 0, unsigned int shaderID = 0, float speed = 1.0, float* updatedDegree = nullptr, bool32 changeAxis = false, std::vector<rollCubeInfo>* rollCubemap = nullptr);
 
 unsigned int SetupTileTexture(const char* path = nullptr);
-void drawTile(const TileGLObject* obj = nullptr, B_shader_program* const Brush = nullptr);
+void drawTile(const TileGLObject* TileObj = nullptr, B_shader_program* const Brush = nullptr);
 
 #define TILE_H
 #endif

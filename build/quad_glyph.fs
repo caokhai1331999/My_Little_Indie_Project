@@ -2,6 +2,7 @@
 
 in vec4 FragColorr;
 in vec2 GlyphSpecs;
+in vec4 GlyphPos_;
 out vec4 FragColor;
 
 uniform float colorOffset;
@@ -18,8 +19,9 @@ struct Material{
 uniform Material material;
 
 void main(){
-    vec4 sampled = texture(material.diffused_texture, vec2(TextCoord.x, TextCoord.y));
-
+    vec4 sampled = texture(material.diffused_texture, vec2(TextCoord.x , TextCoord.y));
+    // vec4 sampled = texture(material.diffused_texture, vec2(TextCoord.x > 0.0f?GlyphPos_.x + GlyphPos_.w: 0.0f, TextCoord.y > 0.0f?GlyphPos_.y + GlyphPos_.z : 0.0f));
+    
         if(sampled != vec4(0.0f)){
 
             if(sampled.rg == vec2(0.0f)){
@@ -33,3 +35,10 @@ void main(){
         // FragColor = FragColorr;
         //* FragColorr;
 }
+
+
+
+
+
+
+

@@ -2167,3 +2167,14 @@ projection applied
 
 NOTE: Why the data is messed up.
 report: the shown glyph is at wrong coord and slightly tilt
+
+---------------- Mon, 29 Jun 26: 10:02AM
+
+Instead of one square I saw a square + a triangle the specs calculation was
+wrong somewhere.
+Why shader draw one more triangle: FOUND: due to UNMATCHED textcoord
+and the the other half receive no data (NO)
+
+Actually The shader just draw a lower fourth part of the quad If I just use the
+mere primitive position data. Maybe the native image data dimension is just too
+small

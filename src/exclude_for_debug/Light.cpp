@@ -85,19 +85,20 @@ void LoadFont_(const Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map , const 
         LoadFont(BackBuffer, map, path);
 };
 
-glm::vec4 CalcGlypProperty(const glm::vec4* previous_glyp_specs, const Rect_* rect, const Glyph_Property* glyph){
+glm::vec4 CalcGlypProperty(const glm::vec4* glyp_specs, const Rect_* rect){
     glm::vec4 font_specs;
-    if(previous_glyp_specs->x < 7.0f){
-        font_specs.x = (float)(float)previous_glyp_specs->x + (float )(previous_glyp_specs->w);
+    if(glyp_specs->x < rect->w){
+        font_specs.x = (float)glyp_specs->x  + (glyp_specs->w * 0.2f);
+        font_specs.y = (float)glyp_specs->y;
     }else{
         font_specs.x = 0;
         // specs.z is h
-        font_specs.y = (float)(float)previous_glyp_specs->y - (float)(previous_glyp_specs->z/rect->h);
+        font_specs.y = (float)glyp_specs->y - (glyp_specs->z + (glyp_specs->z * 0.3f)) ;
     }
     //font_specs.z = 1.0f;
     //font_specs.w = 1.0f;
-    font_specs.z = previous_glyp_specs->z;
-    font_specs.w = previous_glyp_specs->w;
+    font_specs.z = glyp_specs->z;
+    font_specs.w = glyp_specs->w;
     return font_specs;
 }
 
@@ -116,9 +117,9 @@ glm::vec4 CalcGlypProperty(const glm::vec4* previous_glyp_specs, const Rect_* re
 //}
 
 // How to create pos based on each of glyph was draw before
-void DrawFont(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
+void DrawFont(const Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
     shader->use();
-    glBindVertexArray(VAO);
+    glBindVertexArray(BackBuffer->glData.PlaneVAOs);
     // L, R, B, T
     glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)20.0f, 0.0f, (float)20.0f);
     shader->setMat4("projection", othorForGlyph);
@@ -135,8 +136,9 @@ void DrawFont(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, 
     //glm::mat4 current_glyp_specs_ = glm::mat4(1.0f);
     glm::mat4 test_mat;
     std::string name = "GlyphPos";
-    std::string test_text = "YOU";
-    //while(string[i] != '\0'){
+    std::string test_text = "BU\0";
+    int drawtime = 0;
+    ////while(string[i] != '\0'){
     while(i < (int)test_text.size()-1){
         // underlying argument is the i (index)
         //if(string[i] < 'A' || string[i] > 'Z'){
@@ -159,29 +161,39 @@ void DrawFont(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, 
         }
         // wrong here
         // w -> 0
-        current_glyp_specs = CalcGlypProperty(&glm::vec4((float)increased_width, (float)decreased_height, (float)glyp_p->h, (float)glyp_p->w), rect, glyp_p);
         //current_glyp_specs_ = CalcGlypProperty_(&glm::vec4((float)increased_width, (float)decreased_height, (float)glyp_p->h, (float)glyp_p->w), rect, glyp_p);
+
+        if(i > 0){
+            current_glyp_specs = CalcGlypProperty(&glm::vec4((float)increased_width, (float)decreased_height, (float)glyp_p->h, (float)glyp_p->w), rect);
+        }else{
+            current_glyp_specs = glm::vec4(0.0f, (float)decreased_height, (float)glyp_p->h, (float)glyp_p->w);
+        }
 
         //name = "GlyphPoses["+to_string(i)+"]";
         //printf("glypos %d is %s\n", i, glm::to_string(current_glyp_specs).c_str());
 
         //glGetUniformfv(shader->GetProgramID(), glGetUniformLocation(shader->GetProgramID(), "GlyphPos"), &test_mat[0][0]);
         //printf("fed mat:%s\n", glm::to_string(test_mat).c_str());
+
         if(glyp_p->upside_down_bitmap){
+            current_glyp_specs = glm::vec4(current_glyp_specs.x * 0.025f, current_glyp_specs.y * 0.025f, current_glyp_specs.w * 0.025f, current_glyp_specs.z * 0.025f);
+            shader->setVec4(name.c_str(), current_glyp_specs);
+
             glActiveTexture(GL_TEXTURE0+map->TextureID);
             glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0+map->TextureID);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, glyp_p->w, glyp_p->h, 0, GL_RG, GL_UNSIGNED_BYTE, glyp_p->upside_down_bitmap);
-            current_glyp_specs = glm::vec4(current_glyp_specs.x/100, current_glyp_specs.y/100, current_glyp_specs.w/100, current_glyp_specs.z/100);
-            shader->setVec4(name.c_str(), current_glyp_specs);
+
             //shader->setMat4(name.c_str(), current_glyp_specs_);        
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            //drawtime++;
+            //printf("Draw %d times\n", drawtime);
         }
 
         // currently
-        increased_width += glyp_p->w + 10;
+        increased_width += glyp_p->w * 2.5f;
 
         if(increased_width >= rect->w){
-            decreased_height -= glyp_p->h + 10;
+            decreased_height -= glyp_p->h;
             increased_width = 0;
         }
 
@@ -194,7 +206,7 @@ void DrawFont(const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, 
  
 void DrawFont_(const Win32_OffScreen_Buffer* BackBuffer, const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
     ReloadGLFunction(BackBuffer);
-    DrawFont(VAO, shader, map, string, rect);
+    DrawFont(BackBuffer, shader, map, string, rect);
 }
 
 /*

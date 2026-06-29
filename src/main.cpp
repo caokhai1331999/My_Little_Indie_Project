@@ -206,7 +206,7 @@ int CALLBACK WinMain
                 BackBuffer.shaders_list.push_back(new B_shader_program("quad_glyph.vs", "quad_glyph.fs", "glyph drawing brush"));
                 ScreenBuffer.glData.ProgramIDs.push_back(BackBuffer.shaders_list[BackBuffer.shaders_list.size()-1]->GetProgramID());                
 
-                set_tile_vertex(BackBuffer.shaders_list[2]);
+                set_tile_vertex(BackBuffer.shaders_list[2], &BackBuffer.TileProper.TileObj);
 
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
                         CheckShader(shader->GetProgramID(), programme_, shader->GetShaderName());
@@ -634,11 +634,9 @@ int CALLBACK WinMain
                     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, Glyphs_Map.Glyph_list[20]->w, Glyphs_Map.Glyph_list[20]->h, 0, GL_RG, GL_UNSIGNED_BYTE, Glyphs_Map.Glyph_list[20]->upside_down_bitmap);
         //BackBuffer.shaders_list[4]->setInt("material.diffused_texture",  Glyphs_Map.TextureID);
                     DrawFont(&BackBuffer, BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
-        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-                    //glUseProgram(0);
 //========================================================================
-                    drawTile(&TileObj, BackBuffer.shaders_list[2]);
+                    drawTile(&BackBuffer.TileProper.TileObj, BackBuffer.shaders_list[2]);
 
                     //===============================================
 

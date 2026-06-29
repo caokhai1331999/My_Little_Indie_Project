@@ -72,6 +72,8 @@ struct Win32_OffScreen_Buffer{
     bool GLImageRendered = false;
     OpenGLData glData;
 
+    Tile TileProper;
+    
     Camera camera;
     std::vector<Camera*> camera_set;
     const int BytesPerPixel = 4;

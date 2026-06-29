@@ -163,16 +163,16 @@ unsigned int SetupTileTexture(const char* path){
     return textureID;
 }
 
-void set_tile_vertex(B_shader_program* shader){
+void set_tile_vertex(B_shader_program* shader, TileGLObject* TileObj){
 
-    glGenVertexArrays(1, &TileObj.TileVAO);
-    glGenBuffers(1, &TileObj.TileEBO);
-    glGenBuffers(1, &TileObj.TileVBO);
-    glGenBuffers(1, &TileObj.TileColorBO);
+    glGenVertexArrays(1, &TileObj->TileVAO);
+    glGenBuffers(1, &TileObj->TileEBO);
+    glGenBuffers(1, &TileObj->TileVBO);
+    glGenBuffers(1, &TileObj->TileColorBO);
 
-    glBindVertexArray(TileObj.TileVAO);
+    glBindVertexArray(TileObj->TileVAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, TileObj.TileVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, TileObj->TileVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(land_vertices), &land_vertices, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
@@ -181,17 +181,17 @@ void set_tile_vertex(B_shader_program* shader){
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(3*sizeof(float)));
 
-    glBindBuffer(GL_ARRAY_BUFFER, TileObj.TileColorBO);
+    glBindBuffer(GL_ARRAY_BUFFER, TileObj->TileColorBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), &g_color_buffer_data, GL_STATIC_DRAW);
     glEnableVertexAttribArray(3);
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, TileObj.TileEBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, TileObj->TileEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Tile_Land_Indices), &Tile_Land_Indices, GL_STATIC_DRAW);
 
     // Set position for instanced draw
     shader->use();
-    TileObj.TextureID = SetupTileTexture("./media/rock.png");
+    TileObj->TextureID = SetupTileTexture("./media/rock.png");
     
     //Tile Object here
     // Then we have something like trees, monsters, ....
@@ -211,12 +211,12 @@ glUseProgram(0);
 }
 
 
-void drawTile(const TileGLObject* obj, B_shader_program* const Brush){
+void drawTile(const TileGLObject* TileObj, B_shader_program* const Brush){
     
-    glBindVertexArray(TileObj.TileVAO);
+    glBindVertexArray(TileObj->TileVAO);
     Brush->use();
 // Set Texture ID here
-    Brush->setInt("material.diffused_texture", TileObj.TextureID);
+    Brush->setInt("material.diffused_texture", TileObj->TextureID);
 // Set Light Position based on Texture Coordinated
     glDrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, 900);
 
