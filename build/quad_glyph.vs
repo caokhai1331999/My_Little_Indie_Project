@@ -35,7 +35,7 @@ void main(){
     // vec4 GlyphPos = GlyphPoses[gl_InstanceID];
     gl_Position = projection * vec4(aPos.x > 0.0f?((GlyphPos.x) + GlyphPos.w):(GlyphPos.x), (aPos.y > 0.0f)?((GlyphPos.y) + GlyphPos.z):(GlyphPos.y), 0.0f, 1.0f);
     
-    // gl_Position = projection * vec4(aPos.xy, 0.0f, 1.0f);
+    // gl_Position = vec4(aPos.xy, 0.0f, 1.0f);
     // GlypSize = GlyphPos.zw;
     // gl_Position = projection * vec4(Pos.x * aPos.x, Pos.y * aPos.y, 0.0f, 1.0f);
 

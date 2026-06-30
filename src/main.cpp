@@ -215,6 +215,7 @@ int CALLBACK WinMain
                 //wglMakeCurrent(GetDC(BackBuffer.Window), BackBuffer.glData.openglRC);
                 copyBufferData(&BackBuffer, &ScreenBuffer);
                 LoadFont(&BackBuffer, &Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
+                //LoadFont(&BackBuffer, &Glyphs_Map, "./media/arial.ttf");
                 
                 //????
                 //glm::mat4 View = glm::mat4(1.0f);
@@ -356,7 +357,7 @@ int CALLBACK WinMain
                 //Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
 //=================================================
                 // L, R, B, T
-                glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)10.0f, (float)10.0f, 0.0f);
+                glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)100.0f, (float)100.0f, 0.0f);
                 BackBuffer.shaders_list[4]->use();
                 BackBuffer.shaders_list[4]->setMat4("projection", othorForGlyph);
                 BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
@@ -634,6 +635,7 @@ int CALLBACK WinMain
                     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, Glyphs_Map.Glyph_list[20]->w, Glyphs_Map.Glyph_list[20]->h, 0, GL_RG, GL_UNSIGNED_BYTE, Glyphs_Map.Glyph_list[20]->upside_down_bitmap);
         //BackBuffer.shaders_list[4]->setInt("material.diffused_texture",  Glyphs_Map.TextureID);
                     DrawFont(&BackBuffer, BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
+
 
 //========================================================================
                     drawTile(&BackBuffer.TileProper.TileObj, BackBuffer.shaders_list[2]);

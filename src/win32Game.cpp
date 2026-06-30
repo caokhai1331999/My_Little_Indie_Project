@@ -585,7 +585,7 @@ HDC windowDC = GetDC(OBuffer->Window);
                 
                 static const unsigned int planeIndices[] = {
 //Even though the vertex 1, 0 will be reused but we have to feed them name for opengl just like this
-                    0, 4, 2, 0, 1, 2
+                    0, 1, 2, 2, 4, 0
                 };
 
                 static const float PlaneVertices[] = {
@@ -600,13 +600,13 @@ HDC windowDC = GetDC(OBuffer->Window);
                    -1.0f, -1.0f, -1.0f,  0.0f, 0.0f,
                    -1.0f, -1.0f,  1.0f,  0.0f, 1.0f,*/
 
-                    2.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-                    0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 
-                    0.0f, 2.0f, 1.0f, 0.0f, 1.0f,
-                                                   
-                    2.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-                    2.0f, 2.0f, 1.0f, 1.0f, 1.0f,
-                    0.0f, 2.0f, 1.0f, 0.0f, 1.0f 
+                    1.0f, -1.0f, 1.0f, 1.0f, 0.0f,
+                   -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 
+                   -1.0f,  1.0f, 1.0f, 0.0f, 1.0f,
+
+                   -1.0f,  1.0f, 1.0f, 0.0f, 1.0f,                   
+                    1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
+                    1.0f, -1.0f, 1.0f, 1.0f, 0.0f
                 };
                 
                 static const GLfloat g_color_buffer_data[] = {

@@ -2178,3 +2178,13 @@ and the the other half receive no data (NO)
 Actually The shader just draw a lower fourth part of the quad If I just use the
 mere primitive position data. Maybe the native image data dimension is just too
 small
+
+---------------- Tue, 30 Jun 26: 11:52AM
+
+decrease textcoord make texture bigger in fixed range.
+
+So the one triangle is sure the plane VAO's fault
+Got it, We found the culpit: misaligned VAO
+
+NEW ISSUES: . Curved glyph's data is distorted and tilted by an unknown reason.
+            . Calculate the space between glyph based on the glyp.specs 
