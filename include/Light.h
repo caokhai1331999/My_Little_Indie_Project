@@ -106,15 +106,15 @@ extern "C" __declspec(dllexport) void DrawFont_(const Win32_OffScreen_Buffer* Ba
 typedef void (*DrawFont__) (const Win32_OffScreen_Buffer* ,const GLuint, B_shader_program*, const Glyph_Map*, const char* , const Rect_*);
 //=====================================
 void setup_pointlight(global_light* envir_light = nullptr);
-void set_environmental_light(B_shader_program* shader = nullptr, global_light* envir_light = nullptr, Camera* camera = nullptr);
+void set_environmental_light(B_shader_program* shader = nullptr, const global_light* envir_light = nullptr, Camera* camera = nullptr);
 
 extern "C" __declspec(dllexport) void Move_(glm::mat4* object_matrix, float delta_time, float DelayedRatio);
 typedef void (*Move__)(glm::mat4*, float , float);
 
 extern "C" __declspec(dllexport) void setup_pointlight_(global_light* envir_light);
 typedef void (*setup_pointlight__)(global_light*);
-extern "C" __declspec(dllexport) void Set_environmental_light_(B_shader_program* shader, global_light* envir_light, Camera* camera);
-typedef void (*Set_Light_) (B_shader_program*, global_light* , Camera*);
+extern "C" __declspec(dllexport) void Set_environmental_light_(B_shader_program* shader, const global_light* envir_light, Camera* camera);
+typedef void (*Set_Light_) (B_shader_program*, const global_light* , Camera*);
 
 #define LIGHT_H
 #endif

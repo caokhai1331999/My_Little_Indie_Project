@@ -48,20 +48,21 @@ void LoadFont(const Win32_OffScreen_Buffer* Backbuffer, Glyph_Map* map, const ch
 
             glyph-> c = c;
 
-            
-            bitmap = (unsigned char* )malloc(sizeof(unsigned char) * glyph->h * glyph->w);
-            bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 128.0f), c, &glyph->w, &glyph->h, &glyph->Xoffset, &glyph->Yoffset);
+            // glyph->h and w haven't been defined yet.
+            //bitmap = (unsigned char* )malloc(sizeof(unsigned char) * glyph->h * glyph->w);
+            // Still have no clue about the right height scale of font
+            bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 230.0f), c, &glyph->w, &glyph->h, &glyph->Xoffset, &glyph->Yoffset);
 
             assert(bitmap);
 
             //glyph->upside_down_bitmap = VirtualAlloc(0, sizeof(uint32) * glyph->h * glyph->w, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
             glyph->upside_down_bitmap = (uint32* )malloc(sizeof(uint32) * glyph->h * glyph->w);
             IncreaseFontAlpha(bitmap, glyph->upside_down_bitmap, glyph);
-
+            
             assert(glyph->upside_down_bitmap);
             map->Glyph_list.push_back(glyph);
-            //free(glyph);
             stbtt_FreeBitmap(bitmap, nullptr);
+            //free(glyph);
         }
 
         for(char c  = 'a'; c < 'z'; c++){
@@ -73,15 +74,16 @@ void LoadFont(const Win32_OffScreen_Buffer* Backbuffer, Glyph_Map* map, const ch
             glyph-> c = c;
 
             
-            bitmap = (unsigned char* )malloc(sizeof(unsigned char) * glyph->h * glyph->w);
-            bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 128.0f), c, &glyph->w, &glyph->h, &glyph->Xoffset, &glyph->Yoffset);
+            //bitmap = (unsigned char* )malloc(sizeof(unsigned char) * glyph->h * glyph->w);
+            //float hscale = 128.0f * glyph->h/20;
+            bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 140.0f), c, &glyph->w, &glyph->h, &glyph->Xoffset, &glyph->Yoffset);
 
             assert(bitmap);
 
             //glyph->upside_down_bitmap = VirtualAlloc(0, sizeof(uint32) * glyph->h * glyph->w, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
             glyph->upside_down_bitmap = (uint32* )malloc(sizeof(uint32) * glyph->h * glyph->w);
             IncreaseFontAlpha(bitmap, glyph->upside_down_bitmap, glyph);
-
+            
             assert(glyph->upside_down_bitmap);
             map->Glyph_list.push_back(glyph);
             //free(glyph);
@@ -157,19 +159,18 @@ void DrawFont(const Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader
 
     int i = 0;
     int increased_width = 0;
-    int decreased_height = rect->h;
+    int decreased_height = rect->h - 100;
 
     Glyph_Property* glyp_p;
      glm::vec4 current_glyp_specs;
     //glm::mat4 current_glyp_specs_ = glm::mat4(1.0f);
     glm::mat4 test_mat;
     std::string name = "GlyphPos";
-    const char* test_text = "L A o y u n r R m Q T\0";
+    const char* test_text = "Q u erty To See\0";
     int drawtime = 0;
     ////while(string[i] != '\0'){
     while(test_text[i] != '\0'){
         // underlying argument is the i (index)
-        //if(string[i] < 'A' || string[i] > 'Z'){
         if((test_text[i] >= 'A' && test_text[i] <= 'Z') || (test_text[i] >= 'a' && test_text[i] <= 'z')){
             for(Glyph_Property* const &iter: map->Glyph_list){
                 //if(iter->c == string[i]){
@@ -191,11 +192,9 @@ void DrawFont(const Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader
         // w -> 0
         //current_glyp_specs_ = CalcGlypProperty_(&glm::vec4((float)increased_width, (float)decreased_height, (float)glyp_p->h, (float)glyp_p->w), rect, glyp_p);
 
-        if(i > 0){
-            current_glyp_specs = CalcGlypProperty(&glm::vec4((float)increased_width, (float)decreased_height, (float)glyp_p->h, (float)glyp_p->w), rect);
-        }else{
-            current_glyp_specs = glm::vec4(0.0f, (float)decreased_height, (float)glyp_p->h, (float)glyp_p->w);
-        }
+        //if(test_text[i] != ' '){
+        current_glyp_specs = CalcGlypProperty(&glm::vec4((float)increased_width, (float)decreased_height, (float)glyp_p->w, (float)glyp_p->h), rect);
+        //}
 
         //name = "GlyphPoses["+to_string(i)+"]";
         //printf("glypos %d is %s\n", i, glm::to_string(current_glyp_specs).c_str());
@@ -211,7 +210,6 @@ void DrawFont(const Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader
             glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0+map->TextureID);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, glyp_p->w, glyp_p->h, 0, GL_RG, GL_UNSIGNED_BYTE, glyp_p->upside_down_bitmap);
             shader->setVec4(name.c_str(), current_glyp_specs);
-            //shader->setMat4(name.c_str(), current_glyp_specs_);        
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
             //drawtime++;
             //printf("Draw %d times\n", drawtime);
@@ -327,7 +325,7 @@ void setup_pointlight(global_light* envir_light){
     envir_light->dirLight.specular = glm::vec3(0.5f, 0.5f, 0.5f);
 }
 
-void set_environmental_light(B_shader_program* shader, global_light* envir_light, Camera* camera){
+void set_environmental_light(B_shader_program* shader, const global_light* envir_light, Camera* camera){
 
     shader->use();
 
@@ -420,7 +418,7 @@ void setup_pointlight_(global_light* envir_light){
     setup_pointlight(envir_light);
 }
 
-void Set_environmental_light_(B_shader_program* shader, global_light* envir_light, Camera* camera){
+void Set_environmental_light_(B_shader_program* shader, const global_light* envir_light, Camera* camera){
     //ReloadGLFunction(&BackBuffer);
     set_environmental_light(shader, envir_light, camera);
 };

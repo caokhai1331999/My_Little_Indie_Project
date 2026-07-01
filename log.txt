@@ -2186,5 +2186,13 @@ decrease textcoord make texture bigger in fixed range.
 So the one triangle is sure the plane VAO's fault
 Got it, We found the culpit: misaligned VAO
 
-NEW ISSUES: . Curved glyph's data is distorted and tilted by an unknown reason.
+NEW ISSUES: . Curved glyph's data(such as: Q, O, a, r) is distorted and tilted by an unknown reason.
             . Calculate the space between glyph based on the glyp.specs 
+
+---------------- Wed, 01 Jul 26: 11:24AM
+
+The mistaken scalepixelheight caused the glyph distorted
+One more bug is that I messed up ly swap w and h and feed them to the shader
+
+TODO: Consider regroup inherent components and update/render them in one call
+      . Manage to draw first time complex scene using scene graph and instance
