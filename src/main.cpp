@@ -276,18 +276,18 @@ int CALLBACK WinMain
                 BackBuffer.camera_set[0]->projection = glm::perspective(glm::radians(Chosen_Camera->fov), (float)BackBuffer.BitmapWidth / (float)BackBuffer.BitmapHeight, 0.1f, 100.0f);
 
 // MODEL PART === 
-                //std::string Mname = "backpack";                
-                //Model_* backpack = nullptr;
-                //backpack = new Model_(false, &Mname);
-                //std::string backpack_path = "./media/backpack.obj";
-                //loadModel_(backpack, backpack_path);
-                //
+                std::string Mname = "backpack";                
+                Model_* backpack = nullptr;
+                backpack = new Model_(false, &Mname);
+                std::string backpack_path = "./media/backpack.obj";
+                loadModel_(backpack, backpack_path);
+                
 //NOW THE ANIMATING PART
                 if(!first_normal_time)
                     first_normal_time = !first_normal_time;
 //==========================================================
                 Model_* dancing_vampire = nullptr;
-                std::string Mname = "vampire";
+                Mname = "vampire";
                 dancing_vampire = new Model_(false, &Mname);
                 std::string dancing_vampire_path = "./media/dancing_vampire.dae";
                 loadModel_(dancing_vampire, dancing_vampire_path);
@@ -684,9 +684,9 @@ int CALLBACK WinMain
                     brushID = BackBuffer.shaders_list[3]->GetProgramID();
                     //Draw the backpack
 
-                    //BackBuffer.shaders_list[3]->use();
-                    //BackBuffer.shaders_list[3]->setMat4("model", backpack_core);
-                    //DDraw(backpack, &brushID);
+                    BackBuffer.shaders_list[3]->use();
+                    BackBuffer.shaders_list[3]->setMat4("model", backpack_core);
+                    DDraw(backpack, &brushID);
 
                     glUseProgram(0);
 

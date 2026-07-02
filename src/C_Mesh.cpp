@@ -88,27 +88,25 @@ void Draw(Mesh* mesh, GLuint* progID){
 
         glBindVertexArray(mesh->VAO);
         useProgram(*progID);
+
         int textureID;
+        unsigned int number;
+        std::string name;
+
         for(unsigned int i = 0; i < mesh->textures.size(); i++)
         {
             glActiveTexture(GL_TEXTURE0+mesh->textures[i].id);
 // retrieve texture number (the N in diffuse_textureN)
-            unsigned int number;
-            std::string name = mesh->textures[i].type;
+            name = mesh->textures[i].type;
             if(strcmp(name.c_str(),"material.texture_ambient") == 0){
                 number = ambientNr++;
-
             }else if(strcmp(name.c_str(),"material.texture_diffused") == 0){
-
                 number = diffuseNr++;
             }else if(strcmp(name.c_str(),"material.texture_specular")==0){
-                
                 number = specularNr++; // transfer unsigned int to string
             }else if(strcmp(name.c_str(),"material.texture_normal")==0){
-                
                 number = normalNr++; // transfer unsigned int to string
             } else if(strcmp(name.c_str(),"material.texture_height")==0){
-                
                 number = heightNr++; // transfer unsigned int to string
             }
             // now set the sampler to the correct texture unit

@@ -149,8 +149,9 @@ void Zoom(Camera* camera, float offset){
 
 void AutoAdjustCameraPos(Camera* camera, const glm::vec3& Object_Pos, float frameTime){
 // Delve more about this.
-    camera->Position = glm::mix(camera->Position, Object_Pos + glm::vec3(5.0f, -2.0f, 0.0f), 2.5f* frameTime);
+    camera->Position = glm::mix(camera->Position, Object_Pos + glm::vec3(5.0f, -7.0f, 0.0f), 2.5f* frameTime);
     camera->Direction = Object_Pos - camera->Position;
+    camera->fov = 70.0f;
 };
 
 void AutoAdjustCameraPos_(Camera* camera, const glm::vec3& Object_Pos, const float frameTime){

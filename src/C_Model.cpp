@@ -17,9 +17,14 @@ void DDraw(Model_* model, GLuint* programID){
     }
 
     if(model != nullptr && programID != nullptr){
-        for(unsigned int i = 0; i < model->meshes.size(); i++){
-            Draw(&model->meshes[i], programID);
-        }   
+        if(model->meshes.size() > 1){
+            for(unsigned int i = 0; i < model->meshes.size(); i++){
+                 Draw(&model->meshes[i], programID);
+            }   
+        } else {
+            Draw(&model->meshes[0], programID);
+        }
+
     } else {
         printf("model or programID is NULL\n");
     }
@@ -61,7 +66,7 @@ void loadModel_(Model_* model, string path){
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
         cout<<"ERROR::ASSIMP::"<<importer.GetErrorString()<<endl;
     }
-//NOTE: This part is wrong
+
     std::string dir = path.substr(0, path.find_last_of('/'));
     model->directory = (char*)dir.c_str();
     if(strcmp(model->name.c_str(), "vampire") == 0){
@@ -75,23 +80,32 @@ void loadModel_(Model_* model, string path){
 // NODE
     processNode(model, scene->mRootNode, scene);
 // MESH
-    for(unsigned int i = 0; i < model->meshes.size(); i++){
-        setupMesh(&model->meshes[i]);
+    if((int)model->meshes.size() > 1){
+        for(unsigned int i = 0; i < model->meshes.size(); i++){
+            setupMesh(&model->meshes[i]);
+        }
+    }else{
+            setupMesh(&model->meshes[0]);
     }
+
 // MATERIAL Inside mesh
-
 }
-
+// Watch out for this hierarchy
 void processNode(Model_* model, aiNode* node, const aiScene* scene){
     // process all the node'scene meshes (if any)
-    for(unsigned int i = 0; i < node->mNumMeshes; i++){
-        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        model->meshes.push_back(model->processMesh(mesh, scene));;
+    aiMesh* mesh;
+    if(node->mNumMeshes > 0){
+        for(unsigned int i = 0; i < node->mNumMeshes; i++){
+            mesh = scene->mMeshes[node->mMeshes[i]];
+            model->meshes.push_back(model->processMesh(mesh, scene));
+        }
     }
 
 // then do the same for each of its children
-    for(unsigned int i = 0; i < node->mNumChildren; i++){
-        processNode(model, node->mChildren[i], scene);
+    if(node->mNumChildren > 0){
+        for(unsigned int i = 0; i < node->mNumChildren; i++){
+            processNode(model, node->mChildren[i], scene);
+        }
     }
 }
 
@@ -100,51 +114,43 @@ Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
     vector<unsigned int>indices;
     vector<Texture>textures;
     vector<Vertex>vertices;
+// Current Change 02.07.26
+    Vertex vertex = {};
+    glm::vec2 vec = glm::vec2(0.0f);
 
+    if(mesh->mNumVertices > 0){
+        for(unsigned int i = 0; i < mesh->mNumVertices; i++){
+            vertex = {};
+            SetVertexBoneDataToDefault(&vertex);
 
-    for(unsigned int i = 0; i < mesh->mNumVertices; i++){
-    Vertex vertex;
-    SetVertexBoneDataToDefault(&vertex);
-    glm::vec3 vector;
-
-        // Verticle is position
-        //vector.x = mesh->mVertices[i].x;
-        //vector.y = mesh->mVertices[i].y;
-        //vector.z = mesh->mVertices[i].z;
-        //vertex.Position = vector;
+            // For skeletal animation
+            vertex.Position = AssimpGLMHelpers::GetGLMVec(mesh->mVertices[i]);
+            vertex.Normal = AssimpGLMHelpers::GetGLMVec(mesh->mNormals[i]);
+            vertex.Tangent = AssimpGLMHelpers::GetGLMVec(mesh->mTangents[i]);
         
-        //vector.x = mesh->mNormals[i].x;
-        //vector.y = mesh->mNormals[i].y;
-        //vector.z = mesh->mNormals[i].z;
-        //vertex.Normal = vector;
+            if(mesh->mTextureCoords[0]){
+                vec = AssimpGLMHelpers::GetGLMVec(mesh->mTextureCoords[0][i]);
+                vertex.TexCoords = vec;            
+            } else {
+                vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+            }
+            vertices.push_back(vertex);
 
-        // For skeletal animation
-        vertex.Position = AssimpGLMHelpers::GetGLMVec(mesh->mVertices[i]);
-        vertex.Normal = AssimpGLMHelpers::GetGLMVec(mesh->mNormals[i]);
-        vertex.Tangent = AssimpGLMHelpers::GetGLMVec(mesh->mTangents[i]);
-        
-        if(mesh->mTextureCoords[0]){
-            glm::vec2 vec = AssimpGLMHelpers::GetGLMVec(mesh->mTextureCoords[0][i]);
-
-            //vec.x = mesh->mTextureCoords[0][i].x;
-            //vec.y = mesh->mTextureCoords[0][i].y;
-
-            vertex.TexCoords = vec;            
-        } else {
-            vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+            // Process VERTEX Position, Normal, Texure Coordinates
         }
-        vertices.push_back(vertex);
-
-      // Process VERTEX Position, Normal, Texure Coordinates
     }
 
     // Process INDICES(order of mesh vertex(which contain Position, Norm, TexCoords))
-    for(unsigned int i = 0; i < mesh->mNumFaces; i++){
-        aiFace face = mesh->mFaces[i];
-        for(unsigned int j = 0; j < face.mNumIndices; j++){
-            indices.push_back(face.mIndices[j]);
-        };
+    aiFace face;
+    if(mesh->mNumFaces > 0){
+        for(unsigned int i = 0; i < mesh->mNumFaces; i++){
+            face = mesh->mFaces[i];
+            for(unsigned int j = 0; j < face.mNumIndices; j++){
+                indices.push_back(face.mIndices[j]);
+            };
+        }
     }
+
 
             // Texture is simple a type which recall texture from given path
     
@@ -173,7 +179,6 @@ Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
         Model_::ExtractBoneWeightForVertices(mesh, vertices);
         return Mesh(vertices, indices, textures);
 }
-
 
 vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene){
     vector<Texture>textures;
@@ -207,11 +212,12 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
         }
  
     } else {
+        aiString str;
+        std::string strr;
         for(unsigned int i = 0; i < mat->GetTextureCount(type); i++){
-            aiString str;
-            std::string strr = {str.C_Str()};
+            strr = {str.C_Str()};
             if(mat->GetTexture(type, i, &str) == aiReturn_SUCCESS){
-                    //if(std::strcmp(str.C_Str(),"specular.jpg") == 0){
+                //if(std::strcmp(str.C_Str(),"specular.jpg") == 0){
                 //if(string_contain(&strr, "specular")) {
                     //if(first_specular_time){
                         //printf("Texture successfully retrieved %s\n", str.C_Str());
@@ -301,16 +307,19 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
 void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex>&vertices){
 
     std::unordered_map<std::string, Bone_Info>* mBoneInfoMap = this->m_BoneInfoMap;
-    
+    unsigned int boneID = -1;
+    std::string boneName;
+    Bone_Info newboneinfo ;
+
     if(mesh->mNumBones > 0)
     {    for(int boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++){
-            unsigned int boneID = -1;
+            boneID = -1;
             //What is mName
-            std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+            boneName = mesh->mBones[boneIndex]->mName.C_Str();
 //If no elements was found!!!
 
             if(mBoneInfoMap->find(boneName) == mBoneInfoMap->end()){
-                Bone_Info newboneinfo ;
+                newboneinfo = {};
 // On the way of learning here
                 boneID = m_BoneCounter;
 
@@ -318,7 +327,6 @@ void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex
                 newboneinfo.offset = AssimpGLMHelpers::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
 
                 (*mBoneInfoMap)[boneName] = newboneinfo;
-
                 m_BoneCounter++;
             }else{
                 boneID = (*mBoneInfoMap)[boneName].id;
@@ -326,13 +334,16 @@ void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex
 
             assert(boneID != -1);
             //what exactly weights's type is
-            auto weights = mesh->mBones[boneIndex]->mWeights;
+            aiVertexWeight* weights = mesh->mBones[boneIndex]->mWeights;
             int numWeights = mesh->mBones[boneIndex]->mNumWeights;
+
+            int vertexId;
+            float weight;
 
             for(int weightIndex = 0; weightIndex < numWeights; weightIndex++){
 //NOTE:  How do they know that the vertexId is matched with the boneID
-                int vertexId = weights[weightIndex].mVertexId;
-                float weight = weights[weightIndex].mWeight;
+                vertexId = weights[weightIndex].mVertexId;
+                weight = weights[weightIndex].mWeight;
 
                 assert(vertexId <= vertices.size());
                 SetVertexBoneData(&vertices[vertexId], boneID, weight);
@@ -340,8 +351,7 @@ void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex
 
         }
     }
-    // assert check whether the argument is unequal to 0 or not
-    
+    // assert check whether the argument is unequal to 0 or 
 };
 
 

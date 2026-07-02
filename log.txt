@@ -2196,3 +2196,7 @@ One more bug is that I messed up ly swap w and h and feed them to the shader
 
 TODO: Consider regroup inherent components and update/render them in one call
       . Manage to draw first time complex scene using scene graph and instance
+
+---------------- Thu, 02 Jul 26: 10:04AM
+
+TODO: Side Quest: Improve model loading part's performance
