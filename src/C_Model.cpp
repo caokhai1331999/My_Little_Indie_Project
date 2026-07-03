@@ -19,16 +19,32 @@ void DDraw(Model_* model, GLuint* programID){
     if(model != nullptr && programID != nullptr){
         if(model->meshes.size() > 1){
             for(unsigned int i = 0; i < model->meshes.size(); i++){
-                 Draw(&model->meshes[i], programID);
+                 //Draw(&model->meshes[i], programID);
+                 Draw(model->meshes[i], programID);
             }   
         } else {
-            Draw(&model->meshes[0], programID);
+            //Draw(model->meshes[0], programID);
+            Draw(model->meshes[0], programID);
         }
 
     } else {
         printf("model or programID is NULL\n");
     }
 }
+
+void Count_Meshes (const aiNode* node, int* total_meshes_number){
+
+    if(node->mNumMeshes > 0){
+        (*total_meshes_number) += (int)node->mNumMeshes;
+    }
+    
+    if(node->mNumChildren > 0){
+        for(unsigned int i = 0; i < node->mNumChildren; i++){
+            Count_Meshes(node->mChildren[i], total_meshes_number);
+        }
+    }
+}
+
 
 void loadModel_(Model_* model, string path){
 
@@ -78,14 +94,18 @@ void loadModel_(Model_* model, string path){
     }
 
 // NODE
+    //Count_Meshes(scene->mRootNode, &(model->number_of_meshes));
     processNode(model, scene->mRootNode, scene);
 // MESH
     if((int)model->meshes.size() > 1){
+    //if(model->number_of_meshes > 1){
         for(unsigned int i = 0; i < model->meshes.size(); i++){
-            setupMesh(&model->meshes[i]);
+            //setupMesh(&model->meshes[i]);
+            setupMesh(model->meshes[i]);
         }
     }else{
-            setupMesh(&model->meshes[0]);
+            //setupMesh(&model->meshes[0]);
+            setupMesh(model->meshes[0]);
     }
 
 // MATERIAL Inside mesh
@@ -97,6 +117,7 @@ void processNode(Model_* model, aiNode* node, const aiScene* scene){
     if(node->mNumMeshes > 0){
         for(unsigned int i = 0; i < node->mNumMeshes; i++){
             mesh = scene->mMeshes[node->mMeshes[i]];
+            //model->meshes.push_back(model->processMesh(mesh, scene));
             model->meshes.push_back(model->processMesh(mesh, scene));
         }
     }
@@ -109,7 +130,8 @@ void processNode(Model_* model, aiNode* node, const aiScene* scene){
     }
 }
 
-Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
+//Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
+Mesh* Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
 
     vector<unsigned int>indices;
     vector<Texture>textures;
@@ -177,7 +199,10 @@ Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
         //printf("Somehow mesh have no material that means no texture; index: %d\n", mesh->mMaterialIndex);
     //}
         Model_::ExtractBoneWeightForVertices(mesh, vertices);
-        return Mesh(vertices, indices, textures);
+        //return Mesh(vertices, indices, textures);
+        // This work
+        Mesh* OutPut = new Mesh(vertices, indices, textures);
+        return OutPut;
 }
 
 vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene){

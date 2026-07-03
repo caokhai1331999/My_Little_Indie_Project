@@ -93,6 +93,9 @@ struct Mesh{
           vector<unsigned int> indices,
           vector<Texture> textures):vertices(vertices), indices(indices), textures(textures)
           {
+              VBO = 0;
+              EBO = 0;
+              VAO = 0;
           }    
 };
 

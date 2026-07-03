@@ -29,7 +29,10 @@ class Model_{
 //private:
 public:
     // Model data
-    vector<Mesh>meshes;
+    //std::vector<Mesh>meshes;
+    std::vector<Mesh*>meshes;
+    Mesh* meshes_;
+    int number_of_meshes;
     std::string directory;
     std::string Texturedirectory;
     vector<Texture>loaded_textures;
@@ -47,7 +50,8 @@ public:
 
     void ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex>&vertices);
 
-    Mesh processMesh(const aiMesh* mesh, const aiScene* scene);
+    //Mesh processMesh(const aiMesh* mesh, const aiScene* scene);
+    Mesh* processMesh(const aiMesh* mesh, const aiScene* scene);
     std::string* GetModelDir(){return &directory;};
 // About skeletal animation
     std::unordered_map<std::string, Bone_Info>*GetBoneInfoMap(){return m_BoneInfoMap;};
@@ -56,6 +60,7 @@ public:
 
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);
 unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bool gamma = false, aiString* path = nullptr);
+void Count_Meshes (const aiNode* Node = nullptr, int total_meshes_number = 0);
 void loadModel_(Model_*model, string path);
 void processNode(Model_* model, aiNode* node, const aiScene* scene);
 vector <Texture>loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene);

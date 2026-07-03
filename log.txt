@@ -2200,3 +2200,6 @@ TODO: Consider regroup inherent components and update/render them in one call
 ---------------- Thu, 02 Jul 26: 10:04AM
 
 TODO: Side Quest: Improve model loading part's performance
+
+---------------- Fri, 03 Jul 26: 11:13AM
+
