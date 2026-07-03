@@ -19,11 +19,9 @@ void DDraw(Model_* model, GLuint* programID){
     if(model != nullptr && programID != nullptr){
         if(model->meshes.size() > 1){
             for(unsigned int i = 0; i < model->meshes.size(); i++){
-                 //Draw(&model->meshes[i], programID);
                  Draw(model->meshes[i], programID);
             }   
         } else {
-            //Draw(model->meshes[0], programID);
             Draw(model->meshes[0], programID);
         }
 
@@ -98,13 +96,10 @@ void loadModel_(Model_* model, string path){
     processNode(model, scene->mRootNode, scene);
 // MESH
     if((int)model->meshes.size() > 1){
-    //if(model->number_of_meshes > 1){
         for(unsigned int i = 0; i < model->meshes.size(); i++){
-            //setupMesh(&model->meshes[i]);
             setupMesh(model->meshes[i]);
         }
     }else{
-            //setupMesh(&model->meshes[0]);
             setupMesh(model->meshes[0]);
     }
 
@@ -117,7 +112,6 @@ void processNode(Model_* model, aiNode* node, const aiScene* scene){
     if(node->mNumMeshes > 0){
         for(unsigned int i = 0; i < node->mNumMeshes; i++){
             mesh = scene->mMeshes[node->mMeshes[i]];
-            //model->meshes.push_back(model->processMesh(mesh, scene));
             model->meshes.push_back(model->processMesh(mesh, scene));
         }
     }
@@ -130,7 +124,6 @@ void processNode(Model_* model, aiNode* node, const aiScene* scene){
     }
 }
 
-//Mesh Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
 Mesh* Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
 
     vector<unsigned int>indices;

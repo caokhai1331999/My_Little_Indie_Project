@@ -2203,3 +2203,5 @@ TODO: Side Quest: Improve model loading part's performance
 
 ---------------- Fri, 03 Jul 26: 11:13AM
 
+NOTE: All I could do is too change the vector to store mesh pointer which just
+made the app load slightly faster.

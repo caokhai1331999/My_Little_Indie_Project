@@ -31,7 +31,6 @@ public:
     // Model data
     //std::vector<Mesh>meshes;
     std::vector<Mesh*>meshes;
-    Mesh* meshes_;
     int number_of_meshes;
     std::string directory;
     std::string Texturedirectory;
