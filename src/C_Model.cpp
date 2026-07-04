@@ -166,7 +166,6 @@ Mesh* Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
         }
     }
 
-
             // Texture is simple a type which recall texture from given path
     
     //if(mesh->mMaterialIndex > 0){
@@ -288,7 +287,7 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
                     textures.push_back(texture);
                     printf("Start loading texture from external file , model Texture path is :%s\n",model->Texturedirectory.c_str());
                     model->loaded_textures.push_back(texture);
-                } else {
+                }else {
                     //for(unsigned int i = 0; i < scene->mNumTextures; i++){
 
                     /*
@@ -309,8 +308,6 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
                     textures.push_back(texture);
                     model->loaded_textures.push_back(texture);
                 };
-
-                                                 
                 //=======================
             };                    
                    

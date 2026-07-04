@@ -2205,3 +2205,8 @@ TODO: Side Quest: Improve model loading part's performance
 
 NOTE: All I could do is too change the vector to store mesh pointer which just
 made the app load slightly faster.
+
+---------------- Sat, 04 Jul 26: 10:57AM
+
+TODO: Complete the blueprint of group inherent components for updating and
+rendering

@@ -556,21 +556,139 @@ out vec4 fragColor;
 #endif
 
 void init_font(char* path, char* , Font* font){
-   fread(ttf_buffer, 1, 1<<20, fopen(, "rb"));
+   fread(glyphs_map.ttf_buffer, 1, 1<<20, fopen(path, "rb"));
    // Load font data
-   stbtt_BakeFontBitmap(ttf_buffer,0, 32.0, temp_bitmap,512,512, 32,96, cdata); // no guarantee this fits!
+   stbtt_BakeFontBitmap(glyphs_map.ttf_buffer,0, 32.0, glyphs_map.bitmap,512,512, 32,96, cdata);
+   // no guarantee this fits!
    // can free ttf_buffer at this point
    glGenTextures(1, &font->font_texture);
    glBindTexture(GL_TEXTURE_2D, font->font_texture);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 512,512, 0, GL_ALPHA, GL_UNSIGNED_BYTE, temp_bitmap);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 512,512, 0, GL_ALPHA, GL_UNSIGNED_BYTE, glyphs_map.bitmap);
    // can free temp_bitmap at this point
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
 
-void SetSpotLight(B_shader_program* quad_shader, Font* font){
-    quad_shader->used();
-    GLuint font_texture = TextureFromFile(font->path_name,);
-}
-
 // Display Font Buffer.
 // Use bitmap font loading on 2D squad
+// load text to font display
+// Or time to render in group
+//
+//
+// x, y, w, h
+// We loop through the character of char* array. Then render each of it
+void CalcGlyphProperties_(Glyph_Map* map, int index){
+    ;
+}
+
+void RenderStringOnScreen(Glyph_Map* map, const char* string, B_shader_program* shader){
+    char glyph_ = string[i];
+    glm::vec2 glyph_Pos_Offsset = CalcGlyphProperties_(map, i);
+    
+    map->bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 128.0f), glyph_, &map->w, &map->h, &map->Xoffset, &map->Yoffset);
+    
+    // Render glyp using opengl api
+    glActiveTexture(GL_TEXTURE0+map->TextureID);
+    glBindTexture(GL_TEXTURE_2D, map->TextureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, map->w, map->h, 0, GL_RG, GL_UNSIGNED_BYTE, map->bitmap);
+
+    // set offset pos
+    shader->SetVec2("offset["+to_string(i)+"]".c_str(), &glyph_Pos_Offsset[0]);
+};
+
+// We need to define the area's position, size, ...
+// Then calculate the glyph specs based on these.
+//
+Rect_ rect = {0, 0, 400, 100}
+
+glm::vec2 void CalcGlypProperty(const glm::vec2* previous_glyp_specs, const Rect_* rect){
+    glm::vec2 font_specs;
+    if(*previous_glyp_p.x + w < rect->w){
+        font_specs.x = *previous_glyp_specs.x + *previous_glyp_specs.w;
+    }else{
+        font_specs.x = 0;
+        font_specs.y = *previous_glyp_specs.y + *previous_glyp_specs.h;
+    }
+    return font_specs;
+}
+
+// Init: OpenGL, entities's specs
+// Update : position, animation
+// Render : Vertex, Texture, model,
+// Vertex and Texture date belong to Mesh which is bound to ID of entities which contain updated states(Position, level, health)
+
+class RandomScene {
+    // Terrain
+    // Moving Object
+    int ID;
+    
+}
+
+void (const aiNode* Node = nullptr, int total_meshes_number = 0){
+
+    if(node->mNumMeshes > 0){
+        total_meshes_number += (int)node->mNumMeshes;
+    }
+    
+    if(node->mNumChildren > 0){
+        for(unsigned int i = 0; i < node->mNumChildren; i++){
+            TotalMeshesCounter(node->mChildren[i], total_meshes_number);
+        }
+    }
+}
+// update : ;
+// render : loop through entitys and used matched shader to draw;
+//;
+
+// Mesh
+// coimponent:
+//    . still objects: + rock 
+//                     + tree
+//    . moving entities : + river
+//                        + animals
+//    . weather elements : + wind
+//                         + snow
+//                         + mist
+      //  components's properties: . collided volume
+      //                           . moving information: T, S, R.
+      //                           . primitive for drawing:(mesh)
+      //                                       .. position, texture
+//
+//===> Render: feed shader : . fixed primitve data |  . VAO
+      //                     . uniform offset data |  . shader
+      //                     . camera pos for light|  . -//-
+
+struct Game_Specs{
+    int id;
+}
+
+// chunk of meshes
+
+struct render_entity{
+    int mesh_id;
+    bool still;
+   
+};
+
+void construct_scene_pattern(){
+    ;
+}
+
+void update(std::vector<Entity*>* objects_group, input, clock_set* clock){
+// check for collision
+    for(Entity* const &entity: objects_group){
+        ;
+    };
+}
+
+void render (std::vector<Mesh*>* mesh_group, std::vector<B_program_shader*>* shader_list, std::vector<Entity*>* objects_group, Camera* chosen_camera){    
+
+    for(int i = 0; i < (int)objects_group->size()-1; i++){
+        //
+        shader[i]->use();
+        shader[i]->setMat4("projection", chosen_camera[i]->projection); 
+        shader[i]->setMat4("view", chosen_camera[i]->view); 
+
+        Draw(mesh_group[i], shader_list[i]);
+    };
+    glUseProgram(0);
+}
