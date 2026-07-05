@@ -178,25 +178,42 @@
     )
 
 					;Handle a little ; in the end and // at the beginning of line
+    ;"or "//" at the begining of line after hitting RET."
+    ;set current line as string
+  ; the (eolp) just work when the point is at the end of line
+  
   (defun ckhai-little-character-insert-fun()
     (interactive)
-    "add ; at the end of line after hitting RET."
-    ;;set current line as string
+    "add ';' at the end of line "
     (let ((line (thing-at-point 'line t)))
-      (cond ((and (string-match "//" line)(eolp))
+      (cond ((string-match "//" line)
+	     (message "Line contain '//'")
 	     (newline-and-indent)
 	     (insert "//"))
-	    ((and (string-match ";" line)(eolp))
-	     (newline-and-indent)
-             (let ((linetwo (thing-at-point 'line t)))
-               (unless (string-match ";" linetwo)
-		 (insert ";")
-		 (left-char 1))))
+	    ((string-match ";" line)
+	     (message "';' matched in line")
+	     (if(eq(-(line-end-position)
+		     (+(line-beginning-position)(current-indentation))) 1 )
+		 (progn  (insert ";")
+			 (newline-and-indent))
+	       (cond ((and (>(point)(+(line-beginning-position) (current-indentation)))(<(point)(line-end-position)))
+		      (insert ";")
+		      (newline-and-indent))
+		     (t (newline-and-indent))
+		     )
+	       )
+	     )
 	    (t
-	     (newline-and-indent))
+	     (if (or (<= (point) (+(line-beginning-position)(current-indentation))))
+		 (progn (newline-and-indent))
+	       (newline-and-indent)
+	       (insert ";")
+	       (left-char 1)
+	       )
+	     )
 	    )
-      )
     )
+  )
 
   (defun casey-source-format ()
     "Format the given file as a source file."
@@ -206,7 +223,7 @@
     (insert "   $File: $\n")
     (insert "   $Date: $\n")
     (insert "   $Revision: $\n")
-    (insert "   $Creator: Cao Khai(Casey Muratori's disciple) $\n")
+    (insert "   $Creator: Cao Khai $\n")
     (insert "   $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $\n")
     (insert "   ======================================================================== */\n")
     )
@@ -294,26 +311,26 @@
 (add-hook 'text-mode-hook 'casey-big-fun-text-hook)
 
 ;;set up lsp
-(add-hook 'c-mode-hook #'lsp-deferred)
-(add-hook 'c++-mode-hook #'lsp-deferred)
+;; (add-hook 'c-mode-hook #'lsp-deferred)
+;; (add-hook 'c++-mode-hook #'lsp-deferred)
 
-(setq lsp-clients-clangd-executable "clangd")
+;; (setq lsp-clients-clangd-executable "clangd")
 
-(use-package company
-  :hook (lsp-mode . company-mode))
+;; (use-package company
+;;   :hook (lsp-mode . company-mode))
 
-(setq projectile-project-root-files-top-down-recurring
-      '(".git" ".clangd" "compile_commands.json"))
+;; (setq projectile-project-root-files-top-down-recurring
+;;       '(".\envir_files\.git" ".\envir_files\.clangd" ".\envir_files\compile_commands.json"))
 
-(setq lsp-auto-guess-root t)
-(add-hook 'c-mode-hook
-          (lambda ()
-            (setq-local flymake-diagnostic-functions nil)))
+;;(setq lsp-auto-guess-root t)
+;;(add-hook 'c-mode-hook
+          ;;(lambda ()
+            ;;(setq-local flymake-diagnostic-functions nil)))
 
-(add-hook 'c++-mode-hook
-          (lambda ()
-            (setq-local flymake-diagnostic-functions nil)))
-(setq lsp-prefer-flymake nil)
+;;(add-hook 'c++-mode-hook
+          ;;(lambda ()
+            ;;(setq-local flymake-diagnostic-functions nil)))
+;;(setq lsp-prefer-flymake nil)
 
 ;;Hide Tools bar
 (tool-bar-mode 0)
@@ -554,7 +571,7 @@
 (make-face 'font-lock-working-face)
 (make-face 'font-lock-remember-face)
 (make-face 'font-lock-solved-face)
-(modify-face 'font-lock-fixme-face "Red" nil nil t nil t nil nil)
+(modify-face 'font-lock-fixme-face "rgb:f9/26/72" nil nil t nil t nil nil)
 (modify-face 'font-lock-note-face "goldenrod" nil nil t nil t nil nil)
 (modify-face 'font-lock-jobDone-face "rgb:ff/82/47" nil nil t nil t nil nil)
 (modify-face 'font-lock-working-face "lime green" nil nil t nil t nil nil)
@@ -700,6 +717,8 @@
       (append
        '(("\\.cpp$"    . c++-mode)
          ("\\.hin$"    . c++-mode)
+         ("\\.vs$"    . c++-mode)
+         ("\\.fs$"    . c++-mode)
          ("\\.cin$"    . c++-mode)
          ("\\.inl$"    . c++-mode)
          ("\\.rdc$"    . c++-mode)
@@ -854,6 +873,7 @@
  '(hl-paren-colors '("#3cafa5" "#c49619" "#3c98e0" "#7a7ed2" "#93a61a"))
  '(imenu-auto-rescan-maxout 500000)
  '(imenu-auto-rescant t)
+ '(inhibit-startup-screen t)
  '(jdee-db-active-breakpoint-face-colors (cons "#000000" "#8CD0D3"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#000000" "#7F9F7F"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#000000" "#494949"))
@@ -870,7 +890,7 @@
    '("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3"))
  '(objed-cursor-color "#CC9393")
  '(package-selected-packages
-   '(company lsp-dart spinner lsp-mode circadian doom-themes solarized-theme))
+   '(monokai-theme company lsp-dart spinner lsp-mode circadian solarized-theme))
  '(pdf-view-midnight-colors '("#DCDCCC" . "#383838"))
  '(pos-tip-background-color "#01323d")
  '(pos-tip-foreground-color "#9eacac")
