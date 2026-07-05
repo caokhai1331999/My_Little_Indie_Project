@@ -2210,3 +2210,8 @@ made the app load slightly faster.
 
 TODO: Complete the blueprint of group inherent components for updating and
 rendering
+
+---------------- Sun, 05 Jul 26: 12:52PM
+
+The common way to group thing up is to put them in the same class so we have
+class instance's address as one thing in common whenever call a function

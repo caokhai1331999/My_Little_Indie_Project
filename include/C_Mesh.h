@@ -85,6 +85,7 @@ struct Texture{
 struct Mesh{
     unsigned int VBO, EBO;
     unsigned int VAO;
+
     vector<Vertex> vertices;
     vector<unsigned int> indices;
     vector<Texture> textures;

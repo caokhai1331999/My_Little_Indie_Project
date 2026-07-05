@@ -662,33 +662,80 @@ struct Game_Specs{
 }
 
 // chunk of meshes
+//
+void push_size(int size, )
+
+struct Mesh{
+    //
+    Vertex* vertices;
+    unsigned int* indices;
+    Texture* textures;
+}
+//===========================================================
 
 struct render_entity{
     int mesh_id;
-    bool still;
-   
+    bool still;   
 };
 
 void construct_scene_pattern(){
     ;
 }
 
+struct drawing_properties{
+    font;
+    light;
+    mesh;
+}
+
+class object{
+private:
+    std::string name;
+    B_shader_program* program;
+    Mesh* mesh;
+    rigid_body* body;
+public:
+    update_(clock_set* clock);
+    B_shader_program* get_shader(return program);
+    // model path is optional
+    object(const char* name_ = nullptr, char* shader_path = nullptr, char* model_path = nullptr):name{name}{
+        std::string shader_name = name_;
+        program = new B_shader_program(shader_name+"vs", shader_name+"fs", shader_path);
+// ??
+        // load file? or set them up manually???
+        // 
+        mesh = new Mesh();
+
+        // model if possible
+    }
+    void set_mesh_data(const char* data_path);
+}
+
+void set_mesh_data(const char* data_path){
+    ;
+};
+
+class environment_light{
+    // basic ambient light
+    // point light
+    // spot light
+}
+
 void update(std::vector<Entity*>* objects_group, input, clock_set* clock){
 // check for collision
     for(Entity* const &entity: objects_group){
-        ;
+        entity->update(clock);
     };
 }
 
-void render (std::vector<Mesh*>* mesh_group, std::vector<B_program_shader*>* shader_list, std::vector<Entity*>* objects_group, Camera* chosen_camera){    
+void render (std::vector<Entity*>* objects_group, Camera* chosen_camera){    
 
     for(int i = 0; i < (int)objects_group->size()-1; i++){
-        //
         shader[i]->use();
         shader[i]->setMat4("projection", chosen_camera[i]->projection); 
         shader[i]->setMat4("view", chosen_camera[i]->view); 
 
-        Draw(mesh_group[i], shader_list[i]);
+        Draw(objects_group[i]->mesh, objects_group[i]->shader);
     };
     glUseProgram(0);
 }
