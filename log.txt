@@ -2215,3 +2215,23 @@ rendering
 
 The common way to group thing up is to put them in the same class so we have
 class instance's address as one thing in common whenever call a function
+
+---------------- Mon, 06 Jul 26: 10:24AM
+
+NOTE: Generally, we got to know all of properties that I have to init update and
+render to draw a world
+
+       . For Init:
+                   .. Mesh(VAO, VBO, Vertex's data) -- still haven't figure out
+                      ... data currently store as char[] inside the mesh
+                   .. Rigid Body
+                   .. shader program
+                   .. camera
+       . For update : (feed frame time in ms)
+                   .. Rigid body
+                   .. Shader program: projection, view, offset
+                   .. Skinning process
+       . For render :
+                      (feed camera's property + offset to shader)
+                   .. Rigid body's pos
+                   .. shaders

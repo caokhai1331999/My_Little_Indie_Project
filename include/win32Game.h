@@ -64,7 +64,7 @@ struct Win32_OffScreen_Buffer{
     int BitmapHeight;
     int Pitch;
     int BitmapMemorySize;
-
+x
     std::vector<B_shader_program*> shaders_list;
 
     bool SwithCamera = false;

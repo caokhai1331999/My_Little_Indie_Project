@@ -688,6 +688,9 @@ struct drawing_properties{
     mesh;
 }
 
+// PURPOSE: Create a mechanism that draw multiple object of scene using instancing method and available asset.
+//
+
 class object{
 private:
     std::string name;
@@ -701,19 +704,35 @@ public:
     object(const char* name_ = nullptr, char* shader_path = nullptr, char* model_path = nullptr):name{name}{
         std::string shader_name = name_;
         program = new B_shader_program(shader_name+"vs", shader_name+"fs", shader_path);
-// ??
-        // load file? or set them up manually???
-        // 
-        mesh = new Mesh();
 
+        
+        // load file? or set them up manually???
+        //
+        // draw a map
+        mesh = new Mesh();
+        setupMesh(mesh);
         // model if possible
     }
     void set_mesh_data(const char* data_path);
+    void set_rigid_body();
 }
 
-void set_mesh_data(const char* data_path){
-    ;
-};
+void init (std::vector<object*>*object_group){
+    // set rigid body
+    // set light
+    // set mesh;
+}
+
+void object::set_rigid_body(glm::vec3* init_pos){
+    Init_Entity_Specs(this::body);
+}
+
+void set_mesh_data(const char* data_path = nullptr, char* vertices data){
+    // data can be loaded from text file!!;
+    setupMesh(this->mesh);
+    SetVertexBoneData(Vertex* vertex, int boneID, float weight){;
+
+    };
 
 class environment_light{
     // basic ambient light
@@ -721,21 +740,24 @@ class environment_light{
     // spot light
 }
 
-void update(std::vector<Entity*>* objects_group, input, clock_set* clock){
+void update(std::vector<object*>* objects_group, input, clock_set* clock){
 // check for collision
-    for(Entity* const &entity: objects_group){
-        entity->update(clock);
+    for(object* const &obj: objects_group){
+        obj->update(clock);
+// or
+        move_object(clock, obj->rigid_body);
     };
 }
 
-void render (std::vector<Entity*>* objects_group, Camera* chosen_camera){    
+void render (std::vector<object*>*objects_group, Camera* chosen_camera){    
 
-    for(int i = 0; i < (int)objects_group->size()-1; i++){
-        shader[i]->use();
-        shader[i]->setMat4("projection", chosen_camera[i]->projection); 
-        shader[i]->setMat4("view", chosen_camera[i]->view); 
-
-        Draw(objects_group[i]->mesh, objects_group[i]->shader);
+    //for(int i = 0; i < (int)objects_group->size()-1; i++){
+    for(objects* const &obj: *objects_group){
+        obj->shader->use();
+        obj->shader->setMat4("projection", chosen_camera[i]->projection); 
+        obj->shader->setMat4("view", chosen_camera[i]->view); 
+        
+        Draw(obj->mesh, obj->shader);
     };
     glUseProgram(0);
 }
