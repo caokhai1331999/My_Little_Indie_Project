@@ -64,7 +64,7 @@ struct Win32_OffScreen_Buffer{
     int BitmapHeight;
     int Pitch;
     int BitmapMemorySize;
-x
+
     std::vector<B_shader_program*> shaders_list;
 
     bool SwithCamera = false;
@@ -86,7 +86,7 @@ void PassGLData(OpenGLData* BackData, OpenGLData* FrontData);
 global_variable bool GlobalRunning = true;
 global_variable HDC DeviceContext;
 // global_variable int  XOffset{0}, YOffset{0};
-global_variable Win32_OffScreen_Buffer BackBuffer = {};
+extern "C" {Win32_OffScreen_Buffer BackBuffer = {};}
 global_variable Game_State State = {};
 global_variable imagee_content* BMPContent = nullptr;
 global_variable real32 WaitTimeCounter = 0.0f;

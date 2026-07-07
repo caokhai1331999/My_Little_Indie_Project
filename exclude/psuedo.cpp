@@ -663,7 +663,22 @@ struct Game_Specs{
 
 // chunk of meshes
 //
-void push_size(int size, )
+// MEMORY
+#include <Memoryapi.h>
+struct dynamic_array{
+    uint8* array_pointer;
+    size_t current_size;
+    size_t size_used;
+}
+
+void* push_more_memory(size_t size, dynamic_array* array){
+    if(array->array_pointer)
+        VirtualFree(array->array_pointer, array->current_size);
+
+    array->current_size += size;
+    array->array_pointer = (uint8*)VirtualAlloc(array->current_size);
+}
+
 
 struct Mesh{
     //
@@ -673,23 +688,26 @@ struct Mesh{
 }
 //===========================================================
 
-struct render_entity{
-    int mesh_id;
-    bool still;   
+struct world{
+    std::vector<object*>*object_group;
+    std::vector<object*>*camera_set;
+    std::vector<general_light*>lights_group;
 };
-
-void construct_scene_pattern(){
-    ;
-}
-
-struct drawing_properties{
-    font;
-    light;
-    mesh;
-}
 
 // PURPOSE: Create a mechanism that draw multiple object of scene using instancing method and available asset.
 //
+
+struct general_light{
+    glm::vec3 position;
+
+    glm::vec3 ambient;
+    glm::vec3 specular;
+    glm::vec3 diffuse;
+}
+
+class Enviromental_Element{
+    std::general_light;
+}
 
 class object{
 private:
@@ -718,9 +736,17 @@ public:
 }
 
 void init (std::vector<object*>*object_group){
-    // set rigid body
     // set light
-    // set mesh;
+    . Ambient Light - Kind of constance to store it
+    . Point Light -
+                   |
+                   | take camera position as input
+                   |
+    . Spot Light  -
+        //// set mesh;
+    
+    // set rigid body
+        . Init Position
 }
 
 void object::set_rigid_body(glm::vec3* init_pos){

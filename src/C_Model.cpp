@@ -129,6 +129,11 @@ Mesh* Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
     vector<unsigned int>indices;
     vector<Texture>textures;
     vector<Vertex>vertices;
+//
+  // unsigned int* indices;
+  // Texture* textures;
+  // Vertex* vertices;
+    
 // Current Change 02.07.26
     Vertex vertex = {};
     glm::vec2 vec = glm::vec2(0.0f);
@@ -149,6 +154,11 @@ Mesh* Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
             } else {
                 vertex.TexCoords = glm::vec2(0.0f, 0.0f);
             }
+            //
+            //
+            //vertices = (vertex* )malloc(sizeof(vertex));
+            //vertices->array_pointer = push_more_memory(sizeof(vertex), vertices)
+            //
             vertices.push_back(vertex);
 
             // Process VERTEX Position, Normal, Texure Coordinates

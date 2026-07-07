@@ -2224,9 +2224,10 @@ render to draw a world
        . For Init:
                    .. Mesh(VAO, VBO, Vertex's data) -- still haven't figure out
                       ... data currently store as char[] inside the mesh
+                   .. Camera, Light
                    .. Rigid Body
                    .. shader program
-                   .. camera
+                   .. camera O
        . For update : (feed frame time in ms)
                    .. Rigid body
                    .. Shader program: projection, view, offset
@@ -2235,3 +2236,18 @@ render to draw a world
                       (feed camera's property + offset to shader)
                    .. Rigid body's pos
                    .. shaders
+
+---------------- Tue, 07 Jul 26: 11:10AM
+
+NOTE: side quest: create dynamic array to push mesh's data
+GO back to basic: * The pointer is just a number represent the address of a
+chunk of memory it show WHERE the memory is
+The term memory is by today is actually what virtual one which is page contain 4k
+size not physically one
+
++ Stack: is automatically written for me whenever I implement/call a function.
+Here here how it work:
+     . It start from 0 then get bigger each line each check
+     . Then when it hit return/end. It shrink down
+  The reason to explain why it work this way is to ensure that nothing can get
+  out of it scope when app is in the middle of it.
