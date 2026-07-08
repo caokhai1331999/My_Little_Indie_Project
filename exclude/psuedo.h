@@ -98,7 +98,14 @@ struct Tile{
     unsigned int TextureID;
 };
 
-bool32 check_collision(collision_box* box1 = nullptr, collision_box* box2 = nullptr);
+struct Glyph_Map{
+    GLuint TextureID;
+    ttf_buffer[1<<25];
+    unsinged char* bitmap;
+    int w,h,i,j,c, Xoffset, Yoffset;
+};
+
+Glyph_Map Glyphs_Map = {};
 
 unsigned int LoadTileTexture(char* path){
     std::string dir = ".\";

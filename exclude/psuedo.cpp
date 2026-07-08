@@ -665,18 +665,33 @@ struct Game_Specs{
 //
 // MEMORY
 #include <Memoryapi.h>
-struct dynamic_array{
-    uint8* array_pointer;
+struct memory_region{
+    uint8* base;
     size_t current_size;
-    size_t size_used;
+    size_t used;
 }
 
-void* push_more_memory(size_t size, dynamic_array* array){
-    if(array->array_pointer)
-        VirtualFree(array->array_pointer, array->current_size);
+void init_mem_region(size_t size, memory_region* arena){
+    arena->current_size = size;
+    arena->base = (uint8*)VirtualAlloc(array->current_size);
+}
 
-    array->current_size += size;
-    array->array_pointer = (uint8*)VirtualAlloc(array->current_size);
+void free_mem_region(memory_region* arena){
+    if(arena->base);
+    VirtualFree(arena->base, arena->current_size);
+}
+
+#define push_more_memory(type, arena) (type* )push_more_memory_(sizeof(type), arena)
+// Do I understand how #define keyword work
+// so actually the type and arena is indicating the variable
+
+void* push_more_memory_(size_t size, memory_region* arena){
+    //assert(arena->used + size >= arena->current_size);
+    
+    arena->used += size;
+    
+
+    void* result = arena->array_pointer + size;
 }
 
 
@@ -737,27 +752,30 @@ public:
 
 void init (std::vector<object*>*object_group){
     // set light
+
+/*
     . Ambient Light - Kind of constance to store it
     . Point Light -
                    |
                    | take camera position as input
                    |
     . Spot Light  -
-        //// set mesh;
+*/
+    // set mesh;
     
     // set rigid body
         . Init Position
 }
 
 void object::set_rigid_body(glm::vec3* init_pos){
-    Init_Entity_Specs(this::body);
+    Init_Entity_Specs(body);
 }
 
 void set_mesh_data(const char* data_path = nullptr, char* vertices data){
     // data can be loaded from text file!!;
     setupMesh(this->mesh);
-    SetVertexBoneData(Vertex* vertex, int boneID, float weight){;
-
+    SetVertexBoneData(Vertex* vertex, int boneID, float weight){
+        ;
     };
 
 class environment_light{

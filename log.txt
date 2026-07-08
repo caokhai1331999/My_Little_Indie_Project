@@ -2251,3 +2251,14 @@ Here here how it work:
      . Then when it hit return/end. It shrink down
   The reason to explain why it work this way is to ensure that nothing can get
   out of it scope when app is in the middle of it.
+
+---------------- Wed, 08 Jul 26: 10:44AM
+
+BANDWIDTH (in gpu and in gerneral) is the peaked amount of data that can be
+passed through wire.
+
+
+So to expand the memmory we basically just call VirtualAlloc() with bigger size
+
+Maybe the stack shrink the data of the vertices itself before it got out of the
+function

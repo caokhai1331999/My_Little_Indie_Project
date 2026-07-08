@@ -109,10 +109,13 @@ void loadModel_(Model_* model, string path){
 void processNode(Model_* model, aiNode* node, const aiScene* scene){
     // process all the node'scene meshes (if any)
     aiMesh* mesh;
+    Mesh* spawn_mesh;
     if(node->mNumMeshes > 0){
         for(unsigned int i = 0; i < node->mNumMeshes; i++){
             mesh = scene->mMeshes[node->mMeshes[i]];
-            model->meshes.push_back(model->processMesh(mesh, scene));
+            spawn_mesh = model->processMesh(mesh, scene);
+            //model->meshes.push_back(model->processMesh(mesh, scene));
+            model->meshes.push_back(spawn_mesh);
         }
     }
 
@@ -200,10 +203,10 @@ Mesh* Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
     //} else {
         //printf("Somehow mesh have no material that means no texture; index: %d\n", mesh->mMaterialIndex);
     //}
-        Model_::ExtractBoneWeightForVertices(mesh, vertices);
+        Model_::ExtractBoneWeightForVertices(mesh, &vertices);
         //return Mesh(vertices, indices, textures);
         // This work
-        Mesh* OutPut = new Mesh(vertices, indices, textures);
+        Mesh* OutPut = new Mesh(&vertices, indices, textures);
         return OutPut;
 }
 
@@ -329,7 +332,8 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
 }
 
 
-void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex>&vertices){
+//void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex>&vertices){
+void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex>*vertices){
 
     std::unordered_map<std::string, Bone_Info>* mBoneInfoMap = this->m_BoneInfoMap;
     unsigned int boneID = -1;
@@ -370,8 +374,8 @@ void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex
                 vertexId = weights[weightIndex].mVertexId;
                 weight = weights[weightIndex].mWeight;
 
-                assert(vertexId <= vertices.size());
-                SetVertexBoneData(&vertices[vertexId], boneID, weight);
+                assert(vertexId <= vertices->size());
+                SetVertexBoneData(&(*vertices)[vertexId], boneID, weight);
             }
 
         }

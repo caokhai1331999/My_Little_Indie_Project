@@ -86,17 +86,21 @@ struct Mesh{
     unsigned int VBO, EBO;
     unsigned int VAO;
 
-    vector<Vertex> vertices;
+    //vector<Vertex> vertices;
+    vector<Vertex>* vertices;
     vector<unsigned int> indices;
     vector<Texture> textures;
     // MESH constructor
-    Mesh( vector<Vertex> vertices,
+    Mesh( vector<Vertex>* vertices_,
           vector<unsigned int> indices,
-          vector<Texture> textures):vertices(vertices), indices(indices), textures(textures)
+          vector<Texture> textures):indices(indices), textures(textures)
           {
               VBO = 0;
               EBO = 0;
               VAO = 0;
+
+              vertices = new vector<Vertex>;
+              *vertices = *vertices_;
           }    
 };
 

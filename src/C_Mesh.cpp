@@ -33,7 +33,7 @@ void setupMesh(Mesh* mesh){
         
         // Load data into vertex buffer
         glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
-        glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size()*sizeof(struct Vertex), &mesh->vertices[0], GL_STATIC_DRAW);        
+        glBufferData(GL_ARRAY_BUFFER, mesh->vertices->size()*sizeof(struct Vertex), mesh->vertices->data(), GL_STATIC_DRAW);        
         // Time to set vertex attribute pointers
         // POSITION
         glEnableVertexAttribArray(0);
