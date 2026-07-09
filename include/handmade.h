@@ -233,8 +233,8 @@ struct Game_Input{
 struct Game_Memory{
     bool32 IsInitialized; 
     uint64 PermanentStorageSize;
-    uint64 TransientStorageSize;
     void* PermanentStorage;
+    uint64 TransientStorageSize;
     void* TransientStorage;
 };
 

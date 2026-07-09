@@ -159,7 +159,7 @@ Mesh* Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
             }
             //
             //
-            //vertices = (vertex* )malloc(sizeof(vertex));
+            //
             //vertices->array_pointer = push_more_memory(sizeof(vertex), vertices)
             //
             vertices.push_back(vertex);

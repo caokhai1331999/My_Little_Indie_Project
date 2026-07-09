@@ -671,6 +671,8 @@ struct memory_region{
     size_t used;
 }
 
+// apply to grow vertex array
+
 void init_mem_region(size_t size, memory_region* arena){
     arena->current_size = size;
     arena->base = (uint8*)VirtualAlloc(array->current_size);
@@ -681,19 +683,26 @@ void free_mem_region(memory_region* arena){
     VirtualFree(arena->base, arena->current_size);
 }
 
-#define push_more_memory(type, arena) (type* )push_more_memory_(sizeof(type), arena)
+#define push_more_space(type, arena) (type* )push_more_memory_(sizeof(type), arena)
 // Do I understand how #define keyword work
 // so actually the type and arena is indicating the variable
 
 void* push_more_memory_(size_t size, memory_region* arena){
-    //assert(arena->used + size >= arena->current_size);
-    
+    assert(arena->used + size >= arena->current_size);
     arena->used += size;
-    
-
+    VirtualAlloc(size, arena->base);
     void* result = arena->array_pointer + size;
+    VirtualFree();
 }
 
+void* copy_memory(size_t size, type* source, memory_region* arena){
+    ;
+}
+
+void push_data(type source, memory_region* arena){
+    push_more_space(sizeof(source, arena));
+    copy_memory(&source, arena);
+}
 
 struct Mesh{
     //
