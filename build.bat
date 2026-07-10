@@ -17,7 +17,8 @@ set yr=%date:~-4,4%
 set yr=%yr: =0%
 
 set DIRECTIVES_FLAG=/DDEBUG=1 /DINTERNAL=1 /DSTD_140=1 /DDISPLAY_TIME=1
-set COMPILE_FLAG=/FC /Zi /EHsc
+set COMPILE_FLAG=/FC /Zi /EHsc /MT
+rem new flag /MT
 set LIB_= strmiids.lib uuid.lib Kernel32.lib user32.lib gdi32.lib Opengl32.lib assimp-vc143-mtd.lib
 set _include=..\include
 set glad_include=..\include\glad
@@ -54,7 +55,7 @@ rem=========================================
 rem del Camera.obj Light.obj entity.obj
 rem del %dll_name%__* light32.exp light32.lib
 rem set dll_name_with_time_=%dll_name%__%hr%_%min%_%sec%__%dd%-%mm%-%yr%
-rem cl /LD /Zi /EHsc /FD  %DIRECTIVES_FLAG% %src_files_for_dll% %glad_src% -I%_include% -I%glad_include% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link /PDB:%dll_name_with_time_%.pdb %LIB_% /LIBPATH:%ASSIMP_LIB% /FORCE:MULTIPLE /IGNORE:4006 /IMPLIB:%dll_name%.lib /OUT:%dll_name%.dll
+rem cl /LD /FD %COMPILE_FLAG% %DIRECTIVES_FLAG% %src_files_for_dll% %glad_src% -I%_include% -I%glad_include% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link /PDB:%dll_name_with_time_%.pdb %LIB_% /LIBPATH:%ASSIMP_LIB% /FORCE:MULTIPLE /IGNORE:4006 /IMPLIB:%dll_name%.lib /OUT:%dll_name%.dll
  
 rem ====================================== 
 

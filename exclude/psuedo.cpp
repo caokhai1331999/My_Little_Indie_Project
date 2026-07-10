@@ -690,9 +690,8 @@ void free_mem_region(memory_region* arena){
 void* push_more_memory_(size_t size, memory_region* arena){
     assert(arena->used + size >= arena->current_size);
     arena->used += size;
-    VirtualAlloc(size, arena->base);
-    void* result = arena->array_pointer + size;
-    VirtualFree();
+    void* result = arena->base + arena->used;
+    return result;
 }
 
 void* copy_memory(size_t size, type* source, memory_region* arena){
