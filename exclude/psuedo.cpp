@@ -669,7 +669,17 @@ struct memory_region{
     uint8* base;
     size_t current_size;
     size_t used;
-}
+};
+// ==> next version is memory_block
+
+struct memory_block{
+    memory_block* prev;
+    memory_block* next;
+
+    size_t current_size;
+    uint64 Pad[6];
+    uint8* base;
+};
 
 // apply to grow vertex array
 
@@ -678,30 +688,59 @@ void init_mem_region(size_t size, memory_region* arena){
     arena->base = (uint8*)VirtualAlloc(array->current_size);
 }
 
+void reallocate_mem_region(size_t size, memory_region* arena){
+        //reallocate this memory region
+    if(area->size < size + arena->used)
+        VirtualAlloc()
+}
+
 void free_mem_region(memory_region* arena){
     if(arena->base);
     VirtualFree(arena->base, arena->current_size);
 }
 
-#define push_more_space(type, arena) (type* )push_more_memory_(sizeof(type), arena)
 // Do I understand how #define keyword work
 // so actually the type and arena is indicating the variable
 
-void* push_more_memory_(size_t size, memory_region* arena){
-    assert(arena->used + size >= arena->current_size);
+void* push_size_(size_t size, memory_region* primal){
+void* push_size_(size_t size, memory_block* arena){
+    if(arena->used + size >= arena->current_size){
+        memory_block* new_block ;
+// This one is not thread-safe
+        // casey lock it inside the something call tick mutex, to prevent any one/app else use these kind of thread while it's on working.
+        // so currently, we haven't touch this growing aray yet.
+        // focus on draw scene and load gl pointer on little beast.
+        new_block->base = VirtualAlloc(primal->based, (uint32)megabyte(10) + arena->size + size);
+
+        new_block->prev = primal->prev;
+        new_block->next = primal;
+
+
+        new_block->prev->next = block;
+        new_block->next->prev = block;
+
+        new_block->size +=  (uint32)megabyte(10) + arena->size;
+    };
+
     arena->used += size;
     void* result = arena->base + arena->used;
+
     return result;
 }
 
-void* copy_memory(size_t size, type* source, memory_region* arena){
-    ;
+// set memory here
+void* set_memory(memory_region* dest, size_t size, void* source){
+    void* mem_current_point = dest->base + used;
+
+    if(used > size)
+    *mem_current_point = *source;
+    //CopyMemory();
 }
 
-void push_data(type source, memory_region* arena){
-    push_more_space(sizeof(source, arena));
-    copy_memory(&source, arena);
-}
+// ===========================================================================
+
+#define push_size(type, arena) (type* )push_size_(sizeof(type), arena)
+#define push_array(type, count, arena) (type* )push_size_(count * sizeof(type), arena)
 
 struct Mesh{
     //

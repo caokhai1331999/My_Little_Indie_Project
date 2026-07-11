@@ -17,8 +17,8 @@ set yr=%date:~-4,4%
 set yr=%yr: =0%
 
 set DIRECTIVES_FLAG=/DDEBUG=1 /DINTERNAL=1 /DSTD_140=1 /DDISPLAY_TIME=1
-set COMPILE_FLAG=/FC /Zi /EHsc /MT
-rem new flag /MT
+set COMPILE_FLAG=/FC /Zi /EHsc /MT /Fm
+rem new flag /MT /Gm
 set LIB_= strmiids.lib uuid.lib Kernel32.lib user32.lib gdi32.lib Opengl32.lib assimp-vc143-mtd.lib
 set _include=..\include
 set glad_include=..\include\glad
