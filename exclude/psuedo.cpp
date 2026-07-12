@@ -665,6 +665,7 @@ struct Game_Specs{
 //
 // MEMORY
 #include <Memoryapi.h>
+//======================MEMORY_PART==========================
 struct memory_region{
     uint8* base;
     size_t current_size;
@@ -688,12 +689,6 @@ void init_mem_region(size_t size, memory_region* arena){
     arena->base = (uint8*)VirtualAlloc(array->current_size);
 }
 
-void reallocate_mem_region(size_t size, memory_region* arena){
-        //reallocate this memory region
-    if(area->size < size + arena->used)
-        VirtualAlloc()
-}
-
 void free_mem_region(memory_region* arena){
     if(arena->base);
     VirtualFree(arena->base, arena->current_size);
@@ -703,9 +698,10 @@ void free_mem_region(memory_region* arena){
 // so actually the type and arena is indicating the variable
 
 void* push_size_(size_t size, memory_region* primal){
-void* push_size_(size_t size, memory_block* arena){
     if(arena->used + size >= arena->current_size){
-        memory_block* new_block ;
+// start mutex
+        //
+        memory_block* new_block;
 // This one is not thread-safe
         // casey lock it inside the something call tick mutex, to prevent any one/app else use these kind of thread while it's on working.
         // so currently, we haven't touch this growing aray yet.
@@ -718,7 +714,8 @@ void* push_size_(size_t size, memory_block* arena){
 
         new_block->prev->next = block;
         new_block->next->prev = block;
-
+// end mutex
+        
         new_block->size +=  (uint32)megabyte(10) + arena->size;
     };
 
@@ -737,10 +734,43 @@ void* set_memory(memory_region* dest, size_t size, void* source){
     //CopyMemory();
 }
 
-// ===========================================================================
 
 #define push_size(type, arena) (type* )push_size_(sizeof(type), arena)
 #define push_array(type, count, arena) (type* )push_size_(count * sizeof(type), arena)
+
+//======================MEMORY_PART=========================
+
+//======================LIGHT_PART==========================
+struct general_light{
+    glm::vec3 ambient;
+    glm::vec3 specular;
+    glm::vec3 diffuse;
+};
+
+struct dir_light{
+    general_light specs;
+    glm::vec3 direction;
+};
+
+struct point_light{
+    general_light specs;
+    // For attenuation (Point Light)
+    float constant;
+    float linearTerm;
+    float quadraticTerm;
+}
+    //
+struct Enviromental_Element{
+    std::vector<general_light*>light_group;    
+};
+
+// Think about set this light group shrewly
+void turn_on_light(std::vector<general_light*>* light_group){
+    for(general_light* const &light: light_group){;
+        set
+    };
+}
+//======================MESH_PART==========================
 
 struct Mesh{
     //
@@ -750,36 +780,21 @@ struct Mesh{
 }
 //===========================================================
 
-struct world{
-    std::vector<object*>*object_group;
-    std::vector<object*>*camera_set;
-    std::vector<general_light*>lights_group;
-};
-
 // PURPOSE: Create a mechanism that draw multiple object of scene using instancing method and available asset.
-//
+// In terms of graphics
+// enviromental elements is just light
 
-struct general_light{
-    glm::vec3 position;
-
-    glm::vec3 ambient;
-    glm::vec3 specular;
-    glm::vec3 diffuse;
-}
-
-class Enviromental_Element{
-    std::general_light;
-}
-
+// add auto-guide
+// ALL_IN_ONE    
 class object{
 private:
     std::string name;
-    B_shader_program* program;
+    B_shader_program* shader;
     Mesh* mesh;
     rigid_body* body;
 public:
     update_(clock_set* clock);
-    B_shader_program* get_shader(return program);
+    B_shader_program* get_shader(return shader);
     // model path is optional
     object(const char* name_ = nullptr, char* shader_path = nullptr, char* model_path = nullptr):name{name}{
         std::string shader_name = name_;
@@ -795,9 +810,11 @@ public:
     }
     void set_mesh_data(const char* data_path);
     void set_rigid_body();
+    void move();
 }
 
-void init (std::vector<object*>*object_group){
+//===============LOOP_RUNNING_THEM=====================
+void init (const char* path, std::vector<object*>*object_group, std::vector<general_light*> light_group){
     // set light
 
 /*
@@ -809,26 +826,30 @@ void init (std::vector<object*>*object_group){
     . Spot Light  -
 */
     // set mesh;
-    
+    set_mesh_data(path);
     // set rigid body
-        . Init Position
+    //. Init Position
+    glm::vec3 pos = glm::vec3(0.0f);
+    for(object* const &obj : object_group){
+        object->set_rigid_body(&pos);
+        pos.x += 1.0f;
+        if(pos.x > 10.0f)
+            pos.z += 1.0f;
+    }
+
+    turn_on_light(light_group);
 }
 
 void object::set_rigid_body(glm::vec3* init_pos){
     Init_Entity_Specs(body);
 }
 
-void set_mesh_data(const char* data_path = nullptr, char* vertices data){
+void object::set_mesh_data(const char* data_path = nullptr, char* vertices data){
     // data can be loaded from text file!!;
     setupMesh(this->mesh);
     SetVertexBoneData(Vertex* vertex, int boneID, float weight){
         ;
     };
-
-class environment_light{
-    // basic ambient light
-    // point light
-    // spot light
 }
 
 void update(std::vector<object*>* objects_group, input, clock_set* clock){
@@ -836,11 +857,14 @@ void update(std::vector<object*>* objects_group, input, clock_set* clock){
     for(object* const &obj: objects_group){
         obj->update(clock);
 // or
+        // This is O(n²) problems
+        check_collision(obj->rigid_body);
+
         move_object(clock, obj->rigid_body);
     };
 }
 
-void render (std::vector<object*>*objects_group, Camera* chosen_camera){    
+void render (std::vector<object*>*objects_group){    
 
     //for(int i = 0; i < (int)objects_group->size()-1; i++){
     for(objects* const &obj: *objects_group){
@@ -852,3 +876,4 @@ void render (std::vector<object*>*objects_group, Camera* chosen_camera){
     };
     glUseProgram(0);
 }
+//===================================================================

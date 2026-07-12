@@ -2272,3 +2272,11 @@ up.
 
 This one is not thread-safe casey lock it inside the something call tick mutex,
 to prevent any one/app else use these kind of thread while it's on working. so currently, we haven't touch this growing aray yet. Focus on draw scene and load gl pointer on little beast.
+
+---------------- Sun, 12 Jul 26: 11:03AM
+The memory seemed more dangerous and costy, After done prototyping it, still
+don't dare to bring it to work.
+
+Focus on something dynamical.
+set basic light
+then try to make this mechanism to draw a full scene.
