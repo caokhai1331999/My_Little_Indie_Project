@@ -100,10 +100,6 @@ private:
 // wherein x is analogous to y and z is similar to x in 2D coordinates
 //
 
-
-void drawTile(const unsigned int VaoID = 0, const B_shader_program* Brush = nullptr, const Tile_Map* Map);
-
-
 bool* load_bin_map(std::string* name){
     
     std::ifstream bin_map {*name, s.binary | s.trunc | s.in};
@@ -547,81 +543,6 @@ out vec4 fragColor;
      OutFrag *= Light.abient * attenuation;
      fragColor = vec4(OutFrag, 1.0f);
  };
-// We may set texture coordinate as inherent data type at the shader creating stage
-//
-
-#if !defined
-#define STB_TRUE_IMPLEMENTATION 1;
-#include "stb_truetype.h"
-#endif
-
-void init_font(char* path, char* , Font* font){
-   fread(glyphs_map.ttf_buffer, 1, 1<<20, fopen(path, "rb"));
-   // Load font data
-   stbtt_BakeFontBitmap(glyphs_map.ttf_buffer,0, 32.0, glyphs_map.bitmap,512,512, 32,96, cdata);
-   // no guarantee this fits!
-   // can free ttf_buffer at this point
-   glGenTextures(1, &font->font_texture);
-   glBindTexture(GL_TEXTURE_2D, font->font_texture);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 512,512, 0, GL_ALPHA, GL_UNSIGNED_BYTE, glyphs_map.bitmap);
-   // can free temp_bitmap at this point
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-}
-
-// Display Font Buffer.
-// Use bitmap font loading on 2D squad
-// load text to font display
-// Or time to render in group
-//
-//
-// x, y, w, h
-// We loop through the character of char* array. Then render each of it
-void CalcGlyphProperties_(Glyph_Map* map, int index){
-    ;
-}
-
-void RenderStringOnScreen(Glyph_Map* map, const char* string, B_shader_program* shader){
-    char glyph_ = string[i];
-    glm::vec2 glyph_Pos_Offsset = CalcGlyphProperties_(map, i);
-    
-    map->bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 128.0f), glyph_, &map->w, &map->h, &map->Xoffset, &map->Yoffset);
-    
-    // Render glyp using opengl api
-    glActiveTexture(GL_TEXTURE0+map->TextureID);
-    glBindTexture(GL_TEXTURE_2D, map->TextureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, map->w, map->h, 0, GL_RG, GL_UNSIGNED_BYTE, map->bitmap);
-
-    // set offset pos
-    shader->SetVec2("offset["+to_string(i)+"]".c_str(), &glyph_Pos_Offsset[0]);
-};
-
-// We need to define the area's position, size, ...
-// Then calculate the glyph specs based on these.
-//
-Rect_ rect = {0, 0, 400, 100}
-
-glm::vec2 void CalcGlypProperty(const glm::vec2* previous_glyp_specs, const Rect_* rect){
-    glm::vec2 font_specs;
-    if(*previous_glyp_p.x + w < rect->w){
-        font_specs.x = *previous_glyp_specs.x + *previous_glyp_specs.w;
-    }else{
-        font_specs.x = 0;
-        font_specs.y = *previous_glyp_specs.y + *previous_glyp_specs.h;
-    }
-    return font_specs;
-}
-
-// Init: OpenGL, entities's specs
-// Update : position, animation
-// Render : Vertex, Texture, model,
-// Vertex and Texture date belong to Mesh which is bound to ID of entities which contain updated states(Position, level, health)
-
-class RandomScene {
-    // Terrain
-    // Moving Object
-    int ID;
-    
-}
 
 void (const aiNode* Node = nullptr, int total_meshes_number = 0){
 
@@ -666,6 +587,7 @@ struct Game_Specs{
 // MEMORY
 #include <Memoryapi.h>
 //======================MEMORY_PART==========================
+// This is a derivative work from Casey shown down for my dedicated senior
 struct memory_region{
     uint8* base;
     size_t current_size;
@@ -682,6 +604,21 @@ struct memory_block{
     uint8* base;
 };
 
+// first we have to create ticket that is related to the threadID in cheap way.
+// 
+struct ticket_mutex{
+    uint64* ticket;
+    uint64* serving;
+}
+
+void begin_ticket_mutex(ticket_mutex* mutex){
+    uint64* ticket = AtomicAddUint64(mutex->ticket);
+    while{ticket != mutex->serving}
+}
+
+void end_ticket_mutex(ticket_mutex* mutex){
+    AtomicAddUint64(mutex->ticket);
+}
 // apply to grow vertex array
 
 void init_mem_region(size_t size, memory_region* arena){
