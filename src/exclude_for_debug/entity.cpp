@@ -165,6 +165,7 @@ void ApplyMomentum(float delta_t, rigid_body* object){
 };
 
 void Jump(float delta_t, rigid_body* object){
+
     object->position[3][1] = based_a_v_Pos_calc(-object->object_speed.jump_a, -object->object_speed.jump_v, object->position[3][1], delta_t);
     if(object->object_speed.current_states.fancy_move == JUMPING_FORWARD){
           object->position[3][2] = based_a_v_Pos_calc(-object->object_speed.jump_a * 0.4f, -object->object_speed.jump_v * 0.7, object->position[3][2], delta_t);

@@ -2283,3 +2283,11 @@ then try to make this mechanism to draw a full scene.
 
 ---------------- Mon, 13 Jul 26: 10:21AM
 
+
+---------------- Tue, 14 Jul 26: 10:34AM
+Try to make the memory allocation work
+NOTE: Should I store texture in separated place
+So how mutex code work to separate the thread from overwritting same location
+same time. what is serving why loop when come to it???
+The key here that we don't know what is atomic operations. So the atomic add is
+to prevent interruption/preemptive

@@ -1,0 +1,230 @@
+IMPORTANT!! :  Keep In Mind that you always prepare for learning new thing. But
+do it efficiently, with proper method.
+
+1 . Create Window app by entry function int CALLBACK WindMain(...)
+   - Create window using CreateWindowEx()
+   - Create WNDCLASS = {}; + Set its attributes
+   
+2 . If(window) -> Game Loop
+
+3 . Inside game Loop -> received and dispatch message using GetmessageA()...
+
+4 . Draw every bit of BitmapMemory( using pointer point to it) with bltbit, which relate to many element like:
+   - Drawing using nest loop through width and height
+   -
+   
+5 . Loop through input keyboard (WM_...) by switch received message:
+
+6 . Create sinewave sound by using directsound
+   - By mention this : I must created 2 sound buffer the 2nd is to stored the
+     the sound data
+   - Understand the play and write chasing cursor. Therein, the ByteToWrite
+   equal to buffersize , buffersize - byteToLock, 0 depend on situation
+   - Call out the pointer to the region and then fill it (+=
+   sampleOut(2*pi*1/wavePeriod))
+   
+7 . Debug with MSVC (work around it)
+8 . Create the function like type using define and typedef
+9 .*** Effectively using pointer
+10. Create ms per frame counter by using formula (counts per
+frame / counts per second) * 1000, using PerfCountFrequencyResult and intrinsics
+__rdtsc()
+
+11.(15/08/2024) Use #if #else #endif to make cross platform suitable codes the
+var name is mean to using in the compile command(using the -D"NAME"=1 after the
+cl command) (NOT RECOMMENDED ONE)
+
+12.(16/08/2024) Better way is to Extract the code from the original file, put it
+in platform files to make a virtualized function called ever we need for every
+specific platform like : platform_sound_device* device = ...;
+platform_window_device
+
+13.Another way is to think a platform as services to the operating system level to
+produce graphic and sound neccessary to play the game
+
+14. Input Management: Old and New Input managing to catch more complex input
+form
+
+15. Manage memory in form called GAMESTATE!! (Still have alot to learn about
+this)
+
+16. Window library data layer.(Nearly apply to all app component : from window,
+       sound to OpenGl api)
+       Declare data variable
+       Write/Create it (manually or inherent function)
+       assign it to system (by other inherent function)
+
+17. Most of graphic process in window app relate to HDC(Device context). We get it change it the way we want to make thing show
+
+18. IMPORTANT!!
+Casey showed me his insight about learning new things. He won't start doing it
+himself unless he knows for sure that everyone is an idiot in that domain. What
+he usually do is look for paper/document about topic is want to learn online,
+when he know there someone who already done it. These document usually in pdf
+and he will read all of them. Then just apply and make knowledge that suitable
+for him or necessary/he understood his.
+
+One more thing is that thing about creating and deleting pointers not
+individually but In Group. Now ownership is trivial and obvious.
+
+Every single texel/pixel on the object is the aggregated effect of all the light
+source that affect that object.
+
+So Based on Casey: there are 3 kinds of surface that we need to replicate :
+                   . Diffuse
+                   . Glossy/Emission
+                   . Reflectant/Specular
+To Casey, when doing 2D games we just need to do the approximation of it cause
+                   artist already did majority of the light job
+  . So we came up with something called Light Probes:
+  He refer to lookup table just like one that Kesse did
+  Then He think about solutions: normal map, or on the mesh. He will make a
+                   small resolution bitmap/lightmap to simulate the light
+                   from source.
+
+. Normal Map lighting.
+simulate light for limited hardward and 2D game.
+. When reading something necessary, first apply something that is suitable to
+us and what we understand, NOT ALL.
+
+19. Time for motion in play.
+001. The Equation of Motion.
+     .. About the Rigid Body Dynamics.
+1. Linear (Trajectory).
+First of all we have some calculus represent the location of object: f(t) = t2
++4t + 5
+And he said he doesn't have hardward to tell/comput the location of object
+everyframe.
+
+x = f(t) = 5t² + 10t + 3 | x = f(t) = (1/2)at² + vt + p : p is existing position
+                                      -------------
+                                         Distance
+x`= f`(t)= 5t + 10       | x`= f`(t)= at + v : v is existing veclocity
+x`` = f``(t) = 5         | x`` = f``(t) = a  : a is existing acceleration.
+
+
+Instead of Thinking about ground or floor, Think about it like a room.
+to avoid player fall into some unknown void space due to design bugs.
+
+20. Font Loading.
+Display Font Buffer.
+Use bitmap font loading on 2D squad
+
+
+21. Memory Management
+   . Small : stack get rid of data inside the function/ shrink the size of
+   itself to guarantee there are nothing get out when app is in the middle of
+   the function. So we have to copy the data that we need before it got out
+
+   . Dynamically grow the array/region of data : (Kind of simple if we
+   understand the alighment bit mechanism)
+        .. we create an arena struct :
+              struct arena {
+                   uint8* base;//pointer to data pool
+                   size_t used_counter;
+                   size_t inited_size;
+              }
+           method is simple whenever the request side + used one treepass the
+   threshold (inited_size in this case). We will reallocate new region/storage
+   and copy available data for arena
+
+   . Like what Apple did. Casey introduce the concept of transient space, that
+   is not to store the game, one can go away anytime. He want to avoid round
+   trip which and the game is just a service of the platform. Anything take they
+   just take all of them in one call.
+   
+     The first prototype of memory management that Casey created is, He init
+     blank memory pool with given size. Then take point/data from that pool by
+     increasing the base pointer by the size of requested data. The dynamic
+     array concept is based on this plus while it come to the size limit of the
+     pool, instead of hit assert he will reallocate and enlarge the pool..
+
+   . For the sake of capture dynamically growing array. Casey created many block
+   linked with each other to capture all of them.
+
+Atomic Operation. :: This one is multi-threading
+       - One method to ensure this is the interclocked operation. It work on cpu
+       level rather than the app's one. Cause it very fast
+       - We have to know these fundamentals to go further:
+            . Core include many units: instruction decoding, arithmatic logical
+                                unit, memory unit. OS can usually assign 1
+                                thread per core, But if the core is
+                                hyperthreading one, we can assign more than more
+                                thread for that one.            
+            . CPU state: + Process : ++ Many Threads each contain :
+                                     ++ Memory Mapping: in virtuall memory page:
+                                        * Registry, memory, TCD, ...
+                         + Thread:   ++ Assembly instruction for CPU:
+                                        Appear physically in the hardware, can
+                                        be executed concurrently.
+                         + Fiber(not in use so just for fully infor):
+                                     ++ Manual version of thread, we can save
+                                        the CPU state on them. But we can't
+                                        execute them concurrently.
+            . "Processor" type: .. Out of order: ex: win x64: big window,
+                                   can grab many instructions.-> drastically less
+                                   hyperthreading cause it can use stuff in the
+                                   same thread much more efficiently. 
+                                .. In of order: This type execute instructions
+                                   one by one, stall more often and need more
+                                   hyperthreading.
+            . OS's interrupts: when our game is running, os come in instead of
+            let the code running on the cpu core. It save them state. Do
+            other work on that core, and then execute our game's assem
+            instruction/thread on other core.
+            . Preemption: or Preemptive Multitasking OS in OS: Don't interrupt,
+            have something called Yield() to execute our game's thread. Can be
+            dissappeared if our asm is bad written. More efficient.
+       - M.E.S.I(Modified.Exclusive.Shared.Invalid)(4 flags) protocol: JOB: To
+       ensure cache line coherence among cores. -> that mean to ensure the core
+       won't unexpectedly overwrite the same memory's location in app running
+       realtime.
+       For ex: core1 write to memory location 0x100 from 0 -> 4 then core4 have
+       to take the that same memory location value as 4.
+
+       - Ticking Taking: Is the process to ensure when we access a particular
+       piece of data/adress. we are the only person who are doing that.
+             .. Then, we have something call mutex(mutual exclusion) Thing is
+             the mutex basic loop can cause the latency cause it
+       doesn't know all the threads which can come in to take the memory part
+       - Casey came up with an idea name mutex_ticket. which is distribute the
+       tickets to all of the thread there are with unique number. Then do a loop
+       through the ticket every that the thread hold which give the order of
+       their turn to come.
+
+       - So Atomic Operation: is the operation that is not switch/swap or
+       interrupt while running. But how to implemeting it??? 
+       - InterClock vs Mutex : . InterClock is based on MESI protocol which prevent
+   cache of more than one core own the same memory location simultaneously.
+                           . Mutex is a programmed structure built above the
+   system, it works like an owning mark of every memory location, for every
+   app/piece of code that concurrently running. If one app open first and
+   already take a memory location to use, the mutex mark that is is owned and
+   the other app have to get in line and wait for turn to use that memory location.
+
+       . Basic implementation of link-list:
+       struct link{
+       link* next;
+       link* prev;
+       void* base;
+       }
+       link* first;
+       link* new;
+In order to add new to first we have to:
+         new->next = first->next;
+                              | new --------
+//if we do otherwise we will  |   ^         |
+//lose what the first pointer |   |        _v__ 
+//is pointing to              | fist--x-> |____|        
+         first->next = new;
+         new->prev = first;
+
+
+        . Then we have two approachs about this
+          .. Atomic exchange :
+             if(*dest == expect)
+                *dest = new;
+          .. Atomic increment:
+             if(*dest == expect)
+                *dest++ = *source++;
+      

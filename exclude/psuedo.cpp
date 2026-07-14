@@ -600,6 +600,8 @@ struct memory_block{
     memory_block* next;
 
     size_t current_size;
+    uint64 minimum_blocksize;
+    
     uint64 Pad[6];
     uint8* base;
 };
@@ -607,17 +609,28 @@ struct memory_block{
 // first we have to create ticket that is related to the threadID in cheap way.
 // 
 struct ticket_mutex{
-    uint64* ticket;
-    uint64* serving;
+    // keep in mind that the volatile is type that can be delared as an object and modified by hardware
+    volatile uint64 ticket;
+    // serving is current intercepting thread which id is taken from getthreadid.
+    volatile uint64 serving;
+    // the ticket loop is just waiting until the thread left/retire before the other get in to execute that line of code again.
+}
+
+void AtomicAddUint32(uint32* addend, uint32 value){
+// use this to create threadId based ticket and loop through them.
+    // until it retire in order.
+    // Cause this one very fast(cpu level). --> it ensure that no 2 threads can have the same ticket numbers
+    // This one is just the order that a thread hit this line, all of these satisfy the M.E.S.I protocol
+    InterlockedExchangeAdd((long*)addend, value);
 }
 
 void begin_ticket_mutex(ticket_mutex* mutex){
-    uint64* ticket = AtomicAddUint64(mutex->ticket);
-    while{ticket != mutex->serving}
+    uint64* ticket = AtomicAddUint64(&mutex->ticket, 1);
+    while(ticket != mutex->serving)
 }
 
 void end_ticket_mutex(ticket_mutex* mutex){
-    AtomicAddUint64(mutex->ticket);
+    AtomicAddUint64(&mutex->ticket, 1);
 }
 // apply to grow vertex array
 
@@ -633,6 +646,7 @@ void free_mem_region(memory_region* arena){
 
 // Do I understand how #define keyword work
 // so actually the type and arena is indicating the variable
+#define DEFAULT_BLOCK_SIZE GIGABYTE(1)
 
 void* push_size_(size_t size, memory_region* primal){
     if(arena->used + size >= arena->current_size){
@@ -643,7 +657,7 @@ void* push_size_(size_t size, memory_region* primal){
         // casey lock it inside the something call tick mutex, to prevent any one/app else use these kind of thread while it's on working.
         // so currently, we haven't touch this growing aray yet.
         // focus on draw scene and load gl pointer on little beast.
-        new_block->base = VirtualAlloc(primal->based, (uint32)megabyte(10) + arena->size + size);
+        new_block->base = VirtualAlloc(primal->based, max(arena->current_size, arena->minimum_blocksize));
 
         new_block->prev = primal->prev;
         new_block->next = primal;
