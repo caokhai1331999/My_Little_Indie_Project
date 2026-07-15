@@ -2291,3 +2291,8 @@ So how mutex code work to separate the thread from overwritting same location
 same time. what is serving why loop when come to it???
 The key here that we don't know what is atomic operations. So the atomic add is
 to prevent interruption/preemptive
+
+---------------- Wed, 15 Jul 26: 03:31PM
+
+So the u64 ticket, serving is just a random number, what important is the
+volatile type and the interlockedadd function

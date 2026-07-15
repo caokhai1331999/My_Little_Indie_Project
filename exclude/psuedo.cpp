@@ -625,12 +625,16 @@ void AtomicAddUint32(uint32* addend, uint32 value){
 }
 
 void begin_ticket_mutex(ticket_mutex* mutex){
-    uint64* ticket = AtomicAddUint64(&mutex->ticket, 1);
+    uint64 ticket = AtomicAddUint64(&mutex->ticket, 1);
+    // mutex->ticket is now auto change
+    // But why when the ticket equal to ticket thread id that we know it get out.
+    // 
     while(ticket != mutex->serving)
 }
 
 void end_ticket_mutex(ticket_mutex* mutex){
-    AtomicAddUint64(&mutex->ticket, 1);
+    AtomicAddUint64(&mutex->serving, 1);
+    // Whenever the ticket equal to the threadId that mean the thread get out of code lines and bring instruction to the core
 }
 // apply to grow vertex array
 
@@ -651,10 +655,10 @@ void free_mem_region(memory_region* arena){
 void* push_size_(size_t size, memory_region* primal){
     if(arena->used + size >= arena->current_size){
 // start mutex
-        //
+        Begin
         memory_block* new_block;
-// This one is not thread-safe
         // casey lock it inside the something call tick mutex, to prevent any one/app else use these kind of thread while it's on working.
+// This one is not thread-safe
         // so currently, we haven't touch this growing aray yet.
         // focus on draw scene and load gl pointer on little beast.
         new_block->base = VirtualAlloc(primal->based, max(arena->current_size, arena->minimum_blocksize));
@@ -716,9 +720,14 @@ struct Enviromental_Element{
 };
 
 // Think about set this light group shrewly
+void set_light(glm::vec3* position){
+    ;
+}
+
+// Manually set light here.
 void turn_on_light(std::vector<general_light*>* light_group){
     for(general_light* const &light: light_group){;
-        set
+        set_light
     };
 }
 //======================MESH_PART==========================
@@ -737,7 +746,7 @@ struct Mesh{
 
 // add auto-guide
 // ALL_IN_ONE    
-class object{
+class drawn_part{
 private:
     std::string name;
     B_shader_program* shader;
@@ -750,7 +759,6 @@ public:
     object(const char* name_ = nullptr, char* shader_path = nullptr, char* model_path = nullptr):name{name}{
         std::string shader_name = name_;
         program = new B_shader_program(shader_name+"vs", shader_name+"fs", shader_path);
-
         
         // load file? or set them up manually???
         //
@@ -828,3 +836,6 @@ void render (std::vector<object*>*objects_group){
     glUseProgram(0);
 }
 //===================================================================
+class object{
+    draw_part graphic_;
+}
