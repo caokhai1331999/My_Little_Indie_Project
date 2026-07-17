@@ -84,7 +84,7 @@ struct Texture{
 struct Mesh{
     unsigned int VBO, EBO;
     unsigned int VAO;
-
+    size_t size;
     //vector<Vertex> vertices;
     vector<Vertex>* vertices;
     vector<unsigned int> indices;
@@ -94,13 +94,15 @@ struct Mesh{
           vector<unsigned int> indices,
           vector<Texture> textures):indices(indices), textures(textures)
           {
+              size = 3*sizeof(unsigned int) + vertices_->size() + indices.size() + textures.size();
               VBO = 0;
               EBO = 0;
               VAO = 0;
-
+              
               vertices = new vector<Vertex>;
               *vertices = *vertices_;
-          }    
+          };
+    uint64 Pad[6]; 
 };
 
 void SetVertexBoneDataToDefault(Vertex* vertex){

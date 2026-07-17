@@ -2296,3 +2296,15 @@ to prevent interruption/preemptive
 
 So the u64 ticket, serving is just a random number, what important is the
 volatile type and the interlockedadd function
+
+---------------- Thu, 16 Jul 26: 11:09AM
+
+
+---------------- Fri, 17 Jul 26: 10:07AM
+
+How can I mark index for mesh for drawing!!! So instead of recreate the whole
+memory allocator. Should I just replace the tree-like data structure navigator
+with better algorithm.
+
+TODAY: first thing first, try to draw scene with few calls in main file that
+draw many entities using shader group and lights

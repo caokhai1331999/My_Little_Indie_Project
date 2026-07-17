@@ -48,6 +48,8 @@ struct OpenGLData{
 };
 
 struct Win32_OffScreen_Buffer{  
+    Game_State state;
+    
     BITMAPINFO Bitmapinfo;
     HBITMAP BitmapHandle;
 

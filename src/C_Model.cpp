@@ -109,13 +109,18 @@ void loadModel_(Model_* model, string path){
 void processNode(Model_* model, aiNode* node, const aiScene* scene){
     // process all the node'scene meshes (if any)
     aiMesh* mesh;
-    Mesh* spawn_mesh;
+    Mesh* spawned_mesh;
     if(node->mNumMeshes > 0){
         for(unsigned int i = 0; i < node->mNumMeshes; i++){
             mesh = scene->mMeshes[node->mMeshes[i]];
-            spawn_mesh = model->processMesh(mesh, scene);
-            //model->meshes.push_back(model->processMesh(mesh, scene));
-            model->meshes.push_back(spawn_mesh);
+            spawned_mesh = model->processMesh(mesh, scene);
+            //spawn_mesh = (Mesh*)push_size_(sizeof(*spawn_mesh), BackBuffer->state->memory_sentinal, BackBuffer->mutex);
+            model->meshes.push_back(spawned_mesh);
+
+            //model->meshes  = (mesh* )push_size_(sizeof(*spawned_mesh), &BackBuffer->state->memory_sentinal, BackBuffer->state->mutex);
+            //CopyMemory(model->meshes, spawned_mesh, spawned_mesh->size);
+            //Then how to access member of model->meshes.????
+            //and how to iterate them to draw???
         }
     }
 
@@ -160,10 +165,10 @@ Mesh* Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
             //
             //
             //
-            //vertices->array_pointer = push_more_memory(sizeof(vertex), vertices)
             //
             vertices.push_back(vertex);
-
+            // Vertices = (Vertex*)push_size_(size_of(vertex), BackBuffer->game_state->memory_sentinel, BackBuffer->mutex);
+            // CopyMemory(Vertices, &Vertex);
             // Process VERTEX Position, Normal, Texure Coordinates
         }
     }

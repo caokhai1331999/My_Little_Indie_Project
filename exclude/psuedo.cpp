@@ -7,68 +7,6 @@
    ======================================================================== */
 #include "psuedo.h"
 
-bool32 check_collision( space_box* box1 = nullptr, space_box* box2 = nullptr){
-    //AABB BBAA
-    //assume that the position point is in the center of the box
-    bool32 collided = false;
-
-    glm::vec3 spaceforBox1;
-    //ON X-axis
-    if (((box1->position[3][0] < box2->position[3][0])&&(box1->position[3][0] + box1->size.x > box2->position[3][0])) || ((box2->position[3][0] < box1->position[3][0])&&(box2->position[3][0] + box2->size.x > box1->position[3][0]))){
-        //implement here
-        spaceforBox1.x = box1->position[3][0] - box2->position[3][0];
-        !collided?collided = true:collided=false;     
-    }
-    //ON y-axis
-    else if (((box1->position[3][1] < box2->position[3][1])&&(box1->position[3][1] + box1->size.y > box2->position[3][1])) || ((box2->position[3][1] < box1->position[3][1])&&(box2->position[3][1] + box2->size.y > box1->position[3][1]))){
-        spaceforBox1.y = box1->position[3][1] - box1->position[3][1];
-        !collided?collided = true:collided=false;        
-    }
-    //ON z-axis
-    else if (((box1->position[3][2] < box2->position[3][2])&&(box1->position[3][2] + box1->size.z > box2->position[3][2])) || ((box2->position[3][2] < box1->position[3][2])&&(box2->position[3][2] + box2->size.z > box1->position[3][2]))){
-        spaceforBox1.z = box1->position[3][2] - box1->position[3][2];
-        !collided?collided = true:collided=false;        
-    }
-
-    box2->collide_list->push_back(collided_space(spaceforBox1));
-
-    glm::vec3 spaceforBox2 = glm::vec3(-1 * spaceforBox1.x, -1 * spaceforBox1.y, -1 * spaceforBox1.z);
-    box1->collide_list->push_back(collided_space(spaceforBox2));
-
-    return collided;
-};
-
-int main(){
-    std::string Mname = "terrain";                
-    Model_* land = nullptr;
-    land = new Model_(false, &Mname);
-    std::string terrain_path = "C:/Users/klove/Documents/repos/GLFW2/Vulkan_Learning_Project/build/source/stylised_terrain_tile_1011124259_texture_fbx/stylised_terrain_tile_1011124259_texture.fbx";
-    loadModel_(land, terrain_path);
-
-    
-};
-
-//What if we do this on the complex model this ain't work so well cause this is just a rough collision checking method;
-glm::mat4 CamCoor_core = glm::mat4(1.0f);
-CamCoor_core = glm::scale(CamCoor_core, glm::vec3(0.01, 0.01, 0.01 ));
-
-
-Model_* CamCoor_ = nullptr;
-loadModel_(CamCoor_, "");
-model_shader_->setMat4(CamCoor_, "");
-// Game Physics
-void CalculateGravity(float* weight){
-    ;
-}
-
-// Game Logics
-struct physics{
-    float weight = 0.0f;
-    float FallingSpeed = 0.0f;
-};
-// What we do is just affect the model matrix in world space.
-//================================
-
 class level_feature{
     ;
 };
@@ -99,29 +37,6 @@ private:
 // TileMap contain array of positions in xz plane
 // wherein x is analogous to y and z is similar to x in 2D coordinates
 //
-
-bool* load_bin_map(std::string* name){
-    
-    std::ifstream bin_map {*name, s.binary | s.trunc | s.in};
-
-    s.read(reinterpret_cast<char*>(&d), sizeof d);
-    int n;
-    //std::string str;
-    bool* map_content;
-    if(bin_map){
-        while((int)s >> map_content){
-            printf("loading\n");
-        }
-        printf("Succeed loading map content\n");
-    }else{
-        printf("Failed loading map content\n");
-    } 
-    return map_content;
-}
-
-#define TILE_LENGTH 1.0f;
-#define TILE_WIDTH 1.0f;
-#define TILE_HEIGHT 0.1f;
 
 // In order to save performance we just draw tile that is in viewing space
 std::vector<Tile*>ConstructTileMap(bool* map, int width, int length, int height){
@@ -246,46 +161,6 @@ unsigned int SetupTileTexture(const char* path){
 
          camera->orientation = camera->orientation * offsetOrientation;
 
-    //if (fDraw) {
-      //DeviceContext = GetDC(Window);
-      //MoveToEx(DeviceContext, ptPrevious.x, ptPrevious.y, NULL);
-      //LineTo(DeviceContext, ptPrevious.x = LOWORD(Lparam),
-             //ptPrevious.y = HIWORD(Lparam));
-      //ReleaseDC(Window, DeviceContext);
-    //}
-//
-    //
-    // if(BackBuffer.camera.mouse.xPos > BackBuffer.BitmapWidth){
-    // BackBuffer.camera.mouse.xPos = BackBuffer.BitmapWidth;
-    //}
-    //
-    // if(BackBuffer.camera.mouse.xPos < 0){
-    // BackBuffer.camera.mouse.xPos = 0;
-    //}
-    //
-    //
-    // if(BackBuffer.camera.mouse.yPos > BackBuffer.BitmapHeight){
-    // BackBuffer.camera.mouse.yPos = BackBuffer.BitmapHeight;
-    //}
-    //
-    // if(BackBuffer.camera.mouse.yPos < 0){
-    // BackBuffer.camera.mouse.yPos = 0;
-    //}
-    //
-    // printf("Mouse x pos: %d\n", BackBuffer.camera.mouse.xPos);
-    // printf("Mouse y pos: %d\n", BackBuffer.camera.mouse.yPos);
-         //
-//
-//
-// feed vshader with the camera position, and sprite position.
-// .vs :
-// point pos = camera
-
-// Now what we have in memory.
-// what we need to store in permanent storage
-// We have one win32Offscreen_Buffer, one frontbuffer, one game state
-//
-//
 //===========================================================================
 //NOTE: THIS BLOCK IS IN THE ATTEMPT OF CREATING DYNAMIC LIGHT
 
@@ -307,9 +182,9 @@ struct Material{
    sampler2D texture_diffused1;
    sampler2D texture_specular1;
 
-   vec3 ambient;
-   vec3 diffuse;
-   vec3 specular;
+   glm::vec3 ambient;
+   glm::vec3 diffuse;
+   glm::vec3 specular;
 
    float shininess;
 };
@@ -319,9 +194,9 @@ struct DirLight{
  vec3 direction;
 
  // For Phong Shading
- vec3 ambient;
- vec3 diffuse;
- vec3 specular;
+ glm::vec3 ambient;
+ glm::vec3 diffuse;
+ glm::vec3 specular;
 };
 
 struct PointLight{
@@ -329,8 +204,6 @@ struct PointLight{
  vec3 position;
 
  // For Phong Shading
- vec3 ambient;
- vec3 diffuse;
  vec3 specular;
 
  // For attenuation (Point Light)
@@ -343,13 +216,13 @@ struct PointLight{
 
 struct SpotLight{
  // Inherent component
- vec3 direction;
- vec3 position;
-
+ glm::vec3 direction;
+ glm::vec3 position;
+ 
  // For Phong Shading
- vec3 ambient;
- vec3 diffuse;
- vec3 specular;
+ glm::vec3 ambient;
+ glm::vec3 diffuse;
+ glm::vec3 specular;
 
  // For attenuation (Point Light)
  float constant;
@@ -401,64 +274,6 @@ unsigned int LoadCubeMap(const char* path){
 // How to arrange it
 global_variable Tile* World = nullptr;
 
-// Land vertices mesh
-float land_vertices[] = 
-{// vertex                    TextCoords
-//BACK   , {0,0},
-  {-0.125f, -0.125f, -0.125f}, {0.0f, -0.25f},
-  { 0.125f, -0.125f, -0.125f}, {0.0f, -0.25f},
-  { 0.125f,  0.125f, -0.125f}, {0.0f, -0.25f},
-  { 0.125f,  0.125f, -0.125f}, {0.0f, -0.25f},
-  {-0.125f,  0.125f, -0.125f}, {0.0f, -0.25f},
-  {-0.125f, -0.125f, -0.125f}, {0.0f, -0.25f},
-//FRONT  , {0,0},
-  {-0.125f, -0.125f,  0.125f}, {0.0f, 0.25f},
-  { 0.125f,  0.125f,  0.125f}, {0.0f, 0.25f},
-  { 0.125f, -0.125f,  0.125f}, {0.0f, 0.25f},
-  { 0.125f,  0.125f,  0.125f}, {0.0f, 0.25f},
-  {-0.125f, -0.125f,  0.125f}, {0.0f, 0.25f},
-  {-0.125f,  0.125f,  0.125f}, {0.0f, 0.25f},
-//LEFT  , {0,0},
-  {-0.125f,  0.125f,  0.125f}, {0.0f, 0.0f},
-  {-0.125f, -0.125f, -0.125f}, {0.0f, 0.0f},
-  {-0.125f,  0.125f, -0.125f}, {0.0f, 0.0f},
-  {-0.125f, -0.125f, -0.125f}, {0.0f, 0.0f},
-  {-0.125f,  0.125f,  0.125f}, {0.0f, 0.0f},
-  {-0.125f, -0.125f,  0.125f}, {0.0f, 0.0f},
-//RIGHT   , {0,0},
-  {0.125f,  0.125f,  0.125f}, {0.0f,  0.0f},
-  {0.125f,  0.125f, -0.125f}, {0.0f,  0.0f},
-  {0.125f, -0.125f, -0.125f}, {0.0f,  0.0f},
-  {0.125f, -0.125f, -0.125f}, {0.0f,  0.0f},
-  {0.125f, -0.125f,  0.125f}, {0.0f,  0.0f},
-  {0.125f,  0.125f,  0.125f}, {0.0f,  0.0f},
-//bottom , {0,0},
-  {-0.5f, -0.5f, -0.5f}, {-1.0f,  0.0f},
-  { 0.5f, -0.5f,  0.5f}, {-1.0f,  0.0f},
-  { 0.5f, -0.5f, -0.5f}, {-1.0f,  0.0f},
-  { 0.5f, -0.5f,  0.5f}, {-1.0f,  0.0f},
-  {-0.5f, -0.5f, -0.5f}, {-1.0f,  0.0f},
-  {-0.5f, -0.5f,  0.5f}, {-1.0f,  0.0f},
-//TOP
-  {-0.5f,  0.5f, -0.5f}, {1.0f,  0.0f},
-  { 0.5f,  0.5f, -0.5f}, {1.0f,  0.0f},
-  { 0.5f,  0.5f,  0.5f}, {1.0f,  0.0f},
-  { 0.5f,  0.5f,  0.5f}, {1.0f,  0.0f},
-  {-0.5f,  0.5f,  0.5f}, {1.0f,  0.0f},
-  {-0.5f,  0.5f, -0.5f}, {1.0f,  0.0f}
-}
-
-
-// Normal Map Lighting
-// Position
-//Top Left Corner
-glm::vec3 pos1(-1.0f, 1.0f, 0.0f);
-// Bottom Left Corner
-glm::vec3 pos2(-1.0f,-1.0f, 0.0f);
-// Bottom Right Corner
-glm::vec3 pos3( 1.0f,-1.0f, 0.0f);
-// Top Right Corner
-glm::vec3 pos4( 1.0f, 1.0f, 0.0f);
 
 // Texture Coordinate
 // Due to the origin/ We start mapping texture is/at the Bottom of the quad
@@ -473,38 +288,6 @@ glm::vec3 normal(0.0f, 0.0f, 1.0f);
 // the there are none available in model/mesh
 
 // In Vertex Shader
-
-out vs{
-    vec2 TextCoord;
-    vec3 FragPos;
-    vec3 tangentLightPos;
-    vec3 tangentViewPos;
-}vs_out;
-
-void main(){
-    vec3 T = normalize(vec3(model * vec4(tangent, 1.0f)));
-}
-
-void main(){
-    // We will ignore the w value;
-    vec3 bitangent = cross(anormal, tangent);
-
-    vec3 T = normalize(vec3(model * vec4(tangent, 0.0f)));
-    vec3 B = normalize(vec3(model * vec4(bitangent, 0.0f)));
-    vec3 N = normalize(vec3(model * vec4(anormal, 0.0f)));
-
-    // inverse of orthogonal matrix is its transpos form
-    mat3 TBN = transpose(mat3(T, B, N));
-
-    vs_out.TextCoord = aTextCoord;
-    vs_out.FragPos = TBN * (vec3(model * vec4(aPos, 1.0f)));
-    vs_out.tangentViewPos = TBN * normalize(view);
-    vs_out.tangentLightPos[i] = TBN * lightPos;
-
-    for(int i = 0; i < TOTAL_POINT_LIGHTS){
-        vs_out.tangentLightPos[i] = TBN * POINT_LIGHT_POS[i];
-    }
-};
 
 // motion in
 void set_environment_force_(entity* object){
@@ -588,22 +371,24 @@ struct Game_Specs{
 #include <Memoryapi.h>
 //======================MEMORY_PART==========================
 // This is a derivative work from Casey shown down for my dedicated senior
-struct memory_region{
-    uint8* base;
-    size_t current_size;
-    size_t used;
-};
+//struct memory_region{
+    //uint8* base;
+    //size_t current_size;
+    //size_t used;
+//};
 // ==> next version is memory_block
+
+#define minimun(a, b) return (a > b)?b:a
 
 struct memory_block{
     memory_block* prev;
     memory_block* next;
 
-    size_t current_size;
-    uint64 minimum_blocksize;
-    
+    size_t size;
+    size_t used;
+    void* base;
+    // In term of linear data arrangement the Pad itself is to just separate the memory_block memory address from what come after it.
     uint64 Pad[6];
-    uint8* base;
 };
 
 // first we have to create ticket that is related to the threadID in cheap way.
@@ -622,6 +407,33 @@ void AtomicAddUint32(uint32* addend, uint32 value){
     // Cause this one very fast(cpu level). --> it ensure that no 2 threads can have the same ticket numbers
     // This one is just the order that a thread hit this line, all of these satisfy the M.E.S.I protocol
     InterlockedExchangeAdd((long*)addend, value);
+}
+
+void* ALLOCATE_BLOCK_MEMORY(memory_block* mem, size_t size){
+
+    if(mem){
+        memory_block* block = (memory_block*)VirtualAlloc(0, size + sizeof(memory_block), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+        // why plus one
+        void* result = block + 1;
+
+        block->next = mem->next; 
+        block->prev = mem; 
+
+        block->next->prev = block;
+        block->prev->next = block;
+
+        return result
+    };
+}
+
+void DEALLOCATE_BLOCK_MEMORY(memory_block* mem){
+    if(mem){
+        memory_block* block = ((memory_block*)mem - 1);
+        block->prev->next = block->next;
+        block->next->prev = block->prev;
+
+        VirtualFree(block, MEM_COMMIT|MEM_RESERVE);
+    };
 }
 
 void begin_ticket_mutex(ticket_mutex* mutex){
@@ -652,42 +464,31 @@ void free_mem_region(memory_region* arena){
 // so actually the type and arena is indicating the variable
 #define DEFAULT_BLOCK_SIZE GIGABYTE(1)
 
-void* push_size_(size_t size, memory_region* primal){
-    if(arena->used + size >= arena->current_size){
-// start mutex
-        Begin
-        memory_block* new_block;
+void* push_size_(size_t size, memory_region* sentinel, ticket_mutex* mutex){
+    void* result;
+    // whenever the total requested size if bigger than the current block size: allocate new space and copymemory of the old block
+    if(sentinel->used + size >= sentinel->size){
+        begin_ticket_mutex(mutex);
+        memory_block* new_block = (memory_block*)ALLOCATE_BLOCK_MEMORY(sentinal);
         // casey lock it inside the something call tick mutex, to prevent any one/app else use these kind of thread while it's on working.
 // This one is not thread-safe
         // so currently, we haven't touch this growing aray yet.
         // focus on draw scene and load gl pointer on little beast.
-        new_block->base = VirtualAlloc(primal->based, max(arena->current_size, arena->minimum_blocksize));
+        end_ticket_mutex(mutex);
 
-        new_block->prev = primal->prev;
-        new_block->next = primal;
+        result = new_block->based + size;
+        new_block->used += size;
 
-
-        new_block->prev->next = block;
-        new_block->next->prev = block;
-// end mutex
-        
-        new_block->size +=  (uint32)megabyte(10) + arena->size;
+        CopyMemory();
+    } else {
+        sentinel->used += size;
+        result = sentinel->based + sentinel->used;
     };
-
-    arena->used += size;
-    void* result = arena->base + arena->used;
-
     return result;
 }
 
 // set memory here
-void* set_memory(memory_region* dest, size_t size, void* source){
-    void* mem_current_point = dest->base + used;
-
-    if(used > size)
-    *mem_current_point = *source;
-    //CopyMemory();
-}
+// replace by copy_memory of window.
 
 
 #define push_size(type, arena) (type* )push_size_(sizeof(type), arena)
@@ -696,6 +497,7 @@ void* set_memory(memory_region* dest, size_t size, void* source){
 //======================MEMORY_PART=========================
 
 //======================LIGHT_PART==========================
+
 struct general_light{
     glm::vec3 ambient;
     glm::vec3 specular;
@@ -713,7 +515,27 @@ struct point_light{
     float constant;
     float linearTerm;
     float quadraticTerm;
-}
+};
+
+struct spot_light{
+    general_light specs;
+    
+    // Inherent component
+    vec3 direction;
+    vec3 position;
+
+    // For attenuation (Point Light)
+    float constant;
+    float linearTerm;
+    float quadraticTerm;
+
+    // For spotlight effect
+    // spotlight area defining angle(Phi) maybe with the different name such as cutoff
+    float CutOff;
+    // Now the smooth/soft edge effect
+    float OuterCutOff;
+};
+
     //
 struct Enviromental_Element{
     std::vector<general_light*>light_group;    
@@ -746,12 +568,10 @@ struct Mesh{
 
 // add auto-guide
 // ALL_IN_ONE    
-class drawn_part{
+class graphic_property{
 private:
-    std::string name;
     B_shader_program* shader;
     Mesh* mesh;
-    rigid_body* body;
 public:
     update_(clock_set* clock);
     B_shader_program* get_shader(return shader);
@@ -761,21 +581,26 @@ public:
         program = new B_shader_program(shader_name+"vs", shader_name+"fs", shader_path);
         
         // load file? or set them up manually???
-        //
         // draw a map
         mesh = new Mesh();
         setupMesh(mesh);
         // model if possible
     }
     void set_mesh_data(const char* data_path);
-    void set_rigid_body();
-    void move();
-}
+};
 
 //===============LOOP_RUNNING_THEM=====================
-void init (const char* path, std::vector<object*>*object_group, std::vector<general_light*> light_group){
-    // set light
+// In Big init : Init OpenGL
+//               Turn On Light
+//               Init Object: mesh, rigid body
+//
 
+void init_graphic (Win32_OffScreen_Buffer* BackBuffer, std::vector<object*>*object_group, std::vector<general_light*> light_group){
+    // set light
+    // where is the proper place for this light group: backbuffer or object group
+    InitOpenGl(BackBuffer);
+    turn_on_light(light_group);
+    // consider loading textures group separatedly here.
 /*
     . Ambient Light - Kind of constance to store it
     . Point Light -
@@ -786,24 +611,29 @@ void init (const char* path, std::vector<object*>*object_group, std::vector<gene
 */
     // set mesh;
     set_mesh_data(path);
+    // rand map
     // set rigid body
     //. Init Position
     glm::vec3 pos = glm::vec3(0.0f);
-    for(object* const &obj : object_group){
+    // Time to init a 2D map here for every single entity in the current volumm
+}
+
+void Init(Win32_OffScreen_Buffer* BackBuffer){
+    init_graphic(BackBuffer);
+    // Init enity/rigid body specs here
+    char* map_content = load_bin_map()// or random map
+    for(object* const &obj : BackBuffer->object_group){
         object->set_rigid_body(&pos);
         pos.x += 1.0f;
         if(pos.x > 10.0f)
             pos.z += 1.0f;
     }
-
-    turn_on_light(light_group);
 }
-
 void object::set_rigid_body(glm::vec3* init_pos){
     Init_Entity_Specs(body);
 }
 
-void object::set_mesh_data(const char* data_path = nullptr, char* vertices data){
+void graphic_property::set_mesh_data(const char* data_path = nullptr, char* vertices data){
     // data can be loaded from text file!!;
     setupMesh(this->mesh);
     SetVertexBoneData(Vertex* vertex, int boneID, float weight){
@@ -814,28 +644,43 @@ void object::set_mesh_data(const char* data_path = nullptr, char* vertices data)
 void update(std::vector<object*>* objects_group, input, clock_set* clock){
 // check for collision
     for(object* const &obj: objects_group){
-        obj->update(clock);
+        obj->rigid_body->update(clock);
 // or
         // This is O(n²) problems
         check_collision(obj->rigid_body);
-
         move_object(clock, obj->rigid_body);
     };
 }
-
-void render (std::vector<object*>*objects_group){    
-
+//
+// These kind objects will reside inside something call window_game_state.
+// render(&BackBuffer.Game_State)
+//
+void render (std::vector<object*>*objects_group, Camera* chosen_camera){    
     //for(int i = 0; i < (int)objects_group->size()-1; i++){
     for(objects* const &obj: *objects_group){
-        obj->shader->use();
-        obj->shader->setMat4("projection", chosen_camera[i]->projection); 
-        obj->shader->setMat4("view", chosen_camera[i]->view); 
+        obj->graphic_->shader->use();
+        obj->graphic_->shader->setMat4("projection", chosen_camera[i]->projection); 
+        obj->graphic_->shader->setMat4("view", chosen_camera[i]->view); 
         
-        Draw(obj->mesh, obj->shader);
+        Draw(obj->graphic_->mesh, obj->graphic_->shader);
     };
     glUseProgram(0);
 }
 //===================================================================
+
 class object{
-    draw_part graphic_;
+private:
+    std::string name;
+    graphic_property graphic_;
+    rigid_body* body;
+public:
+    void set_rigid_body();
+    void move();
 }
+// In group:
+// How to manage these vertex's data efficiently
+// when ever we load small mesh
+// Init: Set environment light, entity's pos, load texture, mesh: indices, vertices
+//(pos, texcoord, normal, tangent, bitangent, boneid[4], weight[4])
+// how do we RENDER: bind VAO -> use shader -> set uniform(camera's pos, entity's pos, light) -> draw element
+// Think about this in group

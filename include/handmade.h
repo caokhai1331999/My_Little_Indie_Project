@@ -238,6 +238,34 @@ struct Game_Memory{
     void* TransientStorage;
 };
 
+/*
+
+#define minimun(a, b) return (a > b)?b:a
+
+struct memory_block{
+    memory_block* prev;
+    memory_block* next;
+
+    size_t size;
+    size_t used;
+
+    void* base;
+    // In term of linear data arrangement the Pad itself is to just separate the memory_block memory address from what come after it.
+    uint64 Pad[6];
+};
+
+// first we have to create ticket that is related to the threadID in cheap way.
+// 
+struct ticket_mutex{
+    // keep in mind that the volatile is type that can be delared as an object and modified by hardware
+    volatile uint64 ticket;
+    // serving is current intercepting thread which id is taken from getthreadid.
+    volatile uint64 serving;
+    // the ticket loop is just waiting until the thread left/retire before the other get in to execute that line of code again.
+}
+  
+ */
+
 struct imagee_content{
     int32 Width;
     int32 Height;
@@ -247,6 +275,7 @@ struct imagee_content{
 struct Game_State{
     int BlueOffset = 0;
     int GreenOffset = 0;
+    // Memory_Block sentinel;
     int Hz = 256;    
 };
 
@@ -268,6 +297,7 @@ struct Clock_Set{
 
     LARGE_INTEGER previous_collided = {};
     LARGE_INTEGER current_collided = {};
+
     float collided_time = 0.0f;
     float color_switch_dur = 0.0f;
 
