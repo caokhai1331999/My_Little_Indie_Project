@@ -517,8 +517,15 @@ struct general_light{
     // spotlight area defining angle(Phi) maybe with the different name such as cutoff
     spot_light_specs spot_specs;
 };
+
+struct environment_map{
+    bitmap* LOD[4];
+}
+
     //
 struct Enviromental_Element{
+    // But how can this affect the output texture of the shader.
+    environment_map env_map[3];
     std::vector<general_light*>light_group;    
 };
 
@@ -680,3 +687,4 @@ public:
 //(pos, texcoord, normal, tangent, bitangent, boneid[4], weight[4])
 // how do we RENDER: bind VAO -> use shader -> set uniform(camera's pos, entity's pos, light) -> draw element
 // Think about this in group
+// these are in one struct call game_state
