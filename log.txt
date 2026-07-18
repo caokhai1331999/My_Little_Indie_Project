@@ -2308,3 +2308,8 @@ with better algorithm.
 
 TODAY: first thing first, try to draw scene with few calls in main file that
 draw many entities using shader group and lights
+
+---------------- Sat, 18 Jul 26: 09:54AM
+
+Keep going and finish the draw multiple objects mechanism. We may need a map for
+this.

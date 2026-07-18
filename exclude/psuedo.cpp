@@ -292,20 +292,11 @@ glm::vec3 normal(0.0f, 0.0f, 1.0f);
 // motion in
 void set_environment_force_(entity* object){
     object->position * envir.gravity_on_pos;
-}
-
-
-void Jump(motion_spec* object, float delta_time){
-          object->position[3][1] = based_a_v_Pos_calc(object->jump_a, object->jump_v, object->position[3][2], delta_time);
-          object->position[3][2] = based_a_v_Pos_calc(object->acceleration, object->veclocity, object->position[3][2], delta_time);          
-}
-
-              
+}              
 
 // GLSL
 
 uniform sampler2D texture;
-
 in vec2 TexCoord;
 
 uniform struct light{
@@ -314,11 +305,6 @@ uniform struct light{
     vec3 diffuse;
     vec3 specular;
 };
-
-void computLight_intensity_based_on_D(){
-    // attenuation;
-    k * d....
-}
 
 out vec4 fragColor;
  void main(){
@@ -339,7 +325,8 @@ void (const aiNode* Node = nullptr, int total_meshes_number = 0){
         }
     }
 }
-// update : ;
+
+// update :
 // render : loop through entitys and used matched shader to draw;
 //;
 
@@ -360,10 +347,6 @@ void (const aiNode* Node = nullptr, int total_meshes_number = 0){
 //===> Render: feed shader : . fixed primitve data |  . VAO
       //                     . uniform offset data |  . shader
       //                     . camera pos for light|  . -//-
-
-struct Game_Specs{
-    int id;
-}
 
 // chunk of meshes
 //
@@ -498,37 +481,25 @@ void* push_size_(size_t size, memory_region* sentinel, ticket_mutex* mutex){
 
 //======================LIGHT_PART==========================
 
-struct general_light{
+struct basic_light_specs{
     glm::vec3 ambient;
     glm::vec3 specular;
     glm::vec3 diffuse;
 };
 
-struct dir_light{
-    general_light specs;
+struct dir_light_specs{
+    general_light basic_specs;
     glm::vec3 direction;
 };
 
-struct point_light{
-    general_light specs;
+struct attenuation_specs{
     // For attenuation (Point Light)
     float constant;
     float linearTerm;
     float quadraticTerm;
 };
 
-struct spot_light{
-    general_light specs;
-    
-    // Inherent component
-    vec3 direction;
-    vec3 position;
-
-    // For attenuation (Point Light)
-    float constant;
-    float linearTerm;
-    float quadraticTerm;
-
+struct spot_light_specs{
     // For spotlight effect
     // spotlight area defining angle(Phi) maybe with the different name such as cutoff
     float CutOff;
@@ -536,6 +507,16 @@ struct spot_light{
     float OuterCutOff;
 };
 
+struct general_light{
+    // Basic specs
+    basic_light_specs basic_specs;
+    glm::vec3 direction;
+    // For attenuation (Point Light)
+    attenuation_specs attenuation;
+    // For spotlight effect
+    // spotlight area defining angle(Phi) maybe with the different name such as cutoff
+    spot_light_specs spot_specs;
+};
     //
 struct Enviromental_Element{
     std::vector<general_light*>light_group;    
@@ -548,9 +529,8 @@ void set_light(glm::vec3* position){
 
 // Manually set light here.
 void turn_on_light(std::vector<general_light*>* light_group){
-    for(general_light* const &light: light_group){;
-        set_light
-    };
+    // so we have to manually set it here
+    // Is there anyway to automatic this one;
 }
 //======================MESH_PART==========================
 
@@ -562,7 +542,8 @@ struct Mesh{
 }
 //===========================================================
 
-// PURPOSE: Create a mechanism that draw multiple object of scene using instancing method and available asset.
+// PURPOSE: Create a mechanism that draw multiple object of scene using
+//instancing method and available asset.
 // In terms of graphics
 // enviromental elements is just light
 
@@ -599,7 +580,10 @@ void init_graphic (Win32_OffScreen_Buffer* BackBuffer, std::vector<object*>*obje
     // set light
     // where is the proper place for this light group: backbuffer or object group
     InitOpenGl(BackBuffer);
+    // Light here
+    // we need to set this one for every shader we have.
     turn_on_light(light_group);
+    set_light_for_shader();
     // consider loading textures group separatedly here.
 /*
     . Ambient Light - Kind of constance to store it
@@ -616,6 +600,18 @@ void init_graphic (Win32_OffScreen_Buffer* BackBuffer, std::vector<object*>*obje
     //. Init Position
     glm::vec3 pos = glm::vec3(0.0f);
     // Time to init a 2D map here for every single entity in the current volumm
+}
+
+char* randomize_entitiespos(){
+    char[width * height] map_content;
+    int random_value;
+    for(int x = 0; x < width; x++){
+        for(int y = 0; y < height; y++){
+            random_value = std::rand()%4 + 1;
+            *map_content++  = random_value;
+        }
+    };
+    return map_content;
 }
 
 void Init(Win32_OffScreen_Buffer* BackBuffer){
@@ -636,6 +632,7 @@ void object::set_rigid_body(glm::vec3* init_pos){
 void graphic_property::set_mesh_data(const char* data_path = nullptr, char* vertices data){
     // data can be loaded from text file!!;
     setupMesh(this->mesh);
+    // For skinning
     SetVertexBoneData(Vertex* vertex, int boneID, float weight){
         ;
     };
@@ -660,8 +657,7 @@ void render (std::vector<object*>*objects_group, Camera* chosen_camera){
     for(objects* const &obj: *objects_group){
         obj->graphic_->shader->use();
         obj->graphic_->shader->setMat4("projection", chosen_camera[i]->projection); 
-        obj->graphic_->shader->setMat4("view", chosen_camera[i]->view); 
-        
+        obj->graphic_->shader->setMat4("view", chosen_camera[i]->view);         
         Draw(obj->graphic_->mesh, obj->graphic_->shader);
     };
     glUseProgram(0);
