@@ -2313,3 +2313,13 @@ draw many entities using shader group and lights
 
 Keep going and finish the draw multiple objects mechanism. We may need a map for
 this.
+
+---------------- Sun, 19 Jul 26: 10:10AM
+
+With the OpenGL first touch Casey just pass the game->memory to the
+glText2DImage function and the game run.
+
+---------------- Mon, 20 Jul 26: 09:56AM
+
+TODO: Try to make thing simple first do the draw mutiple objects prototype
+exclude the light for later attempts

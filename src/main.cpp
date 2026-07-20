@@ -213,7 +213,7 @@ int CALLBACK WinMain
                     }
 
                 copyBufferData(&BackBuffer, &ScreenBuffer);
-                LoadFont(&BackBuffer, &Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
+                LoadFont(&test_platform, &BackBuffer, &Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
                 //LoadFont(&BackBuffer, &Glyphs_Map, "./media/arial.ttf");
                 
                 //????
@@ -619,7 +619,7 @@ int CALLBACK WinMain
                         showMsPF = !showMsPF;
                     }
 
-                    DrawFont(&BackBuffer, BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
+                    DrawFont(&test_platform, &BackBuffer, BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
 
 
 //========================================================================

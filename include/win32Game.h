@@ -34,7 +34,6 @@ struct OpenGLData{
 
     unsigned int textureHandle;
     std::vector<unsigned int>* texture_id_list;
-
     OpenGLData(){
         //Maybe buggy this part
         // need to be careful
@@ -79,8 +78,9 @@ struct Win32_OffScreen_Buffer{
     Camera camera;
     std::vector<Camera*> camera_set;
     const int BytesPerPixel = 4;
+    
+    uint64 Pad[6];
 };
-
 
 bool isNull(GLuint* member = nullptr);
 void PassGLData(OpenGLData* BackData, OpenGLData* FrontData);
@@ -88,7 +88,7 @@ void PassGLData(OpenGLData* BackData, OpenGLData* FrontData);
 global_variable bool GlobalRunning = true;
 global_variable HDC DeviceContext;
 // global_variable int  XOffset{0}, YOffset{0};
-extern "C" {Win32_OffScreen_Buffer BackBuffer = {};}
+extern "C" {global_variable Win32_OffScreen_Buffer BackBuffer = {};}
 global_variable Game_State State = {};
 global_variable imagee_content* BMPContent = nullptr;
 global_variable real32 WaitTimeCounter = 0.0f;
@@ -156,15 +156,23 @@ void APIENTRY MessageCallback(GLenum source,
                               const GLchar* message,
                               const void* userParam);
 
-void ReloadGLFunction(const Win32_OffScreen_Buffer* BackBuffer_ = nullptr){
-    //HDC tempDC = GetDC(BackBuffer.Window);
-    //if(wglMakeCurrent(tempDC, BackBuffer->glData.openglRC)){
+global_variable void reload_gl_function_pointer (const struct Win32_OffScreen_Buffer* BackBuffer_){
+    HDC tempDC = GetDC(BackBuffer_->Window);
+    if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
         bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
         if (!success)
             bool success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
         assert(success);
-    //};
+    };
 }
+
+typedef void reload_gl_function_pointer_ (const struct Win32_OffScreen_Buffer* BackBuffer_);
+
+struct platform_api{
+    reload_gl_function_pointer_* reloadGLFuncPointer;
+};
+
+global_variable platform_api test_platform = {};
 
 void ResetGLState(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 void SetEnvironmentLights();

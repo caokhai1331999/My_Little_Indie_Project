@@ -109,9 +109,9 @@ void LoadFont(const Win32_OffScreen_Buffer* Backbuffer, Glyph_Map* map, const ch
         TTFfile = nullptr;        
 }
 
-void LoadFont_(const Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map , const char* path){
+void LoadFont_(const platform_api* platform, const Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map , const char* path){
         if(wglMakeCurrent(GetDC(BackBuffer->Window), BackBuffer->glData.openglRC)){
-            ReloadGLFunction(BackBuffer);
+            platform->reloadGLFuncPointer(BackBuffer);
         }
         LoadFont(BackBuffer, map, path);
 };
@@ -230,8 +230,8 @@ void DrawFont(const Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader
     glUseProgram(0);
 }
  
-void DrawFont_(const Win32_OffScreen_Buffer* BackBuffer, const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
-    ReloadGLFunction(BackBuffer);
+void DrawFont_(const platform_api* platform, const Win32_OffScreen_Buffer* BackBuffer, const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
+    platform->reloadGLFuncPointer(BackBuffer);
     DrawFont(BackBuffer, shader, map, string, rect);
 }
 
@@ -413,8 +413,8 @@ void set_environmental_light(B_shader_program* shader, const global_light* envir
     glUseProgram(0);
 };
 
-void setup_pointlight_(global_light* envir_light){
-    ReloadGLFunction(&BackBuffer);
+void setup_pointlight_(const platform_api* platform, global_light* envir_light){
+    //platform->reloadGLFuncPointer(&BackBuffer);
     setup_pointlight(envir_light);
 }
 

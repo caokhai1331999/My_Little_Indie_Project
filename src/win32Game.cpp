@@ -302,6 +302,8 @@ bool InitOpenGL(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, im
 // Posted by D.G. Redd, modified by community. See post 'Timeline' for change history
 // Retrieved 2026-02-10, License - CC BY-SA 3.0
 
+    test_platform.reloadGLFuncPointer = reload_gl_function_pointer;
+    
     GetWindowDimension(OBuffer);
     Win32ResizeDIBSection(OBuffer, Dimens.Width, Dimens.Height);
     

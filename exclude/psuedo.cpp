@@ -29,7 +29,7 @@ private:
 
     int Heath_Bar;
 //
-    controller driver;
+    steerer driver;
 };
 
 // Handshake cross check for collision between entities and entities with background
@@ -136,11 +136,8 @@ unsigned int SetupTileTexture(const char* path){
         if (err != GL_NO_ERROR) {
             printf("OpenGL Error after glTexImage2D: %x\n", err);
         }
-
     }
-
     glBindTexture(GL_TEXTURE_2D, 0);    
-
     //if(OBuffer->glData.textureHandle!=NULL){
     //printf("Texture name is: %d\n", OBuffer->glData.textureHandle);
     //} else {
@@ -518,6 +515,7 @@ struct general_light{
     spot_light_specs spot_specs;
 };
 
+// light based on normal map
 struct environment_map{
     bitmap* LOD[4];
 }
@@ -526,12 +524,15 @@ struct environment_map{
 struct Enviromental_Element{
     // But how can this affect the output texture of the shader.
     environment_map env_map[3];
-    std::vector<general_light*>light_group;    
+    std::vector<general_light*>*light_group;    
 };
 
 // Think about set this light group shrewly
-void set_light(glm::vec3* position){
-    ;
+void set_light(glm::vec3* position, std::vector<general_light*>* light_group){
+    light_group->basic_specs =;
+    light_group->direction =;
+    light_group->attenuation =;
+    light_group->spot_specs =;
 }
 
 // Manually set light here.
@@ -539,14 +540,45 @@ void turn_on_light(std::vector<general_light*>* light_group){
     // so we have to manually set it here
     // Is there anyway to automatic this one;
 }
+//======================LIGHT_PART==========================
+
+
 //======================MESH_PART==========================
 
+// This can declare function as a type
+typedef void render_to_opengl (struct render_group* RenderGroup);
+void render_to_opengl (render_group* RenderGroup){
+    // implementation here
+    
+};
+// if function is too big define it as a pointer
+struct platform_api{
+    render_to_opengl* RenderToOpengl;
+};
+
+RenderToOpengl = 
+
+platform_api.RenderToOpengl(RenderGroup);
+
+// So this can replace class function member effectively
+
 struct Mesh{
-    //
     Vertex* vertices;
     unsigned int* indices;
     Texture* textures;
 }
+
+struct game_state{
+    void* BitmapMemory;
+    int BitmapWidth;
+    int BitmapHeight;
+    int Pitch;
+    int BitmapMemorySize;
+
+    std::vector<C_Model*>Model_Collection;
+    
+};
+
 //===========================================================
 
 // PURPOSE: Create a mechanism that draw multiple object of scene using
@@ -632,6 +664,7 @@ void Init(Win32_OffScreen_Buffer* BackBuffer){
             pos.z += 1.0f;
     }
 }
+
 void object::set_rigid_body(glm::vec3* init_pos){
     Init_Entity_Specs(body);
 }
