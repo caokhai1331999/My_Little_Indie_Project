@@ -334,7 +334,7 @@ int CALLBACK WinMain
                 //map_content = load_bin_map("level.map");
                 //std::cout<<map_content->data()<<std::endl;
 
-                setup_pointlight(&envir_light);
+                setup_pointlight(&BackBuffer, &envir_light);
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
                     if(shader->GetProgramID()!=7){
                         shader->use();
@@ -346,8 +346,8 @@ int CALLBACK WinMain
                 glUseProgram(0);
 
                 //Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
-                Set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
-                Set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
+                Set_environmental_light(&BackBuffer, BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
+                Set_environmental_light(&BackBuffer, BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
 //=================================================
                 // L, R, B, T
                 glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)100.0f, (float)100.0f, 0.0f);

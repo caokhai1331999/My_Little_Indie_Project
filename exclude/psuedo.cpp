@@ -545,21 +545,6 @@ void turn_on_light(std::vector<general_light*>* light_group){
 
 //======================MESH_PART==========================
 
-// This can declare function as a type
-typedef void render_to_opengl (struct render_group* RenderGroup);
-void render_to_opengl (render_group* RenderGroup){
-    // implementation here
-    
-};
-// if function is too big define it as a pointer
-struct platform_api{
-    render_to_opengl* RenderToOpengl;
-};
-
-RenderToOpengl = 
-
-platform_api.RenderToOpengl(RenderGroup);
-
 // So this can replace class function member effectively
 
 struct Mesh{
@@ -575,8 +560,7 @@ struct game_state{
     int Pitch;
     int BitmapMemorySize;
 
-    std::vector<C_Model*>Model_Collection;
-    
+    std::vector<C_Model*>Model_Collection;    
 };
 
 //===========================================================
@@ -653,18 +637,6 @@ char* randomize_entitiespos(){
     return map_content;
 }
 
-void Init(Win32_OffScreen_Buffer* BackBuffer){
-    init_graphic(BackBuffer);
-    // Init enity/rigid body specs here
-    char* map_content = load_bin_map()// or random map
-    for(object* const &obj : BackBuffer->object_group){
-        object->set_rigid_body(&pos);
-        pos.x += 1.0f;
-        if(pos.x > 10.0f)
-            pos.z += 1.0f;
-    }
-}
-
 void object::set_rigid_body(glm::vec3* init_pos){
     Init_Entity_Specs(body);
 }
@@ -678,6 +650,18 @@ void graphic_property::set_mesh_data(const char* data_path = nullptr, char* vert
     };
 }
 
+void Init(Win32_OffScreen_Buffer* BackBuffer){
+    init_graphic(BackBuffer);
+    // Init enity/rigid body specs here
+    char* map_content = load_bin_map()// or random map
+    for(object* const &obj : BackBuffer->object_group){
+        object->set_rigid_body(&pos);
+        pos.x += 1.0f;
+        if(pos.x > 10.0f)
+            pos.z += 1.0f;
+    }
+}
+
 void update(std::vector<object*>* objects_group, input, clock_set* clock){
 // check for collision
     for(object* const &obj: objects_group){
@@ -688,12 +672,13 @@ void update(std::vector<object*>* objects_group, input, clock_set* clock){
         move_object(clock, obj->rigid_body);
     };
 }
-//
+ //
 // These kind objects will reside inside something call window_game_state.
 // render(&BackBuffer.Game_State)
 //
 void render (std::vector<object*>*objects_group, Camera* chosen_camera){    
     //for(int i = 0; i < (int)objects_group->size()-1; i++){
+    // we can use instance
     for(objects* const &obj: *objects_group){
         obj->graphic_->shader->use();
         obj->graphic_->shader->setMat4("projection", chosen_camera[i]->projection); 
@@ -702,6 +687,7 @@ void render (std::vector<object*>*objects_group, Camera* chosen_camera){
     };
     glUseProgram(0);
 }
+
 //===================================================================
 
 class object{

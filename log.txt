@@ -2323,3 +2323,14 @@ glText2DImage function and the game run.
 
 TODO: Try to make thing simple first do the draw mutiple objects prototype
 exclude the light for later attempts
+
+---------------- Tue, 21 Jul 26: 12:44PM
+
+NOTE: Seem like calling opengl function pointer through function type pointer
+seem to be a bad idea.
+
+TODO: Finish prototype for drawing scene mechanism
+      How can I come up with a map or thing that randomize entities
+      Or we used the wrong approach on these. Shader should be used to draw
+      effect, not entities. So we need to pass all entities's information to all
+      shaders

@@ -266,6 +266,14 @@ struct ticket_mutex{
   
  */
 
+struct ticket_mutex{
+    // keep in mind that the volatile is type that can be delared as an object and modified by hardware
+    uint64 volatile ticket;
+    // serving is current intercepting thread which id is taken from getthreadid.
+    uint64 volatile serving;
+    // the ticket loop is just waiting until the thread left/retire before the other get in to execute that line of code again.
+};
+
 struct imagee_content{
     int32 Width;
     int32 Height;
@@ -368,6 +376,34 @@ uint32 safetruncateUint64(uint64 value){
 real32 saferatioN(real32 numerator, real32 divisor);
 real32 saferatio0(real32 numerator, real32 divisor);
 real32 saferatio1(real32 numerator, real32 divisor);
+
+void AtomicAddUint64(uint64* addend, uint64 value);
+void begin_ticket_mutex(ticket_mutex* mutex);
+void end_ticket_mutex(ticket_mutex* mutex);
+
+uint64 AtomicAddUint64(uint64 volatile *addend, uint64 value){
+// use this to create threadId based ticket and loop through them.
+    // until it retire in order.
+    // Cause this one very fast(cpu level). --> it ensure that no 2 threads can have the same ticket numbers
+    // This one is just the order that a thread hit this line, all of these satisfy the M.E.S.I protocol
+    uint64 value_ = _InterlockedExchangeAdd((long*)addend, value);
+    return value_;
+}
+
+void begin_ticket_mutex(ticket_mutex* mutex){
+    uint64 ticket = AtomicAddUint64(&mutex->ticket, 1);
+    // mutex->ticket is now auto change
+    // But why when the ticket equal to ticket thread id that we know it get out.
+    // 
+        while(ticket != mutex->serving);
+}
+
+void end_ticket_mutex(ticket_mutex* mutex){
+    AtomicAddUint64(&mutex->serving, 1);
+    // Whenever the ticket equal to the threadId that mean the thread get out of code lines and bring instruction to the core
+}
+// apply to grow vertex array
+
 
 void CalEarlyFrameTime(Clock_Set* Time_Set = nullptr);
 void CalColliInterv(Clock_Set* Time_Set = nullptr);

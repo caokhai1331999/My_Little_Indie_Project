@@ -73,6 +73,7 @@ struct Win32_OffScreen_Buffer{
     bool GLImageRendered = false;
     OpenGLData glData;
 
+    ticket_mutex ticket;
     Tile TileProper;
     
     Camera camera;
@@ -166,13 +167,25 @@ global_variable void reload_gl_function_pointer (const struct Win32_OffScreen_Bu
     };
 }
 
+extern "C" __declspec(dllexport) global_variable void ReloadGLFunction (Win32_OffScreen_Buffer* BackBuffer_){
+    begin_ticket_mutex(&BackBuffer_->ticket);
+    HDC tempDC = GetDC(BackBuffer_->Window);
+    if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
+        bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
+        if (!success)
+            bool success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
+        assert(success);
+    };
+    end_ticket_mutex(&BackBuffer_->ticket);
+}
+
 typedef void reload_gl_function_pointer_ (const struct Win32_OffScreen_Buffer* BackBuffer_);
 
 struct platform_api{
     reload_gl_function_pointer_* reloadGLFuncPointer;
 };
 
-global_variable platform_api test_platform = {};
+extern "C" __declspec(dllexport) global_variable platform_api test_platform = {};
 
 void ResetGLState(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 void SetEnvironmentLights();

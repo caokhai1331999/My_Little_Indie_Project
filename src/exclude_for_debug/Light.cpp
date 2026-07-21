@@ -32,7 +32,7 @@ void IncreaseFontAlpha(const unsigned char* source, void* dest, const Glyph_Prop
 // Load
 // Render}
 
-void LoadFont(const Win32_OffScreen_Buffer* Backbuffer, Glyph_Map* map, const char* path){
+void LoadFont(Win32_OffScreen_Buffer* Backbuffer, Glyph_Map* map, const char* path){
 // Load File + Init
         debug_read_file_result* TTFfile = DEBUGReadFileWhole(path);
         stbtt_InitFont(&map->FontInfo, (unsigned char*)TTFfile->Content, stbtt_GetFontOffsetForIndex((unsigned char*)TTFfile->Content, 0));
@@ -109,11 +109,15 @@ void LoadFont(const Win32_OffScreen_Buffer* Backbuffer, Glyph_Map* map, const ch
         TTFfile = nullptr;        
 }
 
-void LoadFont_(const platform_api* platform, const Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map , const char* path){
-        if(wglMakeCurrent(GetDC(BackBuffer->Window), BackBuffer->glData.openglRC)){
-            platform->reloadGLFuncPointer(BackBuffer);
+void LoadFont_(const platform_api* platform, Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map , const char* path){
+    //begin_ticket_mutex(&BackBuffer->ticket);
+    if(wglMakeCurrent(GetDC(BackBuffer->Window), BackBuffer->glData.openglRC)){
+            //platform->reloadGLFuncPointer(BackBuffer);
+        ReloadGLFunction(BackBuffer);
         }
-        LoadFont(BackBuffer, map, path);
+    //end_ticket_mutex(&BackBuffer->ticket);
+
+    LoadFont(BackBuffer, map, path);
 };
 
 glm::vec4 CalcGlypProperty(const glm::vec4* glyp_specs, const Rect_* rect){
@@ -231,7 +235,7 @@ void DrawFont(const Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader
 }
  
 void DrawFont_(const platform_api* platform, const Win32_OffScreen_Buffer* BackBuffer, const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
-    platform->reloadGLFuncPointer(BackBuffer);
+    //platform->reloadGLFuncPointer(BackBuffer);
     DrawFont(BackBuffer, shader, map, string, rect);
 }
 
@@ -413,12 +417,13 @@ void set_environmental_light(B_shader_program* shader, const global_light* envir
     glUseProgram(0);
 };
 
-void setup_pointlight_(const platform_api* platform, global_light* envir_light){
+void setup_pointlight_(Win32_OffScreen_Buffer* BackBuffer, global_light* envir_light){
     //platform->reloadGLFuncPointer(&BackBuffer);
+    ReloadGLFunction(BackBuffer);
     setup_pointlight(envir_light);
 }
 
-void Set_environmental_light_(B_shader_program* shader, const global_light* envir_light, Camera* camera){
-    //ReloadGLFunction(&BackBuffer);
+void Set_environmental_light_(Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader, const global_light* envir_light, Camera* camera){
+    ReloadGLFunction(BackBuffer);
     set_environmental_light(shader, envir_light, camera);
 };
