@@ -9,7 +9,7 @@
 #include "Light.h"
 
 
-void IncreaseFontAlpha(const unsigned char* source, void* dest, const Glyph_Property* glyp){
+inline void IncreaseFontAlpha(const unsigned char* source, void* dest, const Glyph_Property* glyp){
     uint8 *Source = (uint8*)source;
     // move the destination pointer to the head of the last row
     uint8* DestRow = (uint8*)dest + (glyp->w * (glyp->h - 1));
@@ -329,7 +329,7 @@ void setup_pointlight(global_light* envir_light){
     envir_light->dirLight.specular = glm::vec3(0.5f, 0.5f, 0.5f);
 }
 
-void set_environmental_light(B_shader_program* shader, const global_light* envir_light, Camera* camera){
+void set_environmental_light(B_shader_program* shader, const global_light* envir_light, const Camera* camera){
 
     shader->use();
 
@@ -423,7 +423,7 @@ void setup_pointlight_(Win32_OffScreen_Buffer* BackBuffer, global_light* envir_l
     setup_pointlight(envir_light);
 }
 
-void Set_environmental_light_(Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader, const global_light* envir_light, Camera* camera){
+void Set_environmental_light_(Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader, const global_light* envir_light, const Camera* camera){
     ReloadGLFunction(BackBuffer);
     set_environmental_light(shader, envir_light, camera);
 };

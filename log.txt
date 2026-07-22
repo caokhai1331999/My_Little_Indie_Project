@@ -2334,3 +2334,22 @@ TODO: Finish prototype for drawing scene mechanism
       Or we used the wrong approach on these. Shader should be used to draw
       effect, not entities. So we need to pass all entities's information to all
       shaders
+
+---------------- Wed, 22 Jul 26: 11:27AM
+
+Just learn new basic thing:
+signed number reside in half big of give range of number type (which got MSB is 1) 
+wherein the  value of negative number is the 'minus' (the overflown bit - its
+number's bits value)
+in 4 bits ex: which the biggest positive is 7, when its bits value get over 7 it
+is negative
+for ex: -2 (0x1110) which can be calculate by = - (16(0x10000) - 14(0x1110))
+--> which can be used to explain the this computing approach: (6 + 14) % 16
+equal to
+             11  
+         ((0x0110)
+        + (0x1110))
+       =  0x10100  and get rid of overflow MSB (0x10000) then result is: 0x0100
+       = 4 
+
+So if I get a negative that mean I got an overflown

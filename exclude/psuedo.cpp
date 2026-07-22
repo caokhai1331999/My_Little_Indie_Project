@@ -75,88 +75,10 @@ std::vector<unsigned int>* RandomizeTileMap(int Map_Width, int Map_Lenght, unsig
     return &Map;
 }
 
-void drawTile(const unsigned int VaoID = 0, const B_shader_program* Brush = nullptr, const std::vector<Tile>* Map){
-
-    glBindVertexArray(VaoID);
-    Brush->use();
-    glm::mat4 tile_container;
-
-    for(*Tile const &tile: Map->map){
-        // If in range
-        tile_container = glm::mat4(1.0f);
-        tile_container = glm::translate(tile_container, tile->position);
-
-        Brush->setInt("material.diffused1", tile->TextureID);
-        Brush->setMat4("model", tile_container);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    };
-};
-
 class Tile_Map{
     std::vector<*Tile>map;
 }
 // General Tiles ID array.
-
-unsigned int SetupTileTexture(const char* path){
-
-    int width, height, nrComponents;
-    unsigned char *data = (unsigned char*)stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-    
-// NOTE: Focus on this
-    unsigned int textureID;
-
-    if(data){
-        glGenTexture(textureID);
-        glActiveTexture(GL_TEXTURE0+textureID);
-
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
-        
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, width);
-        glBindTexture(GL_TEXTURE_2D, textureID);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-
-        glGenerateMipmap(GL_TEXTURE_2D);
-    
-        //Wrapping
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        //Filter
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        GLenum err = glGetError();
-
-        if (err != GL_NO_ERROR) {
-            printf("OpenGL Error after glTexImage2D: %x\n", err);
-        }
-    }
-    glBindTexture(GL_TEXTURE_2D, 0);    
-    //if(OBuffer->glData.textureHandle!=NULL){
-    //printf("Texture name is: %d\n", OBuffer->glData.textureHandle);
-    //} else {
-    //printf("Some How texture is NULL???\n");
-    //}
-    
-}
-
-         glm::vec2 xy = glm::normalize(glm::vec2(camera->mouse.xPos, camera->mouse.yPos));
-         glm::vec2 xy_ = glm::normalize(glm::vec2(camera->mouse.LastX, camera->mouse.LastY));
-         float radAngle = (glm::acos(glm::dot(xy_, xy))) * camera->speed * SENSITIVITY;
-         glm::fquat offsetOrientation = {};
-
-         offsetOrientation.w = glm::cos(radAngle/2.0f);
-         offsetOrientation.x = camera->Direction.x * glm::sin(radAngle/2.0f);
-         offsetOrientation.y = camera->Direction.y * glm::sin(radAngle/2.0f);
-         offsetOrientation.z = camera->Direction.z * glm::sin(radAngle/2.0f);
-
-         camera->orientation = camera->orientation * offsetOrientation;
 
 //===========================================================================
 //NOTE: THIS BLOCK IS IN THE ATTEMPT OF CREATING DYNAMIC LIGHT
@@ -572,6 +494,22 @@ struct game_state{
 
 // add auto-guide
 // ALL_IN_ONE    
+
+   // How can I make sure that all the shaders draw the same object
+
+struct texture_group{
+    char* normal_map;
+    char* ambient_map;
+    char* diffused_map;  
+    char* specular_map;  
+};
+
+struct shader_group{
+    B_shader_program* light_layer_shader;
+    B_shader_program* skinning_layer_shader;
+    B_shader_program* effect_layer_shader;
+}
+
 class graphic_property{
 private:
     B_shader_program* shader;

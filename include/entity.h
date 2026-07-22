@@ -93,7 +93,7 @@ public:
     void move(float delta_t);
 };
 
-float based_a_v_Pos_calc(float a, float v, float p, float delta_t){
+inline float based_a_v_Pos_calc(float a, float v, float p, float delta_t){
     float a_ = a - (0.5*v);
     return ((a_/2)*std::pow(delta_t,2))+(v*delta_t)+p;
 };
@@ -120,16 +120,15 @@ void Init_Entity_Specs(rigid_body* entity = nullptr){
 
 };
 
-void CalcNewPos(float FrameTime = 0, rigid_body* object = nullptr);
-void OrientFace(rigid_body* object = nullptr);
-void Orient_Around_Y(glm::mat4* matrix = nullptr, float angle = 0);
-void CalcNewV(float FrameTime = 0,  float* veclo = nullptr, float* accel = nullptr);
-void ApplyGravity(float delta_t, rigid_body* object);
-
-void CalcMomentumSpeed(float FrameTime = 0,  rigid_body* object = nullptr);
-void ApplyMomentum(float delta_t, rigid_body* object);
+inline void CalcNewPos(float FrameTime = 0, rigid_body* object = nullptr);
+inline void OrientFace(rigid_body* object = nullptr);
+inline void Orient_Around_Y(glm::mat4* matrix = nullptr, float angle = 0);
+inline void CalcNewV(float FrameTime = 0,  float* veclo = nullptr, float* accel = nullptr);
+inline void ApplyGravity(float delta_t, rigid_body* object);
+inline void ApplyMomentum(float delta_t, rigid_body* object);
+inline void CalcMomentumSpeed(float FrameTime = 0,  rigid_body* object = nullptr);
+inline void Jump(float delta_t, rigid_body* object);
 // Need to have fomular for this.
-void Jump(float delta_t, rigid_body* object);
 
 extern "C" __declspec(dllexport) void move_object(float delta_t, rigid_body* object);
 typedef void (*move_object_)(float, rigid_body*);

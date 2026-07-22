@@ -149,15 +149,15 @@ bool InitOpenGL(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, im
 void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
 void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
 
-void APIENTRY MessageCallback(GLenum source,
-                              GLenum type,
-                              GLuint id,
-                              GLenum severity,
-                              GLsizei length,
-                              const GLchar* message,
-                              const void* userParam);
-
-global_variable void reload_gl_function_pointer (const struct Win32_OffScreen_Buffer* BackBuffer_){
+//void APIENTRY MessageCallback(GLenum source,
+                              //GLenum type,
+                              //GLuint id,
+                              //GLenum severity,
+                              //GLsizei length,
+                              //const GLchar* message,
+                              //const void* userParam);
+//
+extern "C" global_variable void reload_gl_function_pointer (const struct Win32_OffScreen_Buffer* BackBuffer_){
     HDC tempDC = GetDC(BackBuffer_->Window);
     if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
         bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
@@ -167,7 +167,7 @@ global_variable void reload_gl_function_pointer (const struct Win32_OffScreen_Bu
     };
 }
 
-extern "C" __declspec(dllexport) global_variable void ReloadGLFunction (Win32_OffScreen_Buffer* BackBuffer_){
+extern "C" global_variable void ReloadGLFunction (Win32_OffScreen_Buffer* BackBuffer_){
     begin_ticket_mutex(&BackBuffer_->ticket);
     HDC tempDC = GetDC(BackBuffer_->Window);
     if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
@@ -185,10 +185,9 @@ struct platform_api{
     reload_gl_function_pointer_* reloadGLFuncPointer;
 };
 
-extern "C" __declspec(dllexport) global_variable platform_api test_platform = {};
+ extern "C" global_variable platform_api test_platform = {};
 
 void ResetGLState(Win32_OffScreen_Buffer* BackBuffer = nullptr);
-void SetEnvironmentLights();
 void InitCamera(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 
