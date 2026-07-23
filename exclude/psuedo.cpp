@@ -503,7 +503,7 @@ struct texture_group{
     char* diffused_map;  
     char* specular_map;  
 };
-
+//
 struct shader_group{
 // For layers of lights:... + emission
     B_shader_program* light_layer_shader;
