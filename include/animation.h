@@ -27,18 +27,18 @@ public:
     inline std::unordered_map<std::string, Bone_Info>* GetBoneIDMap() {return m_Bone_InfoMap;};
     
 // Functions
-    void ConstructBone(); 
-    void Update();
+    inline void ConstructBone(); 
+    inline void Update();
 /*For interpolation each key then the whole*/
 
     // Get normalized value for Lerp and Slerp
-    float GetScaleFactor(float animationTime, float lastkeyTime, float nextkeyTime);
+    inline float GetScaleFactor(float animationTime, float lastkeyTime, float nextkeyTime);
 
 // Part that finish the animation process
     Bone* FindBone(const std::string& name);
-    void ReadMissingBone(const aiAnimation* animation, Model_* model);
-    void ReadHierarchyData(AssimpNodeData& dest, const aiNode* src);
-    std::vector<Bone>* GetBoneArray(){return &m_Bones;};
+    inline void ReadMissingBone(const aiAnimation* animation, Model_* model);
+    inline void ReadHierarchyData(AssimpNodeData& dest, const aiNode* src);
+    inline std::vector<Bone>* GetBoneArray(){return &m_Bones;};
     AssimpNodeData* getRootNode(){return &m_RootNode;};
     
 private:

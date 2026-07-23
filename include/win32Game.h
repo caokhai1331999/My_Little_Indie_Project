@@ -7,7 +7,6 @@
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== */
 #include "B_shader.h"
-//#include "handmade.h"
 #include "entity.h"
 #include "SoundMaker.h"
 
@@ -185,7 +184,7 @@ struct platform_api{
     reload_gl_function_pointer_* reloadGLFuncPointer;
 };
 
- extern "C" global_variable platform_api test_platform = {};
+extern "C" global_variable platform_api test_platform = {};
 
 void ResetGLState(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 void InitCamera(Win32_OffScreen_Buffer* BackBuffer = nullptr);

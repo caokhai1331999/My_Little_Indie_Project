@@ -22,8 +22,9 @@
 #if !defined
 #define GLAD_LIB
 #include <glad/glad_wgl.h>
-#include <glad/glad.h>
-//#include <glad/wgl.h>
+#include <glad/glad_wgl.c>
+//#include <glad/glad.h>
+//#include <glad/glad.c>
 #endif
 
 #include <Windows.h>
@@ -140,6 +141,11 @@ global_variable x_input_set_state* XinputSetState_  = XinputSetStateStub;
 #include <glm/gtx/quaternion.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
+
+#if !defined
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#endif
 
 typedef struct debug_read_file_result{
     uint32 Size;

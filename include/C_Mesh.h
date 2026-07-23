@@ -18,13 +18,6 @@
 #endif
 */
 
-#include "handmade.h"
-
-#if !defined
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-#endif
-
 #include <unordered_map>
 
 #include <glm/glm.hpp>
@@ -34,10 +27,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-//#include "camera.h"
 #include "assimp_glm_helpers.h"
-#include "B_shader.h"
-
+#include "handmade.h"
 
 using namespace std;
 
@@ -90,6 +81,8 @@ struct Mesh{
     vector<unsigned int> indices;
     vector<Texture> textures;
     // MESH constructor
+    //uint64 Pad[6]; 
+
     Mesh( vector<Vertex>* vertices_,
           vector<unsigned int> indices,
           vector<Texture> textures):indices(indices), textures(textures)
@@ -102,7 +95,6 @@ struct Mesh{
               vertices = new vector<Vertex>;
               *vertices = *vertices_;
           };
-    uint64 Pad[6]; 
 };
 
 void SetVertexBoneDataToDefault(Vertex* vertex){

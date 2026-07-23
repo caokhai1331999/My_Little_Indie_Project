@@ -46,7 +46,7 @@ void Animator::playAnimation(Animation* pAnimation){
     //m_currentTime = 0.0f;
 };
 
-void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* parentTransform, glm::mat4* GlobalInverse){
+inline void Animator::calculateBoneTransform(const AssimpNodeData* node, glm::mat4* parentTransform, glm::mat4* GlobalInverse){
  //first fetch Transform from node or matched bone(needed to be updated) existed
     const std::string& nodeName = node->name;
     glm::mat4 nodeTransform = node->transformation;

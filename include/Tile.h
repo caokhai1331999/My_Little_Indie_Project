@@ -11,8 +11,7 @@
 
 #include <ctime>
 
-#include "C_Model.h"
-#include "handmade.h"
+#include "B_shader.h"
 
 #define DOWNN_ 0.0f
 #define UPP_ 1.0f

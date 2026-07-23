@@ -30,7 +30,7 @@ void DDraw(Model_* model, GLuint* programID){
     }
 }
 
-void Count_Meshes (const aiNode* node, int* total_meshes_number){
+internal void Count_Meshes (const aiNode* node, int* total_meshes_number){
 
     if(node->mNumMeshes > 0){
         (*total_meshes_number) += (int)node->mNumMeshes;
@@ -44,7 +44,7 @@ void Count_Meshes (const aiNode* node, int* total_meshes_number){
 }
 
 
-void loadModel_(Model_* model, string path){
+void loadModel_(Win32_OffScreen_Buffer* BackBuffer, Model_* model, string path){
 
     bool32 vampire = false;
 
@@ -93,7 +93,7 @@ void loadModel_(Model_* model, string path){
 
 // NODE
     //Count_Meshes(scene->mRootNode, &(model->number_of_meshes));
-    processNode(model, scene->mRootNode, scene);
+    processNode(BackBuffer, model, scene->mRootNode, scene);
 // MESH
     if((int)model->meshes.size() > 1){
         for(unsigned int i = 0; i < model->meshes.size(); i++){
@@ -106,14 +106,14 @@ void loadModel_(Model_* model, string path){
 // MATERIAL Inside mesh
 }
 // Watch out for this hierarchy
-void processNode(Model_* model, aiNode* node, const aiScene* scene){
+internal void processNode(Win32_OffScreen_Buffer* BackBuffer,  Model_* model, aiNode* node, const aiScene* scene){
     // process all the node'scene meshes (if any)
     aiMesh* mesh;
     Mesh* spawned_mesh;
     if(node->mNumMeshes > 0){
         for(unsigned int i = 0; i < node->mNumMeshes; i++){
             mesh = scene->mMeshes[node->mMeshes[i]];
-            spawned_mesh = model->processMesh(mesh, scene);
+            spawned_mesh = model->processMesh(BackBuffer, mesh, scene);
             //spawn_mesh = (Mesh*)push_size_(sizeof(*spawn_mesh), BackBuffer->state->memory_sentinal, BackBuffer->mutex);
             model->meshes.push_back(spawned_mesh);
 
@@ -127,13 +127,13 @@ void processNode(Model_* model, aiNode* node, const aiScene* scene){
 // then do the same for each of its children
     if(node->mNumChildren > 0){
         for(unsigned int i = 0; i < node->mNumChildren; i++){
-            processNode(model, node->mChildren[i], scene);
+            processNode(BackBuffer, model, node->mChildren[i], scene);
         }
     }
 }
 
-Mesh* Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
-
+inline Mesh* Model_::processMesh(Win32_OffScreen_Buffer* BackBuffer, const aiMesh* mesh, const aiScene* scene){
+    
     vector<unsigned int>indices;
     vector<Texture>textures;
     vector<Vertex>vertices;
@@ -211,11 +211,14 @@ Mesh* Model_::processMesh(const aiMesh* mesh, const aiScene* scene){
         Model_::ExtractBoneWeightForVertices(mesh, &vertices);
         //return Mesh(vertices, indices, textures);
         // This work
+        begin_ticket_mutex(&BackBuffer->ticket);
         Mesh* OutPut = new Mesh(&vertices, indices, textures);
+        end_ticket_mutex(&BackBuffer->ticket);
+
         return OutPut;
 }
 
-vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene){
+internal vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureType type, string typeName, const aiScene* scene){
     vector<Texture>textures;
 // Manually load normal texture here
     if(strcmp(typeName.c_str(), "material.texture_normal") == 0){
@@ -338,7 +341,7 @@ vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, aiTextureTy
 
 
 //void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex>&vertices){
-void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex>*vertices){
+inline void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex>*vertices){
 
     std::unordered_map<std::string, Bone_Info>* mBoneInfoMap = this->m_BoneInfoMap;
     unsigned int boneID = -1;
@@ -390,7 +393,7 @@ void Model_::ExtractBoneWeightForVertices(const aiMesh* mesh, std::vector<Vertex
 
 
 
-unsigned int TextureFromFile(const char *path, const string &directory, bool gamma){
+internal unsigned int TextureFromFile(const char *path, const string &directory, bool gamma){
   std::string filename = string(path);
   //May the file path is insufficient here
   filename = directory + '/' + filename;
@@ -441,7 +444,7 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
     return textureID;
 }
 
-unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bool gamma, aiString* path){
+internal unsigned int TextureFromMemory(const aiScene* scene, const string &directory, bool gamma, aiString* path){
     // IF the embedded texture is NULL
     //string filename = string(path->C_Str());
     //filename = directory + '/' + filename;

@@ -91,12 +91,12 @@ struct global_light{
 
 global_variable global_light envir_light = {};
 
-void LoadFont(Win32_OffScreen_Buffer* Backbuffer = nullptr, Glyph_Map* map = nullptr, const char* path = nullptr);
-inline void IncreaseFontAlpha(const unsigned char* source, void* dest, const Glyph_Property* glyp);
+static void LoadFont(Win32_OffScreen_Buffer* Backbuffer = nullptr, Glyph_Map* map = nullptr, const char* path = nullptr);
+static void IncreaseFontAlpha(const unsigned char* source, void* dest, const Glyph_Property* glyp);
 void DrawFont(const  Win32_OffScreen_Buffer* BackBuffer = nullptr, B_shader_program* shader = nullptr, const Glyph_Map* map = nullptr, const char* string = nullptr, const Rect_* rect = nullptr);
-inline glm::vec4 CalcGlypProperty(const glm::vec4* glyp_specs = nullptr, const Rect_* rect = nullptr);
+static glm::vec4 CalcGlypProperty(const glm::vec4* glyp_specs = nullptr, const Rect_* rect = nullptr);
 
-inline void IncreaseFontAlpha_(Glyph_Map* map = nullptr);
+static void IncreaseFontAlpha_(Glyph_Map* map = nullptr);
 
 extern "C" __declspec(dllexport) void LoadFont_(const platform_api* platform = nullptr, Win32_OffScreen_Buffer* BackBuffer = nullptr, Glyph_Map* map = nullptr, const char* path = nullptr);
 typedef void (*LoadFont__)(const platform_api*, Win32_OffScreen_Buffer*, Glyph_Map*, const char*);
@@ -104,9 +104,9 @@ typedef void (*LoadFont__)(const platform_api*, Win32_OffScreen_Buffer*, Glyph_M
 extern "C" __declspec(dllexport) void DrawFont_(const platform_api* platform = nullptr, const Win32_OffScreen_Buffer* BackBuffer = nullptr, const GLuint VAO = 0, B_shader_program* shader = nullptr, const Glyph_Map* map = nullptr, const char* string = nullptr, const Rect_* rect = nullptr);
 typedef void (*DrawFont__) (const platform_api*, const Win32_OffScreen_Buffer* ,const GLuint, B_shader_program*, const Glyph_Map*, const char* , const Rect_*);
 //=====================================
-inline void setup_pointlight(const Win32_OffScreen_Buffer* BackBuffer = nullptr, global_light* envir_light = nullptr);
+static void setup_pointlight(const Win32_OffScreen_Buffer* BackBuffer = nullptr, global_light* envir_light = nullptr);
 
-void set_environmental_light(B_shader_program* shader = nullptr, const global_light* envir_light = nullptr, const Camera* camera = nullptr);
+inline void set_environmental_light(B_shader_program* shader = nullptr, const global_light* envir_light = nullptr, const Camera* camera = nullptr);
 
 extern "C" __declspec(dllexport) void Move_(glm::mat4* object_matrix, float delta_time, float DelayedRatio);
 typedef void (*Move__)(glm::mat4*, float , float);

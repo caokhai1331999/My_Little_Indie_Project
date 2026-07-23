@@ -280,7 +280,7 @@ int CALLBACK WinMain
                 Model_* backpack = nullptr;
                 backpack = new Model_(false, &Mname);
                 std::string backpack_path = "./media/backpack.obj";
-                loadModel_(backpack, backpack_path);
+                loadModel_(&BackBuffer, backpack, backpack_path);
                 
 //NOW THE ANIMATING PART
                 if(!first_normal_time)
@@ -290,7 +290,7 @@ int CALLBACK WinMain
                 Mname = "vampire";
                 dancing_vampire = new Model_(false, &Mname);
                 std::string dancing_vampire_path = "./media/dancing_vampire.dae";
-                loadModel_(dancing_vampire, dancing_vampire_path);
+                loadModel_(&BackBuffer, dancing_vampire, dancing_vampire_path);
 
                 danceAnimation = new Animation((char* )dancing_vampire_path.c_str(), dancing_vampire);
                 animator = new Animator(danceAnimation);

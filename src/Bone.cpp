@@ -88,7 +88,7 @@ float GetScaleFactor(const float* animationTime, float* lastkeyTime, float* next
 
 // Figure out which Position key to interpolation b/w interpolate and return the
 // final matrix
-glm::mat4 Bone::InterpolatePosition(const float* animationTime){
+inline glm::mat4 Bone::InterpolatePosition(const float* animationTime){
 
     if(mNumPositions == 1){
         return glm::translate(glm::mat4(1.0f), m_Positions[0].Position);
@@ -113,7 +113,7 @@ glm::mat4 Bone::InterpolatePosition(const float* animationTime){
 
 // Figure out which Scale key to interpolation b/w interpolate and return the
 // final matrix
-glm::mat4 Bone::InterpolateScaling(const float* animationTime){
+inline glm::mat4 Bone::InterpolateScaling(const float* animationTime){
 
     if(mNumScalings == 1){
         return glm::scale(glm::mat4(1.0f), m_KeyScales[0].Scale);
@@ -136,7 +136,7 @@ glm::mat4 Bone::InterpolateScaling(const float* animationTime){
 
 // Figure out which Scale key to interpolation b/w interpolate and return the
 // final matrix
-glm::mat4 Bone::InterpolateRotation(const float* animationTime){
+inline glm::mat4 Bone::InterpolateRotation(const float* animationTime){
 
     if(mNumRotations == 1){
         auto rotation = m_Rotations[0].Orientation;

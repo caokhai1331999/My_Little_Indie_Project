@@ -49,7 +49,7 @@ Bone* Animation::FindBone(const std::string& name){
 };
 
 // NOTE: Focus on this
-void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
+inline void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
 // So the mNumChannels is the number of bone
     int size = animation->mNumChannels;
 
@@ -101,7 +101,7 @@ void Animation::ReadMissingBone(const aiAnimation* animation, Model_* model){
     m_Bone_InfoMap = boneInfoMapForAni;
 };
 
-void Animation::ReadHierarchyData(AssimpNodeData& dest, const aiNode* src){
+inline void Animation::ReadHierarchyData(AssimpNodeData& dest, const aiNode* src){
     assert(src);
     
     dest.name = src->mName.data;

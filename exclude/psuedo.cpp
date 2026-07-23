@@ -470,7 +470,7 @@ void turn_on_light(std::vector<general_light*>* light_group){
 // So this can replace class function member effectively
 
 struct Mesh{
-    Vertex* vertices;
+    Vertex* vertices;//cube, plane
     unsigned int* indices;
     Texture* textures;
 }
@@ -505,8 +505,11 @@ struct texture_group{
 };
 
 struct shader_group{
+// For layers of lights:... + emission
     B_shader_program* light_layer_shader;
+// For skeletal moving of entities.
     B_shader_program* skinning_layer_shader;
+// 
     B_shader_program* effect_layer_shader;
 }
 

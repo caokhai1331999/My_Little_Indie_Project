@@ -77,7 +77,7 @@ void Draw(Mesh* mesh, GLuint* progID){
         // bind appropriate textures
 
     glBindVertexArray(0);
-    useProgram(0);
+    glUseProgram(0);
         //unsigned int textureID  = vampire_?3:1;
 
         unsigned int ambientNr  = 1;
@@ -87,7 +87,7 @@ void Draw(Mesh* mesh, GLuint* progID){
         unsigned int heightNr   = 1;
 
         glBindVertexArray(mesh->VAO);
-        useProgram(*progID);
+        glUseProgram(*progID);
 
         int textureID;
         unsigned int number;
@@ -119,7 +119,7 @@ void Draw(Mesh* mesh, GLuint* progID){
         glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(mesh->indices.size()), GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
-        useProgram(0);
+        glUseProgram(0);
         // Always a good practice to set everything back to default once configured
         glActiveTexture(GL_TEXTURE0);
 };

@@ -9,7 +9,7 @@
 #include "Light.h"
 
 
-inline void IncreaseFontAlpha(const unsigned char* source, void* dest, const Glyph_Property* glyp){
+static void IncreaseFontAlpha(const unsigned char* source, void* dest, const Glyph_Property* glyp){
     uint8 *Source = (uint8*)source;
     // move the destination pointer to the head of the last row
     uint8* DestRow = (uint8*)dest + (glyp->w * (glyp->h - 1));

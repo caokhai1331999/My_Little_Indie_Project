@@ -8,7 +8,7 @@
    ======================================================================== */
 
 #include <assimp_glm_helpers.h>
-#include "C_Model.h"
+#include "handmade.h"
 
 struct collided_space{
 // How to store direction

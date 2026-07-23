@@ -8,7 +8,7 @@
    ======================================================================== */
 
 #include <assimp_glm_helpers.h>
-#include "C_Model.h"
+#include "C_Mesh.h"
 
 struct KeyPosition{
     glm::vec3 Position;
@@ -105,9 +105,9 @@ public:
         unsigned int GetScalingIndex(const float* animationTime);
 
         // insert bone
-        glm::mat4 InterpolatePosition(const float* animationTime);
-        glm::mat4 InterpolateScaling(const float* animationTime);
-        glm::mat4 InterpolateRotation(const float* animationTime);        
+        inline glm::mat4 InterpolatePosition(const float* animationTime);
+        inline glm::mat4 InterpolateScaling(const float* animationTime);
+        inline glm::mat4 InterpolateRotation(const float* animationTime);        
 
     unsigned int GetNumPosition(){return mNumPositions;};
     float GetPositionTimeStamp(int index = 0){
