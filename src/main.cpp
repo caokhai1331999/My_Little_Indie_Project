@@ -26,6 +26,8 @@ int CALLBACK WinMain
     //BackBuffer.wndproc = MainWindowCallBack;
 
     Clock_Set TimeSet = {};
+    imagee_content* BMPContent = nullptr;
+
     QueryPerformanceFrequency(&(TimeSet.PerfCountFrequencyResult));
 
     float ColorOffset = 0.0f;
@@ -179,8 +181,8 @@ int CALLBACK WinMain
                 // We have to assign address of memory and glData to
                 //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
                 //RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
-                InitOpenGL(&BackBuffer, &ScreenBuffer, BMPContent);
 
+                InitOpenGL(&BackBuffer, &ScreenBuffer, BMPContent);
                 GLenum err = glGetError();
                 if (err != GL_NO_ERROR) {
                     std::cerr << "OpenGL Error: " << err << std::endl;
@@ -528,10 +530,10 @@ int CALLBACK WinMain
                     //}
 //
                     bool TimeToChangeAxis = false;
-                    if(WaitTimeCounter >= 16.67f){                        
-                        WaitTimeCounter = 0.0f;
+                    if(TimeSet.WaitTimeCounter >= 16.67f){                        
+                       TimeSet.WaitTimeCounter = 0.0f;
                     } else {
-                        WaitTimeCounter += (float)TimeSet.MsPerFrame;
+                        TimeSet.WaitTimeCounter += (float)TimeSet.MsPerFrame;
                         //printf("WaitTimeCounter: %f\n", WaitTimeCounter);
                     }
                         // Update animation
@@ -557,7 +559,7 @@ int CALLBACK WinMain
                                 TimeSet.TimeToChangeAxis = true;
                             }
                         } else {
-                            TimeSet.ChangeAxisCounter += WaitTimeCounter;
+                            TimeSet.ChangeAxisCounter += TimeSet.WaitTimeCounter;
                         }
 
                         

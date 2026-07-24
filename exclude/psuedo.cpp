@@ -7,10 +7,6 @@
    ======================================================================== */
 #include "psuedo.h"
 
-class level_feature{
-    ;
-};
-
 class entity{
 private:
     space_box collided_box;
@@ -89,80 +85,6 @@ class Tile_Map{
 
 // Light
 // May be loop over all of shader to apply this evironment 
-
-struct light_in_general{
-       vec3 ambient;
-       vec3 diffuse;
-       vec3 specular;
-};
-
-struct Material{
-// Ambient will be the same even with change in input
-   sampler2D texture_diffused1;
-   sampler2D texture_specular1;
-
-   glm::vec3 ambient;
-   glm::vec3 diffuse;
-   glm::vec3 specular;
-
-   float shininess;
-};
-
-struct DirLight{
- // Inherent component
- vec3 direction;
-
- // For Phong Shading
- glm::vec3 ambient;
- glm::vec3 diffuse;
- glm::vec3 specular;
-};
-
-struct PointLight{
- // Inherent component
- vec3 position;
-
- // For Phong Shading
- vec3 specular;
-
- // For attenuation (Point Light)
- float constant;
- float linearTerm;
- float quadraticTerm;
-};
-
-//uniform PointLight pointlight;
-
-struct SpotLight{
- // Inherent component
- glm::vec3 direction;
- glm::vec3 position;
- 
- // For Phong Shading
- glm::vec3 ambient;
- glm::vec3 diffuse;
- glm::vec3 specular;
-
- // For attenuation (Point Light)
- float constant;
- float linearTerm;
- float quadraticTerm;
-
- // For spotlight effect
- // spotlight area defining angle(Phi) maybe with the different name such as cutoff
- float CutOff;
- // Now the smooth/soft edge effect
- float OuterCutOff;
-};
-
-#define NR_POINT_LIGHTS 2
-
-    //Material material;
-class global_light{
-    light_in_general light;
-    DirLight dirLight;
-    PointLight pointLights [NR_POINT_LIGHTS];
-};
 
 class Object_Mesh_Specs{
     glm::vec3 Position;
@@ -293,16 +215,6 @@ struct memory_block{
     uint64 Pad[6];
 };
 
-// first we have to create ticket that is related to the threadID in cheap way.
-// 
-struct ticket_mutex{
-    // keep in mind that the volatile is type that can be delared as an object and modified by hardware
-    volatile uint64 ticket;
-    // serving is current intercepting thread which id is taken from getthreadid.
-    volatile uint64 serving;
-    // the ticket loop is just waiting until the thread left/retire before the other get in to execute that line of code again.
-}
-
 void AtomicAddUint32(uint32* addend, uint32 value){
 // use this to create threadId based ticket and loop through them.
     // until it retire in order.
@@ -338,18 +250,6 @@ void DEALLOCATE_BLOCK_MEMORY(memory_block* mem){
     };
 }
 
-void begin_ticket_mutex(ticket_mutex* mutex){
-    uint64 ticket = AtomicAddUint64(&mutex->ticket, 1);
-    // mutex->ticket is now auto change
-    // But why when the ticket equal to ticket thread id that we know it get out.
-    // 
-    while(ticket != mutex->serving)
-}
-
-void end_ticket_mutex(ticket_mutex* mutex){
-    AtomicAddUint64(&mutex->serving, 1);
-    // Whenever the ticket equal to the threadId that mean the thread get out of code lines and bring instruction to the core
-}
 // apply to grow vertex array
 
 void init_mem_region(size_t size, memory_region* arena){
@@ -504,6 +404,7 @@ struct texture_group{
     char* specular_map;  
 };
 //
+// How we do layer of effect on the same object
 struct shader_group{
 // For layers of lights:... + emission
     B_shader_program* light_layer_shader;
@@ -531,13 +432,14 @@ public:
         setupMesh(mesh);
         // model if possible
     }
-    void set_mesh_data(const char* data_path);
 };
 
+void set_mesh_data(const char* data_path);
+
 //===============LOOP_RUNNING_THEM=====================
-// In Big init : Init OpenGL
-//               Turn On Light
-//               Init Object: mesh, rigid body
+// In Big inititalization : Init OpenGL
+//                          Turn On Light
+//                          Init Object: mesh, rigid body
 //
 
 void init_graphic (Win32_OffScreen_Buffer* BackBuffer, std::vector<object*>*object_group, std::vector<general_light*> light_group){
@@ -616,10 +518,33 @@ void update(std::vector<object*>* objects_group, input, clock_set* clock){
  //
 // These kind objects will reside inside something call window_game_state.
 // render(&BackBuffer.Game_State)
-//
-void render (std::vector<object*>*objects_group, Camera* chosen_camera){    
+// Map constructing ===================================
+typedef uint8 entity_type
+
+#define static_object 0
+#define moving_object 1
+
+struct simple_map{
+    uint8* map_content;
+    size_t map_size;
+    // Volumme/Room 3D size in world space
+    unsigned int8 height;
+    unsigned int8 Breadth;
+    unsigned int8 Length;
+};
+// We spawn/randomize new map everytime we change room
+// Think about this is the volume/room not the mere flat ground
+void sketch_map{
+    ;
+}
+// =====================================================
+void render (std::vector<object*>*objects_group, uint8* world_map, Camera* chosen_camera){    
     //for(int i = 0; i < (int)objects_group->size()-1; i++){
     // we can use instance
+    // first feed shader with mesh data (Store with VAO)
+    // Then update the relative position of the obj(with world, or just mere screen space with text)
+    // Then use each brush(shader) in brush_set to draw object
+
     for(objects* const &obj: *objects_group){
         obj->graphic_->shader->use();
         obj->graphic_->shader->setMat4("projection", chosen_camera[i]->projection); 
@@ -630,6 +555,16 @@ void render (std::vector<object*>*objects_group, Camera* chosen_camera){
 }
 
 //===================================================================
+// In group:
+// How to manage these vertex's data efficiently
+// when ever we load small mesh
+// we can sample out the function
+// Init: Set environment light, entity's pos, load texture, mesh: indices, vertices
+//(pos, texcoord, normal, tangent, bitangent, boneid[4], weight[4])
+// how do we RENDER: bind VAO -> use shader -> set uniform(camera's pos, entity's
+//pos, light) -> draw element
+// Think about this in group
+// these are in one struct call game_state
 
 class object{
 private:
@@ -640,11 +575,3 @@ public:
     void set_rigid_body();
     void move();
 }
-// In group:
-// How to manage these vertex's data efficiently
-// when ever we load small mesh
-// Init: Set environment light, entity's pos, load texture, mesh: indices, vertices
-//(pos, texcoord, normal, tangent, bitangent, boneid[4], weight[4])
-// how do we RENDER: bind VAO -> use shader -> set uniform(camera's pos, entity's pos, light) -> draw element
-// Think about this in group
-// these are in one struct call game_state

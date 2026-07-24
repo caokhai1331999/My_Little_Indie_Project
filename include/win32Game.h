@@ -45,6 +45,7 @@ struct OpenGLData{
     }
 };
 
+#pragma pack(push, 1)
 struct Win32_OffScreen_Buffer{  
     Game_State state;
     
@@ -81,19 +82,16 @@ struct Win32_OffScreen_Buffer{
     
     uint64 Pad[6];
 };
+#pragma pack(pop)
 
 bool isNull(GLuint* member = nullptr);
 void PassGLData(OpenGLData* BackData, OpenGLData* FrontData);
 
 global_variable bool GlobalRunning = true;
-global_variable HDC DeviceContext;
-// global_variable int  XOffset{0}, YOffset{0};
 extern "C" {global_variable Win32_OffScreen_Buffer BackBuffer = {};}
-global_variable Game_State State = {};
-global_variable imagee_content* BMPContent = nullptr;
-global_variable real32 WaitTimeCounter = 0.0f;
-global_variable glm::vec3 moving_vector;
+extern "C" global_variable Game_State State = {};
 
+#pragma pack(push, 1)
 struct Win32_Front_Buffer{  
     //BITMAPINFO Bitmapinfo;
     //HBITMAP BitmapHandle;
@@ -119,9 +117,8 @@ struct Win32_Front_Buffer{
         //isNull(&glData.ColorVBO)?glData.ColorVBO=0:printf("Front Buffer ColorVBO is not NUll\n");
         PassGLData(PassedglData, &glData);
     }
-    
 };
-
+#pragma pack(pop)
 
 bool32 first_size = true;
 bool32 first_announce = true;
@@ -156,17 +153,7 @@ void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* S
                               //const GLchar* message,
                               //const void* userParam);
 //
-extern "C" global_variable void reload_gl_function_pointer (const struct Win32_OffScreen_Buffer* BackBuffer_){
-    HDC tempDC = GetDC(BackBuffer_->Window);
-    if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
-        bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
-        if (!success)
-            bool success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
-        assert(success);
-    };
-}
-
-extern "C" global_variable void ReloadGLFunction (Win32_OffScreen_Buffer* BackBuffer_){
+extern "C" void reload_gl_function_pointer (struct Win32_OffScreen_Buffer* BackBuffer_){
     begin_ticket_mutex(&BackBuffer_->ticket);
     HDC tempDC = GetDC(BackBuffer_->Window);
     if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
@@ -178,13 +165,25 @@ extern "C" global_variable void ReloadGLFunction (Win32_OffScreen_Buffer* BackBu
     end_ticket_mutex(&BackBuffer_->ticket);
 }
 
-typedef void reload_gl_function_pointer_ (const struct Win32_OffScreen_Buffer* BackBuffer_);
+extern "C" void ReloadGLFunction (Win32_OffScreen_Buffer* BackBuffer_){
+    begin_ticket_mutex(&BackBuffer_->ticket);
+    HDC tempDC = GetDC(BackBuffer_->Window);
+    if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
+        bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
+        if (!success)
+            bool success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
+        assert(success);
+    };
+    end_ticket_mutex(&BackBuffer_->ticket);
+}
+
+typedef void reload_gl_function_pointer_ (struct Win32_OffScreen_Buffer* BackBuffer_);
 
 struct platform_api{
     reload_gl_function_pointer_* reloadGLFuncPointer;
 };
 
-extern "C" global_variable platform_api test_platform = {};
+extern "C" platform_api test_platform = {};
 
 void ResetGLState(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 void InitCamera(Win32_OffScreen_Buffer* BackBuffer = nullptr);

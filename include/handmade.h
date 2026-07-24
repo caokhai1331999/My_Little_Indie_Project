@@ -340,6 +340,8 @@ struct Clock_Set{
     float ChangeAxisCounter = 0.0f;
     float TimeToChangeAxis = 0.0f;
     int64 ViewRotateCount = 0;
+
+    uint64 Pad[6];
 };
 
 struct Per_Win_Properties{
@@ -396,7 +398,7 @@ uint64 AtomicAddUint64(uint64 volatile *addend, uint64 value){
     return value_;
 }
 
-void begin_ticket_mutex(ticket_mutex* mutex){
+global_variable void begin_ticket_mutex(ticket_mutex* mutex){
     uint64 ticket = AtomicAddUint64(&mutex->ticket, 1);
     // mutex->ticket is now auto change
     // But why when the ticket equal to ticket thread id that we know it get out.
@@ -404,7 +406,7 @@ void begin_ticket_mutex(ticket_mutex* mutex){
         while(ticket != mutex->serving);
 }
 
-void end_ticket_mutex(ticket_mutex* mutex){
+global_variable void end_ticket_mutex(ticket_mutex* mutex){
     AtomicAddUint64(&mutex->serving, 1);
     // Whenever the ticket equal to the threadId that mean the thread get out of code lines and bring instruction to the core
 }

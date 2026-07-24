@@ -303,6 +303,7 @@ bool InitOpenGL(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, im
 // Retrieved 2026-02-10, License - CC BY-SA 3.0
 
     test_platform.reloadGLFuncPointer = reload_gl_function_pointer;
+    assert(test_platform.reloadGLFuncPointer);
     
     GetWindowDimension(OBuffer);
     Win32ResizeDIBSection(OBuffer, Dimens.Width, Dimens.Height);
@@ -940,7 +941,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
               //ShowGlyphs(&BackBuffer, &Glyph_Map);
               HDC currentDC = GetDC(Window);
               HDC tempDC;
-              RenderSplendidGradient(&BackBuffer, nullptr, BMPContent);
+              RenderSplendidGradient(&BackBuffer, nullptr, nullptr);
               Win32DisplayBufferWindow(tempDC, 0, 0, &BackBuffer);
               SwapBuffers(tempDC);
               printf("Change to display glyphs\n");

@@ -27,6 +27,7 @@ rem set PDB_name=
 rem Remember exclude out the src files that is used to build dll while building exe
 set src_files_for_dll=..\src\exclude_for_debug\*.cpp
 set glad_src=..\src\glad\*.c
+set glad_src_for_include=..\src
 set dll_name=light32
 rem set EXPORT_=
 
@@ -52,17 +53,18 @@ rem Let alone the hot Loading code later
 rem delete pre-pdb files
 rem=========================================
 
+rem  %glad_src%
 rem del Camera.obj Light.obj entity.obj
 rem del %dll_name%__* light32.exp light32.lib
 rem set dll_name_with_time_=%dll_name%__%hr%_%min%_%sec%__%dd%-%mm%-%yr%
-rem cl /LD /FD %COMPILE_FLAG% %DIRECTIVES_FLAG% %src_files_for_dll% %glad_src% -I%_include% -I%glad_include% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link /PDB:%dll_name_with_time_%.pdb %LIB_% /LIBPATH:%ASSIMP_LIB% /FORCE:MULTIPLE /IGNORE:4006 /IMPLIB:%dll_name%.lib /OUT:%dll_name%.dll
+rem cl /LD /FD %COMPILE_FLAG% %DIRECTIVES_FLAG% %src_files_for_dll% %glad_src% -I%_include% -I%glad_include% -I%glad_src_for_include% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link /PDB:%dll_name_with_time_%.pdb %LIB_% /LIBPATH:%ASSIMP_LIB% /FORCE:MULTIPLE /IGNORE:4006 /IMPLIB:%dll_name%.lib /OUT:%dll_name%.dll
  
 rem ====================================== 
 
 del B_shader.obj C_Model.obj C_Mesh.obj handmade.obj main.obj SoundMaker.obj testOpenGL.obj Tile.obj win32Game.obj Tile.obj animation.obj animator.obj bone.obj
 del win32Game.pdb win32Game__*
 set exe_name_with_time=win32Game__%hr%_%min%_%sec%__%dd%-%mm%-%yr%
-cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES_FOR_EXE% %glad_src% -I%_include% -I%glad_include% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% /LIBPATH:%ASSIMP_LIB% /PDB:%exe_name_with_time%.pdb /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /ENTRY:WinMainCRTStartup /subsystem:console
+cl %COMPILE_FLAG% %DIRECTIVES_FLAG% -Fe:"win32Game" %FILES_FOR_EXE% %glad_src%  -I%_include% -I%glad_include% -I%glad_src_for_include% -I%GLFW_INCLUDE_DIR% -I%ASSIMP_DIR% -link %LIB_% /LIBPATH:%ASSIMP_LIB% /PDB:%exe_name_with_time%.pdb /subsystem:windows /FORCE:MULTIPLE /IGNORE:4006 /ENTRY:WinMainCRTStartup /subsystem:console
 
 rem=======================================
 

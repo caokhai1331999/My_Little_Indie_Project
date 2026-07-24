@@ -109,12 +109,10 @@ void LoadFont(Win32_OffScreen_Buffer* Backbuffer, Glyph_Map* map, const char* pa
         TTFfile = nullptr;        
 }
 
-void LoadFont_(const platform_api* platform, Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map , const char* path){
+void LoadFont_(platform_api* platform, Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map , const char* path){
     //begin_ticket_mutex(&BackBuffer->ticket);
-    if(wglMakeCurrent(GetDC(BackBuffer->Window), BackBuffer->glData.openglRC)){
             //platform->reloadGLFuncPointer(BackBuffer);
         ReloadGLFunction(BackBuffer);
-        }
     //end_ticket_mutex(&BackBuffer->ticket);
 
     LoadFont(BackBuffer, map, path);
