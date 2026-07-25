@@ -366,7 +366,6 @@ void turn_on_light(std::vector<general_light*>* light_group){
 
 
 //======================MESH_PART==========================
-
 // So this can replace class function member effectively
 
 struct Mesh{
@@ -374,16 +373,6 @@ struct Mesh{
     unsigned int* indices;
     Texture* textures;
 }
-
-struct game_state{
-    void* BitmapMemory;
-    int BitmapWidth;
-    int BitmapHeight;
-    int Pitch;
-    int BitmapMemorySize;
-
-    std::vector<C_Model*>Model_Collection;    
-};
 
 //===========================================================
 
@@ -396,12 +385,12 @@ struct game_state{
 // ALL_IN_ONE    
 
    // How can I make sure that all the shaders draw the same object
-
 struct texture_group{
-    char* normal_map;
-    char* ambient_map;
-    char* diffused_map;  
-    char* specular_map;  
+// This one will be hack for 2D game performance
+    unsigned int normal_map;
+    unsigned int ambient_map;
+    unsigned int diffused_map;  
+    unsigned int specular_map;  
 };
 //
 // How we do layer of effect on the same object
@@ -410,13 +399,14 @@ struct shader_group{
     B_shader_program* light_layer_shader;
 // For skeletal moving of entities.
     B_shader_program* skinning_layer_shader;
-// 
+// For emission or any other effect that I haven't learnt yet. 
     B_shader_program* effect_layer_shader;
 }
 
 class graphic_property{
 private:
     B_shader_program* shader;
+    unsigned int* Texture_Group;
     Mesh* mesh;
 public:
     update_(clock_set* clock);
@@ -432,6 +422,16 @@ public:
         setupMesh(mesh);
         // model if possible
     }
+};
+
+struct game_state{
+    void* BitmapMemory;
+    int BitmapWidth;
+    int BitmapHeight;
+    int Pitch;
+    int BitmapMemorySize;
+
+    std::vector<C_Model*>Model_Collection;    
 };
 
 void set_mesh_data(const char* data_path);
@@ -520,22 +520,55 @@ void update(std::vector<object*>* objects_group, input, clock_set* clock){
 // render(&BackBuffer.Game_State)
 // Map constructing ===================================
 typedef uint8 entity_type
-
+// We then bind single texture/simple model
+// to specific object id
 #define static_object 0
 #define moving_object 1
 
-struct simple_map{
+struct simple_volume_map{
     uint8* map_content;
     size_t map_size;
+    
     // Volumme/Room 3D size in world space
-    unsigned int8 height;
-    unsigned int8 Breadth;
-    unsigned int8 Length;
+    uint16 height;
+    uint16 breadth;
+    uint16 length;
 };
+
 // We spawn/randomize new map everytime we change room
 // Think about this is the volume/room not the mere flat ground
-void sketch_map{
-    ;
+//
+// How to relatively define map size based one world
+// first we have to know how big is the unit cube size to compare to the world
+// current ground size is 1(x0.375)x30(x0.5)x30(x0.5 )
+//
+//So I decide the volume will be 50x50x50
+//
+#define ROOM_HEIGHT (uint8)50
+#define ROOM_BREADTH (uint8)50
+#define ROOM_LENGTH (uint8)50
+
+void init_volume_map(simple_map* map, ){
+    map->height = ROOM_HEIGHT;
+    map->breadth = ROOM_BREADTH;
+    map->length = ROOM_LENGTH;
+
+    map->map_size = (size_t)(map->height * map->breadth * map->length);
+}
+
+void sketch_map(simple_map* map){
+    map->map_content = (char*)VirtualAlloc(map->map_content, map_size);
+    for(int y = 0; y < map->height; y++){
+        for(int x = 0; x < map->breadth; x++){
+            for(int z = 0; z < map->length; z++){
+                // we do every single cube here which have the size of 1,1,1
+                //
+                // have to be more specificly rational about this one
+                // ground first then up
+                *map->map_content++ = rand()%(last_texture_id - first_texture_id);
+            }
+        }        
+    };
 }
 // =====================================================
 void render (std::vector<object*>*objects_group, uint8* world_map, Camera* chosen_camera){    

@@ -210,7 +210,6 @@ void set_tile_vertex(B_shader_program* shader, TileGLObject* TileObj){
 glUseProgram(0);
 }
 
-
 void drawTile(const TileGLObject* TileObj, B_shader_program* const Brush){
     
     glBindVertexArray(TileObj->TileVAO);

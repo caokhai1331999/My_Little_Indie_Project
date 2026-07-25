@@ -137,7 +137,7 @@ int CALLBACK WinMain
       };
 
 #ifdef INTERNAL
-      LPVOID BaseAddress = (LPVOID)Megabytes(5);
+      LPVOID BaseAddress = (LPVOID)MEGABYTES(5);
 #else
       LPVOID BaseAddress = 0;
 #endif
@@ -148,8 +148,8 @@ int CALLBACK WinMain
             glm::vec3 randomRotateAxis = glm::vec3(0.4f*(float)(std::rand()*2),0.4f*(float)(std::rand()*2), 0.4f*(float)(std::rand()*2));
 
             Game_Memory game_memory = {};
-            game_memory.PermanentStorageSize = Megabytes(128);
-            game_memory.TransientStorageSize = Megabytes((uint64)6);
+            game_memory.PermanentStorageSize = MEGABYTES(128);
+            game_memory.TransientStorageSize = MEGABYTES((uint64)6);
 
             uint64 TotalSize = game_memory.PermanentStorageSize + game_memory.TransientStorageSize;
             

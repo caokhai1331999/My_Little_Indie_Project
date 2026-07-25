@@ -51,9 +51,9 @@ using namespace std;
 #define Assert(Expression)
 #endif
 
-#define Kilobytes(data) (data*1024)
-#define Megabytes(data) (Kilobytes(data)*1024)
-#define Gigabytes(data) (Megabytes(data)*1024)
+#define KILOBYTES(data) (data*1024)
+#define MEGABYTES(data) (KILOBYTES(data)*1024)
+#define GIGABYTES(data) (MEGABYTES(data)*1024)
 
 #define internal static
 #define local_persist static
@@ -62,6 +62,8 @@ using namespace std;
 #define Pi32 3.14159265359f
 
 typedef int16_t int16;
+// the number is the max bit count in binary form
+// for ex: uint8 max value is : 0x11111111 = 255
 typedef int8_t int8;
 typedef int32_t int32;
 typedef int64_t int64;
@@ -236,41 +238,12 @@ struct Game_Input{
     Game_Controller_Input Controller[4];
 };
 
-struct Game_Memory{
-    bool32 IsInitialized; 
-    uint64 PermanentStorageSize;
-    void* PermanentStorage;
-    uint64 TransientStorageSize;
-    void* TransientStorage;
-};
-
-/*
-
+//======================MEMORY_PART=========================
 #define minimun(a, b) return (a > b)?b:a
 
-struct memory_block{
-    memory_block* prev;
-    memory_block* next;
-
-    size_t size;
-    size_t used;
-
-    void* base;
-    // In term of linear data arrangement the Pad itself is to just separate the memory_block memory address from what come after it.
-    uint64 Pad[6];
-};
-
-// first we have to create ticket that is related to the threadID in cheap way.
-// 
-struct ticket_mutex{
-    // keep in mind that the volatile is type that can be delared as an object and modified by hardware
-    volatile uint64 ticket;
-    // serving is current intercepting thread which id is taken from getthreadid.
-    volatile uint64 serving;
-    // the ticket loop is just waiting until the thread left/retire before the other get in to execute that line of code again.
-}
-  
- */
+// Do I understand how #define keyword work
+// so actually the type and arena is indicating the variable
+#define DEFAULT_BLOCK_SIZE MEGABYTES(30)
 
 struct ticket_mutex{
     // keep in mind that the volatile is type that can be delared as an object and modified by hardware
@@ -279,6 +252,122 @@ struct ticket_mutex{
     uint64 volatile serving;
     // the ticket loop is just waiting until the thread left/retire before the other get in to execute that line of code again.
 };
+
+struct memory_block{
+    memory_block* prev;
+    memory_block* next;
+
+    size_t size;
+    size_t used;
+    void* base;
+    // In term of linear data arrangement the Pad itself is to just separate the memory_block memory address from what come after it.
+    uint64 Pad[6];
+};
+
+local_persist uint64 AtomicAddUint64(uint64* addend, uint64 value);
+global_variable void begin_ticket_mutex(ticket_mutex* mutex);
+global_variable void end_ticket_mutex(ticket_mutex* mutex);
+
+local_persist uint64 AtomicAddUint64(uint64 volatile *addend, uint64 value){
+// use this to create threadId based ticket and loop through them.
+    // until it retire in order.
+    // Cause this one very fast(cpu level). --> it ensure that no 2 threads can have the same ticket numbers
+    // This one is just the order that a thread hit this line, all of these satisfy the M.E.S.I protocol
+    uint64 value_ = _InterlockedExchangeAdd((long*)addend, value);
+    return value_;
+}
+
+global_variable void begin_ticket_mutex(ticket_mutex* mutex){
+    uint64 ticket = AtomicAddUint64(&mutex->ticket, 1);
+    // mutex->ticket is now auto change
+    // But why when the ticket equal to ticket thread id that we know it get out.
+    // 
+        while(ticket != mutex->serving);
+}
+
+global_variable void end_ticket_mutex(ticket_mutex* mutex){
+    AtomicAddUint64(&mutex->serving, 1);
+    // Whenever the ticket equal to the threadId that mean the thread get out of code lines and bring instruction to the core
+}
+// apply to grow vertex array
+
+void* ALLOCATE_BLOCK_MEMORY(memory_block* mem, size_t size){
+    if(mem){
+        memory_block* block = (memory_block*)VirtualAlloc(block->base, size + sizeof(memory_block), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+        // why plus one
+
+        block->next = mem->next; 
+        block->prev = mem; 
+
+        block->next->prev = block;
+        block->prev->next = block;
+
+        void* result = block + 1;
+        return result;
+    };
+}
+
+void DEALLOCATE_BLOCK_MEMORY(memory_block* mem){
+    if(mem){
+        memory_block* block = ((memory_block*)mem - 1);
+        block->prev->next = block->next;
+        block->next->prev = block->prev;
+
+        VirtualFree(block->base, block->size, MEM_COMMIT|MEM_RESERVE);
+    };
+}
+
+// apply to grow vertex array
+
+void init_mem_region(size_t size, memory_block * arena){
+    arena->size = size;
+    arena->base = (uint8*)VirtualAlloc(arena->base, arena->size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE );
+}
+
+void free_mem_region(memory_block* arena){
+    if(arena->base)
+    VirtualFree(arena->base, arena->size, MEM_COMMIT|MEM_RESERVE);
+}
+
+/*
+void* push_size_(size_t size, memory_block* sentinel, ticket_mutex* mutex){
+    void* result;
+    // whenever the total requested size if bigger than the current block size: allocate new space and copymemory of the old block
+    if(sentinel->used + size >= sentinel->size){
+        begin_ticket_mutex(mutex);
+        memory_block* new_block = (memory_block*)ALLOCATE_BLOCK_MEMORY(sentinel->base, (size_t)DEFAULT_BLOCK_SIZE);
+        // casey lock it inside the something call tick mutex, to prevent any one/app else use these kind of thread while it's on working.
+// This one is not thread-safe
+        // so currently, we haven't touch this growing aray yet.
+        // focus on draw scene and load gl pointer on little beast.
+
+        result = new_block->base + size;
+        new_block->used += size;
+        end_ticket_mutex(mutex);
+        // How can i access these memory in pool using index
+        //CopyMemory();
+    } else {
+        sentinel->used += size;
+        result = sentinel->base + sentinel->used;
+    };
+    return result;
+}
+*/
+
+struct Game_Memory{
+
+    bool32 IsInitialized; 
+    uint64 PermanentStorageSize;
+    void* PermanentStorage;
+    uint64 TransientStorageSize;
+    void* TransientStorage;
+};
+
+// set memory here
+// replace by copy_memory of window.
+
+#define push_size(type, arena) (type* )push_size_(sizeof(type), arena)
+#define push_array(type, count, arena) (type* )push_size_(count * sizeof(type), arena)
 
 struct imagee_content{
     int32 Width;
@@ -384,33 +473,6 @@ uint32 safetruncateUint64(uint64 value){
 real32 saferatioN(real32 numerator, real32 divisor);
 real32 saferatio0(real32 numerator, real32 divisor);
 real32 saferatio1(real32 numerator, real32 divisor);
-
-void AtomicAddUint64(uint64* addend, uint64 value);
-void begin_ticket_mutex(ticket_mutex* mutex);
-void end_ticket_mutex(ticket_mutex* mutex);
-
-uint64 AtomicAddUint64(uint64 volatile *addend, uint64 value){
-// use this to create threadId based ticket and loop through them.
-    // until it retire in order.
-    // Cause this one very fast(cpu level). --> it ensure that no 2 threads can have the same ticket numbers
-    // This one is just the order that a thread hit this line, all of these satisfy the M.E.S.I protocol
-    uint64 value_ = _InterlockedExchangeAdd((long*)addend, value);
-    return value_;
-}
-
-global_variable void begin_ticket_mutex(ticket_mutex* mutex){
-    uint64 ticket = AtomicAddUint64(&mutex->ticket, 1);
-    // mutex->ticket is now auto change
-    // But why when the ticket equal to ticket thread id that we know it get out.
-    // 
-        while(ticket != mutex->serving);
-}
-
-global_variable void end_ticket_mutex(ticket_mutex* mutex){
-    AtomicAddUint64(&mutex->serving, 1);
-    // Whenever the ticket equal to the threadId that mean the thread get out of code lines and bring instruction to the core
-}
-// apply to grow vertex array
 
 
 void CalEarlyFrameTime(Clock_Set* Time_Set = nullptr);
