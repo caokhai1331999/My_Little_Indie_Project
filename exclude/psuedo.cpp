@@ -20,6 +20,7 @@ private:
 
     int current_level;
     int storage;
+    // actually skill is just some set of animation that deal specific damage;
     skills skill;
     int stregth;
 
@@ -107,7 +108,7 @@ unsigned int LoadCubeMap(const char* path){
     return cubemap;
 }
 
-// TODO: How to apply material property to shader for it to draw.
+// TODO: How to apply material property to shader for drawing.
 //===========================================================================
 
 // Build world including group of mesh chunks.
@@ -190,114 +191,6 @@ void (const aiNode* Node = nullptr, int total_meshes_number = 0){
       //                     . camera pos for light|  . -//-
 
 // chunk of meshes
-//
-// MEMORY
-#include <Memoryapi.h>
-//======================MEMORY_PART==========================
-// This is a derivative work from Casey shown down for my dedicated senior
-//struct memory_region{
-    //uint8* base;
-    //size_t current_size;
-    //size_t used;
-//};
-// ==> next version is memory_block
-
-#define minimun(a, b) return (a > b)?b:a
-
-struct memory_block{
-    memory_block* prev;
-    memory_block* next;
-
-    size_t size;
-    size_t used;
-    void* base;
-    // In term of linear data arrangement the Pad itself is to just separate the memory_block memory address from what come after it.
-    uint64 Pad[6];
-};
-
-void AtomicAddUint32(uint32* addend, uint32 value){
-// use this to create threadId based ticket and loop through them.
-    // until it retire in order.
-    // Cause this one very fast(cpu level). --> it ensure that no 2 threads can have the same ticket numbers
-    // This one is just the order that a thread hit this line, all of these satisfy the M.E.S.I protocol
-    InterlockedExchangeAdd((long*)addend, value);
-}
-
-void* ALLOCATE_BLOCK_MEMORY(memory_block* mem, size_t size){
-
-    if(mem){
-        memory_block* block = (memory_block*)VirtualAlloc(0, size + sizeof(memory_block), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
-        // why plus one
-        void* result = block + 1;
-
-        block->next = mem->next; 
-        block->prev = mem; 
-
-        block->next->prev = block;
-        block->prev->next = block;
-
-        return result
-    };
-}
-
-void DEALLOCATE_BLOCK_MEMORY(memory_block* mem){
-    if(mem){
-        memory_block* block = ((memory_block*)mem - 1);
-        block->prev->next = block->next;
-        block->next->prev = block->prev;
-
-        VirtualFree(block, MEM_COMMIT|MEM_RESERVE);
-    };
-}
-
-// apply to grow vertex array
-
-void init_mem_region(size_t size, memory_region* arena){
-    arena->current_size = size;
-    arena->base = (uint8*)VirtualAlloc(array->current_size);
-}
-
-void free_mem_region(memory_region* arena){
-    if(arena->base);
-    VirtualFree(arena->base, arena->current_size);
-}
-
-// Do I understand how #define keyword work
-// so actually the type and arena is indicating the variable
-#define DEFAULT_BLOCK_SIZE GIGABYTE(1)
-
-void* push_size_(size_t size, memory_region* sentinel, ticket_mutex* mutex){
-    void* result;
-    // whenever the total requested size if bigger than the current block size: allocate new space and copymemory of the old block
-    if(sentinel->used + size >= sentinel->size){
-        begin_ticket_mutex(mutex);
-        memory_block* new_block = (memory_block*)ALLOCATE_BLOCK_MEMORY(sentinal);
-        // casey lock it inside the something call tick mutex, to prevent any one/app else use these kind of thread while it's on working.
-// This one is not thread-safe
-        // so currently, we haven't touch this growing aray yet.
-        // focus on draw scene and load gl pointer on little beast.
-        end_ticket_mutex(mutex);
-
-        result = new_block->based + size;
-        new_block->used += size;
-
-        CopyMemory();
-    } else {
-        sentinel->used += size;
-        result = sentinel->based + sentinel->used;
-    };
-    return result;
-}
-
-// set memory here
-// replace by copy_memory of window.
-
-
-#define push_size(type, arena) (type* )push_size_(sizeof(type), arena)
-#define push_array(type, count, arena) (type* )push_size_(count * sizeof(type), arena)
-
-//======================MEMORY_PART=========================
-
 //======================LIGHT_PART==========================
 
 struct basic_light_specs{
@@ -381,14 +274,11 @@ struct Mesh{
 // In terms of graphics
 // enviromental elements is just light
 
-// add auto-guide
-// ALL_IN_ONE    
-
-   // How can I make sure that all the shaders draw the same object
+// How can I make sure that all the shaders draw the same object
 struct texture_group{
 // This one will be hack for 2D game performance
     unsigned int normal_map;
-    unsigned int ambient_map;
+    unsigned int emission_map;
     unsigned int diffused_map;  
     unsigned int specular_map;  
 };
@@ -412,9 +302,13 @@ public:
     update_(clock_set* clock);
     B_shader_program* get_shader(return shader);
     // model path is optional
-    object(const char* name_ = nullptr, char* shader_path = nullptr, char* model_path = nullptr):name{name}{
-        std::string shader_name = name_;
-        program = new B_shader_program(shader_name+"vs", shader_name+"fs", shader_path);
+    object(const char *name_ = nullptr, char *vs_shader_path = nullptr,
+           char *fs_shader_path = nullptr, char *model_path = nullptr)
+        : name{name} {
+//??        
+        std::string vs_shader_name = name;
+        std::string vs_shader_name = name;
+        program = new B_shader_program(shader_name+".vs", shader_name+".fs", shader_path);
         
         // load file? or set them up manually???
         // draw a map
