@@ -17,7 +17,7 @@ down
 ---------------- Sun, 20 Jul 25: 03:42PM
 
 Seemed macros Like GL_CLAMP is deprecated and was replaced by GL_CLAMP_TO_EDGE
-And so many macros like that is in the similar situation
+And the same as many macros like that is in the similar situation
 
 ---------------- Sun, 20 Jul 25: 03:47PM
 
@@ -2363,3 +2363,13 @@ NOTE: Chained including slow the compiling time
 
 ---------------- Sat, 25 Jul 26: 10:30AM
 
+
+---------------- Sun, 26 Jul 26: 10:46AM
+TODO: We have to understand deeper/wider under the hood that how graphic
+pipeline working.
+NOTE: What we don't know is the standard setup to draw every scene for every
+object: We got background, moving main character/ other entities.
+Do It with just one entities loop render call. We need to have enough data's
+group: volume map,
+ . We need to categorize shader type for effect: light, skinning not for
+ entities and pass all entities to its 

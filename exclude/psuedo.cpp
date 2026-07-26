@@ -1,5 +1,5 @@
 /* ========================================================================
-   $File: $
+   $file: $
    $Date: $
    $Revision: $
    $Creator: Cao Khai(Casey Muratori's disciple) $
@@ -37,7 +37,6 @@ private:
 
 // In order to save performance we just draw tile that is in viewing space
 std::vector<Tile*>ConstructTileMap(bool* map, int width, int length, int height){
-
     std::vector<Tile*>map;
     map->resserve(width * length * height);
     glm::vec3 Tile_Pos;
@@ -46,14 +45,12 @@ std::vector<Tile*>ConstructTileMap(bool* map, int width, int length, int height)
      //for(int h = 0; h < height; h+=TILE_HEIGHT){
         for(int l = 0; l < length; l+=TILE_LENGTH){
             for(int w = 0; w < width; w+=TILE_WIDTH){
-
                 if((*map)[w][l][h]=="1"){
 // Random TextureID + texture type 
 // 
                     Tile_Pos.x = l;
                     Tile_Pos.y = h;
                     Tile_Pos.z = w;
-
                     map->push_back(new Tile());
                 }
             }                
@@ -71,12 +68,7 @@ std::vector<unsigned int>* RandomizeTileMap(int Map_Width, int Map_Lenght, unsig
     }
     return &Map;
 }
-
-class Tile_Map{
-    std::vector<*Tile>map;
-}
-// General Tiles ID array.
-
+;
 //===========================================================================
 //NOTE: THIS BLOCK IS IN THE ATTEMPT OF CREATING DYNAMIC LIGHT
 
@@ -86,13 +78,7 @@ class Tile_Map{
 
 // Light
 // May be loop over all of shader to apply this evironment 
-
-class Object_Mesh_Specs{
-    glm::vec3 Position;
-    Mesh mesh;
-    Material material;
-}
-
+   /*
 unsigned int LoadCubeMap(const char* path){
     unsigned int cubemap;
     glGenTextures(1, &cubemap);
@@ -107,7 +93,13 @@ unsigned int LoadCubeMap(const char* path){
     }
     return cubemap;
 }
-
+*/
+//========================PROFILER================================
+// we got clock, we need to show them on opengl
+// Casey store all pixel's data of one frame in large buffer and pass them all to
+// GL context
+//
+//========================PROFILER================================
 // TODO: How to apply material property to shader for drawing.
 //===========================================================================
 
@@ -115,58 +107,6 @@ unsigned int LoadCubeMap(const char* path){
 //Compute normal map to make surface looked less fake
 // How to arrange it
 global_variable Tile* World = nullptr;
-
-
-// Texture Coordinate
-// Due to the origin/ We start mapping texture is/at the Bottom of the quad
-// so we have 
-glm::vec2 uv1(0.0, 1.0);
-glm::vec2 uv2(0.0, 0.0);
-glm::vec2 uv3(1.0, 0.0);
-glm::vec2 uv4(1.0, 1.0);
-
-glm::vec3 normal(0.0f, 0.0f, 1.0f);
-// Manually calculate Tangent and Bitangent if
-// the there are none available in model/mesh
-
-// In Vertex Shader
-
-// motion in
-void set_environment_force_(entity* object){
-    object->position * envir.gravity_on_pos;
-}              
-
-// GLSL
-
-uniform sampler2D texture;
-in vec2 TexCoord;
-
-uniform struct light{
-    vec3 position;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-};
-
-out vec4 fragColor;
- void main(){
-     vec3 OutFrag = texture(sampler2D, TexCoord);
-     OutFrag *= Light.abient * attenuation;
-     fragColor = vec4(OutFrag, 1.0f);
- };
-
-void (const aiNode* Node = nullptr, int total_meshes_number = 0){
-
-    if(node->mNumMeshes > 0){
-        total_meshes_number += (int)node->mNumMeshes;
-    }
-    
-    if(node->mNumChildren > 0){
-        for(unsigned int i = 0; i < node->mNumChildren; i++){
-            TotalMeshesCounter(node->mChildren[i], total_meshes_number);
-        }
-    }
-}
 
 // update :
 // render : loop through entitys and used matched shader to draw;
@@ -234,8 +174,7 @@ struct general_light{
 struct environment_map{
     bitmap* LOD[4];
 }
-
-    //
+//
 struct Enviromental_Element{
     // But how can this affect the output texture of the shader.
     environment_map env_map[3];
@@ -268,7 +207,6 @@ struct Mesh{
 }
 
 //===========================================================
-
 // PURPOSE: Create a mechanism that draw multiple object of scene using
 //instancing method and available asset.
 // In terms of graphics
@@ -284,6 +222,7 @@ struct texture_group{
 };
 //
 // How we do layer of effect on the same object
+//
 struct shader_group{
 // For layers of lights:... + emission
     B_shader_program* light_layer_shader;
@@ -291,7 +230,7 @@ struct shader_group{
     B_shader_program* skinning_layer_shader;
 // For emission or any other effect that I haven't learnt yet. 
     B_shader_program* effect_layer_shader;
-}
+};
 
 class graphic_property{
 private:
@@ -449,7 +388,7 @@ void init_volume_map(simple_map* map, ){
 
     map->map_size = (size_t)(map->height * map->breadth * map->length);
 }
-
+// We need a pre-created Texture group
 void sketch_map(simple_map* map){
     map->map_content = (char*)VirtualAlloc(map->map_content, map_size);
     for(int y = 0; y < map->height; y++){
@@ -464,8 +403,15 @@ void sketch_map(simple_map* map){
         }        
     };
 }
+
+void Draw_Volume(simple_map* map, B_shader_program* shader, Camera* chosen_camera){
+    for(size_t i = 0; i < map->size; i++){
+        shader->setFloat((unsinged int)map->map_content[i]);
+        shader
+    };
+};
 // =====================================================
-void render (std::vector<object*>*objects_group, uint8* world_map, Camera* chosen_camera){    
+void render_in_group (Graphic_Properties* Graphic, uint8* world_map, Camera* chosen_camera){    
     //for(int i = 0; i < (int)objects_group->size()-1; i++){
     // we can use instance
     // first feed shader with mesh data (Store with VAO)
@@ -473,9 +419,10 @@ void render (std::vector<object*>*objects_group, uint8* world_map, Camera* chose
     // Then use each brush(shader) in brush_set to draw object
 
     for(objects* const &obj: *objects_group){
-        obj->graphic_->shader->use();
-        obj->graphic_->shader->setMat4("projection", chosen_camera[i]->projection); 
-        obj->graphic_->shader->setMat4("view", chosen_camera[i]->view);         
+// Each shader represent for one layer of effect at least.
+        Graphic->shader[i]->use();
+        Graphic->shader[i]->setMat4("projection", chosen_camera[i]->projection); 
+        Graphic->shader[i]->setMat4("view", chosen_camera[i]->view);         
         Draw(obj->graphic_->mesh, obj->graphic_->shader);
     };
     glUseProgram(0);
@@ -496,7 +443,6 @@ void render (std::vector<object*>*objects_group, uint8* world_map, Camera* chose
 class object{
 private:
     std::string name;
-    graphic_property graphic_;
     rigid_body* body;
 public:
     void set_rigid_body();
