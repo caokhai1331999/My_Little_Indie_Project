@@ -262,7 +262,7 @@ int CALLBACK WinMain
                 BackBuffer.camera_set.push_back(new Camera);
                 InitCamera_(BackBuffer.camera_set[0], BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, glm::vec3(10.0f, -10.0f, -5.0f));
 
-                Chosen_Camera = BackBuffer.SwithCamera?BackBuffer.camera_set[0]:&BackBuffer.camera;
+                Chosen_Camera = BackBuffer.SwitchCamera?BackBuffer.camera_set[0]:&BackBuffer.camera;
                 
                 ViewCamera(&BackBuffer.camera);
                 ViewCamera(BackBuffer.camera_set[0]);
@@ -368,7 +368,7 @@ int CALLBACK WinMain
                       CalEarlyFrameTime(&TimeSet);
                   }
 
-                  Chosen_Camera = BackBuffer.SwithCamera?BackBuffer.camera_set[0]:&BackBuffer.camera;
+                  Chosen_Camera = BackBuffer.SwitchCamera?BackBuffer.camera_set[0]:&BackBuffer.camera;
                     //printf("Count from start of frame: %I64d\n",LastCycleCounts);
                   //MSG Message;
                     //NOTE: This is where receiving the message to change

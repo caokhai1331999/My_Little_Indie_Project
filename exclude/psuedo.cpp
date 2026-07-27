@@ -169,7 +169,7 @@ struct general_light{
     // spotlight area defining angle(Phi) maybe with the different name such as cutoff
     spot_light_specs spot_specs;
 };
-
+//============================================================
 // light based on normal map
 struct environment_map{
     bitmap* LOD[4];
@@ -180,8 +180,9 @@ struct Enviromental_Element{
     environment_map env_map[3];
     std::vector<general_light*>*light_group;    
 };
-
+//============================================================
 // Think about set this light group shrewly
+//
 void set_light(glm::vec3* position, std::vector<general_light*>* light_group){
     light_group->basic_specs =;
     light_group->direction =;
@@ -199,11 +200,26 @@ void turn_on_light(std::vector<general_light*>* light_group){
 
 //======================MESH_PART==========================
 // So this can replace class function member effectively
-
+// inside redering_platform.h
+struct basic_shape_vertices_pos{
+    // triangle;
+    unsigned int triangle[] ={};
+    unsigned int triangle_indices[] ={};
+    // polygon
+    unsigned int polygon[] ={};
+    unsigned int polygon_indices[] ={};
+    //cylinder
+    unsigned int cube[] ={};
+    unsigned int cube_indices[] ={};
+    //
+};
+// Consider using imposter to replace actual sphere
+// Group of mesh mean group of asset and vertice data(from simple like triangle to complex like cube, cylinder or the whole model vertex)
 struct Mesh{
-    Vertex* vertices;//cube, plane
-    unsigned int* indices;
-    Texture* textures;
+    //Use this whenever I done the dynamic array
+    Vertex primitive_data;//cube, plane
+    unsigned int textures[3];
+    unsigned int VAO;
 }
 
 //===========================================================
@@ -222,31 +238,25 @@ struct texture_group{
 };
 //
 // How we do layer of effect on the same object
-//
-struct shader_group{
-// For layers of lights:... + emission
-    B_shader_program* light_layer_shader;
-// For skeletal moving of entities.
-    B_shader_program* skinning_layer_shader;
-// For emission or any other effect that I haven't learnt yet. 
-    B_shader_program* effect_layer_shader;
-};
 
 class graphic_property{
 private:
-    B_shader_program* shader;
-    unsigned int* Texture_Group;
-    Mesh* mesh;
+    // This will be geometry collection
+    B_shader_program* basic_light_shader;
+    B_shader_program* post_effect_shader;
+
+    //unsigned int* Texture_Group; //dynamic array case
+    std::vector<unsigned int*> texture_Group;
+    std::vector<Mesh*>Mesh_Group;
 public:
+//    Mesh* mesh;
     update_(clock_set* clock);
     B_shader_program* get_shader(return shader);
     // model path is optional
-    object(const char *name_ = nullptr, char *vs_shader_path = nullptr,
-           char *fs_shader_path = nullptr, char *model_path = nullptr)
+    object(char *folder_path = nullptr)
         : name{name} {
-//??        
-        std::string vs_shader_name = name;
-        std::string vs_shader_name = name;
+//??
+        //search inside the folder for matched source for shader
         program = new B_shader_program(shader_name+".vs", shader_name+".fs", shader_path);
         
         // load file? or set them up manually???
@@ -348,10 +358,42 @@ void update(std::vector<object*>* objects_group, input, clock_set* clock){
         move_object(clock, obj->rigid_body);
     };
 }
+
+// =====================================================
+void render_in_group (Graphic_Properties* Graphic, uint8* world_map, Camera* chosen_camera){    
+    //for(int i = 0; i < (int)objects_group->size()-1; i++){
+    // we can use instance
+    // first feed shader with mesh data (Store with VAO)
+    // Then update the relative position of the obj(with world, or just mere screen space with text)
+    // Then use each brush(shader) in brush_set to draw object
+
+    for(objects* const &obj: *objects_group){
+// Each shader represent for one layer of effect at least.
+        glBindVertexArray(Graphics->VAO_Group);
+        Graphic->shader[i]->use();
+        Graphic->shader[i]->setMat4("projection", chosen_camera[i]->projection); 
+        Graphic->shader[i]->setMat4("view", chosen_camera[i]->view);         
+        Draw(obj->graphic_->mesh, obj->graphic_->shader);
+    };
+    // Then draw post effect here.
+    glUseProgram(0);
+}
+//===================================================================
+// In group:
+// How to manage these vertex's data efficiently
+// when ever we load small mesh
+// we can sample out the function
+// Init: Set environment light, entity's pos, load texture, mesh: indices, vertices
+//(pos, texcoord, normal, tangent, bitangent, boneid[4], weight[4])
+// how do we RENDER: bind VAO -> use shader -> set uniform(camera's pos, entity's
+//pos, light) -> draw element
+// Think about this in group
+// these are in one struct call game_state
  //
 // These kind objects will reside inside something call window_game_state.
 // render(&BackBuffer.Game_State)
-// Map constructing ===================================
+
+ // ====================== Map constructing ===================================
 typedef uint8 entity_type
 // We then bind single texture/simple model
 // to specific object id
@@ -385,9 +427,9 @@ void init_volume_map(simple_map* map, ){
     map->height = ROOM_HEIGHT;
     map->breadth = ROOM_BREADTH;
     map->length = ROOM_LENGTH;
-
     map->map_size = (size_t)(map->height * map->breadth * map->length);
 }
+
 // We need a pre-created Texture group
 void sketch_map(simple_map* map){
     map->map_content = (char*)VirtualAlloc(map->map_content, map_size);
@@ -410,35 +452,7 @@ void Draw_Volume(simple_map* map, B_shader_program* shader, Camera* chosen_camer
         shader
     };
 };
-// =====================================================
-void render_in_group (Graphic_Properties* Graphic, uint8* world_map, Camera* chosen_camera){    
-    //for(int i = 0; i < (int)objects_group->size()-1; i++){
-    // we can use instance
-    // first feed shader with mesh data (Store with VAO)
-    // Then update the relative position of the obj(with world, or just mere screen space with text)
-    // Then use each brush(shader) in brush_set to draw object
-
-    for(objects* const &obj: *objects_group){
-// Each shader represent for one layer of effect at least.
-        Graphic->shader[i]->use();
-        Graphic->shader[i]->setMat4("projection", chosen_camera[i]->projection); 
-        Graphic->shader[i]->setMat4("view", chosen_camera[i]->view);         
-        Draw(obj->graphic_->mesh, obj->graphic_->shader);
-    };
-    glUseProgram(0);
-}
-
-//===================================================================
-// In group:
-// How to manage these vertex's data efficiently
-// when ever we load small mesh
-// we can sample out the function
-// Init: Set environment light, entity's pos, load texture, mesh: indices, vertices
-//(pos, texcoord, normal, tangent, bitangent, boneid[4], weight[4])
-// how do we RENDER: bind VAO -> use shader -> set uniform(camera's pos, entity's
-//pos, light) -> draw element
-// Think about this in group
-// these are in one struct call game_state
+// ====================== Map constructing ===========================
 
 class object{
 private:

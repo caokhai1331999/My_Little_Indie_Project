@@ -2373,3 +2373,9 @@ Do It with just one entities loop render call. We need to have enough data's
 group: volume map,
  . We need to categorize shader type for effect: light, skinning not for
  entities and pass all entities to its 
+
+---------------- Mon, 27 Jul 26: 11:00AM
+How to organize the graphic object's elements in the efficient way
+Now I know some effect doesn't belong to any objects at all
+Now I learnt that we can have a post-processing shader that write on screen
+after done drawing the scene.

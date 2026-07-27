@@ -292,6 +292,7 @@ global_variable void end_ticket_mutex(ticket_mutex* mutex){
 // apply to grow vertex array
 
 void* ALLOCATE_BLOCK_MEMORY(memory_block* mem, size_t size){
+    void* result;
     if(mem){
         memory_block* block = (memory_block*)VirtualAlloc(block->base, size + sizeof(memory_block), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
         // why plus one
@@ -303,8 +304,8 @@ void* ALLOCATE_BLOCK_MEMORY(memory_block* mem, size_t size){
         block->prev->next = block;
 
         void* result = block + 1;
-        return result;
     };
+        return result;
 }
 
 void DEALLOCATE_BLOCK_MEMORY(memory_block* mem){

@@ -68,7 +68,7 @@ struct Win32_OffScreen_Buffer{
 
     std::vector<B_shader_program*> shaders_list;
 
-    bool SwithCamera = false;
+    bool32 SwitchCamera = false;
     bool transferNeed;    
     bool GLImageRendered = false;
     OpenGLData glData;

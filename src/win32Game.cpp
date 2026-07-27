@@ -1139,7 +1139,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 
       else if (vkCode == 'S') {
           if((GetKeyState(VK_CONTROL) & (1 << 15)) > 0){
-              BackBuffer.SwithCamera = !BackBuffer.SwithCamera;
+              BackBuffer.SwitchCamera = !BackBuffer.SwitchCamera;
           }
           
         State.GreenOffset += 10;
@@ -1573,8 +1573,8 @@ void InitCamera(Win32_OffScreen_Buffer* BackBuffer){
 void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer){;
     for(const GLuint& shader:BackBuffer->glData.ProgramIDs){
         glUseProgram(shader);
-        setMat4(shader, "projection", !BackBuffer->SwithCamera?BackBuffer->camera.projection:BackBuffer->camera_set[0]->projection);
-        setMat4(shader, "view", !BackBuffer->SwithCamera?BackBuffer->camera.view:BackBuffer->camera_set[0]->view);
+        setMat4(shader, "projection", !BackBuffer->SwitchCamera?BackBuffer->camera.projection:BackBuffer->camera_set[0]->projection);
+        setMat4(shader, "view", !BackBuffer->SwitchCamera?BackBuffer->camera.view:BackBuffer->camera_set[0]->view);
     };
     glUseProgram(0);
         //basic_shader_->setMat4("projection", BackBuffer.camera.projection);
