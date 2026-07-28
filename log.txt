@@ -2379,3 +2379,9 @@ How to organize the graphic object's elements in the efficient way
 Now I know some effect doesn't belong to any objects at all
 Now I learnt that we can have a post-processing shader that write on screen
 after done drawing the scene.
+
+---------------- Tue, 28 Jul 26: 10:20AM
+
+TODO: Focus on sketch_map function to produce the reasonable enough looking map
+NEXT: figure out formular that form postion from map index and dimesion. Then
+test it.

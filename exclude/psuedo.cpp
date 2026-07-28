@@ -218,7 +218,7 @@ struct basic_shape_vertices_pos{
 struct Mesh{
     //Use this whenever I done the dynamic array
     Vertex primitive_data;//cube, plane
-    unsigned int textures[3];
+    texture_group mesh_textures;
     unsigned int VAO;
 }
 
@@ -246,7 +246,6 @@ private:
     B_shader_program* post_effect_shader;
 
     //unsigned int* Texture_Group; //dynamic array case
-    std::vector<unsigned int*> texture_Group;
     std::vector<Mesh*>Mesh_Group;
 public:
 //    Mesh* mesh;
@@ -266,18 +265,79 @@ public:
         // model if possible
     }
 };
-
+// We can replay game by thanks to this struct
 struct game_state{
     void* BitmapMemory;
     int BitmapWidth;
     int BitmapHeight;
     int Pitch;
     int BitmapMemorySize;
-
+// One pit of performance to use this one
+    // be careful
     std::vector<C_Model*>Model_Collection;    
 };
 
 void set_mesh_data(const char* data_path);
+
+ // ====================== Map constructing ===================================
+typedef uint8 entity_type
+// We then bind single texture/simple model
+// to specific object id
+#define static_object 0
+#define moving_object 1
+
+struct simple_volume_map{
+    // one is mesh type, the other is the position;
+    int8* map_content;
+    size_t map_size;
+    
+    // Volumme/Room 3D size in world space
+    uint16 height;
+    uint16 breadth;
+    uint16 length;
+};
+
+// We spawn/randomize new map everytime we change room
+// Think about this is the volume/room not the mere flat ground
+//
+// How to relatively define map size based one world
+// first we have to know how big is the unit cube size to compare to the world
+// current ground size is 1(x0.375)x30(x0.5)x30(x0.5 )
+//
+//So I decide the volume will be 50x50x50
+//
+#define ROOM_HEIGHT (uint8)50
+#define ROOM_BREADTH (uint8)50
+#define ROOM_LENGTH (uint8)50
+
+void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
+    map->height = ROOM_HEIGHT;
+    map->breadth = ROOM_BREADTH;
+    map->length = ROOM_LENGTH;
+    map->map_size = (size_t)(map->height * map->breadth * map->length)+1;
+    map->map_content = (unsigned int*)VirtualAlloc(map->map_content, map_size);
+}
+
+// We need a pre-created Texture group
+void sketch_map(simple_map* map, Mesh* mesh_group){
+    srand(time(NULL));
+    //for(int y = 0; y < map->height; y++){
+        //for(int x = 0; x < map->breadth; x++){
+            //for(int z = 0; z < map->length; z++)
+    for(size_t int i = 0; i < map->size; i++)
+    {
+                //// we do every single cube here which have the size of 1,1,1
+                //
+                // have to be more specificly rational about this one
+                // ground first then up
+                // what to store OMG we just need to store the mesh ID
+                *map->map_content++ = rand()%(mesh_group->size()-1);
+    }
+ //}        
+    //};
+}
+
+// ====================== Map constructing ===========================
 
 //===============LOOP_RUNNING_THEM=====================
 // In Big inititalization : Init OpenGL
@@ -309,18 +369,6 @@ void init_graphic (Win32_OffScreen_Buffer* BackBuffer, std::vector<object*>*obje
     //. Init Position
     glm::vec3 pos = glm::vec3(0.0f);
     // Time to init a 2D map here for every single entity in the current volumm
-}
-
-char* randomize_entitiespos(){
-    char[width * height] map_content;
-    int random_value;
-    for(int x = 0; x < width; x++){
-        for(int y = 0; y < height; y++){
-            random_value = std::rand()%4 + 1;
-            *map_content++  = random_value;
-        }
-    };
-    return map_content;
 }
 
 void object::set_rigid_body(glm::vec3* init_pos){
@@ -360,20 +408,28 @@ void update(std::vector<object*>* objects_group, input, clock_set* clock){
 }
 
 // =====================================================
-void render_in_group (Graphic_Properties* Graphic, uint8* world_map, Camera* chosen_camera){    
+void render_in_group (Graphic_Properties* Graphic, simple_volume_map* world_map, Camera* chosen_camera){    
     //for(int i = 0; i < (int)objects_group->size()-1; i++){
     // we can use instance
     // first feed shader with mesh data (Store with VAO)
     // Then update the relative position of the obj(with world, or just mere screen space with text)
     // Then use each brush(shader) in brush_set to draw object
 
-    for(objects* const &obj: *objects_group){
+    Graphic->shader[i]->setMat4("projection", chosen_camera->projection); 
+    Graphic->shader[i]->setMat4("view", chosen_camera->view);
+    for(size_t i = 0; i < world_map->size; i++)
 // Each shader represent for one layer of effect at least.
-        glBindVertexArray(Graphics->VAO_Group);
-        Graphic->shader[i]->use();
-        Graphic->shader[i]->setMat4("projection", chosen_camera[i]->projection); 
-        Graphic->shader[i]->setMat4("view", chosen_camera[i]->view);         
-        Draw(obj->graphic_->mesh, obj->graphic_->shader);
+        if(!world_map->map_content[i]){
+            //By modding for that dimension we always have a number in its range;
+            glm::vec3 postion = {i>world_map->w?(float)i%w:i, (i>world_map->w)&&(i/world_map->w>l)?i/world_map->w - world_map->l:0,?(i/(world_map->w*world_map->l)):,i>(world_map->w*world_map->h)?(float)(i/(world_map->w*world_map->h)):0.0f};
+            // now we decide how to add matched id in Graphic object;
+            // replace i with some thing
+            glBindVertexArray(Graphics->mesh_group[map->map_content[i]]);
+            Graphic->shader[i]->use();
+            // Postion may be we use i * w * l * h
+            Graphic->shader[i]->setVec3("Postion", map->map_content[i+1]);
+            Draw(obj->graphic_->mesh, obj->graphic_->shader[i]);
+        }
     };
     // Then draw post effect here.
     glUseProgram(0);
@@ -393,67 +449,7 @@ void render_in_group (Graphic_Properties* Graphic, uint8* world_map, Camera* cho
 // These kind objects will reside inside something call window_game_state.
 // render(&BackBuffer.Game_State)
 
- // ====================== Map constructing ===================================
-typedef uint8 entity_type
-// We then bind single texture/simple model
-// to specific object id
-#define static_object 0
-#define moving_object 1
-
-struct simple_volume_map{
-    uint8* map_content;
-    size_t map_size;
-    
-    // Volumme/Room 3D size in world space
-    uint16 height;
-    uint16 breadth;
-    uint16 length;
-};
-
-// We spawn/randomize new map everytime we change room
-// Think about this is the volume/room not the mere flat ground
-//
-// How to relatively define map size based one world
-// first we have to know how big is the unit cube size to compare to the world
-// current ground size is 1(x0.375)x30(x0.5)x30(x0.5 )
-//
-//So I decide the volume will be 50x50x50
-//
-#define ROOM_HEIGHT (uint8)50
-#define ROOM_BREADTH (uint8)50
-#define ROOM_LENGTH (uint8)50
-
-void init_volume_map(simple_map* map, ){
-    map->height = ROOM_HEIGHT;
-    map->breadth = ROOM_BREADTH;
-    map->length = ROOM_LENGTH;
-    map->map_size = (size_t)(map->height * map->breadth * map->length);
-}
-
-// We need a pre-created Texture group
-void sketch_map(simple_map* map){
-    map->map_content = (char*)VirtualAlloc(map->map_content, map_size);
-    for(int y = 0; y < map->height; y++){
-        for(int x = 0; x < map->breadth; x++){
-            for(int z = 0; z < map->length; z++){
-                // we do every single cube here which have the size of 1,1,1
-                //
-                // have to be more specificly rational about this one
-                // ground first then up
-                *map->map_content++ = rand()%(last_texture_id - first_texture_id);
-            }
-        }        
-    };
-}
-
-void Draw_Volume(simple_map* map, B_shader_program* shader, Camera* chosen_camera){
-    for(size_t i = 0; i < map->size; i++){
-        shader->setFloat((unsinged int)map->map_content[i]);
-        shader
-    };
-};
-// ====================== Map constructing ===========================
-
+//  ========================= Rigid Body =============================
 class object{
 private:
     std::string name;
