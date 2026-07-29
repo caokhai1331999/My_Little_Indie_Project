@@ -452,6 +452,7 @@ internal unsigned int TextureFromMemory(const aiScene* scene, const string &dire
     //printf("Embedded texture index is %s\n", path->data);
     //char TextIndex[2] = {'*', (char)(textIndex + 48)};
 
+    // atoi convert the number in string to integer value
     int textIndex = atoi((path->data)+1);
     int width, height, nrComponents;
     size_t size;

@@ -2385,3 +2385,8 @@ after done drawing the scene.
 TODO: Focus on sketch_map function to produce the reasonable enough looking map
 NEXT: figure out formular that form postion from map index and dimesion. Then
 test it.
+
+---------------- Wed, 29 Jul 26: 12:01PM
+
+Now we need the complete the first blue print of graphic prototype class. Make
+it run and try to draw somnething.

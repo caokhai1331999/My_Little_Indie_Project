@@ -200,21 +200,125 @@ void turn_on_light(std::vector<general_light*>* light_group){
 
 //======================MESH_PART==========================
 // So this can replace class function member effectively
-// inside redering_platform.h
-struct basic_shape_vertices_pos{
+// inside redering_platform.h/or graphic_api.h
+struct basic_shape_vertices_data{
     // triangle;
-    unsigned int triangle[] ={};
-    unsigned int triangle_indices[] ={};
+    float triangle[] = {
+    };
+    int triangle_indices[] = {};
     // polygon
-    unsigned int polygon[] ={};
-    unsigned int polygon_indices[] ={};
-    //cylinder
-    unsigned int cube[] ={};
-    unsigned int cube_indices[] ={};
-    //
-};
+    float polygon[] = {};
+    int polygon_indices[] = {};
+    //cube
+    float cube[] = {
+     -0.5f, -0.5f, -0.5f,
+      0.5f, -0.5f, -0.5f,
+      0.5f,  0.5f, -0.5f,
+      0.5f,  0.5f, -0.5f,
+     -0.5f,  0.5f, -0.5f,
+     -0.5f, -0.5f, -0.5f,
+                         
+     -0.5f, -0.5f,  0.5f,
+      0.5f, -0.5f,  0.5f,
+      0.5f,  0.5f,  0.5f,
+      0.5f,  0.5f,  0.5f,
+     -0.5f,  0.5f,  0.5f,
+     -0.5f, -0.5f,  0.5f,
+                         
+                         
+     -0.5f,  0.5f,  0.5f,
+     -0.5f,  0.5f, -0.5f,
+     -0.5f, -0.5f, -0.5f,
+     -0.5f, -0.5f, -0.5f,
+     -0.5f, -0.5f,  0.5f,
+     -0.5f,  0.5f,  0.5f,
+                         
+      0.5f,  0.5f,  0.5f,
+      0.5f,  0.5f, -0.5f,
+      0.5f, -0.5f, -0.5f,
+      0.5f, -0.5f, -0.5f,
+      0.5f, -0.5f,  0.5f,
+      0.5f,  0.5f,  0.5f,
+                         
+     -0.5f, -0.5f, -0.5f,
+      0.5f, -0.5f, -0.5f,
+      0.5f, -0.5f,  0.5f,
+      0.5f, -0.5f,  0.5f,
+     -0.5f, -0.5f,  0.5f,
+     -0.5f, -0.5f, -0.5f,
+                         
+     -0.5f,  0.5f, -0.5f,
+      0.5f,  0.5f, -0.5f,
+      0.5f,  0.5f,  0.5f,
+      0.5f,  0.5f,  0.5f,
+     -0.5f,  0.5f,  0.5f,
+     -0.5f,  0.5f, -0.5f
+    };
+    int cube_indices[] = {
+        0, 1, 2, 2, 4, 0,//0
+        6, 7, 8, 7, 6, 11,
+        12, 13, 14, 13, 12, 17,//2
+        18, 19, 20, 20, 22, 18,
+        24, 25, 26, 25, 24, 29,//4
+        30, 31, 32, 32, 34, 30
+    };
+    //tile-liked shape
+    float tile[] = {// vertex                    TextCoords
+      //BACK   , {0,0},
+      -0.5f,  0.375f, -0.5f,     0.0f, 0.0f,
+       0.5f,  0.375f, -0.5f,     1.0f, 0.0f,
+       0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
+       0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
+      -0.5f,  0.5f,   -0.5f,     0.0f, 1.0f,
+      -0.5f,  0.375f, -0.5f,     0.0f, 0.0f,
+       //FRONT FACE                         
+      -0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
+       0.5f,  0.5f,    0.5f,     1.0f, 1.0f,
+       0.5f,  0.375f,  0.5f,     1.0f, 0.0f,
+       0.5f,  0.5f,    0.5f,     1.0f, 1.0f,
+      -0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
+      -0.5f,  0.5f,    0.5f,     0.0f, 1.0f,
+       // LEFT0.375CE                       
+      -0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+      -0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+      -0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
+      -0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+      -0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+      -0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
+       // RIGH0.375ACE                      
+       0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+       0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
+       0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+       0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+       0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
+       0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+       // BOTT0.375FACE                     
+      -0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+       0.5f,  0.375f,  0.5f,     1.0f, 0.0f,
+       0.5f,  0.375f, -0.5f,     1.0f, 1.0f,
+       0.5f,  0.375f,  0.5f,     1.0f, 0.0f,
+      -0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+      -0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
+      //TOP                 ,               
+      -0.5f,  0.5f,   -0.5f,     0.0f, 1.0f,
+       0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
+       0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+       0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+      -0.5f,  0.5f,    0.5f,     0.0f, 0.0f,
+      -0.5f,  0.5f,   -0.5f,     0.0f, 1.0f
+    };
+    int tile_indices[] = {
+       0, 1, 2, 2, 4, 0,//0
+       6, 7, 8, 7, 6, 11,
+       12, 13, 14, 13, 12, 17,//2
+       18, 19, 20, 20, 22, 18,
+       24, 25, 26, 25, 24, 29,//4
+       30, 31, 32, 32, 34, 30
+    };
+}vertices_collection;
 // Consider using imposter to replace actual sphere
 // Group of mesh mean group of asset and vertice data(from simple like triangle to complex like cube, cylinder or the whole model vertex)
+
 struct Mesh{
     //Use this whenever I done the dynamic array
     Vertex primitive_data;//cube, plane
@@ -238,11 +342,12 @@ struct texture_group{
 };
 //
 // How we do layer of effect on the same object
-
+// How to first prototype the graphic property
 class graphic_property{
 private:
     // This will be geometry collection
     B_shader_program* basic_light_shader;
+    // This is for drawing effect like fog, etc...
     B_shader_program* post_effect_shader;
 
     //unsigned int* Texture_Group; //dynamic array case
@@ -252,12 +357,12 @@ public:
     update_(clock_set* clock);
     B_shader_program* get_shader(return shader);
     // model path is optional
-    object(char *folder_path = nullptr)
+    object(char *assets_folder_path = nullptr, char *light_shader_name_ = nullptr)
         : name{name} {
 //??
+        std::string shader_name = light_shader_name_;
         //search inside the folder for matched source for shader
-        program = new B_shader_program(shader_name+".vs", shader_name+".fs", shader_path);
-        
+        basic_light_shader = new B_shader_program(shader_name+".vs", shader_name+".fs", shader_path);       
         // load file? or set them up manually???
         // draw a map
         mesh = new Mesh();
@@ -265,6 +370,7 @@ public:
         // model if possible
     }
 };
+
 // We can replay game by thanks to this struct
 struct game_state{
     void* BitmapMemory;
@@ -331,6 +437,7 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
                 // have to be more specificly rational about this one
                 // ground first then up
                 // what to store OMG we just need to store the mesh ID
+        // need to be more rational, can not let it randome like this
                 *map->map_content++ = rand()%(mesh_group->size()-1);
     }
  //}        
@@ -421,7 +528,9 @@ void render_in_group (Graphic_Properties* Graphic, simple_volume_map* world_map,
 // Each shader represent for one layer of effect at least.
         if(!world_map->map_content[i]){
             //By modding for that dimension we always have a number in its range;
-            glm::vec3 postion = {i>world_map->w?(float)i%w:i, (i>world_map->w)&&(i/world_map->w>l)?i/world_map->w - world_map->l:0,?(i/(world_map->w*world_map->l)):,i>(world_map->w*world_map->h)?(float)(i/(world_map->w*world_map->h)):0.0f};
+            // I think I done interpret the index to the entities postion in world
+            // space
+            glm::vec3 postion = {(float)i%world_map->w, (i>(world_map->w*world_map->l))?(float)(i/(world_map->w*world_map->h)):0.0f, i>world_map->w?(i/world_map->w)%world_map->l:0.0f};
             // now we decide how to add matched id in Graphic object;
             // replace i with some thing
             glBindVertexArray(Graphics->mesh_group[map->map_content[i]]);
