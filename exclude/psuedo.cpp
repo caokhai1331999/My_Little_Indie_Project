@@ -70,8 +70,7 @@ std::vector<unsigned int>* RandomizeTileMap(int Map_Width, int Map_Lenght, unsig
 }
 ;
 //===========================================================================
-//NOTE: THIS BLOCK IS IN THE ATTEMPT OF CREATING DYNAMIC LIGHT
-
+//NOTE: THIS BLOCK IS IN THE ATTEMPT OF CREATING ROOM/WORLD LIGHT
 // We light up billboard/flat card using the environment/global light set up
 // So We apply one big light source we call sun. And everyobjects have to apply
 // its feature and change its look based on its position or intensity.
@@ -96,8 +95,8 @@ unsigned int LoadCubeMap(const char* path){
 */
 //========================PROFILER================================
 // we got clock, we need to show them on opengl
-// Casey store all pixel's data of one frame in large buffer and pass them all to
-// GL context
+// Casey store all pixel's data of one frame in large buffer and once pass them
+// all to and it still worked.
 //
 //========================PROFILER================================
 // TODO: How to apply material property to shader for drawing.
@@ -201,14 +200,31 @@ void turn_on_light(std::vector<general_light*>* light_group){
 //======================MESH_PART==========================
 // So this can replace class function member effectively
 // inside redering_platform.h/or graphic_api.h
-struct basic_shape_vertices_data{
+static struct basic_shape_vertices_data{
     // triangle;
-    float triangle[] = {
-    };
-    int triangle_indices[] = {};
+// This is for 2D game/effects
+    static const float PlaneVertices[] = {
+        // positions
+        // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
+        // x,    y,     z
+         1.0f, -1.0f, 1.0f, 1.0f, 0.0f,
+        -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 
+        -1.0f,  1.0f, 1.0f, 0.0f, 1.0f,
+
+        -1.0f,  1.0f, 1.0f, 0.0f, 1.0f,                   
+         1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
+         1.0f, -1.0f, 1.0f, 1.0f, 0.0f
+      };
+
+    static const unsigned int planeIndices[] =  {
+//Even though the vertex 1, 0 will be reused but we have to feed them name for opengl just like this
+                    0, 1, 2, 2, 4, 0
+     };
+    
     // polygon
     float polygon[] = {};
     int polygon_indices[] = {};
+
     //cube
     float cube[] = {
      -0.5f, -0.5f, -0.5f,
@@ -254,6 +270,7 @@ struct basic_shape_vertices_data{
      -0.5f,  0.5f,  0.5f,
      -0.5f,  0.5f, -0.5f
     };
+
     int cube_indices[] = {
         0, 1, 2, 2, 4, 0,//0
         6, 7, 8, 7, 6, 11,
@@ -262,9 +279,10 @@ struct basic_shape_vertices_data{
         24, 25, 26, 25, 24, 29,//4
         30, 31, 32, 32, 34, 30
     };
+
     //tile-liked shape
     float tile[] = {// vertex                    TextCoords
-      //BACK   , {0,0},
+      //BACK FACE
       -0.5f,  0.375f, -0.5f,     0.0f, 0.0f,
        0.5f,  0.375f, -0.5f,     1.0f, 0.0f,
        0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
@@ -278,7 +296,7 @@ struct basic_shape_vertices_data{
        0.5f,  0.5f,    0.5f,     1.0f, 1.0f,
       -0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
       -0.5f,  0.5f,    0.5f,     0.0f, 1.0f,
-       // LEFT0.375CE                       
+       // LEFT FACE                       
       -0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
       -0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
       -0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
@@ -316,13 +334,13 @@ struct basic_shape_vertices_data{
        30, 31, 32, 32, 34, 30
     };
 }vertices_collection;
+
 // Consider using imposter to replace actual sphere
 // Group of mesh mean group of asset and vertice data(from simple like triangle to complex like cube, cylinder or the whole model vertex)
 
 struct Mesh{
     //Use this whenever I done the dynamic array
     Vertex primitive_data;//cube, plane
-    texture_group mesh_textures;
     unsigned int VAO;
 }
 
@@ -335,6 +353,7 @@ struct Mesh{
 // How can I make sure that all the shaders draw the same object
 struct texture_group{
 // This one will be hack for 2D game performance
+    std::string name;
     unsigned int normal_map;
     unsigned int emission_map;
     unsigned int diffused_map;  
@@ -349,15 +368,15 @@ private:
     B_shader_program* basic_light_shader;
     // This is for drawing effect like fog, etc...
     B_shader_program* post_effect_shader;
-
     //unsigned int* Texture_Group; //dynamic array case
+    std::vector<texture_group*> matched_texture_collection;
     std::vector<Mesh*>Mesh_Group;
 public:
-//    Mesh* mesh;
+//  Mesh* mesh;
     update_(clock_set* clock);
     B_shader_program* get_shader(return shader);
     // model path is optional
-    object(char *assets_folder_path = nullptr, char *light_shader_name_ = nullptr)
+    object(char *media_folder_path = nullptr, char *light_shader_name_ = nullptr)
         : name{name} {
 //??
         std::string shader_name = light_shader_name_;

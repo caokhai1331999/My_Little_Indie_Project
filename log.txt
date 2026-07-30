@@ -2390,3 +2390,31 @@ test it.
 
 Now we need the complete the first blue print of graphic prototype class. Make
 it run and try to draw somnething.
+
+---------------- Thu, 30 Jul 26: 11:37AM
+
+How to make function that automatically load miscellaneous data inside folder.
+Based on name: folder_name: -- normal map: *normal*
+                            -- normal map: *diffuse*
+                            ...
+
+Now I can boil down what I need to do first.
+    Create a general mechanism that draw scene using given volumme map. This
+    will help me alot in game
+With the graphic object we need to have a world_entities that have all the
+    entities to update position and feed data to graphic to draw.
+
+New issue: The order of data buffer is messed up: Need to rearrange them:
+    GL_Bridge_Platform(include B_Shader_Mesh) : -- graphic properties
+                                                -- opengl data
+                                                -- model
+
+--> Win32Game(include GL_Bridge_Platform + Entities) : GameState Contain: --
+    graphic properties
+    Entities
+    render
+    update
+TODO: 1. Figure out a rational enough sketching map function then test the drawing
+      mechanism .
+      2. Come up with a mechanism and data structure that store pos and move
+      multiple entities around .
