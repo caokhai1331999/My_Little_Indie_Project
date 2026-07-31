@@ -435,6 +435,7 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
     //for(int y = 0; y < map->height; y++){
         //for(int x = 0; x < map->breadth; x++){
             //for(int z = 0; z < map->length; z++)
+    uint8 Block_Object_Count = (uint8)(map->map_size * 5)/100;
     for(size_t int i = 0; i < map->size; i++)
     {
                 //// we do every single cube here which have the size of 1,1,1
@@ -453,15 +454,23 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
         if(z == map->l-1)
             h++;
 
+        // All right. First simple approach is we make the majority of room
+        // walkable then sprinkle few block objects on the way.
 #if TEST_DYNAMICALLY_ALLOCATION
         {
         *map->map_content++ = rand()%(mesh_group->size()-1);
+        if(block_object_count > 0)
         *map->map_content++ = rand()%1;
+        if(*map->map_content == 0)
+            block_object_count--;
         }
 #else
         {
          map->map_content[i] = rand()%(mesh_group->size()-1);
+        if(block_object_count > 0)
          map->map_content[i] = rand()%1;
+        if(*map->map_content == 0)
+            block_object_count--;         
         }
 
     }
