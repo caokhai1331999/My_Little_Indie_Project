@@ -303,7 +303,7 @@ void* ALLOCATE_BLOCK_MEMORY(memory_block* mem, size_t size){
         block->next->prev = block;
         block->prev->next = block;
 
-        void* result = block + 1;
+        void* result = (void*)block + 1;
     };
         return result;
 }
@@ -330,7 +330,7 @@ void free_mem_region(memory_block* arena){
     VirtualFree(arena->base, arena->size, MEM_COMMIT|MEM_RESERVE);
 }
 
-/*
+
 void* push_size_(size_t size, memory_block* sentinel, ticket_mutex* mutex){
     void* result;
     // whenever the total requested size if bigger than the current block size: allocate new space and copymemory of the old block
@@ -353,7 +353,6 @@ void* push_size_(size_t size, memory_block* sentinel, ticket_mutex* mutex){
     };
     return result;
 }
-*/
 
 struct Game_Memory{
 

@@ -2414,7 +2414,13 @@ New issue: The order of data buffer is messed up: Need to rearrange them:
     Entities
     render
     update
+    
 TODO: 1. Figure out a rational enough sketching map function then test the drawing
       mechanism .
       2. Come up with a mechanism and data structure that store pos and move
       multiple entities around .
+
+---------------- Fri, 31 Jul 26: 11:27AM
+
+Still on the way to sketch the reasonable look map
+just add the walkable flag to the map's unit specs

@@ -7,6 +7,12 @@
    ======================================================================== */
 #include "psuedo.h"
 
+std::vector<Entities*>*World_Entities_Trackers;
+
+struct Entities_Structure{
+    std::vector<rigid_body*>all_entities;
+};
+
 class entity{
 private:
     space_box collided_box;
@@ -35,40 +41,6 @@ private:
 // wherein x is analogous to y and z is similar to x in 2D coordinates
 //
 
-// In order to save performance we just draw tile that is in viewing space
-std::vector<Tile*>ConstructTileMap(bool* map, int width, int length, int height){
-    std::vector<Tile*>map;
-    map->resserve(width * length * height);
-    glm::vec3 Tile_Pos;
-// Try to randomize thing here
-// Should I store another map here
-     //for(int h = 0; h < height; h+=TILE_HEIGHT){
-        for(int l = 0; l < length; l+=TILE_LENGTH){
-            for(int w = 0; w < width; w+=TILE_WIDTH){
-                if((*map)[w][l][h]=="1"){
-// Random TextureID + texture type 
-// 
-                    Tile_Pos.x = l;
-                    Tile_Pos.y = h;
-                    Tile_Pos.z = w;
-                    map->push_back(new Tile());
-                }
-            }                
-        //};
-    }
-;}
-
-std::vector<unsigned int>* RandomizeTileMap(int Map_Width, int Map_Lenght, unsigned int* textureIDs){
-    std::vector<unsigned int>Map;
-    std::srand(std::time(NULL));
-    for(int w = 0; w < Map_Width; w++){
-        for(int l = 0; l < Map_Lenght; l++){
-            Map.push_back(textureIDs[std::rand()%(sizeof(*textureIDs) - 1)]);
-        }
-    }
-    return &Map;
-}
-;
 //===========================================================================
 //NOTE: THIS BLOCK IS IN THE ATTEMPT OF CREATING ROOM/WORLD LIGHT
 // We light up billboard/flat card using the environment/global light set up
@@ -103,9 +75,6 @@ unsigned int LoadCubeMap(const char* path){
 //===========================================================================
 
 // Build world including group of mesh chunks.
-//Compute normal map to make surface looked less fake
-// How to arrange it
-global_variable Tile* World = nullptr;
 
 // update :
 // render : loop through entitys and used matched shader to draw;
@@ -404,16 +373,23 @@ struct game_state{
 
 void set_mesh_data(const char* data_path);
 
- // ====================== Map constructing ===================================
+// ====================== Map constructing ===================================
 typedef uint8 entity_type
 // We then bind single texture/simple model
 // to specific object id
 #define static_object 0
 #define moving_object 1
 
+// The walkable unit have to be aligned with each other
+struct map_unit_specs{
+    bool32 walkable;
+    int8 MeshID;
+};
+
 struct simple_volume_map{
     // one is mesh type, the other is the position;
-    int8* map_content;
+    int8* map_content;// replace this with array of map_unit_specs
+    std::vector<map_unit_specs*>map_content;
     size_t map_size;
     
     // Volumme/Room 3D size in world space
@@ -439,13 +415,23 @@ void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
     map->height = ROOM_HEIGHT;
     map->breadth = ROOM_BREADTH;
     map->length = ROOM_LENGTH;
-    map->map_size = (size_t)(map->height * map->breadth * map->length)+1;
+    map->map_size = (size_t)(2 * map->height * map->breadth * map->length)+1;
+
+#if TEST_DYNAMICALLY_ALLOCATION
     map->map_content = (unsigned int*)VirtualAlloc(map->map_content, map_size);
+#else
+    map->map_content.reserve(map->map_size);
+
 }
 
 // We need a pre-created Texture group
 void sketch_map(simple_map* map, Mesh* mesh_group){
     srand(time(NULL));
+    // rational map sketcher here.
+    // 1. first thing first we need to decide where can the character where is not
+    int x = 0;
+    int y = 0;
+    int h = 0;
     //for(int y = 0; y < map->height; y++){
         //for(int x = 0; x < map->breadth; x++){
             //for(int z = 0; z < map->length; z++)
@@ -457,7 +443,27 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
                 // ground first then up
                 // what to store OMG we just need to store the mesh ID
         // need to be more rational, can not let it randome like this
-                *map->map_content++ = rand()%(mesh_group->size()-1);
+        x++;
+
+        if(x == map->w -1 ){
+            x -= map->w - 1;
+            z++;
+        };
+
+        if(z == map->l-1)
+            h++;
+
+#if TEST_DYNAMICALLY_ALLOCATION
+        {
+        *map->map_content++ = rand()%(mesh_group->size()-1);
+        *map->map_content++ = rand()%1;
+        }
+#else
+        {
+         map->map_content[i] = rand()%(mesh_group->size()-1);
+         map->map_content[i] = rand()%1;
+        }
+
     }
  //}        
     //};
