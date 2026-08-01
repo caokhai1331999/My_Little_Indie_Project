@@ -9,87 +9,13 @@
 #include "B_shader.h"
 #include "entity.h"
 #include "SoundMaker.h"
-
 #include "utility"
 #include <vector>
 
-struct Rect_{
-    int x, y, w, h;
-};
-
-struct OpenGLData{
-    unsigned int VAOs;
-    unsigned int PlaneVAOs;
-
-    unsigned int VBO;
-    unsigned int ColorVBO;
-    unsigned int PlaneVBO;  
-
-    std::vector<GLuint> ProgramIDs = {};
-    //std::vector<*B_shader_program> ProgramIDs = {};
-    
-    HGLRC openglRC;
-    HGLRC defaultContext;
-
-    unsigned int textureHandle;
-    std::vector<unsigned int>* texture_id_list;
-    OpenGLData(){
-        //Maybe buggy this part
-        // need to be careful
-        VAOs     = 0;       
-        PlaneVAOs = 0;
-        VBO      = 0;     
-        ColorVBO = 0;
-        PlaneVBO = 0;
-        textureHandle = 0;
-    }
-};
-
-#pragma pack(push, 1)
-struct Win32_OffScreen_Buffer{  
-    Game_State state;
-    
-    BITMAPINFO Bitmapinfo;
-    HBITMAP BitmapHandle;
-
-    void* BitmapMemory;
-    void* BitmapMemoryForDirectBlit;
-
-    HWND Window;
-    RECT ClientRect;
-
-    MSG Message;
-    WNDPROC wndproc;
-    
-    int BitmapWidth;
-    int BitmapHeight;
-    int Pitch;
-    int BitmapMemorySize;
-
-    std::vector<B_shader_program*> shaders_list;
-
-    bool32 SwitchCamera = false;
-    bool transferNeed;    
-    bool GLImageRendered = false;
-    OpenGLData glData;
-
-    ticket_mutex ticket;
-    Tile TileProper;
-    
-    Camera camera;
-    std::vector<Camera*> camera_set;
-    const int BytesPerPixel = 4;
-    
-    uint64 Pad[6];
-};
-#pragma pack(pop)
-
-bool isNull(GLuint* member = nullptr);
-void PassGLData(OpenGLData* BackData, OpenGLData* FrontData);
-
-global_variable bool GlobalRunning = true;
-extern "C" {global_variable Win32_OffScreen_Buffer BackBuffer = {};}
-extern "C" global_variable Game_State State = {};
+bool32 first_size = true;
+bool32 first_announce = true;
+bool32 Load_Lib = false;
+bool32 showMsPF = false;
 
 #pragma pack(push, 1)
 struct Win32_Front_Buffer{  
@@ -103,8 +29,6 @@ struct Win32_Front_Buffer{
     int BitmapWidth;
     int BitmapHeight;
     int Pitch;
-
-    std::vector<B_shader_program* > shaders_list;
 
     bool GLDataPassed = false;
     OpenGLData glData;
@@ -120,10 +44,34 @@ struct Win32_Front_Buffer{
 };
 #pragma pack(pop)
 
-bool32 first_size = true;
-bool32 first_announce = true;
-bool32 Load_Lib = false;
-bool32 showMsPF = false;
+
+#pragma pack(push, 1)
+struct Win32_OffScreen_Buffer{  
+    Game_State state;
+    bool32 SwitchCamera = false;
+    bool transferNeed;    
+    bool GLImageRendered = false;
+
+    HWND Window;
+    RECT ClientRect;
+
+    MSG Message;
+    WNDPROC wndproc;
+
+    OpenGLData glData;
+    
+    Camera camera;
+    std::vector<B_shader_program*> shaders_list;
+    std::vector<Camera*> camera_set;
+
+    const int BytesPerPixel = 4;
+    
+    uint64 Pad[6];
+};
+#pragma pack(pop)
+
+extern "C" {global_variable Win32_OffScreen_Buffer BackBuffer = {};}
+extern "C" global_variable Game_State State = {};
 
 glm::mat4 dancing_vampire_core = glm::mat4(1.0f);
 bool32 is_moving = false;
@@ -154,7 +102,7 @@ void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* S
                               //const void* userParam);
 //
 extern "C" void reload_gl_function_pointer (struct Win32_OffScreen_Buffer* BackBuffer_){
-    begin_ticket_mutex(&BackBuffer_->ticket);
+    //begin_ticket_mutex(&BackBuffer_->ticket);
     HDC tempDC = GetDC(BackBuffer_->Window);
     if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
         bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
@@ -162,11 +110,11 @@ extern "C" void reload_gl_function_pointer (struct Win32_OffScreen_Buffer* BackB
             bool success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
         assert(success);
     };
-    end_ticket_mutex(&BackBuffer_->ticket);
+    //end_ticket_mutex(&BackBuffer_->ticket);
 }
 
 extern "C" void ReloadGLFunction (Win32_OffScreen_Buffer* BackBuffer_){
-    begin_ticket_mutex(&BackBuffer_->ticket);
+    //begin_ticket_mutex(&BackBuffer_->ticket);
     HDC tempDC = GetDC(BackBuffer_->Window);
     if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
         bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
@@ -174,7 +122,7 @@ extern "C" void ReloadGLFunction (Win32_OffScreen_Buffer* BackBuffer_){
             bool success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
         assert(success);
     };
-    end_ticket_mutex(&BackBuffer_->ticket);
+    //end_ticket_mutex(&BackBuffer_->ticket);
 }
 
 typedef void reload_gl_function_pointer_ (struct Win32_OffScreen_Buffer* BackBuffer_);

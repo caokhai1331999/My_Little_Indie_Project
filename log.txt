@@ -2424,3 +2424,18 @@ TODO: 1. Figure out a rational enough sketching map function then test the drawi
 
 Still on the way to sketch the reasonable look map
 just add the walkable flag to the map's unit specs
+
+---------------- Sat, 01 Aug 26: 10:17AM
+
+So the layout () in const data in shader is way cheaper to compare to uniform
+so we have to choose what to keep and what to update every frame
+KEEP                                  UPDATE
+Vertices(Pos,                      model, projection matrix (from camera)
+Normal, tangent, bi,               may finalbonematrices
+maybe boneID and weight)
+
+
+How to stop the character whenever it come across the block with cheap cost
+
+NOTE: I haven't understand the whole linked-list implementation yet. So first I
+will stick with the single block's one.

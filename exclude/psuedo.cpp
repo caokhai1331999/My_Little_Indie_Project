@@ -8,7 +8,6 @@
 #include "psuedo.h"
 
 std::vector<Entities*>*World_Entities_Trackers;
-
 struct Entities_Structure{
     std::vector<rigid_body*>all_entities;
 };
@@ -208,8 +207,7 @@ static struct basic_shape_vertices_data{
       0.5f,  0.5f,  0.5f,
       0.5f,  0.5f,  0.5f,
      -0.5f,  0.5f,  0.5f,
-     -0.5f, -0.5f,  0.5f,
-                         
+     -0.5f, -0.5f,  0.5f,                         
                          
      -0.5f,  0.5f,  0.5f,
      -0.5f,  0.5f, -0.5f,
@@ -380,16 +378,18 @@ typedef uint8 entity_type
 #define static_object 0
 #define moving_object 1
 
-// The walkable unit have to be aligned with each other
-struct map_unit_specs{
-    bool32 walkable;
+// The passable unit have to be aligned with each other
+struct unit_specs{
+    bool32 passable;
+    glm::vec3 position;    
+    rigid_body* body;
     int8 MeshID;
 };
 
 struct simple_volume_map{
     // one is mesh type, the other is the position;
     int8* map_content;// replace this with array of map_unit_specs
-    std::vector<map_unit_specs*>map_content;
+    std::vector<unit_specs*>map_content;
     size_t map_size;
     
     // Volumme/Room 3D size in world space
@@ -410,7 +410,7 @@ struct simple_volume_map{
 #define ROOM_HEIGHT (uint8)50
 #define ROOM_BREADTH (uint8)50
 #define ROOM_LENGTH (uint8)50
-
+// ZII(Zero Initializtion) is good
 void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
     map->height = ROOM_HEIGHT;
     map->breadth = ROOM_BREADTH;
@@ -421,7 +421,6 @@ void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
     map->map_content = (unsigned int*)VirtualAlloc(map->map_content, map_size);
 #else
     map->map_content.reserve(map->map_size);
-
 }
 
 // We need a pre-created Texture group
@@ -435,7 +434,7 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
     //for(int y = 0; y < map->height; y++){
         //for(int x = 0; x < map->breadth; x++){
             //for(int z = 0; z < map->length; z++)
-    uint8 Block_Object_Count = (uint8)(map->map_size * 5)/100;
+    uint8 Block_Object_Count = (uint8)((float)map->map_size * 0.2f);
     for(size_t int i = 0; i < map->size; i++)
     {
                 //// we do every single cube here which have the size of 1,1,1
@@ -455,7 +454,8 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
             h++;
 
         // All right. First simple approach is we make the majority of room
-        // walkable then sprinkle few block objects on the way.
+        // passable then sprinkle few block objects on the way.
+/*
 #if TEST_DYNAMICALLY_ALLOCATION
         {
         *map->map_content++ = rand()%(mesh_group->size()-1);
@@ -465,13 +465,14 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
             block_object_count--;
         }
 #else
-        {
+*/
+        //{
          map->map_content[i] = rand()%(mesh_group->size()-1);
         if(block_object_count > 0)
          map->map_content[i] = rand()%1;
         if(*map->map_content == 0)
             block_object_count--;         
-        }
+        //}
 
     }
  //}        
@@ -537,42 +538,50 @@ void Init(Win32_OffScreen_Buffer* BackBuffer){
     }
 }
 
-void update(std::vector<object*>* objects_group, input, clock_set* clock){
+void update(std::vector<rigid_body*>* entities_group,     std::vector<map_unit_specs*>map_content, clock_set* clock){
 // check for collision
-    for(object* const &obj: objects_group){
+    move_object(main_character);
+    for(map_unit_specs* const &obj: map_content){
         obj->rigid_body->update(clock);
 // or
         // This is O(n²) problems
-        check_collision(obj->rigid_body);
+// TODO: Make this one check out the collision on map
+
+        if(!obj->passable)
+            check_collision(obj->rigid_body, main_character);
+
         move_object(clock, obj->rigid_body);
     };
 }
 
 // =====================================================
 void render_in_group (Graphic_Properties* Graphic, simple_volume_map* world_map, Camera* chosen_camera){    
-    //for(int i = 0; i < (int)objects_group->size()-1; i++){
     // we can use instance
     // first feed shader with mesh data (Store with VAO)
     // Then update the relative position of the obj(with world, or just mere screen space with text)
     // Then use each brush(shader) in brush_set to draw object
-
     Graphic->shader[i]->setMat4("projection", chosen_camera->projection); 
     Graphic->shader[i]->setMat4("view", chosen_camera->view);
-    for(size_t i = 0; i < world_map->size; i++)
+    size_t i = 0;
+    //So with the catatonic object we just pass its position as an unchanged
+    //layout data/ InstanceID
+    while(i < world_map->size){
 // Each shader represent for one layer of effect at least.
         if(!world_map->map_content[i]){
             //By modding for that dimension we always have a number in its range;
             // I think I done interpret the index to the entities postion in world
             // space
-            glm::vec3 postion = {(float)i%world_map->w, (i>(world_map->w*world_map->l))?(float)(i/(world_map->w*world_map->h)):0.0f, i>world_map->w?(i/world_map->w)%world_map->l:0.0f};
+            glm::vec3 position = {(float)i%world_map->w, (i>(world_map->w*world_map->l))?(float)(i/(world_map->w*world_map->h)):0.0f, i>world_map->w?(i/world_map->w)%world_map->l:0.0f};
             // now we decide how to add matched id in Graphic object;
             // replace i with some thing
-            glBindVertexArray(Graphics->mesh_group[map->map_content[i]]);
+            glBindVertexArray(Graphics->mesh_group[map->map_content[i]].VAO);
+// Also decide this one
             Graphic->shader[i]->use();
             // Postion may be we use i * w * l * h
-            Graphic->shader[i]->setVec3("Postion", map->map_content[i+1]);
+            Graphic->shader[i]->setVec3("Postion", position);
             Draw(obj->graphic_->mesh, obj->graphic_->shader[i]);
         }
+    i+=2;
     };
     // Then draw post effect here.
     glUseProgram(0);

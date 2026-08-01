@@ -37,7 +37,7 @@ void move_object(float delta_t, rigid_body* object){
     object->move(delta_t);
 }
 
-static Orient_Around_Y(glm::mat4* matrix, float angle){
+static void  Orient_Around_Y(glm::mat4* matrix, float angle){
 // We forgot the Scale factor here
     //1st col
     (*matrix)[0][0] = (float)glm::cos(glm::radians(angle))/100;
@@ -55,7 +55,7 @@ static Orient_Around_Y(glm::mat4* matrix, float angle){
     //*matrix = glm::rotate(*matrix, glm::radians(angle), glm::vec3(0, 1, 0));
 };
 
-static OrientFace(rigid_body* object){
+static void OrientFace(rigid_body* object){
     float deg ;
     if(object->current_face != object->previous_face){
          //deg = 90.0f * -float(object->current_face - object->previous_face);
@@ -70,7 +70,7 @@ static OrientFace(rigid_body* object){
     Orient_Around_Y(&object->position, deg);
 }
 
-static CalcNewPos(float delta_time, rigid_body* object){
+static void CalcNewPos(float delta_time, rigid_body* object) {
     float value;
     //add a little friction(opposed force here)
    //
@@ -143,14 +143,14 @@ static CalcNewPos(float delta_time, rigid_body* object){
     //};
 }
 
-static ApplyGravity(float delta_t, rigid_body* object){
+static void  ApplyGravity(float delta_t, rigid_body* object){
     if(object->position[3][1] < 0){
         object->object_speed.falling_v += 9.8f * delta_t;         
         object->position[3][1] = based_a_v_Pos_calc(9.8f, object->object_speed.falling_v, object->position[3][1], delta_t);
     }
 }
 
-static ApplyMomentum(float delta_t, rigid_body* object){
+static void ApplyMomentum(float delta_t, rigid_body* object){
     if(object->object_speed.jump_v > 1.0f)
         object->object_speed.jump_v -= 0.5f;
     if(object->object_speed.jump_v < 0.0f)
@@ -164,7 +164,7 @@ static ApplyMomentum(float delta_t, rigid_body* object){
 
 };
 
-static Jump(float delta_t, rigid_body* object){
+static void Jump(float delta_t, rigid_body* object){
 
     object->position[3][1] = based_a_v_Pos_calc(-object->object_speed.jump_a, -object->object_speed.jump_v, object->position[3][1], delta_t);
     if(object->object_speed.current_states.fancy_move == JUMPING_FORWARD){
@@ -174,6 +174,6 @@ static Jump(float delta_t, rigid_body* object){
     }
 }
 
-static CalcNewV(float FrameTime, float* veclo, float* accel){;
+static void CalcNewV(float FrameTime, float* veclo, float* accel){;
     (*veclo) +=  (*accel) * FrameTime;
 };

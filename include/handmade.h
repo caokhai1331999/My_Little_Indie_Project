@@ -79,6 +79,8 @@ typedef uint32_t uint32;
 typedef float real32;
 typedef double real64;
 
+typedef size_t memory_index;
+
 const global_variable int Height = 720;
 const global_variable int Width = 1280;
 
@@ -253,6 +255,14 @@ struct ticket_mutex{
     // the ticket loop is just waiting until the thread left/retire before the other get in to execute that line of code again.
 };
 
+struct memory_arena{
+    size_t size;
+    size_t used;
+    void* base;
+    // In term of linear data arrangement the Pad itself is to just separate the memory_block memory address from what come after it.
+    uint64 Pad[6];
+};
+
 struct memory_block{
     memory_block* prev;
     memory_block* next;
@@ -263,6 +273,25 @@ struct memory_block{
     // In term of linear data arrangement the Pad itself is to just separate the memory_block memory address from what come after it.
     uint64 Pad[6];
 };
+
+
+struct Platform_Properties{
+        
+    BITMAPINFO Bitmapinfo;
+    HBITMAP BitmapHandle;
+
+    void* BitmapMemory;
+    void* BitmapMemoryForDirectBlit;
+    
+    int BitmapWidth;
+    int BitmapHeight;
+    int Pitch;
+    int BitmapMemorySize;
+
+    ticket_mutex ticket;
+};
+global_variable Platform_Properties Game_PlatForm = {};
+
 
 local_persist uint64 AtomicAddUint64(uint64* addend, uint64 value);
 global_variable void begin_ticket_mutex(ticket_mutex* mutex);
@@ -289,25 +318,49 @@ global_variable void end_ticket_mutex(ticket_mutex* mutex){
     AtomicAddUint64(&mutex->serving, 1);
     // Whenever the ticket equal to the threadId that mean the thread get out of code lines and bring instruction to the core
 }
-// apply to grow vertex array
+// ZII
+void init_arena_memory(memory_arena* arena, size_t init_size){
+    arena->size = init_size;
+    arena->used = 0;
+}
 
+// apply to grow vertex array
+void ALLOCATE_BLOCK_MEMORY(memory_arena* arena, size_t size){
+        // why plus one
+        begin_ticket_mutex(&Game_PlatForm.ticket);
+        uint8* result = (uint8*)VirtualAlloc(arena->base, size + sizeof(memory_arena), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+        end_ticket_mutex(&Game_PlatForm.ticket);
+        arena->base = result;
+}
+
+/*
 void* ALLOCATE_BLOCK_MEMORY(memory_block* mem, size_t size){
-    void* result;
-    if(mem){
         memory_block* block = (memory_block*)VirtualAlloc(block->base, size + sizeof(memory_block), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
         // why plus one
 
         block->next = mem->next; 
         block->prev = mem; 
 
+        begin_ticket_mutex(&BackBuffer.mutex);
         block->next->prev = block;
         block->prev->next = block;
+        end_ticket_mutex(&BackBuffer.mutex);
 
-        void* result = (void*)block + 1;
-    };
+        void* result = block->base + 1;
         return result;
 }
+*/
 
+
+bool32 DEALLOCATE_BLOCK_MEMORY(memory_arena* arena){
+    bool32 result;
+    if(arena->base){
+        result = VirtualFree(arena->base, arena->size, MEM_COMMIT|MEM_RESERVE);
+    };
+    return result;
+}
+
+/*
 void DEALLOCATE_BLOCK_MEMORY(memory_block* mem){
     if(mem){
         memory_block* block = ((memory_block*)mem - 1);
@@ -317,7 +370,7 @@ void DEALLOCATE_BLOCK_MEMORY(memory_block* mem){
         VirtualFree(block->base, block->size, MEM_COMMIT|MEM_RESERVE);
     };
 }
-
+ */
 // apply to grow vertex array
 
 void init_mem_region(size_t size, memory_block * arena){
@@ -330,13 +383,34 @@ void free_mem_region(memory_block* arena){
     VirtualFree(arena->base, arena->size, MEM_COMMIT|MEM_RESERVE);
 }
 
+//inline memory_index Get_Alignment_Offset(memory_arena* block, size_t alignment){
+    //;
+//}
 
+/*
+void* push_size_(size_t size, memory_arena* arena, ticket_mutex* mutex){
+    // whenever the total requested size if bigger than the current block size: allocate new space and copymemory of the old block
+    memory_index alignment_mask = Get_Alignment_Offset(, 4);
+    if(arena->used + size >= arena->size){
+        begin_ticket_mutex(mutex);
+        arena->size += minimum_block_size;
+        arean->used += size;
+        ALLOCATE_BLOCK_MEMORY(arena->base, minimum_block_size);
+        void* result = arena->base + used;
+        end_ticket_mutex(mutex);
+        assert(result);
+        //CopyMemory();
+    return result;
+}
+*/
+
+/*
 void* push_size_(size_t size, memory_block* sentinel, ticket_mutex* mutex){
     void* result;
     // whenever the total requested size if bigger than the current block size: allocate new space and copymemory of the old block
     if(sentinel->used + size >= sentinel->size){
         begin_ticket_mutex(mutex);
-        memory_block* new_block = (memory_block*)ALLOCATE_BLOCK_MEMORY(sentinel->base, (size_t)DEFAULT_BLOCK_SIZE);
+        memory_block* new_block = (memory_block*)ALLOCATE_BLOCK_MEMORY(sentinel, (size_t)DEFAULT_BLOCK_SIZE);
         // casey lock it inside the something call tick mutex, to prevent any one/app else use these kind of thread while it's on working.
 // This one is not thread-safe
         // so currently, we haven't touch this growing aray yet.
@@ -353,6 +427,7 @@ void* push_size_(size_t size, memory_block* sentinel, ticket_mutex* mutex){
     };
     return result;
 }
+*/
 
 struct Game_Memory{
 
@@ -432,6 +507,44 @@ struct Clock_Set{
 
     uint64 Pad[6];
 };
+
+
+struct Rect_{
+    int x, y, w, h;
+};
+
+struct OpenGLData{
+    unsigned int VAOs;
+    unsigned int PlaneVAOs;
+
+    unsigned int VBO;
+    unsigned int ColorVBO;
+    unsigned int PlaneVBO;  
+
+    std::vector<GLuint> ProgramIDs = {};
+    //std::vector<*B_shader_program> ProgramIDs = {};
+    
+    HGLRC openglRC;
+    HGLRC defaultContext;
+
+    unsigned int textureHandle;
+    std::vector<unsigned int>* texture_id_list;
+    OpenGLData(){
+        //Maybe buggy this part
+        // need to be careful
+        VAOs     = 0;       
+        PlaneVAOs = 0;
+        VBO      = 0;     
+        ColorVBO = 0;
+        PlaneVBO = 0;
+        textureHandle = 0;
+    }
+};
+
+bool isNull(GLuint* member = nullptr);
+void PassGLData(OpenGLData* BackData, OpenGLData* FrontData);
+
+global_variable bool GlobalRunning = true;
 
 struct Per_Win_Properties{
     WNDCLASSEXA WindowClass;
