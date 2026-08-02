@@ -32,7 +32,7 @@ static void IncreaseFontAlpha(const unsigned char* source, void* dest, const Gly
 // Load
 // Render}
 
-void LoadFont(Win32_OffScreen_Buffer* Backbuffer, Glyph_Map* map, const char* path){
+inline void LoadFont(Win32_OffScreen_Buffer* Backbuffer, Glyph_Map* map, const char* path){
 // Load File + Init
         debug_read_file_result* TTFfile = DEBUGReadFileWhole(path);
         stbtt_InitFont(&map->FontInfo, (unsigned char*)TTFfile->Content, stbtt_GetFontOffsetForIndex((unsigned char*)TTFfile->Content, 0));
@@ -109,10 +109,10 @@ void LoadFont(Win32_OffScreen_Buffer* Backbuffer, Glyph_Map* map, const char* pa
         TTFfile = nullptr;        
 }
 
-void LoadFont_(platform_api* platform, Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map , const char* path){
+void LoadFont_(platform_api* platform, Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map , const char* path){
     //begin_ticket_mutex(&BackBuffer->ticket);
             //platform->reloadGLFuncPointer(BackBuffer);
-        ReloadGLFunction(BackBuffer);
+    ReloadGLFunction(Game_Platform, BackBuffer);
     //end_ticket_mutex(&BackBuffer->ticket);
 
     LoadFont(BackBuffer, map, path);
@@ -415,13 +415,13 @@ void set_environmental_light(B_shader_program* shader, const global_light* envir
     glUseProgram(0);
 };
 
-void setup_pointlight_(Win32_OffScreen_Buffer* BackBuffer, global_light* envir_light){
+void setup_pointlight_(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, global_light* envir_light){
     //platform->reloadGLFuncPointer(&BackBuffer);
-    ReloadGLFunction(BackBuffer);
+    ReloadGLFunction(Game_Platform, BackBuffer);
     setup_pointlight(envir_light);
 }
 
-void Set_environmental_light_(Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader, const global_light* envir_light, const Camera* camera){
-    ReloadGLFunction(BackBuffer);
+void Set_environmental_light_(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader, const global_light* envir_light, const Camera* camera){
+    ReloadGLFunction(Game_Platform, BackBuffer);
     set_environmental_light(shader, envir_light, camera);
 };

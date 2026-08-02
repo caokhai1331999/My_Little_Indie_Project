@@ -309,7 +309,7 @@ struct Mesh{
     //Use this whenever I done the dynamic array
     Vertex primitive_data;//cube, plane
     unsigned int VAO;
-}
+};
 
 //===========================================================
 // PURPOSE: Create a mechanism that draw multiple object of scene using

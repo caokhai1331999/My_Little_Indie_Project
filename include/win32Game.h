@@ -47,19 +47,8 @@ struct Win32_Front_Buffer{
 
 #pragma pack(push, 1)
 struct Win32_OffScreen_Buffer{  
-    Game_State state;
-    bool32 SwitchCamera = false;
-    bool transferNeed;    
-    bool GLImageRendered = false;
-
-    HWND Window;
-    RECT ClientRect;
-
-    MSG Message;
-    WNDPROC wndproc;
-
     OpenGLData glData;
-    
+    TileGLObject TileProperty;    
     Camera camera;
     std::vector<B_shader_program*> shaders_list;
     std::vector<Camera*> camera_set;
@@ -77,21 +66,20 @@ glm::mat4 dancing_vampire_core = glm::mat4(1.0f);
 bool32 is_moving = false;
 float DelayedRatio = 0.5f;
 
-
-void GetWindowDimension(Win32_OffScreen_Buffer* BackBuffer);
-void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Height);
+void GetWindowDimension(Platform_Properties* GamePlatform = nullptr);
+void Win32ResizeDIBSection(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* OBuffer, int Width, int Height);
 
 //void RenderSplendidGradient(Win32_Front_Buffer* OBuffer, imagee_content* BMPContent, int XOffset, int YOffset);
-void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer = nullptr, Win32_Front_Buffer* FBuffer = nullptr, imagee_content* BMPContent = nullptr);
-void Win32DisplayBufferWindow (HDC DeviceContext, int WindowWidth, int WindowHeight, Win32_OffScreen_Buffer* OBuffer);
+void RenderSplendidGradient(Platform_Properties* Game_Platform = nullptr, Win32_Front_Buffer* FBuffer = nullptr, imagee_content* BMPContent = nullptr);
+void Win32DisplayBufferWindow (HDC DeviceContext, int WindowWidth, int WindowHeight, Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer);
 
 void GameUpdateAndRender(Game_Memory* Memory = nullptr, imagee_content* BMPContent = nullptr ,Game_Input* Input = nullptr, Game_State* State = nullptr ,Win32_Front_Buffer* OBuffer = nullptr, Game_Sound_OutPut* SoundBuffer = nullptr, HDC DeviceContextt = NULL);
 
 void OpenConsole();
-bool InitOpenGL(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* bmpContent);
+bool InitOpenGL(Platform_Properties* Game_Platform = nullptr, Win32_OffScreen_Buffer* OBuffer = nullptr, Win32_Front_Buffer* FBuffer = nullptr, imagee_content* bmpContent = nullptr);
 
-void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
-void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
+void copyBufferData(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
+void displayBufferData(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer);
 
 //void APIENTRY MessageCallback(GLenum source,
                               //GLenum type,
@@ -101,9 +89,9 @@ void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* S
                               //const GLchar* message,
                               //const void* userParam);
 //
-extern "C" void reload_gl_function_pointer (struct Win32_OffScreen_Buffer* BackBuffer_){
+extern "C" void reload_gl_function_pointer (struct Platform_Properties* Game_Platform, struct Win32_OffScreen_Buffer* BackBuffer_){
     //begin_ticket_mutex(&BackBuffer_->ticket);
-    HDC tempDC = GetDC(BackBuffer_->Window);
+    HDC tempDC = GetDC(Game_Platform->Window);
     if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
         bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
         if (!success)
@@ -113,9 +101,9 @@ extern "C" void reload_gl_function_pointer (struct Win32_OffScreen_Buffer* BackB
     //end_ticket_mutex(&BackBuffer_->ticket);
 }
 
-extern "C" void ReloadGLFunction (Win32_OffScreen_Buffer* BackBuffer_){
+extern "C" void ReloadGLFunction (Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer_){
     //begin_ticket_mutex(&BackBuffer_->ticket);
-    HDC tempDC = GetDC(BackBuffer_->Window);
+    HDC tempDC = GetDC(Game_Platform->Window);
     if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
         bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
         if (!success)
@@ -125,7 +113,7 @@ extern "C" void ReloadGLFunction (Win32_OffScreen_Buffer* BackBuffer_){
     //end_ticket_mutex(&BackBuffer_->ticket);
 }
 
-typedef void reload_gl_function_pointer_ (struct Win32_OffScreen_Buffer* BackBuffer_);
+typedef void reload_gl_function_pointer_ (struct Platform_Properties* Game_Platform, struct Win32_OffScreen_Buffer* BackBuffer_);
 
 struct platform_api{
     reload_gl_function_pointer_* reloadGLFuncPointer;
@@ -133,15 +121,15 @@ struct platform_api{
 
 extern "C" platform_api test_platform = {};
 
-void ResetGLState(Win32_OffScreen_Buffer* BackBuffer = nullptr);
-void InitCamera(Win32_OffScreen_Buffer* BackBuffer = nullptr);
+void ResetGLState(Win32_OffScreen_Buffer* BackBuffer = nullptr, Platform_Properties* Game_Platform = nullptr);
+void InitCamera(Platform_Properties* Game_Platform = nullptr, Win32_OffScreen_Buffer* BackBuffer = nullptr);
 void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer = nullptr);
 
 LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam ,LPARAM Lparam);
 
 void CalDelayedRatio(float* DelayedRatio = nullptr, Clock_Set* Time_Set = nullptr, Win32_OffScreen_Buffer* BackBuffer = nullptr);
-WNDCLASSEXA SetUpWindowClass(Win32_OffScreen_Buffer* BackBuffer, HINSTANCE Instance);
-void CleanUpandExit(Win32_OffScreen_Buffer* BackBuffer = nullptr, Glyph_Map* map = nullptr);
+WNDCLASSEXA SetUpWindowClass(Platform_Properties* Game_Platform, HINSTANCE Instance);
+void CleanUpandExit(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer = nullptr, Glyph_Map* map = nullptr);
 void ErrorExit();
 
 #define WIN32GAME_H

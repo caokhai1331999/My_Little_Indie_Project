@@ -44,7 +44,7 @@ internal void Count_Meshes (const aiNode* node, int* total_meshes_number){
 }
 
 
-void loadModel_(Win32_OffScreen_Buffer* BackBuffer, Model_* model, string path){
+void loadModel_(Platform_Properties* Game_Platform, Model_* model, string path){
 
     bool32 vampire = false;
 
@@ -93,7 +93,7 @@ void loadModel_(Win32_OffScreen_Buffer* BackBuffer, Model_* model, string path){
 
 // NODE
     //Count_Meshes(scene->mRootNode, &(model->number_of_meshes));
-    processNode(BackBuffer, model, scene->mRootNode, scene);
+    processNode(Game_Platform, model, scene->mRootNode, scene);
 // MESH
     if((int)model->meshes.size() > 1){
         for(unsigned int i = 0; i < model->meshes.size(); i++){
@@ -106,14 +106,14 @@ void loadModel_(Win32_OffScreen_Buffer* BackBuffer, Model_* model, string path){
 // MATERIAL Inside mesh
 }
 // Watch out for this hierarchy
-internal void processNode(Win32_OffScreen_Buffer* BackBuffer,  Model_* model, aiNode* node, const aiScene* scene){
+internal void processNode(Platform_Properties* Game_Platform,  Model_* model, aiNode* node, const aiScene* scene){
     // process all the node'scene meshes (if any)
     aiMesh* mesh;
     Mesh* spawned_mesh;
     if(node->mNumMeshes > 0){
         for(unsigned int i = 0; i < node->mNumMeshes; i++){
             mesh = scene->mMeshes[node->mMeshes[i]];
-            spawned_mesh = model->processMesh(BackBuffer, mesh, scene);
+            spawned_mesh = model->processMesh(Game_Platform, mesh, scene);
             //spawn_mesh = (Mesh*)push_size_(sizeof(*spawn_mesh), BackBuffer->state->memory_sentinal, BackBuffer->mutex);
             model->meshes.push_back(spawned_mesh);
 
@@ -127,12 +127,12 @@ internal void processNode(Win32_OffScreen_Buffer* BackBuffer,  Model_* model, ai
 // then do the same for each of its children
     if(node->mNumChildren > 0){
         for(unsigned int i = 0; i < node->mNumChildren; i++){
-            processNode(BackBuffer, model, node->mChildren[i], scene);
+            processNode(Game_Platform, model, node->mChildren[i], scene);
         }
     }
 }
 
-inline Mesh* Model_::processMesh(Win32_OffScreen_Buffer* BackBuffer, const aiMesh* mesh, const aiScene* scene){
+inline Mesh* Model_::processMesh(Platform_Properties* Game_Platform, const aiMesh* mesh, const aiScene* scene){
     
     vector<unsigned int>indices;
     vector<Texture>textures;
@@ -211,10 +211,9 @@ inline Mesh* Model_::processMesh(Win32_OffScreen_Buffer* BackBuffer, const aiMes
         Model_::ExtractBoneWeightForVertices(mesh, &vertices);
         //return Mesh(vertices, indices, textures);
         // This work
-        begin_ticket_mutex(&BackBuffer->ticket);
+        begin_ticket_mutex(&Game_Platform->ticket);
         Mesh* OutPut = new Mesh(&vertices, indices, textures);
-        end_ticket_mutex(&BackBuffer->ticket);
-
+        end_ticket_mutex(&Game_Platform->ticket);
         return OutPut;
 }
 

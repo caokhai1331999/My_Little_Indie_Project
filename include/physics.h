@@ -30,7 +30,11 @@ struct space_box{
         size = *size_; 
         
         position = glm::mat4(1.0f);
-        position = glm::translate(position, (*first_pos));
+        if(first_pos != NULL){
+            position = glm::translate(position, (*first_pos));
+        } else {
+            position = glm::translate(position, glm::vec3(0.0f));
+        }
 
         collide_list = new std::vector<collided_space>;
         collide_list->reserve(10);

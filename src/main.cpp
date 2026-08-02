@@ -23,7 +23,7 @@ int CALLBACK WinMain
  PSTR cmdline,
  int cmdshow)
 {
-    //BackBuffer.wndproc = MainWindowCallBack;
+    //Game_Platform.wndproc = MainWindowCallBack;
 
     Clock_Set TimeSet = {};
     imagee_content* BMPContent = nullptr;
@@ -42,7 +42,7 @@ int CALLBACK WinMain
 
   win32LoadXInput();
 
-  WNDCLASSEXA WindowClass = SetUpWindowClass(&BackBuffer, Instance);
+  WNDCLASSEXA WindowClass = SetUpWindowClass(&Game_Platform, Instance);
     //HWND Window = {};
 
   
@@ -73,13 +73,13 @@ int CALLBACK WinMain
 
   if (RegisterClassExA(&WindowClass)) {
 
-    BackBuffer.Window = CreateWindowExA(
+    Game_Platform.Window = CreateWindowExA(
         // NOTE: The window didn't show up is because the first argument
         WS_EX_APPWINDOW, WindowClass.lpszClassName, "win32GameWithoutEngine",
         WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT,
         CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, Instance, 0);
 
-    if (BackBuffer.Window) {
+    if (Game_Platform.Window) {
 
       OpenConsole();
       int displayCount = ShowCursor(true);
@@ -90,9 +90,9 @@ int CALLBACK WinMain
         GlobalRunning = true;
       }
 
-      HDC DeviceContext = GetDC(BackBuffer.Window);
+      HDC DeviceContext = GetDC(Game_Platform.Window);
       int refreshRate = GetDeviceCaps(DeviceContext, VREFRESH);
-      ReleaseDC(BackBuffer.Window, DeviceContext);
+      ReleaseDC(Game_Platform.Window, DeviceContext);
 
 
       if(first_announce){
@@ -171,18 +171,18 @@ int CALLBACK WinMain
             // OpenGL part
 
               Win32_Front_Buffer ScreenBuffer = Win32_Front_Buffer(
-                BackBuffer.BitmapWidth, BackBuffer.BitmapHeight,
-                &BackBuffer.glData, BackBuffer.BitmapMemory, BackBuffer.Window);
+                Game_Platform.BitmapWidth, Game_Platform.BitmapHeight,
+                &BackBuffer.glData, Game_Platform.BitmapMemory, Game_Platform.Window);
               
             // Randomize cube direction
             std::srand(std::time(0));
                 
 // Cause the ScreenData will be deleted out of the loop so
                 // We have to assign address of memory and glData to
-                //InitOpenGL(Window, &BackBuffer, &ScreenBuffer, JPGContent);
-                //RenderSplendidGradient(&BackBuffer, &ScreenBuffer, BMPContent, 0, 0, 4);
+                //InitOpenGL(Window, &Game_Platform, &ScreenBuffer, JPGContent);
+                //RenderSplendidGradient(&Game_Platform, &ScreenBuffer, BMPContent, 0, 0, 4);
 
-                InitOpenGL(&BackBuffer, &ScreenBuffer, BMPContent);
+            InitOpenGL(&Game_Platform, &BackBuffer, &ScreenBuffer, BMPContent);
                 GLenum err = glGetError();
                 if (err != GL_NO_ERROR) {
                     std::cerr << "OpenGL Error: " << err << std::endl;
@@ -208,15 +208,15 @@ int CALLBACK WinMain
                 BackBuffer.shaders_list.push_back(new B_shader_program("quad_glyph.vs", "quad_glyph.fs", "glyph drawing brush"));
                 ScreenBuffer.glData.ProgramIDs.push_back(BackBuffer.shaders_list[BackBuffer.shaders_list.size()-1]->GetProgramID());                
 
-                set_tile_vertex(BackBuffer.shaders_list[2], &BackBuffer.TileProper.TileObj);
+                set_tile_vertex(BackBuffer.shaders_list[2], &BackBuffer.TileProperty);
 
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
                         CheckShader(shader->GetProgramID(), programme_, shader->GetShaderName());
                     }
 
-                copyBufferData(&BackBuffer, &ScreenBuffer);
-                LoadFont(&test_platform, &BackBuffer, &Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
-                //LoadFont(&BackBuffer, &Glyphs_Map, "./media/arial.ttf");
+                copyBufferData(&Game_Platform, &BackBuffer, &ScreenBuffer);
+                LoadFont(&test_platform, &Game_Platform, &BackBuffer, &Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
+                //LoadFont(&Game_Platform, &Glyphs_Map, "./media/arial.ttf");
                 
                 //????
                 //glm::mat4 View = glm::mat4(1.0f);
@@ -234,7 +234,7 @@ int CALLBACK WinMain
 //Font drawing rect
                 Rect_ rect = {0, 0, 700, 700};
                 
-                //WorldToCamera = BackBuffer.camera.view * dancing_vampire_core;
+                //WorldToCamera = Game_Platform.camera.view * dancing_vampire_core;
                 WorldToCamera = BackBuffer.camera.view * test_vampire_motion.position;
 
                 Init_Entity_Specs(&test_vampire_motion);
@@ -242,12 +242,12 @@ int CALLBACK WinMain
                 TRACKMOUSEEVENT mouseEventVar = {};
                 mouseEventVar.cbSize = sizeof(TRACKMOUSEEVENT);
                 mouseEventVar.dwFlags = TME_HOVER|TME_LEAVE;
-                mouseEventVar.hwndTrack = BackBuffer.Window;
+                mouseEventVar.hwndTrack = Game_Platform.Window;
                 mouseEventVar.dwHoverTime = 1000;
 
                 BackBuffer.camera.mouse.mouseEvent = &mouseEventVar;
 
-                //if(BackBuffer.camera.mouse.mouseEvent == NULL){
+                //if(Game_Platform.camera.mouse.mouseEvent == NULL){
                     //printf("Can't initialize mouse Event, hoverTime\n");
                 //} else {
                     //printf("Succeed initialize mouse Event\n");                    
@@ -255,14 +255,14 @@ int CALLBACK WinMain
                 
                 // This will be replaced by camera.view matrix
                 //
-                GetWindowDimension(&BackBuffer);
-                //InitCamera(&BackBuffer.camera, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, glm::vec3(-3.0f, -10.0f, -12.0f));
-                InitCamera(&BackBuffer);
+                GetWindowDimension(&Game_Platform);
+                //InitCamera(&Game_Platform.camera, Game_Platform.BitmapWidth, Game_Platform.BitmapHeight, glm::vec3(-3.0f, -10.0f, -12.0f));
+                InitCamera(&Game_Platform, &BackBuffer);
 
                 BackBuffer.camera_set.push_back(new Camera);
-                InitCamera_(BackBuffer.camera_set[0], BackBuffer.BitmapWidth, BackBuffer.BitmapHeight, glm::vec3(10.0f, -10.0f, -5.0f));
+                InitCamera_(BackBuffer.camera_set[0], Game_Platform.BitmapWidth, Game_Platform.BitmapHeight, glm::vec3(10.0f, -10.0f, -5.0f));
 
-                Chosen_Camera = BackBuffer.SwitchCamera?BackBuffer.camera_set[0]:&BackBuffer.camera;
+                Chosen_Camera = Game_Platform.SwitchCamera?BackBuffer.camera_set[0]:&BackBuffer.camera;
                 
                 ViewCamera(&BackBuffer.camera);
                 ViewCamera(BackBuffer.camera_set[0]);
@@ -273,16 +273,16 @@ int CALLBACK WinMain
                 
 
                 // Bug is here
-                BackBuffer.camera.projection = glm::perspective(glm::radians(Chosen_Camera->fov), (float)BackBuffer.BitmapWidth / (float)BackBuffer.BitmapHeight, 0.1f, 100.0f);
+                BackBuffer.camera.projection = glm::perspective(glm::radians(Chosen_Camera->fov), (float)Game_Platform.BitmapWidth / (float)Game_Platform.BitmapHeight, 0.1f, 100.0f);
                 // By some unknown dark magic, The set projection matrix part didn't work in that function
-                BackBuffer.camera_set[0]->projection = glm::perspective(glm::radians(Chosen_Camera->fov), (float)BackBuffer.BitmapWidth / (float)BackBuffer.BitmapHeight, 0.1f, 100.0f);
+                BackBuffer.camera_set[0]->projection = glm::perspective(glm::radians(Chosen_Camera->fov), (float)Game_Platform.BitmapWidth / (float)Game_Platform.BitmapHeight, 0.1f, 100.0f);
 
 // MODEL PART === 
                 std::string Mname = "backpack";                
                 Model_* backpack = nullptr;
                 backpack = new Model_(false, &Mname);
                 std::string backpack_path = "./media/backpack.obj";
-                loadModel_(&BackBuffer, backpack, backpack_path);
+                loadModel_(&Game_Platform, backpack, backpack_path);
                 
 //NOW THE ANIMATING PART
                 if(!first_normal_time)
@@ -292,7 +292,7 @@ int CALLBACK WinMain
                 Mname = "vampire";
                 dancing_vampire = new Model_(false, &Mname);
                 std::string dancing_vampire_path = "./media/dancing_vampire.dae";
-                loadModel_(&BackBuffer, dancing_vampire, dancing_vampire_path);
+                loadModel_(&Game_Platform, dancing_vampire, dancing_vampire_path);
 
                 danceAnimation = new Animation((char* )dancing_vampire_path.c_str(), dancing_vampire);
                 animator = new Animator(danceAnimation);
@@ -336,7 +336,7 @@ int CALLBACK WinMain
                 //map_content = load_bin_map("level.map");
                 //std::cout<<map_content->data()<<std::endl;
 
-                setup_pointlight(&BackBuffer, &envir_light);
+                setup_pointlight(&Game_Platform, &BackBuffer, &envir_light);
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
                     if(shader->GetProgramID()!=7){
                         shader->use();
@@ -348,8 +348,8 @@ int CALLBACK WinMain
                 glUseProgram(0);
 
                 //Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
-                Set_environmental_light(&BackBuffer, BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
-                Set_environmental_light(&BackBuffer, BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
+                Set_environmental_light(&Game_Platform, &BackBuffer, BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
+                Set_environmental_light(&Game_Platform, &BackBuffer, BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
 //=================================================
                 // L, R, B, T
                 glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)100.0f, (float)100.0f, 0.0f);
@@ -368,21 +368,21 @@ int CALLBACK WinMain
                       CalEarlyFrameTime(&TimeSet);
                   }
 
-                  Chosen_Camera = BackBuffer.SwitchCamera?BackBuffer.camera_set[0]:&BackBuffer.camera;
+                  Chosen_Camera = Game_Platform.SwitchCamera?BackBuffer.camera_set[0]:&BackBuffer.camera;
                     //printf("Count from start of frame: %I64d\n",LastCycleCounts);
                   //MSG Message;
                     //NOTE: This is where receiving the message to change
                     // for any change in window
                     //INPUT
-                  while(PeekMessageA(&(BackBuffer.Message), 0, 0, 0, PM_REMOVE)) {
-                        if(BackBuffer.Message.message == WM_QUIT){
+                  while(PeekMessageA(&(Game_Platform.Message), 0, 0, 0, PM_REMOVE)) {
+                        if(Game_Platform.Message.message == WM_QUIT){
                             if(GlobalRunning){
                                 GlobalRunning = false;
                                 break;
                             }
                         }
-                        DispatchMessage(&BackBuffer.Message);
-                        TranslateMessage(&BackBuffer.Message);
+                        DispatchMessage(&Game_Platform.Message);
+                        TranslateMessage(&Game_Platform.Message);
                     }
                     if( MaxControllerCount > ArrayCount(Input->Controller)) {
                         MaxControllerCount = ArrayCount(Input->Controller);   
@@ -450,20 +450,20 @@ int CALLBACK WinMain
                     //Update here                
                     //printf("Just before Game update and render\n");                
                     // Attach VAO
-                    if(BackBuffer.transferNeed){
+                    if(Game_Platform.transferNeed){
                         int count = 0;
                         while (count < 6){
                             count++;
                         };
                         if (count >= 5){
-                            copyBufferData(&BackBuffer, &ScreenBuffer);
-                            BackBuffer.transferNeed = false;                        
-                            displayBufferData(&BackBuffer, &ScreenBuffer);
-                            glViewport(BackBuffer.ClientRect.left, BackBuffer.ClientRect.top, ScreenBuffer.BitmapWidth, ScreenBuffer.BitmapHeight);
+                            copyBufferData(&Game_Platform, &BackBuffer, &ScreenBuffer);
+                            Game_Platform.transferNeed = false;                        
+                            displayBufferData(&Game_Platform, &BackBuffer, &ScreenBuffer);
+                            glViewport(Game_Platform.ClientRect.left, Game_Platform.ClientRect.top, ScreenBuffer.BitmapWidth, ScreenBuffer.BitmapHeight);
                         };
                     }
 
-                    DeviceContext = GetDC(BackBuffer.Window);
+                    DeviceContext = GetDC(Game_Platform.Window);
                     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);             
 
                     //GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);
@@ -522,7 +522,7 @@ int CALLBACK WinMain
                     BackBuffer.shaders_list[0]->setMat4("WorldToCamera", WorldToCamera);
                     glUseProgram(0);
 
-                    //Set_Projection_View(&BackBuffer);
+                    //Set_Projection_View(&Game_Platform);
 
                     // Start to add some basic lighting to the model
                     //if (first_size) {
@@ -625,7 +625,7 @@ int CALLBACK WinMain
 
 
 //========================================================================
-                    drawTile(&BackBuffer.TileProper.TileObj, BackBuffer.shaders_list[2]);
+                    drawTile(&BackBuffer.TileProperty, BackBuffer.shaders_list[2]);
 
                     //===============================================
 
@@ -843,7 +843,7 @@ indexx);
                        OutputDebugStringA(buffer);
                     }
 
-                    ReleaseDC(BackBuffer.Window, DeviceContext);//maybe this one
+                    ReleaseDC(Game_Platform.Window, DeviceContext);//maybe this one
 
                     //End count of frame time
                     if (!QueryPerformanceCounter(&(TimeSet.EndCounter))) {
@@ -866,12 +866,12 @@ MULPD -> real32 ==> 128 bits / 32 bits -> 4 real32 packs per registerMULPS -> re
           animator = nullptr;
           delete danceAnimation;
           danceAnimation = nullptr;
-          CleanUpandExit(&BackBuffer, &Glyphs_Map);
+          CleanUpandExit(&Game_Platform, &BackBuffer, &Glyphs_Map);
         }
         else{
             //TODO: Logging
 
-            if(!IsWindow(BackBuffer.Window)){
+            if(!IsWindow(Game_Platform.Window)){
                 printf("Window is NULL\n");
                 DWORD errorCode = GetLastError();
                 char buffer[256] = {};

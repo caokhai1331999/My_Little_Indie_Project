@@ -34,48 +34,48 @@ void OpenConsole() {
     // freopen("CONIN$", "r", stdin);              // Redirect stdin (optional)
 }
 
-void GetWindowDimension(Win32_OffScreen_Buffer* BackBuffer) {
-    GetClientRect(BackBuffer->Window, &(BackBuffer->ClientRect));
-    Dimens.Width = BackBuffer->ClientRect.right - BackBuffer->ClientRect.left;
-    Dimens.Height= BackBuffer->ClientRect.bottom - BackBuffer->ClientRect.top;
-    BackBuffer->BitmapWidth = Dimens.Width;
-    BackBuffer->BitmapHeight = Dimens.Height;
+void GetWindowDimension(Platform_Properties* Game_Platform) {
+    GetClientRect(Game_Platform->Window, &(Game_Platform->ClientRect));
+    Dimens.Width = Game_Platform->ClientRect.right - Game_Platform->ClientRect.left;
+    Dimens.Height= Game_Platform->ClientRect.bottom - Game_Platform->ClientRect.top;
+    Game_Platform->BitmapWidth = Dimens.Width;
+    Game_Platform->BitmapHeight = Dimens.Height;
 }
 
-void Win32ResizeDIBSection(Win32_OffScreen_Buffer* OBuffer, int Width, int Height) {
-
-    if(OBuffer->BitmapMemoryForDirectBlit) {
-        VirtualFree(OBuffer->BitmapMemoryForDirectBlit, 0, MEM_RELEASE);
+void Win32ResizeDIBSection(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* OBuffer, int Width, int Height) {
+\
+    if(Game_Platform->BitmapMemoryForDirectBlit) {
+        VirtualFree(Game_Platform->BitmapMemoryForDirectBlit, 0, MEM_RELEASE);
     }
     // NOTE: The BitmapWidth change every time we resize the window
-    OBuffer->BitmapWidth = Width;
-    OBuffer->BitmapHeight = Height;
-    //OBuffer->Pitch = OBuffer->BytesPerPixel * OBuffer->BitmapWidth;
-    OBuffer->Pitch = 4 * OBuffer->BitmapWidth;
+    Game_Platform->BitmapWidth = Width;
+    Game_Platform->BitmapHeight = Height;
+    //OBuffer->Pitch = OBuffer->BytesPerPixel * Game_Platform->BitmapWidth;
+    Game_Platform->Pitch = 4 * Game_Platform->BitmapWidth;
     
-    OBuffer->Bitmapinfo.bmiHeader.biSize = sizeof(OBuffer->Bitmapinfo.bmiHeader);
-    OBuffer->Bitmapinfo.bmiHeader.biWidth = OBuffer->BitmapWidth;
-    OBuffer->Bitmapinfo.bmiHeader.biHeight = -OBuffer->BitmapHeight;
-    OBuffer->Bitmapinfo.bmiHeader.biPlanes = 1;
-    OBuffer->Bitmapinfo.bmiHeader.biBitCount = 32;
-    OBuffer->Bitmapinfo.bmiHeader.biCompression = BI_RGB;
+    Game_Platform->Bitmapinfo.bmiHeader.biSize = sizeof(Game_Platform->Bitmapinfo.bmiHeader);
+    Game_Platform->Bitmapinfo.bmiHeader.biWidth = Game_Platform->BitmapWidth;
+    Game_Platform->Bitmapinfo.bmiHeader.biHeight = -Game_Platform->BitmapHeight;
+    Game_Platform->Bitmapinfo.bmiHeader.biPlanes = 1;
+    Game_Platform->Bitmapinfo.bmiHeader.biBitCount = 32;
+    Game_Platform->Bitmapinfo.bmiHeader.biCompression = BI_RGB;
                      
-    OBuffer->BitmapMemorySize = OBuffer->BytesPerPixel*(OBuffer->BitmapWidth*OBuffer->BitmapHeight);
+    Game_Platform->BitmapMemorySize = OBuffer->BytesPerPixel*(Game_Platform->BitmapWidth*Game_Platform->BitmapHeight);
 
-    if(!OBuffer->GLImageRendered){
-        if(OBuffer->BitmapMemory) {
-            VirtualFree(OBuffer->BitmapMemory, 0, MEM_RELEASE);
+    if(!Game_Platform->GLImageRendered){
+        if(Game_Platform->BitmapMemory) {
+            VirtualFree(Game_Platform->BitmapMemory, 0, MEM_RELEASE);
         }
-        OBuffer->BitmapMemory = VirtualAlloc(0 ,OBuffer->BitmapMemorySize ,MEM_COMMIT, PAGE_READWRITE);
+        Game_Platform->BitmapMemory = VirtualAlloc(0 ,Game_Platform->BitmapMemorySize ,MEM_COMMIT, PAGE_READWRITE);
     }
 
-    OBuffer->BitmapMemoryForDirectBlit = VirtualAlloc(0 ,OBuffer->BitmapMemorySize ,MEM_COMMIT, PAGE_READWRITE);
+    Game_Platform->BitmapMemoryForDirectBlit = VirtualAlloc(0 ,Game_Platform->BitmapMemorySize ,MEM_COMMIT, PAGE_READWRITE);
 
 }
 
 //void RenderSplendidGradient(Win32_Front_Buffer* OBuffer, imagee_content* BMPContent, int XOffset, int YOffset) {
 
-void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* BMPContent) {
+void RenderSplendidGradient(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* BMPContent) {
     // RR GG BB
     // Row is a pointer to every line of bitmapMemory
     // While pitch is data length of everyline of bitmap
@@ -87,9 +87,9 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
     int32 Height;
     int32 Width;
 
-    if (OBuffer!=NULL){
-        Height = OBuffer->BitmapHeight;
-        Width =  OBuffer->BitmapWidth;
+    if (OBuffer!=NULL && Game_Platform!=NULL){
+        Height = Game_Platform->BitmapHeight;
+        Width =  Game_Platform->BitmapWidth;
     } else {
         Height = FBuffer->BitmapHeight;
         Width =  FBuffer->BitmapWidth;        
@@ -110,14 +110,14 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
     uint8* DirectRow;
 
     if (OBuffer!=NULL){
-        Row = ((uint8 *)OBuffer->BitmapMemory);
+        Row = ((uint8 *)Game_Platform->BitmapMemory);
     } else {
         Row = ((uint8 *)FBuffer->BitmapMemory);
     }
 
     if (OBuffer!=NULL){
-        if(OBuffer->BitmapMemoryForDirectBlit != NULL){
-            DirectRow = ((uint8 *)OBuffer->BitmapMemoryForDirectBlit);
+        if(Game_Platform->BitmapMemoryForDirectBlit != NULL){
+            DirectRow = ((uint8 *)Game_Platform->BitmapMemoryForDirectBlit);
         } else {
             printf("Bitmap Memory for direct blit is empty\n");
         }
@@ -141,10 +141,10 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
         //for(int32 X{0}; X < Width; X++) {
 
 //NOTE: For Gradient version
-    for (int Y = 0; Y < OBuffer->BitmapHeight; Y++) {
+    for (int Y = 0; Y < Game_Platform->BitmapHeight; Y++) {
         uint32* Pixel = (uint32 *)Row;
         //uint32* imagePixel = (uint32* )imageRow;
-        for(int X = 0; X < OBuffer->BitmapWidth; X++) {
+        for(int X = 0; X < Game_Platform->BitmapWidth; X++) {
 
             uint8 Blue = X;
             uint8 Green = Y;
@@ -197,7 +197,7 @@ void RenderSplendidGradient(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer*
 
 }
 
-void ShowGlyphs(Win32_OffScreen_Buffer* OBuffer, Glyph_Map* map){
+void ShowGlyphs(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* OBuffer, Glyph_Map* map){
     // RR GG BB
     // Row is a pointer to every line of bitmapMemory
     // While pitch is data length of everyline of bitmap
@@ -213,8 +213,8 @@ void ShowGlyphs(Win32_OffScreen_Buffer* OBuffer, Glyph_Map* map){
         int32 Width;
 
         if (OBuffer!=NULL){
-            Height = OBuffer->BitmapHeight;
-            Width =  OBuffer->BitmapWidth;
+            Height = Game_Platform->BitmapHeight;
+            Width =  Game_Platform->BitmapWidth;
         }
     
         //BUG right here
@@ -232,12 +232,12 @@ void ShowGlyphs(Win32_OffScreen_Buffer* OBuffer, Glyph_Map* map){
         uint8* DirectRow;
 
         if (OBuffer!=NULL){
-            Row = ((uint8 *)OBuffer->BitmapMemory);
+            Row = ((uint8 *)Game_Platform->BitmapMemory);
         }
 
         if (OBuffer!=NULL){
-            if(OBuffer->BitmapMemoryForDirectBlit != NULL){
-                DirectRow = ((uint8 *)OBuffer->BitmapMemoryForDirectBlit);
+            if(Game_Platform->BitmapMemoryForDirectBlit != NULL){
+                DirectRow = ((uint8 *)Game_Platform->BitmapMemoryForDirectBlit);
             } else {
                 printf("Bitmap Memory for direct blit is empty\n");
             }
@@ -270,21 +270,21 @@ void ShowGlyphs(Win32_OffScreen_Buffer* OBuffer, Glyph_Map* map){
 }
 
 
-void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeight, Win32_OffScreen_Buffer* OBuffer ) {
+void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeight, Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* OBuffer ) {
 
     //int ScannedLine;
 
     StretchDIBits(
         DeviceContext,
-        0,0,OBuffer->BitmapWidth, OBuffer->BitmapHeight, // Source rectangle
+        0,0,Game_Platform->BitmapWidth, Game_Platform->BitmapHeight, // Source rectangle
         0,0,WindowWidth, WindowHeight,                 // Destination Rectangle
         // const VOID* lpBits,
-        OBuffer->BitmapMemoryForDirectBlit,
-        &OBuffer->Bitmapinfo,
+        Game_Platform->BitmapMemoryForDirectBlit,
+        &Game_Platform->Bitmapinfo,
         DIB_RGB_COLORS,
         SRCCOPY);    
 
-    //OBuffer->BitmapMemoryForDirectBlit!=NULL?printf("Memory for direct blit was not NULL but screen still being black\n"):printf("Memory Pool is empty\n");
+    //Game_Platform->BitmapMemoryForDirectBlit!=NULL?printf("Memory for direct blit was not NULL but screen still being black\n"):printf("Memory Pool is empty\n");
     
 /*
      Why Flickering???
@@ -292,7 +292,7 @@ void Win32DisplayBufferWindow(HDC DeviceContext, int WindowWidth, int WindowHeig
 */
 }
 
-bool InitOpenGL(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* bmpContent){
+bool InitOpenGL(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, imagee_content* bmpContent){
     // first device context gotten from current window
     // printf("Start to init OpenGL\n");
         // Create the pixel format features
@@ -305,8 +305,8 @@ bool InitOpenGL(Win32_OffScreen_Buffer* OBuffer, Win32_Front_Buffer* FBuffer, im
     test_platform.reloadGLFuncPointer = reload_gl_function_pointer;
     assert(test_platform.reloadGLFuncPointer);
     
-    GetWindowDimension(OBuffer);
-    Win32ResizeDIBSection(OBuffer, Dimens.Width, Dimens.Height);
+    GetWindowDimension(Game_Platform);
+    Win32ResizeDIBSection(Game_Platform, OBuffer, Dimens.Width, Dimens.Height);
     
 WNDCLASSW wcDummy = {0};
 wcDummy.lpfnWndProc     = +[](HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){return DefWindowProcW(hWnd, message, wParam, lParam);};
@@ -413,7 +413,7 @@ if (wglCreateContextAttribsARB) {
 // succeed enable wgl extension
 // Working window and context
 
-HDC windowDC = GetDC(OBuffer->Window);
+HDC windowDC = GetDC(Game_Platform->Window);
     PIXELFORMATDESCRIPTOR desiredPixelFormat = {};
         desiredPixelFormat.nSize = sizeof(desiredPixelFormat);
         desiredPixelFormat.nVersion =  1;
@@ -738,11 +738,11 @@ HDC windowDC = GetDC(OBuffer->Window);
 // OBuffer->glData.textureHandle is the name of the texture
                 //last argument This is where point to the image data
                 // Why this doesn't work
-                if(FBuffer->BitmapHeight != OBuffer->BitmapHeight){
-                    FBuffer->BitmapHeight = OBuffer->BitmapHeight;
+                if(FBuffer->BitmapHeight != Game_Platform->BitmapHeight){
+                    FBuffer->BitmapHeight = Game_Platform->BitmapHeight;
                 }
-                if(FBuffer->BitmapWidth != OBuffer->BitmapWidth){
-                    FBuffer->BitmapWidth = OBuffer->BitmapWidth;
+                if(FBuffer->BitmapWidth != Game_Platform->BitmapWidth){
+                    FBuffer->BitmapWidth = Game_Platform->BitmapWidth;
                 }
                 glViewport(0, 0, FBuffer->BitmapWidth, FBuffer->BitmapHeight);
 
@@ -800,8 +800,8 @@ HDC windowDC = GetDC(OBuffer->Window);
             return false;
         }        
 
-        glViewport(OBuffer->ClientRect.left, OBuffer->ClientRect.top, OBuffer->BitmapWidth, OBuffer->BitmapHeight);
-        ReleaseDC(OBuffer->Window, windowDC);
+        glViewport(Game_Platform->ClientRect.left, Game_Platform->ClientRect.top, Game_Platform->BitmapWidth, Game_Platform->BitmapHeight);
+        ReleaseDC(Game_Platform->Window, windowDC);
         return true;
 }
 
@@ -851,11 +851,11 @@ void GameUpdateAndRender(Game_Memory* Memory, imagee_content* BMPContent ,Game_I
     //GameOutPutSound(SoundBuffer, State->Hz);
 }
 
-void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer){
+void copyBufferData(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* ScreenBuffer){
     
-    ScreenBuffer->BitmapWidth = ScreenBuffer->BitmapWidth!=BackBuffer->BitmapWidth?BackBuffer->BitmapWidth:printf("W didn't change\n");
-    ScreenBuffer->BitmapHeight = ScreenBuffer->BitmapHeight!=BackBuffer->BitmapHeight?BackBuffer->BitmapHeight:printf("H didn't change\n");
-    ScreenBuffer->Pitch = ScreenBuffer->Pitch!=BackBuffer->Pitch?BackBuffer->Pitch:printf("Pitch didn't change\n");
+    ScreenBuffer->BitmapWidth = ScreenBuffer->BitmapWidth!=Game_Platform->BitmapWidth?Game_Platform->BitmapWidth:printf("W didn't change\n");
+    ScreenBuffer->BitmapHeight = ScreenBuffer->BitmapHeight!=Game_Platform->BitmapHeight?Game_Platform->BitmapHeight:printf("H didn't change\n");
+    ScreenBuffer->Pitch = ScreenBuffer->Pitch!=Game_Platform->Pitch?Game_Platform->Pitch:printf("Pitch didn't change\n");
 
     // Why if I don't pass this type of data the app will collapse as the conflict of memory
     if(!ScreenBuffer->GLDataPassed){
@@ -863,22 +863,22 @@ void copyBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* Scre
         ScreenBuffer->GLDataPassed = true;
     }
 
-    if(ScreenBuffer->BitmapMemory != BackBuffer->BitmapMemory && BackBuffer->BitmapMemory!=NULL){
-        ScreenBuffer->BitmapMemory = BackBuffer->BitmapMemory;
+    if(ScreenBuffer->BitmapMemory != Game_Platform->BitmapMemory && Game_Platform->BitmapMemory!=NULL){
+        ScreenBuffer->BitmapMemory = Game_Platform->BitmapMemory;
     }
 
     //if(ScreenBuffer->shaders_list != BackBuffer->shaders_list && BackBuffer->shaders_list.size()>0){
         //;
     //}
-        //ScreenBuffer->Bitmapinfo = BackBuffer->Bitmapinfo;
+        //ScreenBuffer->Bitmapinfo = Game_Platform->Bitmapinfo;
 //
-        //if(ScreenBuffer->BitmapHandle != BackBuffer->BitmapHandle && BackBuffer->BitmapHandle != NULL){
-        //ScreenBuffer->BitmapHandle = BackBuffer->BitmapHandle;
+        //if(ScreenBuffer->BitmapHandle != Game_Platform->BitmapHandle && Game_Platform->BitmapHandle != NULL){
+        //ScreenBuffer->BitmapHandle = Game_Platform->BitmapHandle;
     //}
     //ScreenBuffer->Window = BackBuffer->Window;
 }
 
-void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* FrontBuffer){
+void displayBufferData(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* FrontBuffer){
     printf("=====================================\n");
     printf("                 |  BackBuffer | FrontBuffer\n");
     printf("VAOS             |  %d         | %d\n", BackBuffer->glData.VAOs, FrontBuffer->glData.VAOs);
@@ -889,8 +889,8 @@ void displayBufferData(Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* F
     printf("TextureID        |  %d         | %d\n", BackBuffer->glData.textureHandle, FrontBuffer->glData.textureHandle);
     //printf("ProgramID        |  %d         | %d\n", BackBuffer->glData.ProgramIDs[0], FrontBuffer->glData.ProgramIDs[0]);
     //printf("ProgramID        |  %d         | %d\n", BackBuffer->glData.ProgramIDs[1], FrontBuffer->glData.ProgramIDs[1]);
-    printf("Memory Address   |0x%x |0x%x \n", BackBuffer->BitmapMemory, FrontBuffer->BitmapMemory);
-    printf("DirectMem Address|0x%x size:%d |       \n", BackBuffer->BitmapMemoryForDirectBlit, BackBuffer->BitmapMemorySize);
+    printf("Memory Address   |0x%x |0x%x \n", FrontBuffer->BitmapMemory, Game_Platform->BitmapMemory);
+    printf("DirectMem Address|0x%x size:%d |       \n", FrontBuffer->BitmapMemoryForDirectBlit, Game_Platform->BitmapMemoryForDirectBlit);
     printf("=====================================\n");
 }
 
@@ -930,23 +930,23 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
       if (first_size) {
           first_size = false;
       } else {
-          GetWindowDimension(&BackBuffer);
-          printf("Client Rect left:%d top:%d right:%d bottom:%d\n", (int)BackBuffer.ClientRect.left, (int)BackBuffer.ClientRect.top, (int)BackBuffer.ClientRect.right, (int)BackBuffer.ClientRect.bottom);
-          Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
-          if (!BackBuffer.transferNeed) {
-              BackBuffer.transferNeed = true;
+          GetWindowDimension(&Game_Platform);
+          printf("Client Rect left:%d top:%d right:%d bottom:%d\n", (int)Game_Platform.ClientRect.left, (int)Game_Platform.ClientRect.top, (int)Game_Platform.ClientRect.right, (int)Game_Platform.ClientRect.bottom);
+          Win32ResizeDIBSection(&Game_Platform, &BackBuffer, Dimens.Width, Dimens.Height);
+          if (!Game_Platform.transferNeed) {
+              Game_Platform.transferNeed = true;
           }
 
           if((GetKeyState(VK_CONTROL) & (1 << 15)) > 0){
               //ShowGlyphs(&BackBuffer, &Glyph_Map);
               HDC currentDC = GetDC(Window);
               HDC tempDC;
-              RenderSplendidGradient(&BackBuffer, nullptr, nullptr);
-              Win32DisplayBufferWindow(tempDC, 0, 0, &BackBuffer);
+              RenderSplendidGradient(nullptr, &BackBuffer, nullptr, nullptr);
+              Win32DisplayBufferWindow(tempDC, 0, 0, &Game_Platform, &BackBuffer);
               SwapBuffers(tempDC);
               printf("Change to display glyphs\n");
           }else{
-              glViewport(BackBuffer.ClientRect.left, BackBuffer.ClientRect.top, BackBuffer.BitmapWidth, BackBuffer.BitmapHeight);
+              glViewport(Game_Platform.ClientRect.left, Game_Platform.ClientRect.top, Game_Platform.BitmapWidth, Game_Platform.BitmapHeight);
           }
 
           OutputDebugStringA("WM_SIZE\n");
@@ -1120,12 +1120,12 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
           // Actually the front vec is at the back of the camera
           // State.BlueOffset+= 10;
           if((GetKeyState(VK_CONTROL) & (1 << 15)) > 0){
-              Win32ResizeDIBSection(&BackBuffer, Dimens.Width, Dimens.Height);
+              Win32ResizeDIBSection(&Game_Platform, &BackBuffer, Dimens.Width, Dimens.Height);
               //ShowGlyphs(&BackBuffer, &Glyph_Map);
               HDC currentDC = GetDC(Window);
-              Win32DisplayBufferWindow(currentDC, 0, 0, &BackBuffer);
+              Win32DisplayBufferWindow(currentDC, 0, 0, &Game_Platform, &BackBuffer);
               SwapBuffers(currentDC);
-              ReleaseDC(BackBuffer.Window, currentDC);
+              ReleaseDC(Game_Platform.Window, currentDC);
               printf("Change to display glyphs\n");
           }else{
               BackBuffer.camera.Position +=
@@ -1139,7 +1139,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 
       else if (vkCode == 'S') {
           if((GetKeyState(VK_CONTROL) & (1 << 15)) > 0){
-              BackBuffer.SwitchCamera = !BackBuffer.SwitchCamera;
+              Game_Platform.SwitchCamera = !Game_Platform.SwitchCamera;
           }
           
         State.GreenOffset += 10;
@@ -1361,7 +1361,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
   } break;
 
   case WM_MOUSELEAVE: {
-      GetWindowDimension(&BackBuffer);
+      GetWindowDimension(&Game_Platform);
       
     //if (BackBuffer.camera.mouse.LastX != BackBuffer.BitmapWidth / 2) {
       //BackBuffer.camera.mouse.LastX = BackBuffer.BitmapWidth / 2;
@@ -1541,20 +1541,20 @@ void ErrorExit()
     ExitProcess(dw); 
 }
 
-void ResetGLState(Win32_OffScreen_Buffer* BackBuffer){
+void ResetGLState(Win32_OffScreen_Buffer* BackBuffer, Platform_Properties* Game_Platform){
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEBUG_OUTPUT);
     glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
-    HDC windowContext = GetDC(BackBuffer->Window);
+    HDC windowContext = GetDC(Game_Platform->Window);
     wglMakeCurrent(windowContext, BackBuffer->glData.defaultContext);
     wglDeleteContext(BackBuffer->glData.openglRC);
 };
 
 
-void InitCamera(Win32_OffScreen_Buffer* BackBuffer){
+void InitCamera(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer){
 
     glm::vec3 Position = glm::vec3(-3.0f, -10.0f, -12.0f);
     glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -1566,15 +1566,15 @@ void InitCamera(Win32_OffScreen_Buffer* BackBuffer){
     //set camera view here
     //std::cout<<"View matrix from camera: "<<glm::to_string(BackBuffer.camera.view)<<std::endl;
 
-    BackBuffer->camera = Camera(BackBuffer->BitmapWidth, BackBuffer->BitmapHeight, Position, Front, Right, Up);    
+    BackBuffer->camera = Camera(Game_Platform->BitmapWidth, Game_Platform->BitmapHeight, Position, Front, Right, Up);    
     BackBuffer->camera.fov = 45.0f;
 };
 
-void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer){;
+void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer, Platform_Properties* Game_Platform){
     for(const GLuint& shader:BackBuffer->glData.ProgramIDs){
         glUseProgram(shader);
-        setMat4(shader, "projection", !BackBuffer->SwitchCamera?BackBuffer->camera.projection:BackBuffer->camera_set[0]->projection);
-        setMat4(shader, "view", !BackBuffer->SwitchCamera?BackBuffer->camera.view:BackBuffer->camera_set[0]->view);
+        setMat4(shader, "projection", !Game_Platform->SwitchCamera?BackBuffer->camera.projection:BackBuffer->camera_set[0]->projection);
+        setMat4(shader, "view", !Game_Platform->SwitchCamera?BackBuffer->camera.view:BackBuffer->camera_set[0]->view);
     };
     glUseProgram(0);
         //basic_shader_->setMat4("projection", BackBuffer.camera.projection);
@@ -1590,7 +1590,7 @@ void CalDelayedRatio(float* DelayedRatio, Clock_Set* Time_Set, Win32_OffScreen_B
     //}                    
 };
 
-WNDCLASSEXA SetUpWindowClass(Win32_OffScreen_Buffer* BackBuffer, HINSTANCE Instance){
+WNDCLASSEXA SetUpWindowClass(Platform_Properties* Game_Platform, HINSTANCE Instance){
     WNDCLASSEXA WindowClass = {};
   WindowClass.cbSize = sizeof(WNDCLASSEXA);
   WindowClass.style = CS_HREDRAW|CS_VREDRAW;
@@ -1599,11 +1599,11 @@ WNDCLASSEXA SetUpWindowClass(Win32_OffScreen_Buffer* BackBuffer, HINSTANCE Insta
   WindowClass.lpfnWndProc = MainWindowCallBack;
   WindowClass.hInstance = Instance;
   WindowClass.lpszClassName = "First Game Window Class";
-  Win32ResizeDIBSection(BackBuffer, Dimens.Height, Dimens.Width);
+  Win32ResizeDIBSection(Game_Platform, &BackBuffer, Dimens.Height, Dimens.Width);
   return WindowClass;
 };
 
-void CleanUpandExit(Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map){
+void CleanUpandExit(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map){
     
     glDeleteVertexArrays(1, &BackBuffer->glData.VAOs);
     glDeleteVertexArrays(1, &BackBuffer->glData.PlaneVAOs);
@@ -1634,5 +1634,5 @@ void CleanUpandExit(Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map){
     }
 
 
-    ResetGLState(BackBuffer);
+    ResetGLState(BackBuffer, Game_Platform);
 };

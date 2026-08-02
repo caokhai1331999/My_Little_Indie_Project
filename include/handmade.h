@@ -280,18 +280,29 @@ struct Platform_Properties{
     BITMAPINFO Bitmapinfo;
     HBITMAP BitmapHandle;
 
-    void* BitmapMemory;
-    void* BitmapMemoryForDirectBlit;
-    
+    //Game_State state;
+
+    bool32 SwitchCamera = false;
+    bool transferNeed;    
+    bool GLImageRendered = false;
+
     int BitmapWidth;
     int BitmapHeight;
     int Pitch;
-    int BitmapMemorySize;
+    int BitmapMemorySize; 
+
+    HWND Window;
+    RECT ClientRect;
+    void* BitmapMemory;
+    void* BitmapMemoryForDirectBlit;
+
+    MSG Message;
+    WNDPROC wndproc;
 
     ticket_mutex ticket;
 };
-global_variable Platform_Properties Game_PlatForm = {};
 
+global_variable Platform_Properties Game_Platform = {};
 
 local_persist uint64 AtomicAddUint64(uint64* addend, uint64 value);
 global_variable void begin_ticket_mutex(ticket_mutex* mutex);
@@ -327,9 +338,9 @@ void init_arena_memory(memory_arena* arena, size_t init_size){
 // apply to grow vertex array
 void ALLOCATE_BLOCK_MEMORY(memory_arena* arena, size_t size){
         // why plus one
-        begin_ticket_mutex(&Game_PlatForm.ticket);
+        begin_ticket_mutex(&Game_Platform.ticket);
         uint8* result = (uint8*)VirtualAlloc(arena->base, size + sizeof(memory_arena), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
-        end_ticket_mutex(&Game_PlatForm.ticket);
+        end_ticket_mutex(&Game_Platform.ticket);
         arena->base = result;
 }
 
