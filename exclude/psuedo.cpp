@@ -29,8 +29,7 @@ private:
     skills skill;
     int stregth;
 
-    int Heath_Bar;
-//
+    int Health_Bar;
     steerer driver;
 };
 
@@ -168,10 +167,10 @@ void turn_on_light(std::vector<general_light*>* light_group){
 //======================MESH_PART==========================
 // So this can replace class function member effectively
 // inside redering_platform.h/or graphic_api.h
-static struct basic_shape_vertices_data{
+struct basic_shape_vertices_data{
     // triangle;
 // This is for 2D game/effects
-    static const float PlaneVertices[] = {
+    float PlaneVertices[] = {
         // positions
         // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
         // x,    y,     z
@@ -184,7 +183,7 @@ static struct basic_shape_vertices_data{
          1.0f, -1.0f, 1.0f, 1.0f, 0.0f
       };
 
-    static const unsigned int planeIndices[] =  {
+    unsigned int planeIndices[] =  {
 //Even though the vertex 1, 0 will be reused but we have to feed them name for opengl just like this
                     0, 1, 2, 2, 4, 0
      };
@@ -195,47 +194,48 @@ static struct basic_shape_vertices_data{
 
     //cube
     float cube[] = {
-     -0.5f, -0.5f, -0.5f,
-      0.5f, -0.5f, -0.5f,
-      0.5f,  0.5f, -0.5f,
-      0.5f,  0.5f, -0.5f,
-     -0.5f,  0.5f, -0.5f,
-     -0.5f, -0.5f, -0.5f,
-                         
-     -0.5f, -0.5f,  0.5f,
-      0.5f, -0.5f,  0.5f,
-      0.5f,  0.5f,  0.5f,
-      0.5f,  0.5f,  0.5f,
-     -0.5f,  0.5f,  0.5f,
-     -0.5f, -0.5f,  0.5f,                         
-                         
-     -0.5f,  0.5f,  0.5f,
-     -0.5f,  0.5f, -0.5f,
-     -0.5f, -0.5f, -0.5f,
-     -0.5f, -0.5f, -0.5f,
-     -0.5f, -0.5f,  0.5f,
-     -0.5f,  0.5f,  0.5f,
-                         
-      0.5f,  0.5f,  0.5f,
-      0.5f,  0.5f, -0.5f,
-      0.5f, -0.5f, -0.5f,
-      0.5f, -0.5f, -0.5f,
-      0.5f, -0.5f,  0.5f,
-      0.5f,  0.5f,  0.5f,
-                         
-     -0.5f, -0.5f, -0.5f,
-      0.5f, -0.5f, -0.5f,
-      0.5f, -0.5f,  0.5f,
-      0.5f, -0.5f,  0.5f,
-     -0.5f, -0.5f,  0.5f,
-     -0.5f, -0.5f, -0.5f,
-                         
-     -0.5f,  0.5f, -0.5f,
-      0.5f,  0.5f, -0.5f,
-      0.5f,  0.5f,  0.5f,
-      0.5f,  0.5f,  0.5f,
-     -0.5f,  0.5f,  0.5f,
-     -0.5f,  0.5f, -0.5f
+      //Position           //Normal           //TexCoords
+     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+      0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+     -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+                                                           
+     -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+      0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
+     -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+     -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
+     
+     -0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+     -0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+     -0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+     -0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+                                                           
+      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+      0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+      0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+                                                           
+     -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+      0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+      0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+     -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+                                                           
+     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+      0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+     -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+     -0.5f,  0.5f, -0.5f   0.0f,  1.0f,  0.0f,  0.0f, 1.0f 
     };
 
     int cube_indices[] = {
@@ -302,13 +302,17 @@ static struct basic_shape_vertices_data{
     };
 }vertices_collection;
 
+external vertices_collection vertices_storage;
+
 // Consider using imposter to replace actual sphere
 // Group of mesh mean group of asset and vertice data(from simple like triangle to complex like cube, cylinder or the whole model vertex)
 
 struct Mesh{
     //Use this whenever I done the dynamic array
-    Vertex primitive_data;//cube, plane
     unsigned int VAO;
+    unsigned int VBO;
+    unsigned int EBO;
+    char* name;
 };
 
 //===========================================================
@@ -321,6 +325,7 @@ struct Mesh{
 struct texture_group{
 // This one will be hack for 2D game performance
     std::string name;
+
     unsigned int normal_map;
     unsigned int emission_map;
     unsigned int diffused_map;  
@@ -337,7 +342,7 @@ private:
     B_shader_program* post_effect_shader;
     //unsigned int* Texture_Group; //dynamic array case
     std::vector<texture_group*> matched_texture_collection;
-    std::vector<Mesh*>Mesh_Group;
+    std::vector<Mesh>Mesh_Group;
 public:
 //  Mesh* mesh;
     update_(clock_set* clock);
@@ -368,8 +373,6 @@ struct game_state{
     // be careful
     std::vector<C_Model*>Model_Collection;    
 };
-
-void set_mesh_data(const char* data_path);
 
 // ====================== Map constructing ===================================
 typedef uint8 entity_type
@@ -444,14 +447,15 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
                 // what to store OMG we just need to store the mesh ID
         // need to be more rational, can not let it randome like this
         x++;
-
         if(x == map->w -1 ){
             x -= map->w - 1;
             z++;
         };
 
-        if(z == map->l-1)
+        if(z == map->l-1){
             h++;
+            z -= map->l-1;
+        }
 
         // All right. First simple approach is we make the majority of room
         // passable then sprinkle few block objects on the way.
@@ -487,15 +491,19 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
 //                          Init Object: mesh, rigid body
 //
 
-void init_graphic (Win32_OffScreen_Buffer* BackBuffer, std::vector<object*>*object_group, std::vector<general_light*> light_group){
+void init_graphic (Win32_OffScreen_Buffer* BackBuffer, graphic_property* object_group, std::vector<general_light*> light_group){
     // set light
     // where is the proper place for this light group: backbuffer or object group
     InitOpenGl(BackBuffer);
+    // set VAOs array for data
+// NOTE: How to parse data to vertex level???
+    setupMesh(object_group-> )
     // Light here
     // we need to set this one for every shader we have.
     turn_on_light(light_group);
     set_light_for_shader();
     // consider loading textures group separatedly here.
+
 /*
     . Ambient Light - Kind of constance to store it
     . Point Light -
@@ -505,7 +513,6 @@ void init_graphic (Win32_OffScreen_Buffer* BackBuffer, std::vector<object*>*obje
     . Spot Light  -
 */
     // set mesh;
-    set_mesh_data(path);
     // rand map
     // set rigid body
     //. Init Position
@@ -513,18 +520,68 @@ void init_graphic (Win32_OffScreen_Buffer* BackBuffer, std::vector<object*>*obje
     // Time to init a 2D map here for every single entity in the current volumm
 }
 
-void object::set_rigid_body(glm::vec3* init_pos){
+void set_rigid_body(glm::vec3* init_pos){
     Init_Entity_Specs(body);
 }
 
-void graphic_property::set_mesh_data(const char* data_path = nullptr, char* vertices data){
-    // data can be loaded from text file!!;
-    setupMesh(this->mesh);
-    // For skinning
-    SetVertexBoneData(Vertex* vertex, int boneID, float weight){
-        ;
-    };
+void set_each_Mesh_up(Mesh_* mesh, const float* VBOdata, const float* EBOdata){
+
+        glGenVertexArrays(1, &mesh->VAO);
+        glGenBuffers(1, &mesh->VBO);
+        glGenBuffers(1, &mesh->EBO);
+
+        glBindVertexArray(mesh->VAO);
+        // Good thing about struct is that their memory is sequential for all its time
+        //glVertexAttribPointer(0, 1, GL_UNSIGNED_INT, GL_FALSE, sizeof(unsigned int), (const void*)0);
+        
+        // Load data into vertex buffer
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(*data)*sizeof(float), data, GL_STATIC_DRAW);        
+        // Time to set vertex attribute pointers
+        // POSITION
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)0);
+
+        // NORMAL
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(struct Vertex, Normal));
+
+        // TEXCOORDS
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(struct Vertex, TexCoords));
+
+        // TANGENT
+        //glEnableVertexAttribArray(3);
+        //glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(struct Vertex, Tangent));
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*sizeof(*EBOdata), EBOdata, GL_STATIC_DRAW);        
+
+        glBindVertexArray(0);        
 }
+
+//How to make this compact and automatically??
+//
+// Still think about this one.=================================
+void set_whole_mesh_data(const basic_shape_vertices_data* vertices_groups = nullptr, graphic_property* graphic_obj){
+    // data can be loaded from text file!!;
+    // we need to copy whole data not just the address
+    Mesh_ temp_mesh;
+    // load basic shape first
+    // We replace vertices data with prestored simple shape one
+    set_each_Mesh_up(&temp_mesh, vertices_groups->PlaneVertices, vertices_group->planeIndices); 
+    temp_mesh = vertice_groups.PlaneVertices;
+    temp_mesh.name = "plane";
+
+    temp_mesh = {};
+    
+    set_each_Mesh_up(&temp_mesh, vertices_groups->tile, vertices_groups->tile_indices);
+    temp_mesh = vertice_groups.PlaneVertices;
+    temp_mesh.name = "tile";
+    
+    graphic_obj->Mesh_Group.push_back(temp_mesh);
+}
+// Still think about this one.=================================
 
 void Init(Win32_OffScreen_Buffer* BackBuffer){
     init_graphic(BackBuffer);

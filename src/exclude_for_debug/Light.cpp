@@ -232,8 +232,9 @@ void DrawFont(const Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader
     glUseProgram(0);
 }
  
-void DrawFont_(const platform_api* platform, const Win32_OffScreen_Buffer* BackBuffer, const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
+void DrawFont_(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
     //platform->reloadGLFuncPointer(BackBuffer);
+    ReloadGLFunction(Game_Platform, BackBuffer);
     DrawFont(BackBuffer, shader, map, string, rect);
 }
 

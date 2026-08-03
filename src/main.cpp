@@ -621,7 +621,7 @@ int CALLBACK WinMain
                         showMsPF = !showMsPF;
                     }
 
-                    DrawFont(&test_platform, &BackBuffer, BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
+                    DrawFont(&Game_Platform, &BackBuffer, BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
 
 
 //========================================================================

@@ -102,7 +102,7 @@ extern "C" void reload_gl_function_pointer (struct Platform_Properties* Game_Pla
 }
 
 extern "C" void ReloadGLFunction (Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer_){
-    //begin_ticket_mutex(&BackBuffer_->ticket);
+    begin_ticket_mutex(&Game_Platform->ticket);
     HDC tempDC = GetDC(Game_Platform->Window);
     if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
         bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
@@ -110,7 +110,7 @@ extern "C" void ReloadGLFunction (Platform_Properties* Game_Platform, Win32_OffS
             bool success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
         assert(success);
     };
-    //end_ticket_mutex(&BackBuffer_->ticket);
+    end_ticket_mutex(&Game_Platform->ticket);
 }
 
 typedef void reload_gl_function_pointer_ (struct Platform_Properties* Game_Platform, struct Win32_OffScreen_Buffer* BackBuffer_);

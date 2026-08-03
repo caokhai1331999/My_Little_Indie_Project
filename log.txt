@@ -2429,7 +2429,8 @@ just add the walkable flag to the map's unit specs
 
 So the layout () in const data in shader is way cheaper to compare to uniform
 so we have to choose what to keep and what to update every frame
-KEEP                                  UPDATE
+
+   KEEP                                  UPDATE
 Vertices(Pos,                      model, projection matrix (from camera)
 Normal, tangent, bi,               may finalbonematrices
 maybe boneID and weight)
@@ -2442,3 +2443,20 @@ will stick with the single block's one.
 
 ---------------- Sun, 02 Aug 26: 10:58AM
 
+
+---------------- Mon, 03 Aug 26: 09:35AM
+NOTE: Yes we can access/assign pointer to predefined array, just pass it.
+We know for sure that we need basic shape vertices for mass drawing. But is that
+true that I have no way but to set them manually in some hardcoded function
+
+NOTE: Think about what you what to do and figure out what I need to know to do
+that. Cause graphics programming is freaking massive.
+
+Up until now we know for sure that gpu is very good at doing multitude of specific
+math computations(mostly for graphic)(mostly predesigned type)
+simultaneously thanks to its thousands of cores now a days. CPU can do way
+more complex math but not so many at a time(the limit is the number of threads and
+cores.)
+I have to know which part is for cpu and which one is for gpu. The most basic
+thing that I know is that I can use gpu through shader code. Careful what I put
+inside this.

@@ -101,8 +101,8 @@ static void IncreaseFontAlpha_(Glyph_Map* map = nullptr);
 extern "C" __declspec(dllexport) void LoadFont_(platform_api* platform = nullptr, Platform_Properties* Game_Platform = nullptr, Win32_OffScreen_Buffer* BackBuffer = nullptr, Glyph_Map* map = nullptr, const char* path = nullptr);
 typedef void (*LoadFont__)(platform_api*, Platform_Properties*, Win32_OffScreen_Buffer*, Glyph_Map*, const char*);
 
-extern "C" __declspec(dllexport) void DrawFont_(const platform_api* platform = nullptr, const Win32_OffScreen_Buffer* BackBuffer = nullptr, const GLuint VAO = 0, B_shader_program* shader = nullptr, const Glyph_Map* map = nullptr, const char* string = nullptr, const Rect_* rect = nullptr);
-typedef void (*DrawFont__) (const platform_api*, const Win32_OffScreen_Buffer* ,const GLuint, B_shader_program*, const Glyph_Map*, const char* , const Rect_*);
+extern "C" __declspec(dllexport) void DrawFont_(Platform_Properties* Game_Platform = nullptr, Win32_OffScreen_Buffer* BackBuffer = nullptr, const GLuint VAO = 0, B_shader_program* shader = nullptr, const Glyph_Map* map = nullptr, const char* string = nullptr, const Rect_* rect = nullptr);
+typedef void (*DrawFont__) (Platform_Properties*, Win32_OffScreen_Buffer* ,const GLuint, B_shader_program*, const Glyph_Map*, const char* , const Rect_*);
 //=====================================
 static void setup_pointlight(const Win32_OffScreen_Buffer* BackBuffer = nullptr, global_light* envir_light = nullptr);
 
