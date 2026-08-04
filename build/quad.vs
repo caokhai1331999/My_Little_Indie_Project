@@ -35,8 +35,11 @@ bool notNUll(mat4 matrix){
 void main(){
 
 // Place Model First -> calculate the local space to World/Perspective space
-//                  -> Then Calculate latest space to clip space
-       vec2 offset = offsets[gl_InstanceID];
+//                   -> Then Calculate latest space to clip space
+    // So all we need is to feed the position array data based on ID
+    // Then the vertex shader automatically know when to call each one
+    // in order
+    vec2 offset = offsets[gl_InstanceID];
 
 //       ModelPos = vec3(aPos.x + offset.x, aPos.y, aPos.z + offset.y);
        vec3 modelPos = vec3(aPos.x + offset.x, aPos.y, aPos.z + offset.y);

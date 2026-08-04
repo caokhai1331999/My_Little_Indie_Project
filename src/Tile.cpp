@@ -164,7 +164,7 @@ unsigned int SetupTileTexture(const char* path){
 }
 
 void set_tile_vertex(B_shader_program* shader, TileGLObject* TileObj){
-
+// Put a memory checking flag here
     glGenVertexArrays(1, &TileObj->TileVAO);
     glGenBuffers(1, &TileObj->TileEBO);
     glGenBuffers(1, &TileObj->TileVBO);

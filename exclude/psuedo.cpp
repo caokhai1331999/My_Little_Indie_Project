@@ -167,30 +167,50 @@ void turn_on_light(std::vector<general_light*>* light_group){
 //======================MESH_PART==========================
 // So this can replace class function member effectively
 // inside redering_platform.h/or graphic_api.h
+typedef mesh_name uint8
+#define TRIANGLE (mesh_name)0
+#define PLANE (mesh_name)1
+#define POLYGON (mesh_name)2
+#define TILE_SHAPE (mesh_name)3
+#define CUBE_SHAPE (mesh_name)4
+
+struct vertices_data_structure{
+    float* Vertices_;
+    unsigned int* Indices_;
+};
+
+
+struct basic_shape_vertices_data_{
+    std::vector<vertices_data_structure>* Vertices_Data;
+};
+
 struct basic_shape_vertices_data{
     // triangle;
-// This is for 2D game/effects
+    // This is for 2D game/effects
+    
+    // polygon
+    // Every Vertex we must have at least position, normal and texcoord data
+    // inside it
+    float polygon[] = {};
+    int polygon_indices[] = {};
+
     float PlaneVertices[] = {
         // positions
         // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
-        // x,    y,     z
-         1.0f, -1.0f, 1.0f, 1.0f, 0.0f,
-        -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 
-        -1.0f,  1.0f, 1.0f, 0.0f, 1.0f,
-
-        -1.0f,  1.0f, 1.0f, 0.0f, 1.0f,                   
-         1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
-         1.0f, -1.0f, 1.0f, 1.0f, 0.0f
+         // x,    y,    z    //Normal    //TexCoord
+         1.0f, -1.0f, 1.0f,  1.0f, 0.0f,
+        -1.0f, -1.0f, 1.0f,  0.0f, 0.0f, 
+        -1.0f,  1.0f, 1.0f,  0.0f, 1.0f,
+                            
+        -1.0f,  1.0f, 1.0f,  0.0f, 1.0f,                   
+         1.0f,  1.0f, 1.0f,  1.0f, 1.0f,
+         1.0f, -1.0f, 1.0f,  1.0f, 0.0f
       };
 
     unsigned int planeIndices[] =  {
 //Even though the vertex 1, 0 will be reused but we have to feed them name for opengl just like this
                     0, 1, 2, 2, 4, 0
      };
-    
-    // polygon
-    float polygon[] = {};
-    int polygon_indices[] = {};
 
     //cube
     float cube[] = {
@@ -208,7 +228,7 @@ struct basic_shape_vertices_data{
       0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
      -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
      -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
-     
+`     
      -0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
      -0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
      -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
@@ -300,9 +320,9 @@ struct basic_shape_vertices_data{
        24, 25, 26, 25, 24, 29,//4
        30, 31, 32, 32, 34, 30
     };
-}vertices_collection;
+};
 
-external vertices_collection vertices_storage;
+static vertices_collection vertices_storage;
 
 // Consider using imposter to replace actual sphere
 // Group of mesh mean group of asset and vertice data(from simple like triangle to complex like cube, cylinder or the whole model vertex)
@@ -312,7 +332,6 @@ struct Mesh{
     unsigned int VAO;
     unsigned int VBO;
     unsigned int EBO;
-    char* name;
 };
 
 //===========================================================
@@ -324,8 +343,6 @@ struct Mesh{
 // How can I make sure that all the shaders draw the same object
 struct texture_group{
 // This one will be hack for 2D game performance
-    std::string name;
-
     unsigned int normal_map;
     unsigned int emission_map;
     unsigned int diffused_map;  
@@ -341,10 +358,9 @@ private:
     // This is for drawing effect like fog, etc...
     B_shader_program* post_effect_shader;
     //unsigned int* Texture_Group; //dynamic array case
-    std::vector<texture_group*> matched_texture_collection;
+    //std::vector<texture_group*> matched_texture_collection;
     std::vector<Mesh>Mesh_Group;
 public:
-//  Mesh* mesh;
     update_(clock_set* clock);
     B_shader_program* get_shader(return shader);
     // model path is optional
@@ -354,11 +370,6 @@ public:
         std::string shader_name = light_shader_name_;
         //search inside the folder for matched source for shader
         basic_light_shader = new B_shader_program(shader_name+".vs", shader_name+".fs", shader_path);       
-        // load file? or set them up manually???
-        // draw a map
-        mesh = new Mesh();
-        setupMesh(mesh);
-        // model if possible
     }
 };
 
@@ -410,9 +421,11 @@ struct simple_volume_map{
 //
 //So I decide the volume will be 50x50x50
 //
+
 #define ROOM_HEIGHT (uint8)50
 #define ROOM_BREADTH (uint8)50
 #define ROOM_LENGTH (uint8)50
+
 // ZII(Zero Initializtion) is good
 void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
     map->height = ROOM_HEIGHT;
@@ -482,7 +495,7 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
  //}        
     //};
 }
-
+// So the map is the place to store entities position
 // ====================== Map constructing ===========================
 
 //===============LOOP_RUNNING_THEM=====================
@@ -491,17 +504,17 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
 //                          Init Object: mesh, rigid body
 //
 
-void init_graphic (Win32_OffScreen_Buffer* BackBuffer, graphic_property* object_group, std::vector<general_light*> light_group){
+void init_graphic (Win32_OffScreen_Buffer* BackBuffer, graphic_property* object_group, std::vector<general_light*> light_group, const basic_shape_vertices_data* vertices_groups = nullptr){
     // set light
     // where is the proper place for this light group: backbuffer or object group
     InitOpenGl(BackBuffer);
     // set VAOs array for data
 // NOTE: How to parse data to vertex level???
-    setupMesh(object_group-> )
+    set_whole_mesh_data(vertices_groups, object_group);
     // Light here
-    // we need to set this one for every shader we have.
     turn_on_light(light_group);
-    set_light_for_shader();
+    set_light_for_shader(light_group, object_group->shaders_list);
+    // we need to set this one for every shader we have.
     // consider loading textures group separatedly here.
 
 /*
@@ -562,27 +575,29 @@ void set_each_Mesh_up(Mesh_* mesh, const float* VBOdata, const float* EBOdata){
 
 //How to make this compact and automatically??
 //
+// Hard code vertices data here
+void make_vertices_storage(std::vector<vertices_data_structure>* vertices_groups = nullptr){
+    vertices_groups->reserve(10);
+    for (size_t i = 0; i < sizeof(basic_shape_vertices_data); i++){
+        vertices_groups->push_back(basic_shape_vertices_data.PlaneVertices);
+    }
+}
 // Still think about this one.=================================
-void set_whole_mesh_data(const basic_shape_vertices_data* vertices_groups = nullptr, graphic_property* graphic_obj){
+void set_whole_mesh_data(const std::vector<vertices_data_structure>* vertices_groups = nullptr, graphic_property* graphic_obj){
     // data can be loaded from text file!!;
     // we need to copy whole data not just the address
     Mesh_ temp_mesh;
     // load basic shape first
     // We replace vertices data with prestored simple shape one
-    set_each_Mesh_up(&temp_mesh, vertices_groups->PlaneVertices, vertices_group->planeIndices); 
-    temp_mesh = vertice_groups.PlaneVertices;
-    temp_mesh.name = "plane";
-
-    temp_mesh = {};
-    
-    set_each_Mesh_up(&temp_mesh, vertices_groups->tile, vertices_groups->tile_indices);
-    temp_mesh = vertice_groups.PlaneVertices;
-    temp_mesh.name = "tile";
-    
-    graphic_obj->Mesh_Group.push_back(temp_mesh);
+    // how to set, store and link these then call these vertices data
+    // when we need wisely we need a rational enough simple ID mechanism
+    for(mesh_name i = 0; i < CUBE_SHAPE; i++){
+        set_each_Mesh_up(&temp_mesh, (*vertices_groups)[i].Vertices_, (*vertices_groups)[i].Indices_); 
+        graphic_obj->Mesh_Group.push_back(temp_mesh);
+    }
 }
-// Still think about this one.=================================
 
+// Still think about this one.=================================
 void Init(Win32_OffScreen_Buffer* BackBuffer){
     init_graphic(BackBuffer);
     // Init enity/rigid body specs here

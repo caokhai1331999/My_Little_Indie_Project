@@ -2460,3 +2460,12 @@ cores.)
 I have to know which part is for cpu and which one is for gpu. The most basic
 thing that I know is that I can use gpu through shader code. Careful what I put
 inside this.
+
+---------------- Tue, 04 Aug 26: 10:42AM
+
+TODO: We may need to understand and then build up a function that recreate
+vertex's basic data based on our demand.
+Remember that the indices's order have to be linearly connected with each other
+
+Focus on Vertex's data sampling first.
+Seemd like we need to spawn vertex out per one
