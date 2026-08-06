@@ -162,9 +162,9 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
 #else
 */
         //{
-         map->map_content[i] = rand()%(mesh_group->size()-1);
+        map->map_content[i]->MeshID = rand()%(mesh_group->size()-1);
         if(block_object_count > 0)
-         map->map_content[i] = rand()%1;
+         map->map_content[i]->passable = rand()%1;
         if(*map->map_content == 0)
             block_object_count--;         
         //}
@@ -222,14 +222,6 @@ void spawn_vertex(plane_type, map){
     Vertex vertex = {};
     vertex.position = glm::vec3();
     vertex.position.x
-/* ========================================================================
-   $file: $
-   $Date: $
-   $Revision: $
-   $Creator: Cao Khai(Casey Muratori's disciple) $
-   $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
-   ======================================================================== */
-#include "psuedo.h"
 
 // Handshake cross check for collision between entities and entities with background
 
@@ -387,7 +379,7 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
 */
         //{
          map->map_content[i] = rand()%(mesh_group->size()-1);
-        if(block_object_count > 0)
+        if(block_object_count > 0 && h == 0)
          map->map_content[i] = rand()%1;
         if(*map->map_content == 0)
             block_object_count--;         
@@ -490,27 +482,157 @@ void spawn_vertex(plane_type, map){
     vertex.position.y;
     vertex.position.z;
 }
+
+void spawn_triangle(plane_type, map){
+    ;
+};
 // First we hardcode it to see how it work, and then think about the proper approach of this one.
 
 // Still think about this one.=================================
-void set_whole_mesh_data(const basic_shape_vertices_data* vertices_data = nullptr, graphic_property* graphic_obj){
+void set_whole_mesh_data(graphic_property* graphic_obj){
     // data can be loaded from text file!!;
     // we need to copy whole data not just the address
     graphic_obj->Mesh_Group.reserve(10);
-    mesh_name name;
-    Mesh_ temp_mesh;
+
+// Time to replace this with generalized concept like triangle, cube struct
+external float plane_vertices[] = {
+    // positions
+    // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
+    // x,    y,    z    //Normal    //TexCoord
+    1.0f, -1.0f, 1.0f,  1.0f, 0.0f,
+   -1.0f, -1.0f, 1.0f,  0.0f, 0.0f, 
+   -1.0f,  1.0f, 1.0f,  0.0f, 1.0f,
+                           
+   -1.0f,  1.0f, 1.0f,  0.0f, 1.0f,                   
+    1.0f,  1.0f, 1.0f,  1.0f, 1.0f,
+    1.0f, -1.0f, 1.0f,  1.0f, 0.0f
+};
+
+external unsigned int plane_indices[] =  {
+//Even though the vertex 1, 0 will be reused but we have to feed them name for opengl just like this
+    0, 1, 2, 2, 4, 0
+};
+
+    //cube
+float cube_vertices[] = {
+      //Position           //Normal           //TexCoords
+     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+      0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+     -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+                                                           
+     -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+      0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
+     -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+     -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
+`     
+     -0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+     -0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+     -0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+     -0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+                                                           
+      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+      0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+      0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+                                                           
+     -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+      0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+      0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+     -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+                                                           
+     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+      0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+     -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+     -0.5f,  0.5f, -0.5f   0.0f,  1.0f,  0.0f,  0.0f, 1.0f 
+    };
+
+int cube_indices[] = {
+    0, 1, 2, 2, 4, 0,//0
+    6, 7, 8, 7, 6, 11,
+    12, 13, 14, 13, 12, 17,//2
+    18, 19, 20, 20, 22, 18,
+    24, 25, 26, 25, 24, 29,//4
+    30, 31, 32, 32, 34, 30
+};
+
+    //tile-liked shapes
+float tile_vertices[] = {// vertex                    TextCoords
+      //BACK FACE
+      -0.5f,  0.375f, -0.5f,     0.0f, 0.0f,
+       0.5f,  0.375f, -0.5f,     1.0f, 0.0f,
+       0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
+       0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
+      -0.5f,  0.5f,   -0.5f,     0.0f, 1.0f,
+      -0.5f,  0.375f, -0.5f,     0.0f, 0.0f,
+       //FRONT FACE                         
+      -0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
+       0.5f,  0.5f,    0.5f,     1.0f, 1.0f,
+       0.5f,  0.375f,  0.5f,     1.0f, 0.0f,
+       0.5f,  0.5f,    0.5f,     1.0f, 1.0f,
+      -0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
+      -0.5f,  0.5f,    0.5f,     0.0f, 1.0f,
+       // LEFT FACE                       
+      -0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+      -0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+      -0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
+      -0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+      -0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+      -0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
+       // RIGH0.375ACE                      
+       0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+       0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
+       0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+       0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+       0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
+       0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+       // BOTT0.375FACE                     
+      -0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+       0.5f,  0.375f,  0.5f,     1.0f, 0.0f,
+       0.5f,  0.375f, -0.5f,     1.0f, 1.0f,
+       0.5f,  0.375f,  0.5f,     1.0f, 0.0f,
+      -0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
+      -0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
+      //TOP                 ,               
+      -0.5f,  0.5f,   -0.5f,     0.0f, 1.0f,
+       0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
+       0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+       0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
+      -0.5f,  0.5f,    0.5f,     0.0f, 0.0f,
+      -0.5f,  0.5f,   -0.5f,     0.0f, 1.0f
+};
+
+unsigned int tile_indices[] = {
+       0, 1, 2, 2, 4, 0,//0
+       6, 7, 8, 7, 6, 11,
+       12, 13, 14, 13, 12, 17,//2
+       18, 19, 20, 20, 22, 18,
+       24, 25, 26, 25, 24, 29,//4
+       30, 31, 32, 32, 34, 30
+};    
+
+// Consider using imposter to replace actual sphere
+// Group of mesh mean group of asset and vertice data(from simple like triangle to complex like cube, cylinder or the whole model vertex)
 
     // load basic shape first
     // TODO: set single primive on this and test the mass drawing thing
     // We replace vertices data with prestored simple shape one
     // how to set, store and link these then call these vertices data
     // when we need wisely we need a rational enough simple ID mechanism
-    //for(mesh_name i = 0; i < CUBE_SHAPE; i++){
-    while(name <= CUBE_SHAPE){
-        set_each_Mesh_up(&temp_mesh, vertices_data->name, vertices_data->planeIndices); 
-        graphics_obj->Mesh_Group[name] = temp_mesh;
-        name++;
-            }
+        set_each_Mesh_up(&graphics_obj->Mesh_Group[PLANE], plane_vertices, plane_indices);
+        set_each_Mesh_up(&graphics_obj->Mesh_Group[CUBE_SHAPE], cube_vertices, cube_indices);
     //}
 }
 
@@ -557,15 +679,15 @@ void render_in_group (Graphic_Properties* Graphic, simple_volume_map* world_map,
     while(i < world_map->size){
 // Each shader represent for one layer of effect at least.
         if(!world_map->map_content[i]){
-            //By modding for that dimension we always have a number in its range;
+            // By modding for that dimension we always have a number in its range
             // I think I done interpret the index to the entities postion in world
             // space
-// May be change this
+            // May be change this
             glm::vec3 position = {(float)i%world_map->w, (i>(world_map->w*world_map->l))?(float)(i/(world_map->w*world_map->h)):0.0f, i>world_map->w?(i/world_map->w)%world_map->l:0.0f};
-            // now we decide how to add matched id in Graphic object;
+            // now we decide how to add matched id in Graphic object
             // replace i with some thing
             glBindVertexArray(Graphics->mesh_group[map->map_content[i]].VAO);
-// Also decide this one
+            // Also decide this one
             Graphic->shader[i]->use();
             // Postion may be we use i * w * l * h
             // we use instandid here

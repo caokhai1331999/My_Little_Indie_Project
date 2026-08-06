@@ -729,8 +729,8 @@ void* GetAnyGLFuncAddress(const char* name)
     }
     return p;
     //May be the wglgetprocaddress doesn't on pc case work I have to use getprocaddress instead
-}
-;
+};
+
 void* LoadFunctionFromDLL(const char* DLLName = nullptr, const char* FuncName = nullptr);
 void SetUpWindow();
 glm::vec3 randomRotateAxis_(int rollIndex);

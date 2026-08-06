@@ -81,29 +81,45 @@ struct general_light{
 typedef mesh_name uint8
 
 enum primitive_shape{
-    TRIANGLE = (mesh_name)0,
-    PLANE = (mesh_name)1,
-    POLYGON = (mesh_name)2,
-    TILE_SHAPE = (mesh_name)3,
-    CUBE_SHAPE = (mesh_name)4
-};
-//set primitives for mass drawing here
-struct triangle{
-    glm::vec3 pos;
-    unsigned int texture;
-    float size;
+    //TRIANGLE = (mesh_name)0,
+    PLANE = (mesh_name)0,
+    POLYGON = (mesh_name)1,
+    CUBE_SHAPE = (mesh_name)2
 };
 
-struct plane{
+enum face_type_rhs{
+    UP = 0,
+    DOWN = 1,
+    FRONT = 2,
+    BACK = 3,
+    RIGHT = 4,
+    LEFT = 5
+};
+//set primitives for mass drawing here
+struct vertex{
     glm::vec3 pos;
-    unsigned int texture;
+};
+
+struct triangle{
+    face_type_rhs face;
+    vertex vertices[3];
     float size;
+};
+//plane is polygon(for the sake of fully information)
+struct plane{
+    face_type_rhs face;
+    float size;
+    vertex vertices[6];
+    index indices[6];
+    // Should put it in here
+    unsigned int texture;
 };
 
 struct cube{
-    glm::vec3 pos;
-    unsigned int texture;
+    vertex vertices[24];    
+    index indices[24];
     float size;
+    //unsigned int texture;
 };
 
 struct mesh_shape_data_pointers{
@@ -111,137 +127,13 @@ struct mesh_shape_data_pointers{
     unsigned int* indices;
 };
 
-// Time to replace this with generalized concept like triangle, cube struct
-    external float plane_vertices[] = {
-        // positions
-        // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
-         // x,    y,    z    //Normal    //TexCoord
-         1.0f, -1.0f, 1.0f,  1.0f, 0.0f,
-        -1.0f, -1.0f, 1.0f,  0.0f, 0.0f, 
-        -1.0f,  1.0f, 1.0f,  0.0f, 1.0f,
-                            
-        -1.0f,  1.0f, 1.0f,  0.0f, 1.0f,                   
-         1.0f,  1.0f, 1.0f,  1.0f, 1.0f,
-         1.0f, -1.0f, 1.0f,  1.0f, 0.0f
-      };
-
-    external unsigned int plane_indices[] =  {
-//Even though the vertex 1, 0 will be reused but we have to feed them name for opengl just like this
-        0, 1, 2, 2, 4, 0
-     };
-
-    //cube
-    external float cube_vertices[] = {
-      //Position           //Normal           //TexCoords
-     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-      0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-     -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-                                                           
-     -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
-      0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
-      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,
-      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
-     -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
-     -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
-`     
-     -0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-     -0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-     -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-     -0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-     -0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-     -0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-                                                           
-      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-      0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-      0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-      0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-      0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-                                                           
-     -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-      0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-      0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-      0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-     -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-     -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-                                                           
-     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-      0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-     -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-     -0.5f,  0.5f, -0.5f   0.0f,  1.0f,  0.0f,  0.0f, 1.0f 
-    };
-
-    int cube_indices[] = {
-        0, 1, 2, 2, 4, 0,//0
-        6, 7, 8, 7, 6, 11,
-        12, 13, 14, 13, 12, 17,//2
-        18, 19, 20, 20, 22, 18,
-        24, 25, 26, 25, 24, 29,//4
-        30, 31, 32, 32, 34, 30
-    };
-
-    //tile-liked shapes
-    external float tile_vertices[] = {// vertex                    TextCoords
-      //BACK FACE
-      -0.5f,  0.375f, -0.5f,     0.0f, 0.0f,
-       0.5f,  0.375f, -0.5f,     1.0f, 0.0f,
-       0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
-       0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
-      -0.5f,  0.5f,   -0.5f,     0.0f, 1.0f,
-      -0.5f,  0.375f, -0.5f,     0.0f, 0.0f,
-       //FRONT FACE                         
-      -0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
-       0.5f,  0.5f,    0.5f,     1.0f, 1.0f,
-       0.5f,  0.375f,  0.5f,     1.0f, 0.0f,
-       0.5f,  0.5f,    0.5f,     1.0f, 1.0f,
-      -0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
-      -0.5f,  0.5f,    0.5f,     0.0f, 1.0f,
-       // LEFT FACE                       
-      -0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
-      -0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
-      -0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
-      -0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
-      -0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
-      -0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
-       // RIGH0.375ACE                      
-       0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
-       0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
-       0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
-       0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
-       0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
-       0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
-       // BOTT0.375FACE                     
-      -0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
-       0.5f,  0.375f,  0.5f,     1.0f, 0.0f,
-       0.5f,  0.375f, -0.5f,     1.0f, 1.0f,
-       0.5f,  0.375f,  0.5f,     1.0f, 0.0f,
-      -0.5f,  0.375f, -0.5f,     0.0f, 1.0f,
-      -0.5f,  0.375f,  0.5f,     0.0f, 0.0f,
-      //TOP                 ,               
-      -0.5f,  0.5f,   -0.5f,     0.0f, 1.0f,
-       0.5f,  0.5f,   -0.5f,     1.0f, 1.0f,
-       0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
-       0.5f,  0.5f,    0.5f,     1.0f, 0.0f,
-      -0.5f,  0.5f,    0.5f,     0.0f, 0.0f,
-      -0.5f,  0.5f,   -0.5f,     0.0f, 1.0f
-    };
-
-    external unsigned int tile_indices[] = {
-       0, 1, 2, 2, 4, 0,//0
-       6, 7, 8, 7, 6, 11,
-       12, 13, 14, 13, 12, 17,//2
-       18, 19, 20, 20, 22, 18,
-       24, 25, 26, 25, 24, 29,//4
-       30, 31, 32, 32, 34, 30
-    };    
-
-// Consider using imposter to replace actual sphere
-// Group of mesh mean group of asset and vertice data(from simple like triangle to complex like cube, cylinder or the whole model vertex)
+//======================MESH_PART==========================
+//
+//===========================================================
+// PURPOSE: Create a mechanism that draw multiple object of scene using
+//instancing method and available asset.
+// In terms of graphics
+// enviromental elements is just light
 
 struct Mesh{
     //Use this whenever I done the dynamic array
@@ -251,14 +143,6 @@ struct Mesh{
     unsigned int VBO;
     unsigned int EBO;
 };
-//======================MESH_PART==========================
-//
-//===========================================================
-// PURPOSE: Create a mechanism that draw multiple object of scene using
-//instancing method and available asset.
-// In terms of graphics
-// enviromental elements is just light
-
 // How can I make sure that all the shaders draw the same object
 struct texture_group{
 // This one will be hack for 2D game performance
@@ -317,10 +201,12 @@ typedef uint8 entity_type
 
 // The passable unit have to be aligned with each other
 struct unit_specs{
+    //
+    int8 MeshID;
     bool32 passable;
+    // consider removing this one.
     glm::vec3 position;    
     rigid_body* body;
-    int8 MeshID;
 };
 
 struct simple_volume_map{

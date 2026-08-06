@@ -13,7 +13,7 @@
 #include <vector>
 
 bool32 first_size = true;
-bool32 first_announce = true;
+global_variable bool32 first_announce = true;
 bool32 Load_Lib = false;
 bool32 showMsPF = false;
 
@@ -90,7 +90,7 @@ void displayBufferData(Platform_Properties* Game_Platform, Win32_OffScreen_Buffe
                               //const void* userParam);
 //
 extern "C" void reload_gl_function_pointer (struct Platform_Properties* Game_Platform, struct Win32_OffScreen_Buffer* BackBuffer_){
-    //begin_ticket_mutex(&BackBuffer_->ticket);
+    begin_ticket_mutex(&Game_Platform->ticket);
     HDC tempDC = GetDC(Game_Platform->Window);
     if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
         bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
@@ -98,13 +98,19 @@ extern "C" void reload_gl_function_pointer (struct Platform_Properties* Game_Pla
             bool success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
         assert(success);
     };
-    //end_ticket_mutex(&BackBuffer_->ticket);
+    end_ticket_mutex(&Game_Platform->ticket);
 }
 
 extern "C" void ReloadGLFunction (Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer_){
     begin_ticket_mutex(&Game_Platform->ticket);
     HDC tempDC = GetDC(Game_Platform->Window);
     if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
+
+        if(first_announce){
+            printf("Current initialized GL context:%p\n", BackBuffer_->glData.openglRC);
+            printf("%p\n", wglGetCurrentContext());
+        }
+
         bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
         if (!success)
             bool success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);

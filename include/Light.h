@@ -8,6 +8,7 @@
    ======================================================================== */
 // First of all we don't use global light
 // We used normal map to compenstate for that.
+#include "handmade.h"
 #include "win32game.h"
 #include "B_shader.h"
 #include "Camera.h"

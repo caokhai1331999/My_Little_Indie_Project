@@ -2478,3 +2478,10 @@ chunks through glTextImageImage
 he did all the linear computation in cpu stage, so for the sake of performance
 maybe consider doing light approximation and mass position
 computation(*worldspace one) in cpu stage
+
+---------------- Thu, 06 Aug 26: 10:12AM
+
+DONE! Set the basic primitive vertices's data
+TODO: Time to complete the map sketching function and bring them to work
+Move light.h/cpp to exe compile folder.
+It's not good to share gl function between exe and dll
