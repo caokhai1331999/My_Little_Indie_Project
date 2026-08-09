@@ -193,15 +193,20 @@ public:
     }
 };
 // ====================== Map constructing ===================================
+
 typedef uint8 entity_type
 // We then bind single texture/simple model
 // to specific object id
 #define static_object 0
 #define moving_object 1
 
+typedef graphic_attribute_type uint8
+#define ()_light_source map_attribute_type(0)/
+        
+#define light_shone_entity map_attribute_type(1)
+#define light_source map_attribute_type(0)
 // The passable unit have to be aligned with each other
 struct unit_specs{
-    //
     int8 MeshID;
     bool32 passable;
     // consider removing this one.

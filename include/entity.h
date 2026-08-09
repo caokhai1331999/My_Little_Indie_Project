@@ -9,17 +9,11 @@
 
 #include "Tile.h"
 #include "physics.h"
-
-typedef bool motion_state;
-typedef bool motion_type;
-typedef int direction_;
-typedef int motion;
-
 // Must be clockwise
 
 // This one is righthanded coor sys
 /*
-enum {
+enum FACE_DIRECTION {
 FORWARD,
 LEFT,
 BACKWARD,
@@ -29,36 +23,65 @@ DOWN,
 NONE
 };
 */
-
+typedef uint8 direction;
 // This one is lefthanded coor sys
-enum {
-BACKWARD,
-LEFT,
-FORWARD,
-RIGHT,
-UP,
-DOWN,
-NONE
+enum FACE_DIRECTION {
+    BACKWARD = (direction)1,
+    LEFT = (direction)2,
+    FORWARD = (direction)3,
+    RIGHT = (direction)4,
+    UP = (direction)5,
+    DOWN = (direction)6,
+    NONE = (direction)0
 };
 
-#define complex (motion_type)1
-#define basic (motion_type)0
+typedef uint8 moving_type;
+typedef moving_type basic_moving_type;
+typedef moving_type complex_moving_type;
 
-#define moving (motion_state)1
-#define IDLE (motion_type)0
+enum BASIC_MOVE{
+    IDLE = basic_moving_type(0),
+    WALKING = basic_moving_type(1)
+};
+
+enum COMPLEX_MOVE{
+    JUMPING = complex_moving_type(2),
+    FALLING = complex_moving_type(10)
+};
+
 
 // \ is + in macro language
-#define MOVING_(x)\
-    moving+x
+#define WALKING_(direction) (BASIC_MOVE::WALKING + direction)// This work because the enum
+#define JUMPING_(direction) (COMPLEX_MOVE::JUMPING + direction)// This work because the enum
+// structure auto define the value of ordered member
+    //(complex_motion)
+// how can gravity affect object
 
-#define JUMPING_FORWARD (motion)5//(complex_motion)
-#define JUMPING_BACKWARD (motion)6//(complex_motion)
-#define FALLING         (motion)7//(complex_motion)
+typedef moving_type basic_moving_type;
+typedef moving_type basic_moving_state;
+typedef moving_type complex_moving_type;
+typedef moving_type complex_moving_state;
+
+enum BASIC_MOVE{
+    IDLE = basic_moving_type(0),
+    WALKING = basic_moving_type(1)
+};
+
+enum COMPLEX_MOVE{
+    JUMPING = complex_moving_type(2),
+    FALLING = complex_moving_type(10)
+};
+
+// \ is + in macro language
+#define WALKING_(direction) (BASIC_MOVE::WALKING + direction)// This work because the enum
+#define JUMPING_(direction) (COMPLEX_MOVE::JUMPING + direction)// This work because the enum
+// structure auto define the value of ordered member
+    //(complex_motion)
 // how can gravity affect object
 
 struct object_motion_state_group{
-    motion basic_move;
-    motion fancy_move;
+    basic_moving_state basic_move;
+    complex_moving_state fancy_move;
 };
 
 struct motion_spec{
@@ -86,8 +109,8 @@ public:
     float mass;
     glm::mat4 position;
     glm::vec3 pre_pos;
-    direction_ current_face;
-    direction_ previous_face;
+    FACE_DIRECTION current_face;
+    FACE_DIRECTION previous_face;
     motion_spec object_speed;
     space_box box_;
     void move(float delta_t);

@@ -75,16 +75,16 @@ static void CalcNewPos(float delta_time, rigid_body* object) {
     //add a little friction(opposed force here)
    //
     switch(object->object_speed.current_states.basic_move){
-        case MOVING_(FORWARD):
+        case WALKING_(FORWARD):
             object->position[3][2] = based_a_v_Pos_calc(object->object_speed.acceleration, object->object_speed.veclocity, object->position[3][2], delta_time);            
             break;
-        case MOVING_(BACKWARD):
+        case WALKING_(BACKWARD):
             object->position[3][2] = based_a_v_Pos_calc(-object->object_speed.acceleration, -object->object_speed.veclocity, object->position[3][2], delta_time);
             break;
-        case MOVING_(RIGHT):
+        case WALKING_(RIGHT):
             object->position[3][0] = based_a_v_Pos_calc(object->object_speed.acceleration, object->object_speed.veclocity, object->position[3][0], delta_time);            
             break;
-        case MOVING_(LEFT):
+        case WALKING_(LEFT):
             object->position[3][0] = based_a_v_Pos_calc(-object->object_speed.acceleration, -object->object_speed.veclocity, object->position[3][0], delta_time);
             break;
         //default:
@@ -94,7 +94,7 @@ static void CalcNewPos(float delta_time, rigid_body* object) {
 
     if(abs(object->position[3][2] - object->pre_pos.z) >= 3.0f){
         printf("distance traveled until falling:%f\n", abs(object->position[3][2] - object->pre_pos.z));
-        if(object->object_speed.current_states.fancy_move == JUMPING_FORWARD || object->object_speed.current_states.fancy_move == JUMPING_BACKWARD){
+        if(object->object_speed.current_states.fancy_move == JUMPING_(FORWARD) || object->object_speed.current_states.fancy_move == JUMPING_(BACKWARD)){
             object->object_speed.previous_states.fancy_move = object->object_speed.current_states.fancy_move;
             object->object_speed.current_states.fancy_move = FALLING;
 
@@ -106,12 +106,12 @@ static void CalcNewPos(float delta_time, rigid_body* object) {
 
     
     switch(object->object_speed.current_states.fancy_move){
-        case JUMPING_FORWARD:
+        case JUMPING_(FORWARD):
             Jump(delta_time, object);
             ApplyGravity(delta_time, object);
             break;
 
-        case JUMPING_BACKWARD:
+        case JUMPING_(BACKWARD):
             Jump(delta_time, object);
             ApplyGravity(delta_time, object);
             break;
@@ -156,9 +156,9 @@ static void ApplyMomentum(float delta_t, rigid_body* object){
     if(object->object_speed.jump_v < 0.0f)
         object->object_speed.jump_v += 0.5f;
 
-    if(object->object_speed.previous_states.fancy_move == JUMPING_FORWARD){
+    if(object->object_speed.previous_states.fancy_move == JUMPING_(FORWARD)){
         object->position[3][2] = based_a_v_Pos_calc(0.0f, -object->object_speed.jump_v, object->position[3][2], delta_t);
-    }else if(object->object_speed.previous_states.fancy_move == JUMPING_BACKWARD){
+    }else if(object->object_speed.previous_states.fancy_move == JUMPING_(BACKWARD)){
         object->position[3][2] = based_a_v_Pos_calc(0.0f, object->object_speed.jump_v, object->position[3][2], delta_t);
     }
 
@@ -167,9 +167,9 @@ static void ApplyMomentum(float delta_t, rigid_body* object){
 static void Jump(float delta_t, rigid_body* object){
 
     object->position[3][1] = based_a_v_Pos_calc(-object->object_speed.jump_a, -object->object_speed.jump_v, object->position[3][1], delta_t);
-    if(object->object_speed.current_states.fancy_move == JUMPING_FORWARD){
+    if(object->object_speed.current_states.fancy_move == JUMPING_(FORWARD)){
           object->position[3][2] = based_a_v_Pos_calc(-object->object_speed.jump_a * 0.4f, -object->object_speed.jump_v * 0.7, object->position[3][2], delta_t);
-    }else if(object->object_speed.current_states.fancy_move == JUMPING_BACKWARD){
+    }else if(object->object_speed.current_states.fancy_move == JUMPING_(BACKWARD)){
           object->position[3][2] = based_a_v_Pos_calc(object->object_speed.jump_a * 0.4f, object->object_speed.jump_v * 0.7, object->position[3][2], delta_t);
     }
 }

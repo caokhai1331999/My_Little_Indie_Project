@@ -221,8 +221,8 @@ void set_rigid_body(glm::vec3* init_pos){
 void spawn_vertex(plane_type, map){
     Vertex vertex = {};
     vertex.position = glm::vec3();
-    vertex.position.x
-
+    vertex.position.x;
+}
 // Handshake cross check for collision between entities and entities with background
 
 // TileMap contain array of positions in xz plane
@@ -292,6 +292,10 @@ unsigned int LoadCubeMap(const char* path){
 //============================================================
 // Think about set this light group shrewly
 //
+typedef element_type uint8
+struct map_drawn_element{
+    ;
+};
 void set_light(glm::vec3* position, std::vector<general_light*>* light_group){
     light_group->basic_specs =;
     light_group->direction =;
@@ -381,10 +385,9 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
          map->map_content[i] = rand()%(mesh_group->size()-1);
         if(block_object_count > 0 && h == 0)
          map->map_content[i] = rand()%1;
-        if(*map->map_content == 0)
+        if(!(*map->map_content))
             block_object_count--;         
         //}
-
     }
  //}        
     //};

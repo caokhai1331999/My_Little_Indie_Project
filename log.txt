@@ -2485,3 +2485,27 @@ DONE! Set the basic primitive vertices's data
 TODO: Time to complete the map sketching function and bring them to work
 Move light.h/cpp to exe compile folder.
 It's not good to share gl function between exe and dll
+
+---------------- Fri, 07 Aug 26: 10:29AM
+
+
+---------------- Sun, 09 Aug 26: 08:42AM
+We need a general map of need-to-be-drawn entities on display range for texture,
+or light/shade shader to fill accordingly
+
+NOTE: What inherent feature construct a normal scene? We need to generalize this!!
+
+1. background : .. ground : ex: grass, rock, barren ground, lava, ...
+                .. pattern-liked moving thing: river, falling leaves,
+                                       weather-simulated effect: wind, snow,
+                                       rain, ...
+                .. static : rock, tree, house, ...
+
+2. auto-steered moving objects: .. animal
+                                .. monster (boss..)
+
+Then finish the mechanism to choose vertex data(VAO)+texture and
+light/effect(shader) (basically we just need to do + lighteffect(vec3()) layer
+whenever we want to add any after consider its effect/cost
+
+REMEMBER: we do RPG top down looking 2.5/3D game

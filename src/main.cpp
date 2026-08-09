@@ -52,17 +52,16 @@ int CALLBACK WinMain
   TimeSet.PerfCountFrequency = (int64)(TimeSet.PerfCountFrequencyResult.QuadPart);  
 
   updateCa UpdateCamera = NULL;
-  setup_pointlight__ setup_pointlight = NULL;
-  Set_Light_ Set_environmental_light = NULL;
+  //setup_pointlight__ setup_pointlight = NULL;
+  //Set_Light_ Set_environmental_light = NULL;
   move_object_ move_ = NULL;
   InitCamera__ InitCamera_ = NULL;
   AutoAdjustCameraPos__ AutoAdjustCameraPos = NULL;
-  LoadFont__ LoadFont = NULL;
-  DrawFont__ DrawFont = NULL;
+
+  //LoadFont__ LoadFont = NULL;
+  //DrawFont__ DrawFont = NULL;
   //setUpUBO__ setUpUBO = NULL;
-  //updateUBOData__ updateUBOData = NULL;
-  //setupMeshh setupMesh = NULL;
-  //MDraw Draw = NULL;
+
       //AniTimeUpdater AniUpdate_;
 
   Animation* danceAnimation = nullptr;
@@ -112,13 +111,13 @@ int CALLBACK WinMain
 
               if(AniLib != NULL){
                   UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");          
-                  setup_pointlight = (setup_pointlight__)GetProcAddress(AniLib, "setup_pointlight_");
-                  Set_environmental_light = (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
+                  //setup_pointlight = (setup_pointlight__)GetProcAddress(AniLib, "setup_pointlight_");
+                  //Set_environmental_light = (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
                   move_ = (move_object_)GetProcAddress(AniLib, "move_object");
                   InitCamera_ = (InitCamera__)GetProcAddress(AniLib, "InitCamera_");
                   AutoAdjustCameraPos = (AutoAdjustCameraPos__)GetProcAddress(AniLib, "AutoAdjustCameraPos_");
-                  LoadFont = (LoadFont__)GetProcAddress(AniLib, "LoadFont_");
-                  DrawFont = (DrawFont__)GetProcAddress(AniLib, "DrawFont_");
+                  //LoadFont = (LoadFont__)GetProcAddress(AniLib, "LoadFont_");
+                  //DrawFont = (DrawFont__)GetProcAddress(AniLib, "DrawFont_");
               }else{
                   printf("Failed loading library from dll file\n");
               }
@@ -215,7 +214,8 @@ int CALLBACK WinMain
                     }
 
                 copyBufferData(&Game_Platform, &BackBuffer, &ScreenBuffer);
-                LoadFont(&test_platform, &Game_Platform, &BackBuffer, &Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
+                //LoadFont(&test_platform, &Game_Platform, &BackBuffer, &Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
+                LoadFont(&Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
                 //LoadFont(&Game_Platform, &Glyphs_Map, "./media/arial.ttf");
                 
                 //????
@@ -336,7 +336,8 @@ int CALLBACK WinMain
                 //map_content = load_bin_map("level.map");
                 //std::cout<<map_content->data()<<std::endl;
 
-                setup_pointlight(&Game_Platform, &BackBuffer, &envir_light);
+                //setup_pointlight(&Game_Platform, &BackBuffer, &envir_light);
+                setup_pointlight(&envir_light);
                 for(B_shader_program* const &shader: BackBuffer.shaders_list){
                     if(shader->GetProgramID()!=7){
                         shader->use();
@@ -348,8 +349,10 @@ int CALLBACK WinMain
                 glUseProgram(0);
 
                 //Set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
-                Set_environmental_light(&Game_Platform, &BackBuffer, BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
-                Set_environmental_light(&Game_Platform, &BackBuffer, BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
+                //Set_environmental_light(&Game_Platform, &BackBuffer, BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
+                //Set_environmental_light(&Game_Platform, &BackBuffer, BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
+                set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
+                set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
 //=================================================
                 // L, R, B, T
                 glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)100.0f, (float)100.0f, 0.0f);
@@ -422,12 +425,12 @@ int CALLBACK WinMain
                             //}
 
                           UpdateCamera = (updateCa)GetProcAddress(AniLib, "updateCamera_");
-                          setup_pointlight = (setup_pointlight__)GetProcAddress(AniLib, "setup_pointlight_");
-                          Set_environmental_light =                      (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
+                          //setup_pointlight = (setup_pointlight__)GetProcAddress(AniLib, "setup_pointlight_");
+                          //Set_environmental_light =                      (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
                           move_ = (move_object_)GetProcAddress(AniLib, "move_object");
                           AutoAdjustCameraPos = (AutoAdjustCameraPos__)GetProcAddress(AniLib, "AutoAdjustCameraPos_");
-                          LoadFont = (LoadFont__)GetProcAddress(AniLib, "LoadFont_");
-                          DrawFont = (DrawFont__)GetProcAddress(AniLib, "DrawFont_");
+                          //LoadFont = (LoadFont__)GetProcAddress(AniLib, "LoadFont_");
+                          //DrawFont = (DrawFont__)GetProcAddress(AniLib, "DrawFont_");
 //setupMesh =
                           // reload and recompile shader code
                           for(B_shader_program* const &brush: BackBuffer.shaders_list)
@@ -621,7 +624,8 @@ int CALLBACK WinMain
                         showMsPF = !showMsPF;
                     }
 
-                    DrawFont(&Game_Platform, &BackBuffer, BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
+                    //DrawFont(&Game_Platform, &BackBuffer, BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
+                    DrawFont(&BackBuffer, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
 
 
 //========================================================================

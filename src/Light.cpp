@@ -1,4 +1,4 @@
-\/* ========================================================================
+/* ========================================================================
    $File: $
    $Date: $
    $Revision: $
@@ -32,7 +32,7 @@ static void IncreaseFontAlpha(const unsigned char* source, void* dest, const Gly
 // Load
 // Render}
 
-inline void LoadFont(Win32_OffScreen_Buffer* Backbuffer, Glyph_Map* map, const char* path){
+void LoadFont(Glyph_Map* map, const char* path){
 // Load File + Init
         debug_read_file_result* TTFfile = DEBUGReadFileWhole(path);
         stbtt_InitFont(&map->FontInfo, (unsigned char*)TTFfile->Content, stbtt_GetFontOffsetForIndex((unsigned char*)TTFfile->Content, 0));
@@ -108,15 +108,6 @@ inline void LoadFont(Win32_OffScreen_Buffer* Backbuffer, Glyph_Map* map, const c
         delete TTFfile;
         TTFfile = nullptr;        
 }
-
-void LoadFont_(platform_api* platform, Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map , const char* path){
-    //begin_ticket_mutex(&BackBuffer->ticket);
-            //platform->reloadGLFuncPointer(BackBuffer);
-    ReloadGLFunction(Game_Platform, BackBuffer);
-    //end_ticket_mutex(&BackBuffer->ticket);
-
-    LoadFont(BackBuffer, map, path);
-};
 
 glm::vec4 CalcGlypProperty(const glm::vec4* glyp_specs, const Rect_* rect){
     glm::vec4 font_specs;
@@ -231,72 +222,6 @@ void DrawFont(const Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader
     glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0);
     glUseProgram(0);
 }
- 
-void DrawFont_(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
-    //platform->reloadGLFuncPointer(BackBuffer);
-    ReloadGLFunction(Game_Platform, BackBuffer);
-    DrawFont(BackBuffer, shader, map, string, rect);
-}
-
-/*
-void LoadFont(Glyph_Map* map, const char* path){
-    debug_read_file_result* TTFfile = nullptr;
-
-    if(first_announce){
-// Load File + Init
-        TTFfile = new debug_read_file_result;
-        debug_read_file_result* TTFfile = DEBUGReadFileWhole(path);
-        stbtt_InitFont(&map->FontInfo, (unsigned char*)TTFfile->Content, stbtt_GetFontOffsetForIndex((unsigned char*)TTFfile->Content, 0));
-    }
-// This function load every character
-    // For/while
-    //
-    map->bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 128.0f), 'A', &map->w, &map->h, &map->Xoffset, &map->Yoffset);
-
-    if(map->bitmap){
-
-        if(first_announce){
-            InitBitmap(map);
-            glGenTextures(1, &map->TextureID);
-        }
-
-        IncreaseFontAlpha(map);
-//Render
-        // Actually we still don't know the relative size of character to the
-        // screen size
-        glActiveTexture(GL_TEXTURE0+map->TextureID);
-        glBindTexture(GL_TEXTURE_2D, map->TextureID);
-        if(map->upside_down_bitmap){
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, map->w, map->h, 0, GL_RG, GL_UNSIGNED_BYTE, map->upside_down_bitmap);
-        }else{
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, map->w, map->h, 0, GL_RG, GL_UNSIGNED_BYTE, map->bitmap);
-        }
-
-        if(first_announce){
-        // Why there are no pointer of this
-        glGenerateMipmap(GL_TEXTURE_2D);
-        // can free temp_bitmap at this point
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);        
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        }
-    
-        printf("load Font successfully\n");
-    }else{
-        printf("Failed Loading font\n");
-    }       
-    printf("Created Font Texture :%d\n", map->TextureID);
-
-    if(first_announce){
-        if(TTFfile->Content)
-            DEBUGFreeFileMemory(TTFfile->Content);
-
-        delete TTFfile;
-        TTFfile = nullptr;
-    }
-}
-*/
 
 void setup_pointlight(global_light* envir_light){
     glm::vec3 pointlight_Pos[] =
@@ -415,6 +340,17 @@ void set_environmental_light(B_shader_program* shader, const global_light* envir
     }
     glUseProgram(0);
 };
+// for dll export
+/*
+void LoadFont_(platform_api* platform, Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map , const char* path){
+    //begin_ticket_mutex(&BackBuffer->ticket);
+            //platform->reloadGLFuncPointer(BackBuffer);
+    ReloadGLFunction(Game_Platform, BackBuffer);
+    //end_ticket_mutex(&BackBuffer->ticket);
+
+    LoadFont(BackBuffer, map, path);
+};
+
 
 void setup_pointlight_(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, global_light* envir_light){
     //platform->reloadGLFuncPointer(&BackBuffer);
@@ -426,3 +362,12 @@ void Set_environmental_light_(Platform_Properties* Game_Platform, Win32_OffScree
     ReloadGLFunction(Game_Platform, BackBuffer);
     set_environmental_light(shader, envir_light, camera);
 };
+
+ 
+void DrawFont_(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, const GLuint VAO, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
+    //platform->reloadGLFuncPointer(BackBuffer);
+    ReloadGLFunction(Game_Platform, BackBuffer);
+    DrawFont(BackBuffer, shader, map, string, rect);
+}
+
+*/
