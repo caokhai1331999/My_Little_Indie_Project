@@ -135,10 +135,31 @@ struct mesh_shape_data_pointers{
 // In terms of graphics
 // enviromental elements is just light
 
+typedef uint8 be_drawn_type;
+
+// The passable unit have to be aligned with each other
+// This group of ID mark element for the engine to drawn accordingly
+// This type will be drawn alot...
+typedef be_drawn_type under_shone_entity;
+typedef be_drawn_type light_source;
+// snow, mist, wind...
+typedef be_drawn_type posted_scene_effect;
+
+#define under_shone_entity (be_drawn_type)0
+#define light_source (be_drawn_type)1;
+// snow, mist, wind...
+#define posted_scene_effect (be_drawn_type)2;
+// 
+struct map_drawn_element{
+    std::vector<under_shone_entity>whole_lit_entities;
+    std::vector<light_source>light_sources;
+    std::vector<posted_scene_effect>weather_effect_group;
+};
+
 struct Mesh{
     //Use this whenever I done the dynamic array
-    mesh_shape_data_pointers data_pointer;
     mesh_name name;
+    mesh_shape_data_pointers data_pointer;
     unsigned int VAO;
     unsigned int VBO;
     unsigned int EBO;
@@ -146,7 +167,10 @@ struct Mesh{
 // How can I make sure that all the shaders draw the same object
 struct texture_group{
 // This one will be hack for 2D game performance
+    char* name;
+
     unsigned int normal_map;
+
     unsigned int emission_map;
     unsigned int diffused_map;  
     unsigned int specular_map;  
@@ -170,6 +194,7 @@ struct Enviromental_Element{
 //
 // How we do layer of effect on the same object
 // How to first prototype the graphic property
+// struct graphic_property{
 class graphic_property{
 private:
     // This will be geometry collection
@@ -179,6 +204,9 @@ private:
     //unsigned int* Texture_Group; //dynamic array case
     //std::vector<texture_group*> matched_texture_collection;
     std::vector<Mesh>Mesh_Group;
+    // we need to add light group here.
+    // textures
+    std::vector<texture_group>texture_collection;
     std::vector<vertices_data_structure>* Vertices_Data;    
 public:
     update_(clock_set* clock);
@@ -194,23 +222,18 @@ public:
 };
 // ====================== Map constructing ===================================
 
-typedef uint8 entity_type
+typedef uint8 entity_type;
 // We then bind single texture/simple model
 // to specific object id
 #define static_object 0
 #define moving_object 1
 
-typedef graphic_attribute_type uint8
-#define ()_light_source map_attribute_type(0)/
-        
-#define light_shone_entity map_attribute_type(1)
-#define light_source map_attribute_type(0)
-// The passable unit have to be aligned with each other
 struct unit_specs{
     int8 MeshID;
     bool32 passable;
     // consider removing this one.
-    glm::vec3 position;    
+    glm::vec3 position;
+    be_drawn_type be_drawn_type;
     rigid_body* body;
 };
 
@@ -218,8 +241,7 @@ struct simple_volume_map{
     // one is mesh type, the other is the position;
     int8* map_content;// replace this with array of map_unit_specs
     std::vector<unit_specs*>map_content;
-    size_t map_size;
-    
+    size_t map_size;   
     // Volumme/Room 3D size in world space
     uint16 height;
     uint16 breadth;

@@ -2509,3 +2509,13 @@ light/effect(shader) (basically we just need to do + lighteffect(vec3()) layer
 whenever we want to add any after consider its effect/cost
 
 REMEMBER: we do RPG top down looking 2.5/3D game
+
+---------------- Mon, 10 Aug 26: 10:15AM
+
+TODO: Test the first prototype of masss drawing mechanism. Then be able to tweak
+more on that.
+We may need to know more about the graphic drawing process. what is inherently
+different among these need-to-be drawn elements.
+
+TODO: Next try to finish the sketch_map function
+then move on in the folder loop load textures

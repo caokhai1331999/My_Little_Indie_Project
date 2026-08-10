@@ -26,13 +26,13 @@ NONE
 typedef uint8 direction;
 // This one is lefthanded coor sys
 enum FACE_DIRECTION {
-    BACKWARD = (direction)1,
-    LEFT = (direction)2,
-    FORWARD = (direction)3,
-    RIGHT = (direction)4,
-    UP = (direction)5,
-    DOWN = (direction)6,
-    NONE = (direction)0
+    BACKWARD = (direction)0,
+    LEFT = (direction)1,
+    FORWARD = (direction)2,
+    RIGHT = (direction)3,
+    UP = (direction)4,
+    DOWN = (direction)5,
+    NONE = (direction)6
 };
 
 typedef uint8 moving_type;
@@ -40,50 +40,33 @@ typedef moving_type basic_moving_type;
 typedef moving_type complex_moving_type;
 
 enum BASIC_MOVE{
-    IDLE = basic_moving_type(0),
     WALKING = basic_moving_type(1)
 };
 
 enum COMPLEX_MOVE{
     JUMPING = complex_moving_type(2),
-    FALLING = complex_moving_type(10)
+    //FALLING = complex_moving_type(10)
 };
 
+#define DIRECTION_(x) \
+    x ## _BACKWARD, \
+    x ## _LEFT, \
+    x ## _FORWARD, \
+    x ## _RIGHT, \
+    x ## _UP, \
+    x ## _DOWN
 
-// \ is + in macro language
-#define WALKING_(direction) (BASIC_MOVE::WALKING + direction)// This work because the enum
-#define JUMPING_(direction) (COMPLEX_MOVE::JUMPING + direction)// This work because the enum
-// structure auto define the value of ordered member
-    //(complex_motion)
-// how can gravity affect object
-
-typedef moving_type basic_moving_type;
-typedef moving_type basic_moving_state;
-typedef moving_type complex_moving_type;
-typedef moving_type complex_moving_state;
-
-enum BASIC_MOVE{
+enum MOVING_STATE {
     IDLE = basic_moving_type(0),
-    WALKING = basic_moving_type(1)
-};
-
-enum COMPLEX_MOVE{
-    JUMPING = complex_moving_type(2),
-    FALLING = complex_moving_type(10)
+    DIRECTION_(WALK),
+    DIRECTION_(JUMP),
+    FALLING
 };
 
 // \ is + in macro language
-#define WALKING_(direction) (BASIC_MOVE::WALKING + direction)// This work because the enum
-#define JUMPING_(direction) (COMPLEX_MOVE::JUMPING + direction)// This work because the enum
 // structure auto define the value of ordered member
     //(complex_motion)
 // how can gravity affect object
-
-struct object_motion_state_group{
-    basic_moving_state basic_move;
-    complex_moving_state fancy_move;
-};
-
 struct motion_spec{
     float base_veclocity;
     float acceleration;
@@ -95,8 +78,8 @@ struct motion_spec{
 
     float falling_v;
     
-    object_motion_state_group current_states;
-    object_motion_state_group previous_states;
+    MOVING_STATE current_states;
+    MOVING_STATE previous_states;
 };
 
 //void apply_gravity(float mass);

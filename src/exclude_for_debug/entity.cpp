@@ -28,7 +28,7 @@ void rigid_body::move(float delta_t){
 
 void move_object(float delta_t, rigid_body* object){
 
-    if(object->object_speed.current_states.basic_move != IDLE && (object->object_speed.previous_states.basic_move == object->object_speed.current_states.basic_move)){
+    if(object->object_speed.current_states != IDLE && (object->object_speed.previous_states == object->object_speed.current_states)){
         CalcNewV(delta_t, &object->object_speed.veclocity, &object->object_speed.acceleration);
     }else{
         object->object_speed.veclocity = object->object_speed.base_veclocity;
@@ -74,17 +74,17 @@ static void CalcNewPos(float delta_time, rigid_body* object) {
     float value;
     //add a little friction(opposed force here)
    //
-    switch(object->object_speed.current_states.basic_move){
-        case WALKING_(FORWARD):
+    switch(object->object_speed.current_states){
+        case WALK_FORWARD:
             object->position[3][2] = based_a_v_Pos_calc(object->object_speed.acceleration, object->object_speed.veclocity, object->position[3][2], delta_time);            
             break;
-        case WALKING_(BACKWARD):
+        case WALK_BACKWARD:
             object->position[3][2] = based_a_v_Pos_calc(-object->object_speed.acceleration, -object->object_speed.veclocity, object->position[3][2], delta_time);
             break;
-        case WALKING_(RIGHT):
+        case WALK_RIGHT:
             object->position[3][0] = based_a_v_Pos_calc(object->object_speed.acceleration, object->object_speed.veclocity, object->position[3][0], delta_time);            
             break;
-        case WALKING_(LEFT):
+        case WALK_LEFT:
             object->position[3][0] = based_a_v_Pos_calc(-object->object_speed.acceleration, -object->object_speed.veclocity, object->position[3][0], delta_time);
             break;
         //default:
@@ -94,9 +94,9 @@ static void CalcNewPos(float delta_time, rigid_body* object) {
 
     if(abs(object->position[3][2] - object->pre_pos.z) >= 3.0f){
         printf("distance traveled until falling:%f\n", abs(object->position[3][2] - object->pre_pos.z));
-        if(object->object_speed.current_states.fancy_move == JUMPING_(FORWARD) || object->object_speed.current_states.fancy_move == JUMPING_(BACKWARD)){
-            object->object_speed.previous_states.fancy_move = object->object_speed.current_states.fancy_move;
-            object->object_speed.current_states.fancy_move = FALLING;
+        if(object->object_speed.current_states == JUMP_FORWARD || object->object_speed.current_states == JUMP_BACKWARD){
+            object->object_speed.previous_states = object->object_speed.current_states;
+            object->object_speed.current_states = FALLING;
 
             test_vampire_motion.pre_pos = glm::vec3(test_vampire_motion.position[3]);
         }
@@ -105,13 +105,13 @@ static void CalcNewPos(float delta_time, rigid_body* object) {
     }
 
     
-    switch(object->object_speed.current_states.fancy_move){
-        case JUMPING_(FORWARD):
+    switch(object->object_speed.current_states){
+        case JUMP_FORWARD:
             Jump(delta_time, object);
             ApplyGravity(delta_time, object);
             break;
 
-        case JUMPING_(BACKWARD):
+        case JUMP_BACKWARD:
             Jump(delta_time, object);
             ApplyGravity(delta_time, object);
             break;
@@ -127,9 +127,9 @@ static void CalcNewPos(float delta_time, rigid_body* object) {
             break;
     }
 
-    if(object->position[3][1] >= 0.0f && object->object_speed.current_states.fancy_move == FALLING){
+    if(object->position[3][1] >= 0.0f && object->object_speed.current_states == FALLING){
         object->object_speed.previous_states = object->object_speed.current_states;
-        object->object_speed.current_states.fancy_move = IDLE;
+        object->object_speed.current_states = IDLE;
         object->object_speed.jump_v = object->object_speed.base_jump_v;
         object->object_speed.falling_v = 0.0f;
     }
@@ -156,9 +156,9 @@ static void ApplyMomentum(float delta_t, rigid_body* object){
     if(object->object_speed.jump_v < 0.0f)
         object->object_speed.jump_v += 0.5f;
 
-    if(object->object_speed.previous_states.fancy_move == JUMPING_(FORWARD)){
+    if(object->object_speed.previous_states == JUMP_FORWARD){
         object->position[3][2] = based_a_v_Pos_calc(0.0f, -object->object_speed.jump_v, object->position[3][2], delta_t);
-    }else if(object->object_speed.previous_states.fancy_move == JUMPING_(BACKWARD)){
+    }else if(object->object_speed.previous_states == JUMP_BACKWARD){
         object->position[3][2] = based_a_v_Pos_calc(0.0f, object->object_speed.jump_v, object->position[3][2], delta_t);
     }
 
@@ -167,9 +167,9 @@ static void ApplyMomentum(float delta_t, rigid_body* object){
 static void Jump(float delta_t, rigid_body* object){
 
     object->position[3][1] = based_a_v_Pos_calc(-object->object_speed.jump_a, -object->object_speed.jump_v, object->position[3][1], delta_t);
-    if(object->object_speed.current_states.fancy_move == JUMPING_(FORWARD)){
+    if(object->object_speed.current_states == JUMP_FORWARD){
           object->position[3][2] = based_a_v_Pos_calc(-object->object_speed.jump_a * 0.4f, -object->object_speed.jump_v * 0.7, object->position[3][2], delta_t);
-    }else if(object->object_speed.current_states.fancy_move == JUMPING_(BACKWARD)){
+    }else if(object->object_speed.current_states == JUMP_BACKWARD){
           object->position[3][2] = based_a_v_Pos_calc(object->object_speed.jump_a * 0.4f, object->object_speed.jump_v * 0.7, object->position[3][2], delta_t);
     }
 }

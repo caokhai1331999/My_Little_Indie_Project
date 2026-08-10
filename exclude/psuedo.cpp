@@ -104,6 +104,9 @@ struct game_state{
 
 // ====================== Map constructing ===================================
 
+
+// ====================== Map constructing ===================================
+
 // ZII(Zero Initializtion) is good
 void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
     map->height = ROOM_HEIGHT;
@@ -128,7 +131,17 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
     //for(int y = 0; y < map->height; y++){
         //for(int x = 0; x < map->breadth; x++){
             //for(int z = 0; z < map->length; z++)
+    // We distribute the drawn type here
+    // These objects graphical differences are the shader and its position in room
+    //
+    // Total object will be drawn in displaying range in room
+    unsigned int total_drawn_object = 0;
     uint8 Block_Object_Count = (uint8)((float)map->map_size * 0.2f);
+    uint8 light_source_number = 3;
+    // all of the will be drawn obj is the under lit one
+    uint8 under_lit_number = ;
+    uint8 posted_game_effect_number = 1;
+
     for(size_t int i = 0; i < map->size; i++)
     {
                 //// we do every single cube here which have the size of 1,1,1
@@ -162,14 +175,19 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
 #else
 */
         //{
-        map->map_content[i]->MeshID = rand()%(mesh_group->size()-1);
-        if(block_object_count > 0)
-         map->map_content[i]->passable = rand()%1;
-        if(*map->map_content == 0)
-            block_object_count--;         
-        //}
+         map->map_content[i] = rand()%(mesh_group->size()-1);
+         total_drawn_object++;
 
+         if(block_object_count > 0 && h == 0)
+         map->map_content[i] = rand()%1;
+         if(!(*map->map_content))
+            block_object_count--;
+        // how shrewly decide drawn type for these entities of map
+         map->map_content[i+1] = (be_drawn_type)rand()%((uint8)2);        
+        //}
     }
+    under_lit_number = total_drawn_object - light_source_number;
+    
  //}        
     //};
 }
@@ -218,11 +236,13 @@ void set_rigid_body(glm::vec3* init_pos){
 //How to make this compact and automatically??
 //
 // Hard code vertices data here
+// ========WORKING===========
 void spawn_vertex(plane_type, map){
     Vertex vertex = {};
     vertex.position = glm::vec3();
     vertex.position.x;
 }
+// ========WORKING===========
 // Handshake cross check for collision between entities and entities with background
 
 // TileMap contain array of positions in xz plane
@@ -274,9 +294,11 @@ unsigned int LoadCubeMap(const char* path){
 //                     + tree
 //    . moving entities : + river
 //                        + animals
-//    . weather elements : + wind
-//                         + snow
-//                         + mist
+//    . weather elements : + wind  |
+//                         + snow  |==> These are screen space posted-game effect
+//                         + mist  |
+// NOTE: We mainly use texture and (and may be light probing) due to the limit of
+// indie game and hardward management 
       //  components's properties: . collided volume
       //                           . moving information: T, S, R.
       //                           . primitive for drawing:(mesh)
@@ -291,11 +313,7 @@ unsigned int LoadCubeMap(const char* path){
 
 //============================================================
 // Think about set this light group shrewly
-//
-typedef element_type uint8
-struct map_drawn_element{
-    ;
-};
+
 void set_light(glm::vec3* position, std::vector<general_light*>* light_group){
     light_group->basic_specs =;
     light_group->direction =;
@@ -321,79 +339,6 @@ struct game_state{
     // be careful
     std::vector<C_Model*>Model_Collection;    
 };
-
-// ====================== Map constructing ===================================
-
-// ZII(Zero Initializtion) is good
-void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
-    map->height = ROOM_HEIGHT;
-    map->breadth = ROOM_BREADTH;
-    map->length = ROOM_LENGTH;
-    map->map_size = (size_t)(2 * map->height * map->breadth * map->length)+1;
-
-#if TEST_DYNAMICALLY_ALLOCATION
-    map->map_content = (unsigned int*)VirtualAlloc(map->map_content, map_size);
-#else
-    map->map_content.reserve(map->map_size);
-}
-
-// We need a pre-created Texture group
-void sketch_map(simple_map* map, Mesh* mesh_group){
-    srand(time(NULL));
-    // rational map sketcher here.
-    // 1. first thing first we need to decide where can the character where is not
-    int x = 0;
-    int y = 0;
-    int h = 0;
-    //for(int y = 0; y < map->height; y++){
-        //for(int x = 0; x < map->breadth; x++){
-            //for(int z = 0; z < map->length; z++)
-    uint8 Block_Object_Count = (uint8)((float)map->map_size * 0.2f);
-    for(size_t int i = 0; i < map->size; i++)
-    {
-                //// we do every single cube here which have the size of 1,1,1
-                //
-                // have to be more specificly rational about this one
-                // ground first then up
-                // what to store OMG we just need to store the mesh ID
-        // need to be more rational, can not let it randome like this
-        x++;
-        if(x == map->w -1 ){
-            x -= map->w - 1;
-            z++;
-        };
-
-        if(z == map->l-1){
-            h++;
-            z -= map->l-1;
-        }
-
-        // All right. First simple approach is we make the majority of room
-        // passable then sprinkle few block objects on the way.
-/*
-#if TEST_DYNAMICALLY_ALLOCATION
-        {
-        *map->map_content++ = rand()%(mesh_group->size()-1);
-        if(block_object_count > 0)
-        *map->map_content++ = rand()%1;
-        if(*map->map_content == 0)
-            block_object_count--;
-        }
-#else
-*/
-        //{
-         map->map_content[i] = rand()%(mesh_group->size()-1);
-        if(block_object_count > 0 && h == 0)
-         map->map_content[i] = rand()%1;
-        if(!(*map->map_content))
-            block_object_count--;         
-        //}
-    }
- //}        
-    //};
-}
-// So the map is the place to store entities position
-// ====================== Map constructing ===========================
 
 //===============LOOP_RUNNING_THEM=====================
 // In Big inititalization : Init OpenGL
@@ -652,6 +597,30 @@ void Init(Win32_OffScreen_Buffer* BackBuffer){
     }
 }
 
+void Load_Textures_for_OpenGL(graphic_property* graphic_obj, const char* path){
+// Recursively loop over the folder and load group of textures here
+    graphic_obj->texture_collection.reserve(10); 
+
+    unsigned int* temp_normal_texture;
+    unsigned int* temp_diffuse_texture;
+    unsigned int* temp_specular_texture;
+
+    char* temp_image_content;
+    char* name;
+// Loop through all of the media folder for textures.
+    for(;;){
+        //stb_image(temp_image_content, path)
+        // i
+        temp_texture = new unsigned int;
+        glCreateTexture(temp_texture);
+        glBindTexture(*temp_texture);
+        glTexImage2D(*temp_texture, temp_image_content);
+        graphic_obj->texture_collection[i].normal_map = *temp_normal_texture;
+        graphic_obj->texture_collection[i].normal_map = *temp_normal_texture;
+        graphic_obj->texture_collection[i].normal_map = *temp_normal_texture;
+    }
+}
+
 void update(std::vector<rigid_body*>* entities_group,     std::vector<map_unit_specs*>map_content, clock_set* clock){
 // check for collision
     move_object(main_character);
@@ -669,8 +638,8 @@ void update(std::vector<rigid_body*>* entities_group,     std::vector<map_unit_s
 }
 
 // =====================================================
-void render_in_group (Graphic_Properties* Graphic, simple_volume_map* world_map, Camera* chosen_camera){    
-    // we can use instance
+// Apply textures group here
+void render_in_group (Graphic_Properties* Graphic, simple_volume_map* world_map, Camera* chosen_camera, bool32 post_effect_on){    
     // first feed shader with mesh data (Store with VAO)
     // Then update the relative position of the obj(with world, or just mere screen space with text)
     // Then use each brush(shader) in brush_set to draw object
@@ -683,22 +652,30 @@ void render_in_group (Graphic_Properties* Graphic, simple_volume_map* world_map,
 // Each shader represent for one layer of effect at least.
         if(!world_map->map_content[i]){
             // By modding for that dimension we always have a number in its range
-            // I think I done interpret the index to the entities postion in world
-            // space
-            // May be change this
+            // I think I done interpret the index to the entities postion in world space
+            // Postion may be we use i * w * l * h
             glm::vec3 position = {(float)i%world_map->w, (i>(world_map->w*world_map->l))?(float)(i/(world_map->w*world_map->h)):0.0f, i>world_map->w?(i/world_map->w)%world_map->l:0.0f};
             // now we decide how to add matched id in Graphic object
-            // replace i with some thing
-            glBindVertexArray(Graphics->mesh_group[map->map_content[i]].VAO);
-            // Also decide this one
-            Graphic->shader[i]->use();
-            // Postion may be we use i * w * l * h
-            // we use instandid here
-            Graphic->shader[i]->setVec3("Postion["+to_string(i)+"]", position);
-            Draw(obj->graphic_->mesh, obj->graphic_->shader[i]);
+            if(map->map_content[i+1]){
+                glBindVertexArray(Graphics->mesh_group[map->map_content[i]].VAO);
+                Graphic->shader[i]->setVec3("Postion["+to_string(i)+"]", position);
+                // This line will draw object based on its be_drawn_type
+                // Set Light
+                Graphic->shader[map->map_content[i+1]]->use();
+                // Choose among lights here
+                Draw(obj->graphic_->mesh, obj->graphic_->shader[i]);
+            }
         }
     i+=2;
     };
+
+    if(post_effect_on){
+        glUseProgram(Graphic->shader[effect]);
+        glBindVertexArray(Graphic->VAOs[effect]);
+        glSetVec2(glm::vec2(ScreenH, ScreenW), "screen_dimesion");
+        glDrawElements();
+    }
+
     // Then draw post effect here.
     glUseProgram(0);
 }

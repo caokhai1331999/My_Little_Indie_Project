@@ -393,7 +393,7 @@ int CALLBACK WinMain
 
                     TrackMouseEvent(Chosen_Camera->mouse.mouseEvent);
 //After polling event we update the positon of object
-                    if(test_vampire_motion.object_speed.current_states.basic_move != IDLE || test_vampire_motion.object_speed.current_states.fancy_move != IDLE){
+                    if(test_vampire_motion.object_speed.current_states != IDLE || test_vampire_motion.object_speed.current_states != IDLE){
                         move_(TimeSet.SPerFrame, &test_vampire_motion);
                     }
 
@@ -704,7 +704,7 @@ int CALLBACK WinMain
                     brushID = BackBuffer.shaders_list[0]->GetProgramID();
 
 
-                    if(test_vampire_motion.object_speed.current_states.basic_move != IDLE || test_vampire_motion.object_speed.current_states.fancy_move != IDLE || first_announce){
+                    if(test_vampire_motion.object_speed.current_states != IDLE || test_vampire_motion.object_speed.current_states != IDLE || first_announce){
                         if(animator->GetCurrentTime() > danceAnimation->GetDuration() )
                         {
                             //PlayAnimation(animator, danceAnimation);

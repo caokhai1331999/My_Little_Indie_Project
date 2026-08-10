@@ -982,7 +982,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
                   //if(is_moving)
                   //is_moving = !is_moving;
 //
-              test_vampire_motion.object_speed.current_states.basic_move = IDLE;
+              test_vampire_motion.object_speed.current_states = IDLE;
               printf("Up is released\n");
           }
 
@@ -992,14 +992,14 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
                   //if(is_moving){
                       //is_moving = !is_moving;
                   //}
-              test_vampire_motion.object_speed.current_states.basic_move = IDLE;
+              test_vampire_motion.object_speed.current_states = IDLE;
               printf("DOWN is released\n");
           }
 
           else if (vkCode == VK_LEFT) {
               // Actually the front vec is at the back of the camera
               // State.BlueOffset+= 10;
-              test_vampire_motion.object_speed.current_states.basic_move = IDLE;
+              test_vampire_motion.object_speed.current_states = IDLE;
               printf("LEFT is released\n");
               //if(is_moving)
                 //is_moving = !is_moving;
@@ -1011,7 +1011,7 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
               // State.BlueOffset+= 10;
               //if(is_moving)
                 //is_moving = !is_moving;
-              test_vampire_motion.object_speed.current_states.basic_move = IDLE;
+              test_vampire_motion.object_speed.current_states = IDLE;
               printf("RIGHT is released\n");
           }          
 
@@ -1052,8 +1052,8 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 
           test_vampire_motion.current_face = FORWARD;          
 
-          test_vampire_motion.object_speed.previous_states.basic_move = test_vampire_motion.object_speed.current_states.basic_move;
-          test_vampire_motion.object_speed.current_states.basic_move = MOVING_(FORWARD);
+          test_vampire_motion.object_speed.previous_states = test_vampire_motion.object_speed.current_states;
+          test_vampire_motion.object_speed.current_states = WALK_FORWARD;
                 //if(!is_moving)
                     //is_moving = !is_moving;
 
@@ -1073,8 +1073,8 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 
           test_vampire_motion.current_face = BACKWARD;
 
-          test_vampire_motion.object_speed.previous_states.basic_move = test_vampire_motion.object_speed.current_states.basic_move;
-          test_vampire_motion.object_speed.current_states.basic_move = MOVING_(BACKWARD);
+          test_vampire_motion.object_speed.previous_states = test_vampire_motion.object_speed.current_states;
+          test_vampire_motion.object_speed.current_states = WALK_BACKWARD;
           printf("DOWN is HIT\n");
             //}
 
@@ -1092,8 +1092,8 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 
           test_vampire_motion.current_face = LEFT;
 
-          test_vampire_motion.object_speed.previous_states.basic_move = test_vampire_motion.object_speed.current_states.basic_move;
-          test_vampire_motion.object_speed.current_states.basic_move = MOVING_(LEFT);
+          test_vampire_motion.object_speed.previous_states = test_vampire_motion.object_speed.current_states;
+          test_vampire_motion.object_speed.current_states = WALK_LEFT;
                 printf("LEFT is HIT\n");
         //}
       }
@@ -1110,8 +1110,8 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 
           test_vampire_motion.current_face = RIGHT;
 
-          test_vampire_motion.object_speed.previous_states.basic_move = test_vampire_motion.object_speed.current_states.basic_move;
-          test_vampire_motion.object_speed.current_states.basic_move = MOVING_(RIGHT);
+          test_vampire_motion.object_speed.previous_states = test_vampire_motion.object_speed.current_states;
+          test_vampire_motion.object_speed.current_states = WALK_RIGHT;
           printf("RIGHT is HIT\n");
             //}
       }
@@ -1201,10 +1201,10 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
 //
           //test_vampire_motion.current_face = FORWARD;
             test_vampire_motion.pre_pos = glm::vec3(test_vampire_motion.position[3]);
-          test_vampire_motion.object_speed.previous_states.fancy_move = test_vampire_motion.object_speed.current_states.fancy_move;
+          test_vampire_motion.object_speed.previous_states = test_vampire_motion.object_speed.current_states;
 
-              if(test_vampire_motion.object_speed.current_states.fancy_move != JUMPING_FORWARD)
-              test_vampire_motion.object_speed.current_states.fancy_move = JUMPING_FORWARD;
+              if(test_vampire_motion.object_speed.current_states != JUMP_FORWARD)
+              test_vampire_motion.object_speed.current_states = JUMP_FORWARD;
 
 
           if (!WasDown) {
@@ -1223,10 +1223,10 @@ LRESULT CALLBACK MainWindowCallBack(HWND Window, UINT Message, WPARAM Wparam, LP
           //test_vampire_motion.current_face = BACKWARD;
 //
             test_vampire_motion.pre_pos = glm::vec3(test_vampire_motion.position[3]);
-          test_vampire_motion.object_speed.previous_states.fancy_move = test_vampire_motion.object_speed.current_states.fancy_move;
+          test_vampire_motion.object_speed.previous_states = test_vampire_motion.object_speed.current_states;
 
-              if(test_vampire_motion.object_speed.current_states.fancy_move != JUMPING_BACKWARD)
-              test_vampire_motion.object_speed.current_states.fancy_move = JUMPING_BACKWARD;
+              if(test_vampire_motion.object_speed.current_states != JUMP_BACKWARD)
+              test_vampire_motion.object_speed.current_states = JUMP_BACKWARD;
 
           if (!WasDown) {
             printf("J is HIT\n");
