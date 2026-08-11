@@ -8,6 +8,7 @@
    ======================================================================== */
 
 std::vector<Entities*>*World_Entities_Trackers;
+
 struct Entities_Structure{
     std::vector<rigid_body*>all_entities;
 };
@@ -72,8 +73,7 @@ struct general_light{
     spot_light_specs spot_specs;
 };
 //======================LIGHT_PART==========================
-//
-//============================================================
+
 //
 //======================MESH_PART==========================
 // So this can replace class function member effectively
@@ -87,17 +87,11 @@ enum primitive_shape{
     CUBE_SHAPE = (mesh_name)2
 };
 
-enum face_type_rhs{
-    UP = 0,
-    DOWN = 1,
-    FRONT = 2,
-    BACK = 3,
-    RIGHT = 4,
-    LEFT = 5
-};
 //set primitives for mass drawing here
 struct vertex{
-    glm::vec3 pos;
+   float* pos;
+   float* normal;
+   float* texcoord;
 };
 
 struct triangle{
@@ -105,7 +99,7 @@ struct triangle{
     vertex vertices[3];
     float size;
 };
-//plane is polygon(for the sake of fully information)
+
 struct plane{
     face_type_rhs face;
     float size;
@@ -179,18 +173,10 @@ struct texture_group{
 struct environment_map{
     bitmap* LOD[4];
 }
-//
-struct Enviromental_Element{
-    // But how can this affect the output texture of the shader.
-    environment_map env_map[3];
-    std::vector<general_light*>*light_group;    
-};
-
 
 // GROUP_EVERYTHING_UP
 //
 //
-
 //
 // How we do layer of effect on the same object
 // How to first prototype the graphic property
@@ -225,22 +211,31 @@ public:
 typedef uint8 entity_type;
 // We then bind single texture/simple model
 // to specific object id
-#define static_object 0
-#define moving_object 1
+// This is for game play
 
-struct unit_specs{
-    int8 MeshID;
-    bool32 passable;
-    // consider removing this one.
-    glm::vec3 position;
+// Be pragmatic, think about what its real use in shader and game play(collision)
+// we need a tracker to watch all of entities in room
+struct map_unit{
+    // store multiple vec3 is not cheap,we need to find the
+    // alternatives
+    int8* MeshID;
     be_drawn_type be_drawn_type;
+    //
+    bool32 movable;
+    bool32 tangible;
+    uint8 space_id;
+    glm::vec3 position;
     rigid_body* body;
+    map_unit(){};
 };
 
 struct simple_volume_map{
     // one is mesh type, the other is the position;
+    std::vector<map_unit*>background_map_content;
+    // I think because of moving object object position
+    // is changeable so we need to store these
+    std::vector<map_unit*>moving_obj_group;
     int8* map_content;// replace this with array of map_unit_specs
-    std::vector<unit_specs*>map_content;
     size_t map_size;   
     // Volumme/Room 3D size in world space
     uint16 height;

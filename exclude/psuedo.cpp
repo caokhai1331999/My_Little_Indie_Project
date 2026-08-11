@@ -76,11 +76,16 @@ unsigned int LoadCubeMap(const char* path){
 //============================================================
 // Think about set this light group shrewly
 //
+void distribute_light(std::vector<general_light*>light_group){
+    // Normal map global light here;
+    (*light_group)[spot_light]->pos;
+}
+
 void set_light(glm::vec3* position, std::vector<general_light*>* light_group){
-    light_group->basic_specs =;
-    light_group->direction =;
-    light_group->attenuation =;
-    light_group->spot_specs =;
+    light_group->basic_specs = ;
+    light_group->direction = ;
+    light_group->attenuation = ;
+    light_group->spot_specs = ;
 }
 
 // Manually set light here.
@@ -104,9 +109,6 @@ struct game_state{
 
 // ====================== Map constructing ===================================
 
-
-// ====================== Map constructing ===================================
-
 // ZII(Zero Initializtion) is good
 void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
     map->height = ROOM_HEIGHT;
@@ -121,7 +123,8 @@ void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
 }
 
 // We need a pre-created Texture group
-void sketch_map(simple_map* map, Mesh* mesh_group){
+// Sketch map and spawn entities
+void sketch_map(simple_volume_map* map, Mesh* mesh_group){
     srand(time(NULL));
     // rational map sketcher here.
     // 1. first thing first we need to decide where can the character where is not
@@ -135,12 +138,29 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
     // These objects graphical differences are the shader and its position in room
     //
     // Total object will be drawn in displaying range in room
-    unsigned int total_drawn_object = 0;
     uint8 Block_Object_Count = (uint8)((float)map->map_size * 0.2f);
-    uint8 light_source_number = 3;
     // all of the will be drawn obj is the under lit one
-    uint8 under_lit_number = ;
-    uint8 posted_game_effect_number = 1;
+    uint8 total_objects = 10 + rand()%15;
+    uint8 plane_size = map->breadth * map->length;
+    bool32 plane_ids [plane_size] = {};
+
+    // spawn moving objects here
+    map->moving_obj_group.reserve((size_t)total_objects);
+    uint8 object_count_down = total_objects;
+    uint8 rand_id = 0;
+    map_unit_specs temp_unit = {};
+
+    while(object_count_down > 0){
+        rand_id = rand()%plane_size;
+        if(!plane_ids[rand_id]){
+            plane_ids[rand_id] = 1;
+            temp_unit.space_id = rand_id;
+            map->moving_obj_group.push_back(map_unit_specs);
+            object_count_down--;
+        }else{
+            continue;
+        }
+    }
 
     for(size_t int i = 0; i < map->size; i++)
     {
@@ -175,9 +195,9 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
 #else
 */
         //{
+        //static one
          map->map_content[i] = rand()%(mesh_group->size()-1);
-         total_drawn_object++;
-
+         //moving one
          if(block_object_count > 0 && h == 0)
          map->map_content[i] = rand()%1;
          if(!(*map->map_content))
@@ -186,10 +206,6 @@ void sketch_map(simple_map* map, Mesh* mesh_group){
          map->map_content[i+1] = (be_drawn_type)rand()%((uint8)2);        
         //}
     }
-    under_lit_number = total_drawn_object - light_source_number;
-    
- //}        
-    //};
 }
 // So the map is the place to store entities position
 // ====================== Map constructing ===========================
@@ -379,16 +395,11 @@ void set_rigid_body(glm::vec3* init_pos){
     Init_Entity_Specs(body);
 }
 
-float* spawn_vertex_data_from_given_map(const uint8* map){
-    ;
-}
-
 void set_each_Mesh_up(Mesh_* mesh, const float* VBOdata, const float* EBOdata){
 
         glGenVertexArrays(1, &mesh->VAO);
         glGenBuffers(1, &mesh->VBO);
         glGenBuffers(1, &mesh->EBO);
-
         glBindVertexArray(mesh->VAO);
         // Good thing about struct is that their memory is sequential for all its time
         //glVertexAttribPointer(0, 1, GL_UNSIGNED_INT, GL_FALSE, sizeof(unsigned int), (const void*)0);
@@ -421,9 +432,14 @@ void set_each_Mesh_up(Mesh_* mesh, const float* VBOdata, const float* EBOdata){
 
 //How to make this compact and automatically??
 //
-// Hard code vertices data here
-void spawn_vertex(plane_type, map){
-    Vertex vertex = {};
+// calculate vertex's data(position, normal, texture coords) here
+void spawn_vertex(uint8 size, /*what to pass here*/ ){
+
+    float position[3];
+    float normal[3];
+    float texcoords[2];
+    float stride[8];
+
     vertex.position = glm::vec3();
     // This is based on map and plane
     vertex.position.x;
@@ -584,18 +600,6 @@ unsigned int tile_indices[] = {
     //}
 }
 
-// Still think about this one.=================================
-void Init(Win32_OffScreen_Buffer* BackBuffer){
-    init_graphic(BackBuffer);
-    // Init enity/rigid body specs here
-    char* map_content = load_bin_map()// or random map
-    for(object* const &obj : BackBuffer->object_group){
-        object->set_rigid_body(&pos);
-        pos.x += 1.0f;
-        if(pos.x > 10.0f)
-            pos.z += 1.0f;
-    }
-}
 
 void Load_Textures_for_OpenGL(graphic_property* graphic_obj, const char* path){
 // Recursively loop over the folder and load group of textures here
@@ -658,6 +662,7 @@ void render_in_group (Graphic_Properties* Graphic, simple_volume_map* world_map,
             // now we decide how to add matched id in Graphic object
             if(map->map_content[i+1]){
                 glBindVertexArray(Graphics->mesh_group[map->map_content[i]].VAO);
+                // Remember we already set all lights's basic specs before in the init graphics
                 Graphic->shader[i]->setVec3("Postion["+to_string(i)+"]", position);
                 // This line will draw object based on its be_drawn_type
                 // Set Light

@@ -2519,3 +2519,11 @@ different among these need-to-be drawn elements.
 
 TODO: Next try to finish the sketch_map function
 then move on in the folder loop load textures
+
+---------------- Tue, 11 Aug 26: 09:43AM
+
+NOTE: So to be clear, we need a consensus that we only use light probe(normal
+texture) for global light and point light for layers on that.
+
+NOTE: Time to watch light_probe ep of handmade hero we need to make graphic look
+not so bad
