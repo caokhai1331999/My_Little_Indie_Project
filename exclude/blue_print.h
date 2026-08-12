@@ -218,23 +218,30 @@ typedef uint8 entity_type;
 struct map_unit{
     // store multiple vec3 is not cheap,we need to find the
     // alternatives
-    int8* MeshID;
+    // This is for choosing suitable mesh to draw
+    uint8 MeshID;
     be_drawn_type be_drawn_type;
-    //
-    bool32 movable;
-    bool32 tangible;
-    uint8 space_id;
-    glm::vec3 position;
+    // This is for position reconstruction
+    uint8* space_id;
+    // This is only for moving object
+    // This is for gameplay
     rigid_body* body;
+    bool32 tangible;
+    bool32 movable;
     map_unit(){};
+};
+
+struct moving_entity_specs{
+    map_unit basic_unit_specs;
+    glm::vec3 position;
 };
 
 struct simple_volume_map{
     // one is mesh type, the other is the position;
-    std::vector<map_unit*>background_map_content;
+    std::vector<map_unit>background_map_content;
     // I think because of moving object object position
     // is changeable so we need to store these
-    std::vector<map_unit*>moving_obj_group;
+    std::vector<moving_entity_specs>moving_obj_group;
     int8* map_content;// replace this with array of map_unit_specs
     size_t map_size;   
     // Volumme/Room 3D size in world space

@@ -258,9 +258,9 @@ void spawn_vertex(plane_type, map){
     vertex.position = glm::vec3();
     vertex.position.x;
 }
-// ========WORKING===========
+//=====================WORKING==============================
+//
 // Handshake cross check for collision between entities and entities with background
-
 // TileMap contain array of positions in xz plane
 // wherein x is analogous to y and z is similar to x in 2D coordinates
 //
@@ -600,6 +600,10 @@ unsigned int tile_indices[] = {
     //}
 }
 
+// NOTE: Then we have something to do with the pre-lighted texels
+// we will write a function that comput normal from texture's texel data
+// (if we don't have any normal map) and compute light based on that one of the cheapest
+// way for our game engine
 
 void Load_Textures_for_OpenGL(graphic_property* graphic_obj, const char* path){
 // Recursively loop over the folder and load group of textures here
@@ -612,16 +616,29 @@ void Load_Textures_for_OpenGL(graphic_property* graphic_obj, const char* path){
     char* temp_image_content;
     char* name;
 // Loop through all of the media folder for textures.
-    for(;;){
+    while(;;/*reach the end of folder*/){
         //stb_image(temp_image_content, path)
         // i
         temp_texture = new unsigned int;
+        
         glCreateTexture(temp_texture);
         glBindTexture(*temp_texture);
         glTexImage2D(*temp_texture, temp_image_content);
-        graphic_obj->texture_collection[i].normal_map = *temp_normal_texture;
-        graphic_obj->texture_collection[i].normal_map = *temp_normal_texture;
-        graphic_obj->texture_collection[i].normal_map = *temp_normal_texture;
+        if(/* if file's name contain "normal" in name*/){
+            // load file contain here;
+            graphic_obj->texture_collection[i].normal_map = *temp_normal_texture;
+            // move next
+        }
+
+        if(/* if file's name contain "diffuse" in name*/){
+            // load file contain here;
+            graphic_obj->texture_collection[i].diffuse_texture = *temp_diffuse_texture;
+        }
+
+        if(/* if file's name contain "specular" in name*/){
+            // load file contain here;
+            graphic_obj->texture_collection[i].specular_map = *temp_specular_texture;;
+        }
     }
 }
 
@@ -643,15 +660,31 @@ void update(std::vector<rigid_body*>* entities_group,     std::vector<map_unit_s
 
 // =====================================================
 // Apply textures group here
-void render_in_group (Graphic_Properties* Graphic, simple_volume_map* world_map, Camera* chosen_camera, bool32 post_effect_on){    
+void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_map, Camera* chosen_camera, bool32 post_effect_on){    
     // first feed shader with mesh data (Store with VAO)
-    // Then update the relative position of the obj(with world, or just mere screen space with text)
+    // Then update relative position of the obj(with world, or just mere screen space with text)
     // Then use each brush(shader) in brush_set to draw object
-    Graphic->shader[i]->setMat4("projection", chosen_camera->projection); 
-    Graphic->shader[i]->setMat4("view", chosen_camera->view);
+    //NOTE: if(/*in view range*/)
+    for(B_shader_program* const &shader: Graphic->shader){
+        shader->setMat4("projection", chosen_camera->projection); 
+        shader->shader[i]->setMat4("view", chosen_camera->view);            
+    };
+    glUseProgram(0);
     size_t i = 0;
     //So with the catatonic object we just pass its position as an unchanged
+    //
     //layout data/ InstanceID
+    // How to specify entities position just above the down-ground without making looked like they're floating
+    for(moving_entity_specs* const &unit:world_map->moving_obj_group){
+                glBindVertexArray(Graphics->mesh_group[unit->basic_unit_specs.MeshID].VAO);
+                // Remember we already set all lights's basic specs before in the init graphics
+                Graphic->shader[unit->basic_unit_specs.MeshID]->use();
+                Graphic->shader[unit->basic_unit_specs.MeshID]->setVec3("Postion["+to_string(unit->basic_unit_specs.space_id)+"]", unit->position);
+                // Set Light
+                // Choose among lights here
+                glDrawElements();
+    }
+
     while(i < world_map->size){
 // Each shader represent for one layer of effect at least.
         if(!world_map->map_content[i]){
@@ -663,12 +696,15 @@ void render_in_group (Graphic_Properties* Graphic, simple_volume_map* world_map,
             if(map->map_content[i+1]){
                 glBindVertexArray(Graphics->mesh_group[map->map_content[i]].VAO);
                 // Remember we already set all lights's basic specs before in the init graphics
+                // NOTE: How about textures and normal map lighting
+                Graphic->shader[map->map_content[i+1]]->use();
                 Graphic->shader[i]->setVec3("Postion["+to_string(i)+"]", position);
                 // This line will draw object based on its be_drawn_type
                 // Set Light
-                Graphic->shader[map->map_content[i+1]]->use();
                 // Choose among lights here
-                Draw(obj->graphic_->mesh, obj->graphic_->shader[i]);
+                glDrawElements();
+                glBindVertexArray(0);
+                glUseProgram(0);
             }
         }
     i+=2;
