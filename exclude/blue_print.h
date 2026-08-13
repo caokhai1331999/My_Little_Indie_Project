@@ -5,7 +5,23 @@
    $Revision: $
    $Creator: Cao Khai(Casey's disciple) $
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
-   ======================================================================== */
+   ======================================================================== 
+*/
+//=====================SIMPLE_FILE_HANDLE========================
+struct File_Manager{
+    WIN32_FIND_DATA FindFileData;
+    HANDLE handler;
+    DWORD
+};
+
+handler move_around_folder(const char* path){
+    handler = FindFirstFileEx();
+    if(handler){
+        load_file;
+    }
+}
+
+//=====================SIMPLE_FILE_HANDLE========================
 
 std::vector<Entities*>*World_Entities_Trackers;
 
@@ -134,6 +150,7 @@ typedef uint8 be_drawn_type;
 // The passable unit have to be aligned with each other
 // This group of ID mark element for the engine to drawn accordingly
 // This type will be drawn alot...
+
 typedef be_drawn_type under_shone_entity;
 typedef be_drawn_type light_source;
 // snow, mist, wind...

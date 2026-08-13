@@ -2530,3 +2530,6 @@ not so bad
 
 NOTE: Based on Casey approaching way, we got to have normal value per texel. But
 to compute that we still don't know yet
+
+---------------- Thu, 13 Aug 26: 10:20AM
+

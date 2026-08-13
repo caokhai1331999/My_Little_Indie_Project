@@ -164,7 +164,7 @@ void sketch_map(simple_volume_map* map, Mesh* mesh_group){
 
     for(size_t int i = 0; i < map->size; i++)
     {
-                //// we do every single cube here which have the size of 1,1,1
+                // we do every single cube here which have the size of 1,1,1
                 //
                 // have to be more specificly rational about this one
                 // ground first then up
@@ -605,22 +605,25 @@ unsigned int tile_indices[] = {
 // (if we don't have any normal map) and compute light based on that one of the cheapest
 // way for our game engine
 
-void Load_Textures_for_OpenGL(graphic_property* graphic_obj, const char* path){
+void Load_Textures_for_OpenGL(graphic_property* graphic_obj, const char* folder_path){
 // Recursively loop over the folder and load group of textures here
     graphic_obj->texture_collection.reserve(10); 
-
+    
     unsigned int* temp_normal_texture;
     unsigned int* temp_diffuse_texture;
     unsigned int* temp_specular_texture;
 
     char* temp_image_content;
     char* name;
+    // we just need to feed the folder path for stb_image to load texture's data
+    char folder_path_[100] = *folder_path;
+    DWORD current_folder;
 // Loop through all of the media folder for textures.
     while(;;/*reach the end of folder*/){
         //stb_image(temp_image_content, path)
         // i
         temp_texture = new unsigned int;
-        
+        current_folder = GetCurrentDirectory(100, folder_path_);
         glCreateTexture(temp_texture);
         glBindTexture(*temp_texture);
         glTexImage2D(*temp_texture, temp_image_content);
