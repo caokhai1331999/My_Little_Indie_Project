@@ -9,17 +9,9 @@
 */
 //=====================SIMPLE_FILE_HANDLE========================
 struct File_Manager{
-    WIN32_FIND_DATA FindFileData;
-    HANDLE handler;
-    DWORD
+    WIN32_FIND_DATA find_data;
+    HANDLE handle;
 };
-
-handler move_around_folder(const char* path){
-    handler = FindFirstFileEx();
-    if(handler){
-        load_file;
-    }
-}
 
 //=====================SIMPLE_FILE_HANDLE========================
 
@@ -181,10 +173,10 @@ struct texture_group{
     char* name;
 
     unsigned int normal_map;
-
-    unsigned int emission_map;
     unsigned int diffused_map;  
     unsigned int specular_map;  
+
+    unsigned int emission_map;
 };
 // light based on normal map
 struct environment_map{

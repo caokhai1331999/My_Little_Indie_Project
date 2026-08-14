@@ -82,14 +82,11 @@ void loadModel_(Platform_Properties* Game_Platform, Model_* model, string path){
     }
 
     std::string dir = path.substr(0, path.find_last_of('/'));
+    std::string texture_folder = dir+model->name;
     model->directory = (char*)dir.c_str();
-    if(strcmp(model->name.c_str(), "vampire") == 0){
-        vampire = true;
-        printf("being drawn model: %s which has %d materials in the scene\n", model->name.c_str(), scene->mNumMaterials);
-        model->Texturedirectory = model->directory + "/for_vampire";
-    }else{
-        model->Texturedirectory = model->directory;
-    }
+
+    printf("being drawn model: %s which has %d materials in the scene\n", model->name.c_str(), scene->mNumMaterials);
+    model->Texturedirectory = model->directory+"/"+model->name;
 
 // NODE
     //Count_Meshes(scene->mRootNode, &(model->number_of_meshes));
@@ -229,8 +226,8 @@ internal vector<Texture> loadMaterialTextures(Model_* model, aiMaterial* mat, ai
             std::string pattern = model->Texturedirectory+"/*normal*";
             intptr_t searchAgent = {};
             _finddata64i32_t Normal_Texture_File = {};
-
             searchAgent = _findfirst(pattern.c_str(), &Normal_Texture_File);
+
             if(searchAgent != -1L){
                 printf("Succeed searching out the file in folder %s\n", model->directory.c_str());
                 filename_ = Normal_Texture_File.name;

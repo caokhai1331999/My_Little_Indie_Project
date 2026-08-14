@@ -604,45 +604,90 @@ unsigned int tile_indices[] = {
 // we will write a function that comput normal from texture's texel data
 // (if we don't have any normal map) and compute light based on that one of the cheapest
 // way for our game engine
+void move_around_folder(const char* path, char_t* name){
+    file_looker.handle = FindFirstFileA(path, &file_looker.find_data);
+    if(file_looker.handle != INVALID_HANDLE_VALUE){
+        load_file;
+    }else{
+        ;
+    }
+}
 
-void Load_Textures_for_OpenGL(graphic_property* graphic_obj, const char* folder_path){
+texture_group load_textures_in_folder(char* normal, char* diffuse, char* specular, file_manager* folder_looker){
+    file_manager texture_looker;
+    //
+    char name[strlen(folder_looker.cFileName)];
+    texture_group textures_of_folder = {};
+    char* current_subfolder_path = folder_looker.find_data.cFileName;
+    texture_looker.handle = FindFirstFileA(current_subfolder_path, &texture_looker.find_data);
+    graphic_obj->texture_collection[i].normal_map = *temp_normal_texture;
+
+    while(texture_looker.handle != INVALID_HANDLE_VALUE && GetLastError() != ERROR_NO_MORE_FILES){
+        if(texture_looker->find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
+            //now search for file
+            if(!(texture_looker.find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)){
+                if(string_contain(texture_looker.find_data.cFileName, "normal")){
+                        // load file contain here;
+                        // move next
+                            char* normal_map_content = stb_image(current_subfolder_path);
+                            glCreateTexture(&folder_textures.normal_map);
+                            glBindTexture(textures_of_folder.normal_map);
+                            glTexImage2D(textures_of_folder.normal_map, normal_map_content);
+                    }
+// so the argv[0] is the name of program or the path containing it.
+
+                    else if(string_contain(texture_looker.find_data.cFileName, "diffuse"
+                        /* if file's name contain "diffuse" in name*/)
+                        {
+                        // load file contain here;
+                            char* diffuse_map_content = stb_image(current_subfolder_path);
+                            glCreateTexture(&folder_textures.diffuse_map);
+                            glBindTexture(textures_of_folder.diffuse_map);
+                            glTexImage2D(textures_of_folder.diffuse_map, diffuse_map_content);
+                        }
+
+                    else {
+                            // load file contain here;
+                            char* specular_map_content = stb_image(current_subfolder_path);
+                            glCreateTexture(&folder_textures.specular_map);
+                            glBindTexture(textures_of_folder.specular_map);
+                            glTexImage2D(textures_of_folder.specular_map, specular_map_content);
+                    }
+                }
+            }
+            texture_looker.handle = FindNextFileA(current_folder_path, &texture_looker.find_data);
+        }
+        strcpy(current_folder_path, );
+        folder_textures.name =path.substr(0, .find_last_of('/'));
+    };
+}
+
+void Load_Textures_for_OpenGL(graphic_property* graphic_obj, const char* textures_folder_path){
 // Recursively loop over the folder and load group of textures here
     graphic_obj->texture_collection.reserve(10); 
-    
-    unsigned int* temp_normal_texture;
-    unsigned int* temp_diffuse_texture;
-    unsigned int* temp_specular_texture;
 
-    char* temp_image_content;
-    char* name;
+    File_Manager folder_looker;
+    File_Manager texture_file_looker;
+
+    char* current_subfolder_path;
+
     // we just need to feed the folder path for stb_image to load texture's data
-    char folder_path_[100] = *folder_path;
-    DWORD current_folder;
+    //char folder_path_[100] = *folder_path;
 // Loop through all of the media folder for textures.
-    while(;;/*reach the end of folder*/){
+    folder_looker.handle = FindFirstFileA(folder_path, &file_looker.find_data);
+    // which function I have to use to mark whether the maker reach the end of folder
+    while((folder_looker.handle != INVALID_HANDLE_VALUE) && (GetLastError() != ERROR_NO_MORE_FILES)/*reach the end of folder*/ ){
         //stb_image(temp_image_content, path)
         // i
-        temp_texture = new unsigned int;
-        current_folder = GetCurrentDirectory(100, folder_path_);
-        glCreateTexture(temp_texture);
-        glBindTexture(*temp_texture);
-        glTexImage2D(*temp_texture, temp_image_content);
-        if(/* if file's name contain "normal" in name*/){
-            // load file contain here;
-            graphic_obj->texture_collection[i].normal_map = *temp_normal_texture;
-            // move next
+        // Win32 way
+        
+        folder_looker.handle = FindNextFileA(folder_path, &folder_looker.find_data);
+        if(!temp_normal_texture && !temp_diffuse_texture && !temp_specular_texture){
+            graphic_obj->texture_collection.push_back(load_textures_in_folder(&folder_looker));
         }
-
-        if(/* if file's name contain "diffuse" in name*/){
-            // load file contain here;
-            graphic_obj->texture_collection[i].diffuse_texture = *temp_diffuse_texture;
-        }
-
-        if(/* if file's name contain "specular" in name*/){
-            // load file contain here;
-            graphic_obj->texture_collection[i].specular_map = *temp_specular_texture;;
-        }
+        folder_looker.handle = FindNextFileA(textures_folder_path, &folder_looker.find_data);
     }
+    FileClose(folder_looker.handle);
 }
 
 void update(std::vector<rigid_body*>* entities_group,     std::vector<map_unit_specs*>map_content, clock_set* clock){
