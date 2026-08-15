@@ -7,6 +7,7 @@
    $Notice: (C) Copyright 2024 by Cao Khai, Inc. All Rights Reserved. $
    ======================================================================== 
 */
+
 //=====================SIMPLE_FILE_HANDLE========================
 struct File_Manager{
     WIN32_FIND_DATA find_data;

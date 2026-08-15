@@ -737,15 +737,7 @@ glm::vec3 randomRotateAxis_(int rollIndex);
 bool32 string_contain(std::string* string = nullptr, char* substr = nullptr);
 
 bool32 string_contain(std::string* string, char* substr){
-    int substrIndex = 0;
-    while (substrIndex < sizeof(*substr)){
-        if (string->find(substr[substrIndex])==string->npos){
-            return false;
-        } else {
-            substrIndex++;
-        }
-    };
-    return true;
+    return !(string->find(substr) == string->npos);
 };
 
 std::string* load_bin_map(const char* name = nullptr);

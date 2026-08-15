@@ -39,8 +39,9 @@ int CALLBACK WinMain
     bool32 short_color_change_ = false;
 
     std::string test_string = " HE ";
-
-  win32LoadXInput();
+    std::vector<texture_group>texture_collection;
+    texture_collection.reserve(10);
+    win32LoadXInput();
 
   WNDCLASSEXA WindowClass = SetUpWindowClass(&Game_Platform, Instance);
     //HWND Window = {};
@@ -57,7 +58,7 @@ int CALLBACK WinMain
   move_object_ move_ = NULL;
   InitCamera__ InitCamera_ = NULL;
   AutoAdjustCameraPos__ AutoAdjustCameraPos = NULL;
-
+  Load_Textures_for_OpenGL__ Load_Textures_for_OpenGL = NULL;
   //LoadFont__ LoadFont = NULL;
   //DrawFont__ DrawFont = NULL;
   //setUpUBO__ setUpUBO = NULL;
@@ -93,7 +94,6 @@ int CALLBACK WinMain
       int refreshRate = GetDeviceCaps(DeviceContext, VREFRESH);
       ReleaseDC(Game_Platform.Window, DeviceContext);
 
-
       if(first_announce){
           if(AniLib!=NULL)
               if(FreeLibrary(AniLib)){
@@ -116,6 +116,7 @@ int CALLBACK WinMain
                   move_ = (move_object_)GetProcAddress(AniLib, "move_object");
                   InitCamera_ = (InitCamera__)GetProcAddress(AniLib, "InitCamera_");
                   AutoAdjustCameraPos = (AutoAdjustCameraPos__)GetProcAddress(AniLib, "AutoAdjustCameraPos_");
+                  Load_Textures_for_OpenGL = (Load_Textures_for_OpenGL__)GetProcAddress("Load_Textures_for_OpenGL_");
                   //LoadFont = (LoadFont__)GetProcAddress(AniLib, "LoadFont_");
                   //DrawFont = (DrawFont__)GetProcAddress(AniLib, "DrawFont_");
               }else{
@@ -180,7 +181,7 @@ int CALLBACK WinMain
                 // We have to assign address of memory and glData to
                 //InitOpenGL(Window, &Game_Platform, &ScreenBuffer, JPGContent);
                 //RenderSplendidGradient(&Game_Platform, &ScreenBuffer, BMPContent, 0, 0, 4);
-
+            
             InitOpenGL(&Game_Platform, &BackBuffer, &ScreenBuffer, BMPContent);
                 GLenum err = glGetError();
                 if (err != GL_NO_ERROR) {
@@ -236,7 +237,9 @@ int CALLBACK WinMain
                 
                 //WorldToCamera = Game_Platform.camera.view * dancing_vampire_core;
                 WorldToCamera = BackBuffer.camera.view * test_vampire_motion.position;
-
+                //--------------------------For_Debugging--------------------------
+                Load_Textures_for_OpenGL(&texture_collection, "./media");
+                //--------------------------For_Debugging--------------------------                
                 Init_Entity_Specs(&test_vampire_motion);
                 
                 TRACKMOUSEEVENT mouseEventVar = {};
@@ -290,7 +293,7 @@ int CALLBACK WinMain
 //==========================================================
                 Model_* dancing_vampire = nullptr;
                 Mname = "vampire";
-                dancing_vampire = new Model_(false, &Mname);
+                dancing_vampire = newModel_(false, &Mname);
                 std::string dancing_vampire_path = "./media/dancing_vampire.dae";
                 loadModel_(&Game_Platform, dancing_vampire, dancing_vampire_path);
 
@@ -429,6 +432,7 @@ int CALLBACK WinMain
                           //Set_environmental_light =                      (Set_Light_)GetProcAddress(AniLib, "Set_environmental_light_");
                           move_ = (move_object_)GetProcAddress(AniLib, "move_object");
                           AutoAdjustCameraPos = (AutoAdjustCameraPos__)GetProcAddress(AniLib, "AutoAdjustCameraPos_");
+                          Load_Textures_for_OpenGL = (Load_Textures_for_OpenGL__)GetProcAddress(AniLib, "Load_Textures_for_OpenGL_");                          
                           //LoadFont = (LoadFont__)GetProcAddress(AniLib, "LoadFont_");
                           //DrawFont = (DrawFont__)GetProcAddress(AniLib, "DrawFont_");
 //setupMesh =

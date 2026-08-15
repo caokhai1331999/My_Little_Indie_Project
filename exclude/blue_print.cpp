@@ -603,52 +603,44 @@ unsigned int tile_indices[] = {
 // NOTE: Then we have something to do with the pre-lighted texels
 // we will write a function that comput normal from texture's texel data
 // (if we don't have any normal map) and compute light based on that one of the cheapest
-// way for our game engine
-void move_around_folder(const char* path, char_t* name){
-    file_looker.handle = FindFirstFileA(path, &file_looker.find_data);
-    if(file_looker.handle != INVALID_HANDLE_VALUE){
-        load_file;
-    }else{
-        ;
-    }
-}
 
-texture_group load_textures_in_folder(char* normal, char* diffuse, char* specular, file_manager* folder_looker){
+local_persist texture_group load_textures_in_folder(char* normal, char* diffuse, char* specular, file_manager* folder_looker){
     file_manager texture_looker;
+    std::string folder_path = texture_looker.find_data.cFileName;
     //
     char name[strlen(folder_looker.cFileName)];
     texture_group textures_of_folder = {};
-    char* current_subfolder_path = folder_looker.find_data.cFileName;
     texture_looker.handle = FindFirstFileA(current_subfolder_path, &texture_looker.find_data);
     graphic_obj->texture_collection[i].normal_map = *temp_normal_texture;
 
-    while(texture_looker.handle != INVALID_HANDLE_VALUE && GetLastError() != ERROR_NO_MORE_FILES){
+    while((texture_looker.handle != INVALID_HANDLE_VALUE) || (GetLastError() != ERROR_NO_MORE_FILES)){
         if(texture_looker->find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
+            folder_path = texture_looker.find_data.cFileName;
             //now search for file
             if(!(texture_looker.find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)){
-                if(string_contain(texture_looker.find_data.cFileName, "normal")){
+                if(string_contain(&folder_path, "normal")){
                         // load file contain here;
                         // move next
-                            char* normal_map_content = stb_image(current_subfolder_path);
+                            char* normal_map_content = stb_image(folder_path.c_str());
                             glCreateTexture(&folder_textures.normal_map);
                             glBindTexture(textures_of_folder.normal_map);
                             glTexImage2D(textures_of_folder.normal_map, normal_map_content);
                     }
 // so the argv[0] is the name of program or the path containing it.
 
-                    else if(string_contain(texture_looker.find_data.cFileName, "diffuse"
-                        /* if file's name contain "diffuse" in name*/)
+                else if (string_contain(folder_path, "diffuse"))
+                        /* if file's name contain "diffuse" in name*/
                         {
                         // load file contain here;
-                            char* diffuse_map_content = stb_image(current_subfolder_path);
+                            char* diffuse_map_content = stb_image(folder_path.c_str());
                             glCreateTexture(&folder_textures.diffuse_map);
                             glBindTexture(textures_of_folder.diffuse_map);
                             glTexImage2D(textures_of_folder.diffuse_map, diffuse_map_content);
                         }
 
-                    else {
+                else if(string_contain(folder_path, "specular")){
                             // load file contain here;
-                            char* specular_map_content = stb_image(current_subfolder_path);
+                            char* specular_map_content = stb_image(folder_path.c_str());
                             glCreateTexture(&folder_textures.specular_map);
                             glBindTexture(textures_of_folder.specular_map);
                             glTexImage2D(textures_of_folder.specular_map, specular_map_content);
@@ -657,8 +649,8 @@ texture_group load_textures_in_folder(char* normal, char* diffuse, char* specula
             }
             texture_looker.handle = FindNextFileA(current_folder_path, &texture_looker.find_data);
         }
-        strcpy(current_folder_path, );
-        folder_textures.name =path.substr(0, .find_last_of('/'));
+        // draw out name;
+        strncpy(folder_textures.name, texture_looker.cFileName + find_last_of(texture_looker.cFileName, '/'), sizeof(texture_looker.cFileName - 1) - find_last_of(texture_looker.cFileName, '/'));
     };
 }
 
