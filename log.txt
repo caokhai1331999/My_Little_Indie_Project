@@ -2540,3 +2540,6 @@ to compute that we still don't know yet
 ---------------- Sat, 15 Aug 26: 08:56AM
 
 TODO: Put on test the texture loop load function
+
+---------------- Sun, 16 Aug 26: 11:24AM
+
