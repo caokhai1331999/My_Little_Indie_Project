@@ -29,7 +29,7 @@ struct File_Manager{
 
 struct texture_group{
 // This one will be hack for 2D game performance
-    char* name;
+    const char* name;
 
     unsigned int normal_map;
     unsigned int diffused_map;  
@@ -37,7 +37,7 @@ struct texture_group{
     unsigned int emission_map;
 };
 
-local_persist texture_group load_textures_in_folder(File_Manager* folder_looker = nullptr);
+local_persist texture_group load_textures_in_folder(File_Manager* folder_looker = nullptr, const char* folder_path_ = nullptr);
 local_persist void Load_Textures_for_OpenGL(std::vector<texture_group>* texture_collection, const char* textures_folder_path);
 extern "C" __declspec(dllexport) void Load_Textures_for_OpenGL_(std::vector<texture_group>* texture_collection, const char* textures_folder_path = nullptr);
 typedef void (*Load_Textures_for_OpenGL__) (std::vector<texture_group>* , const char*);

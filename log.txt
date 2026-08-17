@@ -2543,3 +2543,8 @@ TODO: Put on test the texture loop load function
 
 ---------------- Sun, 16 Aug 26: 11:24AM
 
+
+---------------- Mon, 17 Aug 26: 10:09AM
+NOTE: Remember to debug new piece of code for the first time to avoid app crash
+and pc harmful threat.
+Why the findfirstfile doesn't search inside the given folder

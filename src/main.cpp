@@ -116,7 +116,7 @@ int CALLBACK WinMain
                   move_ = (move_object_)GetProcAddress(AniLib, "move_object");
                   InitCamera_ = (InitCamera__)GetProcAddress(AniLib, "InitCamera_");
                   AutoAdjustCameraPos = (AutoAdjustCameraPos__)GetProcAddress(AniLib, "AutoAdjustCameraPos_");
-                  Load_Textures_for_OpenGL = (Load_Textures_for_OpenGL__)GetProcAddress("Load_Textures_for_OpenGL_");
+                  Load_Textures_for_OpenGL = (Load_Textures_for_OpenGL__)GetProcAddress(AniLib, "Load_Textures_for_OpenGL_");
                   //LoadFont = (LoadFont__)GetProcAddress(AniLib, "LoadFont_");
                   //DrawFont = (DrawFont__)GetProcAddress(AniLib, "DrawFont_");
               }else{
@@ -293,7 +293,7 @@ int CALLBACK WinMain
 //==========================================================
                 Model_* dancing_vampire = nullptr;
                 Mname = "vampire";
-                dancing_vampire = newModel_(false, &Mname);
+                dancing_vampire = new Model_(false, &Mname);
                 std::string dancing_vampire_path = "./media/dancing_vampire.dae";
                 loadModel_(&Game_Platform, dancing_vampire, dancing_vampire_path);
 
