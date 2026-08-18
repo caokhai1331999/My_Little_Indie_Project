@@ -11,18 +11,22 @@ texture_group load_textures_in_folder(File_Manager* folder_looker, const char* f
     // NOTE: first of all, all we get from the cFileName is just the name of the folder not the path;
     File_Manager texture_looker;
     std::string folder_path = folder_path_;
+    std::string file_path;
 
     int width, height, nrComponents;
     GLenum format;
 
-    std::string file_path;
     std::string name;
     texture_group textures_of_folder = {};
-    texture_looker.handle = FindFirstFileA(folder_path.c_str(), &texture_looker.find_data);
 
-    while((texture_looker.handle != INVALID_HANDLE_VALUE) || (GetLastError() != ERROR_NO_MORE_FILES)){
-        if(texture_looker.find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
-            file_path = folder_path + texture_looker.find_data.cFileName;
+    file_path = folder_path + "/*";
+    texture_looker.handle = FindFirstFileA(file_path.c_str(), &texture_looker.find_data);
+    bool32 load_succeeded = true;
+
+    while((texture_looker.handle != INVALID_HANDLE_VALUE) && (GetLastError() != ERROR_NO_MORE_FILES) && load_succeeded){
+        if(!(texture_looker.find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)){
+            file_path.clear();
+            file_path = folder_path + "/" + texture_looker.find_data.cFileName;
             //now search for file
             if(!(texture_looker.find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)){
                 if(string_contain(&file_path, "normal")){
@@ -83,41 +87,53 @@ texture_group load_textures_in_folder(File_Manager* folder_looker, const char* f
                 }
             }
         // TODO: Remember to free stb_image load data;
-            FindNextFileA(texture_looker.handle, &texture_looker.find_data);
+            load_succeeded = FindNextFileA(texture_looker.handle, &texture_looker.find_data);
         }
     FindClose(texture_looker.handle);
         // draw out name;
-    textures_of_folder.name = file_path.substr(file_path.find_last_of('/'), file_path.size() - file_path.find_last_of('/')).c_str();
+    //textures_of_folder.name = file_path.substr(file_path.find_last_of('/'), file_path.size() - file_path.find_last_of('/')).c_str();
+    textures_of_folder.name = file_path.c_str();
     return textures_of_folder;
 }
 
 
-local_persist void Load_Textures_for_OpenGL(std::vector<texture_group>* texture_collection, const char* textures_folder_path){
+local_persist void Load_Textures_for_OpenGL(std::vector<texture_group>* texture_collection, const char* media_folder_path){
 // Recursively loop over the folder and load group of textures here
     //graphic_obj->texture_collection.reserve(10); 
     texture_collection->reserve(10); 
 
     File_Manager folder_looker;
-    //std::string folder_path = textures_folder_path;
+    std::string folder_path;
 
     // we just need to feed the folder path for stb_image to load texture's data
-    //char folder_path_[100] = *folder_path;
 // Loop through all of the media folder for textures.
-    folder_looker.handle = FindFirstFileA(textures_folder_path, &folder_looker.find_data);
+    PVOID OldValue = NULL;
+    //Wow64DisableWow64FsRedirection(&OldValue);
+    folder_path = media_folder_path;
+    folder_path += "/*";
+    folder_looker.handle = FindFirstFileA(folder_path.c_str(), &folder_looker.find_data);
     // which function I have to use to mark whether the maker reach the end of folder
-    while((folder_looker.handle != INVALID_HANDLE_VALUE) && (GetLastError() != ERROR_NO_MORE_FILES)/*reach the end of folder*/ ){
+    bool32 load_succeeded = true;
+    while((folder_looker.handle != INVALID_HANDLE_VALUE) && (GetLastError() != ERROR_NO_MORE_FILES) && load_succeeded/*reach the end of folder*/ ){
         //stb_image(temp_image_content, path)
         // i
         // Win32 way        
         // TODO: Put a null check flag hee
-            texture_collection->push_back(load_textures_in_folder(&folder_looker, textures_folder_path));
-        FindNextFileA(folder_looker.handle, &folder_looker.find_data);
+        folder_path.clear();
+        folder_path = media_folder_path;
+        folder_path = folder_path + "/" + folder_looker.find_data.cFileName;
+
+        if((folder_looker.find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && (!string_contain(new string(folder_looker.find_data.cFileName),".")))
+            texture_collection->push_back(load_textures_in_folder(&folder_looker, folder_path.c_str()));
+
+        load_succeeded = FindNextFileA(folder_looker.handle, &folder_looker.find_data);
     }
+     //Wow64RevertWow64FsRedirection(OldValue);
     FindClose(folder_looker.handle);
 }
 // change graphic_property* graphic_obj to vector of texture_group
-extern "C" __declspec(dllexport) void Load_Textures_for_OpenGL_(std::vector<texture_group>* texture_collection, const char* textures_folder_path){
-    Load_Textures_for_OpenGL(texture_collection, textures_folder_path);
+extern "C" __declspec(dllexport) void Load_Textures_for_OpenGL_(std::vector<texture_group>* texture_collection, const char* media_folder_path){
+    Load_Textures_for_OpenGL(texture_collection, media_folder_path);
 };
 
 //-----------------For_Debugging-------------------------

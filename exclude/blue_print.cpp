@@ -603,7 +603,8 @@ unsigned int tile_indices[] = {
 // NOTE: Then we have something to do with the pre-lighted texels
 // we will write a function that comput normal from texture's texel data
 // (if we don't have any normal map) and compute light based on that one of the cheapest
-
+//
+//==============================================Testing_Debugging=====================================================
 local_persist texture_group load_textures_in_folder(char* normal, char* diffuse, char* specular, file_manager* folder_looker){
     file_manager texture_looker;
     std::string folder_path = texture_looker.find_data.cFileName;
@@ -653,7 +654,7 @@ local_persist texture_group load_textures_in_folder(char* normal, char* diffuse,
         strncpy(folder_textures.name, texture_looker.cFileName + find_last_of(texture_looker.cFileName, '/'), sizeof(texture_looker.cFileName - 1) - find_last_of(texture_looker.cFileName, '/'));
     };
 }
-
+//==============================================Testing_Debugging=====================================================
 void Load_Textures_for_OpenGL(graphic_property* graphic_obj, const char* textures_folder_path){
 // Recursively loop over the folder and load group of textures here
     graphic_obj->texture_collection.reserve(10); 

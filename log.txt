@@ -2547,4 +2547,9 @@ TODO: Put on test the texture loop load function
 ---------------- Mon, 17 Aug 26: 10:09AM
 NOTE: Remember to debug new piece of code for the first time to avoid app crash
 and pc harmful threat.
+
 Why the findfirstfile doesn't search inside the given folder
+
+---------------- Tue, 18 Aug 26: 09:50AM
+
+NOTE: we did it! it did loop through folder for file
