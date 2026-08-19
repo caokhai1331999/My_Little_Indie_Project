@@ -172,7 +172,7 @@ int CALLBACK WinMain
 
               Win32_Front_Buffer ScreenBuffer = Win32_Front_Buffer(
                 Game_Platform.BitmapWidth, Game_Platform.BitmapHeight,
-                &BackBuffer.glData, Game_Platform.BitmapMemory, Game_Platform.Window);
+                &Game_Platform.glData, Game_Platform.BitmapMemory, Game_Platform.Window);
               
             // Randomize cube direction
             std::srand(std::time(0));
@@ -238,7 +238,7 @@ int CALLBACK WinMain
                 //WorldToCamera = Game_Platform.camera.view * dancing_vampire_core;
                 WorldToCamera = BackBuffer.camera.view * test_vampire_motion.position;
                 //--------------------------For_Debugging--------------------------
-                Load_Textures_for_OpenGL(&texture_collection, "./media");
+                Load_Textures_for_OpenGL(&Game_Platform, &texture_collection, "./media");
                 //--------------------------For_Debugging--------------------------                
                 Init_Entity_Specs(&test_vampire_motion);
                 
@@ -629,7 +629,7 @@ int CALLBACK WinMain
                     }
 
                     //DrawFont(&Game_Platform, &BackBuffer, BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
-                    DrawFont(&BackBuffer, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
+                    DrawFont(&Game_Platform, &BackBuffer, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
 
 
 //========================================================================

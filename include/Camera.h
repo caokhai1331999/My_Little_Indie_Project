@@ -20,30 +20,6 @@ glm::mat4 view = glm::lookAt(camera.Position, camera.Position + camera.Front, ca
 
 */
 
-//-----------------For_Debugging-------------------------
-
-struct File_Manager{
-    WIN32_FIND_DATA find_data;
-    HANDLE handle;
-};
-
-struct texture_group{
-// This one will be hack for 2D game performance
-    const char* name;
-
-    unsigned int normal_map;
-    unsigned int diffused_map;  
-    unsigned int specular_map;
-    unsigned int emission_map;
-};
-
-local_persist texture_group load_textures_in_folder(File_Manager* folder_looker = nullptr, const char* folder_path_ = nullptr);
-local_persist void Load_Textures_for_OpenGL(std::vector<texture_group>* texture_collection, const char* media_folder_path);
-extern "C" __declspec(dllexport) void Load_Textures_for_OpenGL_(std::vector<texture_group>* texture_collection, const char* media_folder_path = nullptr);
-typedef void (*Load_Textures_for_OpenGL__) (std::vector<texture_group>* , const char*);
-
-//-----------------For_Debugging-------------------------;
-
 // Default camera values
 const float YAW         = -90.0f;
 const float PITCH       =  0.0f;

@@ -8,6 +8,147 @@
 
 #include "entity.h"
 
+//-----------------For_Debugging-------------------------
+texture_group load_textures_in_folder(File_Manager* folder_looker, const char* folder_path_){
+    // NOTE: first of all, all we get from the cFileName is just the name of the folder not the path;
+    File_Manager texture_looker;
+    std::string folder_path = folder_path_;
+    std::string file_path;
+
+    int width, height, nrComponents;
+    GLenum format;
+
+    std::string name;
+    texture_group textures_of_folder = {};
+
+    file_path = folder_path + "/*";
+    texture_looker.handle = FindFirstFileA(file_path.c_str(), &texture_looker.find_data);
+    bool32 load_succeeded = true;
+    //if(texture_looker.handle != INVALID_HANDLE_VALUE){
+    //(GetLastError() != ERROR_NO_MORE_FILES) && 
+        while(load_succeeded){
+            if(!(texture_looker.find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)){
+                file_path.clear();
+                file_path = folder_path + "/" + texture_looker.find_data.cFileName;
+                //now search for file
+                if((!(texture_looker.find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) && (string_contain(&file_path, "."))){
+                    if(string_contain(&file_path, "normal")){
+                        // load file contain here;
+                        // move next
+                        unsigned char* normal_map_content = (unsigned char*)stbi_load(file_path.c_str(), &width, &height, &nrComponents, 0);
+
+                        if (nrComponents == 1)
+                            format = GL_RED;
+                        else if (nrComponents == 3)
+                            format = GL_RGB;
+                        else if (nrComponents == 4)
+                            format = GL_RGBA;
+
+                        glGenTextures(1, &textures_of_folder.normal_map);
+                        glBindTexture(GL_TEXTURE_2D, textures_of_folder.normal_map);
+                        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, normal_map_content);
+                        stbi_image_free(normal_map_content);
+                    }
+
+// so the argv[0] is the name of program or the path containing it.
+
+                    else if (string_contain(&file_path, "diffuse"))
+                        /* if file's name contain "diffuse" in name*/
+                    {
+                        // load file contain here;
+                        unsigned char* diffuse_map_content = (unsigned char*)stbi_load(file_path.c_str(), &width, &height, &nrComponents, 0);
+
+                        if (nrComponents == 1)
+                            format = GL_RED;
+                        else if (nrComponents == 3)
+                            format = GL_RGB;
+                        else if (nrComponents == 4)
+                            format = GL_RGBA;
+
+                        glGenTextures(1, &textures_of_folder.diffused_map);
+                        glBindTexture(GL_TEXTURE_2D, textures_of_folder.diffused_map);
+                        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, diffuse_map_content);
+                        stbi_image_free(diffuse_map_content);
+                    }
+
+                    else if(string_contain(&file_path, "specular")){
+                        // load file contain here;
+                        unsigned char* specular_map_content = (unsigned char*)stbi_load(file_path.c_str(), &width, &height, &nrComponents, 0);
+
+                        if (nrComponents == 1)
+                            format = GL_RED;
+                        else if (nrComponents == 3)
+                            format = GL_RGB;
+                        else if (nrComponents == 4)
+                            format = GL_RGBA;
+
+                        glGenTextures(1, &textures_of_folder.specular_map);
+                        glBindTexture(GL_TEXTURE_2D, textures_of_folder.specular_map);
+                        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, specular_map_content);
+                        stbi_image_free(specular_map_content);
+                    }
+                }
+            }
+            // TODO: Remember to free stb_image load data;
+            load_succeeded = FindNextFileA(texture_looker.handle, &texture_looker.find_data);
+        }
+    //} else {
+        //printf("Error: %d\n", GetLastError());
+    //}
+    FindClose(texture_looker.handle);
+        // draw out name;
+    //textures_of_folder.name = file_path.substr(file_path.find_last_of('/'), file_path.size() - file_path.find_last_of('/')).c_str();
+    textures_of_folder.name = file_path.c_str();
+    return textures_of_folder;
+}
+
+local_persist void Load_Textures_for_OpenGL(std::vector<texture_group>* texture_collection, const char* media_folder_path){
+// Recursively loop over the folder and load group of textures here
+    //graphic_obj->texture_collection.reserve(10); 
+    texture_collection->reserve(10); 
+
+    File_Manager folder_looker;
+    std::string folder_path;
+
+    // we just need to feed the folder path for stb_image to load texture's data
+// Loop through all of the media folder for textures.
+    PVOID OldValue = NULL;
+    //Wow64DisableWow64FsRedirection(&OldValue);
+    folder_path = media_folder_path;
+    folder_path += "/*";
+    folder_looker.handle = FindFirstFileA(folder_path.c_str(), &folder_looker.find_data);
+    // which function I have to use to mark whether the maker reach the end of folder
+    bool32 load_succeeded = true;
+    if(folder_looker.handle != INVALID_HANDLE_VALUE){
+        while(load_succeeded/*reach the end of folder*/ ){
+            //stb_image(temp_image_content, path)
+            // i
+            // Win32 way        
+                // TODO: Put a null check flag hee
+                folder_path.clear();
+            folder_path = media_folder_path;
+            folder_path = folder_path + "/" + folder_looker.find_data.cFileName;
+
+            if((folder_looker.find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && (!string_contain(new string(folder_looker.find_data.cFileName),".")))
+             texture_collection->push_back(load_textures_in_folder(&folder_looker, folder_path.c_str()));
+
+            load_succeeded = FindNextFileA(folder_looker.handle, &folder_looker.find_data);
+//This cause thread thread violation NOTE: Be careful
+            //if(!load_succeeded)
+                //printf("Error: %s\n", loadCurrentErr());
+        }
+        //Wow64RevertWow64FsRedirection(OldValue);
+    }
+    FindClose(folder_looker.handle);
+}
+// change graphic_property* graphic_obj to vector of texture_group
+extern "C" __declspec(dllexport) void Load_Textures_for_OpenGL_(Platform_Properties* Game_Platform, std::vector<texture_group>* texture_collection, const char* media_folder_path){
+    ReloadGLFunction(Game_Platform);
+    Load_Textures_for_OpenGL(texture_collection, media_folder_path);
+};
+
+//-----------------For_Debugging-------------------------
+
 void rigid_body::move(float delta_t){
 
     if(this->current_face != this->previous_face){

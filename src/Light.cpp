@@ -141,7 +141,7 @@ glm::vec4 CalcGlypProperty(const glm::vec4* glyp_specs, const Rect_* rect){
 //}
 
 // How to create pos based on each of glyph was draw before
-void DrawFont(const Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
+void DrawFont(const Platform_Properties* Game_Platform, const Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader, const Glyph_Map* map, const char* string, const Rect_* rect){
     // L, R, B, T
     glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)30.0f, 0.0f, (float)20.0f);
     shader->use();
@@ -198,7 +198,7 @@ void DrawFont(const Win32_OffScreen_Buffer* BackBuffer, B_shader_program* shader
         if(glyp_p->upside_down_bitmap){
             current_glyp_specs = glm::vec4(current_glyp_specs.x * 0.025f, current_glyp_specs.y * 0.025f, current_glyp_specs.w * 0.025f, current_glyp_specs.z * 0.025f);
             shader->use();
-            glBindVertexArray(BackBuffer->glData.PlaneVAOs);
+            glBindVertexArray(Game_Platform->glData.PlaneVAOs);
             glActiveTexture(GL_TEXTURE0+map->TextureID);
             glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0+map->TextureID);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, glyp_p->w, glyp_p->h, 0, GL_RG, GL_UNSIGNED_BYTE, glyp_p->upside_down_bitmap);

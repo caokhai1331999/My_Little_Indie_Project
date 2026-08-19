@@ -94,7 +94,7 @@ global_variable global_light envir_light = {};
 
 void LoadFont(Glyph_Map* map = nullptr, const char* path = nullptr);
 static void IncreaseFontAlpha(const unsigned char* source, void* dest, const Glyph_Property* glyp);
-void DrawFont(const  Win32_OffScreen_Buffer* BackBuffer = nullptr, B_shader_program* shader = nullptr, const Glyph_Map* map = nullptr, const char* string = nullptr, const Rect_* rect = nullptr);
+void DrawFont(const Platform_Properties* Game_Platform,const  Win32_OffScreen_Buffer* BackBuffer = nullptr, B_shader_program* shader = nullptr, const Glyph_Map* map = nullptr, const char* string = nullptr, const Rect_* rect = nullptr);
 static glm::vec4 CalcGlypProperty(const glm::vec4* glyp_specs = nullptr, const Rect_* rect = nullptr);
 
 static void IncreaseFontAlpha_(Glyph_Map* map = nullptr);

@@ -100,31 +100,6 @@ void B_shader::loadShader(char* name, ShaderType type){
     }
 };
 
-char* loadCurrentErr(){
-    LPVOID lpMsgBuf;
-    DWORD dw = GetLastError(); 
-    char* errorContent;
-        
-    if (FormatMessage(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-            FORMAT_MESSAGE_FROM_SYSTEM |
-            FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
-            dw,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR) &lpMsgBuf,
-            0, NULL) == 0) {
-
-        errorContent = (char*)lpMsgBuf;
-        //ExitProcess(dw);
-    }
-        
-    LocalFree(lpMsgBuf);
-    //ExitProcess(dw);
-    return errorContent;
-}
-
-
 void checkCompileErrors(GLuint shader, const ShaderType type, const char* programName)
 {
     GLint success;

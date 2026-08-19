@@ -12,11 +12,6 @@
 #include "utility"
 #include <vector>
 
-bool32 first_size = true;
-global_variable bool32 first_announce = true;
-bool32 Load_Lib = false;
-bool32 showMsPF = false;
-
 #pragma pack(push, 1)
 struct Win32_Front_Buffer{  
     //BITMAPINFO Bitmapinfo;
@@ -47,7 +42,6 @@ struct Win32_Front_Buffer{
 
 #pragma pack(push, 1)
 struct Win32_OffScreen_Buffer{  
-    OpenGLData glData;
     TileGLObject TileProperty;    
     Camera camera;
     std::vector<B_shader_program*> shaders_list;
@@ -89,43 +83,6 @@ void displayBufferData(Platform_Properties* Game_Platform, Win32_OffScreen_Buffe
                               //const GLchar* message,
                               //const void* userParam);
 //
-extern "C" void reload_gl_function_pointer (struct Platform_Properties* Game_Platform, struct Win32_OffScreen_Buffer* BackBuffer_){
-    begin_ticket_mutex(&Game_Platform->ticket);
-    HDC tempDC = GetDC(Game_Platform->Window);
-    if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
-        bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
-        if (!success)
-            bool success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
-        assert(success);
-    };
-    end_ticket_mutex(&Game_Platform->ticket);
-}
-
-extern "C" void ReloadGLFunction (Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer_){
-    begin_ticket_mutex(&Game_Platform->ticket);
-    HDC tempDC = GetDC(Game_Platform->Window);
-    if(wglMakeCurrent(tempDC, BackBuffer_->glData.openglRC)){
-
-        if(first_announce){
-            printf("Current initialized GL context:%p\n", BackBuffer_->glData.openglRC);
-            printf("%p\n", wglGetCurrentContext());
-        }
-
-        bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
-        if (!success)
-            bool success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
-        assert(success);
-    };
-    end_ticket_mutex(&Game_Platform->ticket);
-}
-
-typedef void reload_gl_function_pointer_ (struct Platform_Properties* Game_Platform, struct Win32_OffScreen_Buffer* BackBuffer_);
-
-struct platform_api{
-    reload_gl_function_pointer_* reloadGLFuncPointer;
-};
-
-extern "C" platform_api test_platform = {};
 
 void ResetGLState(Win32_OffScreen_Buffer* BackBuffer = nullptr, Platform_Properties* Game_Platform = nullptr);
 void InitCamera(Platform_Properties* Game_Platform = nullptr, Win32_OffScreen_Buffer* BackBuffer = nullptr);

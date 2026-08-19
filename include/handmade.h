@@ -195,6 +195,13 @@ typedef DEBUG_WRITE_WHOLE_FILE(debug_write_whole_file);
 #define DEBUG_FREE_FILE_MEMORY(name) void name(void* memory);
 typedef  DEBUG_FREE_FILE_MEMORY(debug_free_file_memory);
 
+
+bool32 first_size = true;
+global_variable bool32 first_announce = true;
+bool32 Load_Lib = false;
+bool32 showMsPF = false;
+
+
 struct Game_Sound_OutPut{  
     int16 SamplePerSecond;
     int SampleCounts;
@@ -255,6 +262,90 @@ struct ticket_mutex{
     // the ticket loop is just waiting until the thread left/retire before the other get in to execute that line of code again.
 };
 
+struct win32Dimension{
+    int PosX{0};
+    int PosY{0};
+    int Height{720};
+    int Width{1280};
+}Dimens;
+
+
+struct Clock_Set{
+  // This one is how many count per Second
+    LARGE_INTEGER PerfCountFrequencyResult = {};
+    int64 PerfCountFrequency = 0;
+
+    LARGE_INTEGER LastCounter = {};
+    LARGE_INTEGER EndCounter = {};
+
+    LARGE_INTEGER previous_collided = {};
+    LARGE_INTEGER current_collided = {};
+
+    float collided_time = 0.0f;
+    float color_switch_dur = 0.0f;
+
+    uint64 LastCycleCounts = 0;
+    uint64 EndCycleCounts = 0;
+
+
+    float TimeCounter = 0.0f;
+    float WaitTimeCounter = 0.0f;
+
+    uint64 TicksPerFrame = 0;
+    uint64 TicksPerS = 0;
+
+    int64 CountsPerFrame = 0;
+    //So what will be less than 0 must be float type
+    float MsPerFrame = 0.0f;
+    float SPerFrame = 0.0f;
+    float FramePerS = 0.0f;
+    // Time elapsed of one cycle/frame in second
+
+    //bool RatioCalculated = false;
+
+    float DelayedRatio = 0.0f;
+    float StandardMSperFrame = 16.67f;
+
+    float ChangeAxisCounter = 0.0f;
+    float TimeToChangeAxis = 0.0f;
+    int64 ViewRotateCount = 0;
+
+    uint64 Pad[6];
+};
+
+
+struct Rect_{
+    int x, y, w, h;
+};
+
+struct OpenGLData{
+    unsigned int VAOs;
+    unsigned int PlaneVAOs;
+
+    unsigned int VBO;
+    unsigned int ColorVBO;
+    unsigned int PlaneVBO;  
+
+    std::vector<GLuint> ProgramIDs = {};
+    //std::vector<*B_shader_program> ProgramIDs = {};
+    
+    HGLRC openglRC;
+    HGLRC defaultContext;
+
+    unsigned int textureHandle;
+    std::vector<unsigned int>* texture_id_list;
+    OpenGLData(){
+        //Maybe buggy this part
+        // need to be careful
+        VAOs     = 0;       
+        PlaneVAOs = 0;
+        VBO      = 0;     
+        ColorVBO = 0;
+        PlaneVBO = 0;
+        textureHandle = 0;
+    }
+};
+
 struct memory_arena{
     size_t size;
     size_t used;
@@ -299,6 +390,7 @@ struct Platform_Properties{
     MSG Message;
     WNDPROC wndproc;
 
+    OpenGLData glData;
     ticket_mutex ticket;
 };
 
@@ -466,90 +558,6 @@ struct Game_State{
     int GreenOffset = 0;
     // Memory_Block sentinel;
     int Hz = 256;    
-};
-
-struct win32Dimension{
-    int PosX{0};
-    int PosY{0};
-    int Height{720};
-    int Width{1280};
-}Dimens;
-
-
-struct Clock_Set{
-  // This one is how many count per Second
-    LARGE_INTEGER PerfCountFrequencyResult = {};
-    int64 PerfCountFrequency = 0;
-
-    LARGE_INTEGER LastCounter = {};
-    LARGE_INTEGER EndCounter = {};
-
-    LARGE_INTEGER previous_collided = {};
-    LARGE_INTEGER current_collided = {};
-
-    float collided_time = 0.0f;
-    float color_switch_dur = 0.0f;
-
-    uint64 LastCycleCounts = 0;
-    uint64 EndCycleCounts = 0;
-
-
-    float TimeCounter = 0.0f;
-    float WaitTimeCounter = 0.0f;
-
-    uint64 TicksPerFrame = 0;
-    uint64 TicksPerS = 0;
-
-    int64 CountsPerFrame = 0;
-    //So what will be less than 0 must be float type
-    float MsPerFrame = 0.0f;
-    float SPerFrame = 0.0f;
-    float FramePerS = 0.0f;
-    // Time elapsed of one cycle/frame in second
-
-    //bool RatioCalculated = false;
-
-    float DelayedRatio = 0.0f;
-    float StandardMSperFrame = 16.67f;
-
-    float ChangeAxisCounter = 0.0f;
-    float TimeToChangeAxis = 0.0f;
-    int64 ViewRotateCount = 0;
-
-    uint64 Pad[6];
-};
-
-
-struct Rect_{
-    int x, y, w, h;
-};
-
-struct OpenGLData{
-    unsigned int VAOs;
-    unsigned int PlaneVAOs;
-
-    unsigned int VBO;
-    unsigned int ColorVBO;
-    unsigned int PlaneVBO;  
-
-    std::vector<GLuint> ProgramIDs = {};
-    //std::vector<*B_shader_program> ProgramIDs = {};
-    
-    HGLRC openglRC;
-    HGLRC defaultContext;
-
-    unsigned int textureHandle;
-    std::vector<unsigned int>* texture_id_list;
-    OpenGLData(){
-        //Maybe buggy this part
-        // need to be careful
-        VAOs     = 0;       
-        PlaneVAOs = 0;
-        VBO      = 0;     
-        ColorVBO = 0;
-        PlaneVBO = 0;
-        textureHandle = 0;
-    }
 };
 
 bool isNull(GLuint* member = nullptr);
@@ -731,6 +739,44 @@ void* GetAnyGLFuncAddress(const char* name)
     //May be the wglgetprocaddress doesn't on pc case work I have to use getprocaddress instead
 };
 
+extern "C" void reload_gl_function_pointer (struct Platform_Properties* Game_Platform){
+    begin_ticket_mutex(&Game_Platform->ticket);
+    HDC tempDC = GetDC(Game_Platform->Window);
+    if(wglMakeCurrent(tempDC, Game_Platform->glData.openglRC)){
+        bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
+        if (!success)
+            bool success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
+        assert(success);
+    };
+    end_ticket_mutex(&Game_Platform->ticket);
+}
+
+extern "C" void ReloadGLFunction (Platform_Properties* Game_Platform){
+    begin_ticket_mutex(&Game_Platform->ticket);
+    HDC tempDC = GetDC(Game_Platform->Window);
+    if(wglMakeCurrent(tempDC, Game_Platform->glData.openglRC)){
+
+        if(first_announce){
+            printf("Current initialized GL context:%p\n", Game_Platform->glData.openglRC);
+            printf("%p\n", wglGetCurrentContext());
+        }
+
+        bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
+        if (!success)
+            bool success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
+        assert(success);
+    };
+    end_ticket_mutex(&Game_Platform->ticket);
+}
+
+typedef void reload_gl_function_pointer_ (struct Platform_Properties* Game_Platform);
+
+struct platform_api{
+    reload_gl_function_pointer_* reloadGLFuncPointer;
+};
+
+extern "C" platform_api test_platform = {};
+
 void* LoadFunctionFromDLL(const char* DLLName = nullptr, const char* FuncName = nullptr);
 void SetUpWindow();
 glm::vec3 randomRotateAxis_(int rollIndex);
@@ -739,6 +785,29 @@ bool32 string_contain(std::string* string = nullptr, char* substr = nullptr);
 bool32 string_contain(std::string* string, char* substr){
     return !(string->find(substr) == string->npos);
 };
+
+char* loadCurrentErr(){
+    LPVOID lpMsgBuf;
+    DWORD dw = GetLastError(); 
+    char* errorContent;
+        
+    if (FormatMessage(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+            FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            dw,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR) &lpMsgBuf,
+            0, NULL) == 0) {
+        errorContent = (char*)lpMsgBuf;
+        ExitProcess(dw);
+    }
+        
+    LocalFree(lpMsgBuf);
+    ExitProcess(dw);
+    return errorContent;
+}
 
 std::string* load_bin_map(const char* name = nullptr);
 

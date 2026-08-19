@@ -364,9 +364,9 @@ HDC dummyDrawingContext = GetDC(windowDummy);
 INT pixelFormatDummy = ChoosePixelFormat(dummyDrawingContext, &pfdDummy);
 SetPixelFormat(dummyDrawingContext, pixelFormatDummy, &pfdDummy);
 
-OBuffer->glData.defaultContext = wglCreateContext(dummyDrawingContext);
+Game_Platform->glData.defaultContext = wglCreateContext(dummyDrawingContext);
 
-wglMakeCurrent(dummyDrawingContext, OBuffer->glData.defaultContext);
+wglMakeCurrent(dummyDrawingContext, Game_Platform->glData.defaultContext);
 
 //Succeed make enable wgl
 PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetExtensionsStringARB = nullptr;
@@ -403,7 +403,7 @@ wglCreateContextAttribsARB =
 // Delete dummy here
 if (wglCreateContextAttribsARB) {
     printf("Succeed get wglCreateContextAttribsARB function pointer\n");
-    wglDeleteContext(OBuffer->glData.defaultContext);
+    wglDeleteContext(Game_Platform->glData.defaultContext);
     ReleaseDC(windowDummy, dummyDrawingContext);
     DestroyWindow(windowDummy);
 } else {
@@ -453,7 +453,7 @@ HDC windowDC = GetDC(Game_Platform->Window);
             // NOTE: Failed right at the beginning
             bool success = false;
             // Next create OPENGL context
-             //OBuffer->glData.openglRC = wglCreateContext(windowDC);
+             //Game_Platform->glData.openglRC = wglCreateContext(windowDC);
 
             const GLint attribList[] = {WGL_CONTEXT_MAJOR_VERSION_ARB,
                                         3,
@@ -463,12 +463,12 @@ HDC windowDC = GetDC(Game_Platform->Window);
                                         WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
                                         0};
 
-            OBuffer->glData.openglRC = wglCreateContextAttribsARB(windowDC, NULL, attribList);
+            Game_Platform->glData.openglRC = wglCreateContextAttribsARB(windowDC, NULL, attribList);
 
             //printf("%p\n",GetProcAddress(LoadLibraryA("opengl32.dll"), "glGetString"));
 
             //======================================================================
-            if(wglMakeCurrent(windowDC, OBuffer->glData.openglRC)){
+            if(wglMakeCurrent(windowDC, Game_Platform->glData.openglRC)){
         // NOTE: Failed right at the beginning
         // success = gladLoadGL((GLADloadfunc)wglGetProcAddress);
 
@@ -651,10 +651,10 @@ HDC windowDC = GetDC(Game_Platform->Window);
                     0.982f,  0.099f,  0.879f
                 };
 
-                glGenVertexArrays(1, &OBuffer->glData.VAOs);
-                glGenBuffers(1, &OBuffer->glData.VBO);
-                glBindVertexArray(OBuffer->glData.VAOs);
-                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.VBO);
+                glGenVertexArrays(1, &Game_Platform->glData.VAOs);
+                glGenBuffers(1, &Game_Platform->glData.VBO);
+                glBindVertexArray(Game_Platform->glData.VAOs);
+                glBindBuffer(GL_ARRAY_BUFFER, Game_Platform->glData.VBO);
                 glBufferData(GL_ARRAY_BUFFER, sizeof(fullvertices), &fullvertices, GL_STATIC_DRAW);
                 
                 // CUBE position in NDC
@@ -670,8 +670,8 @@ HDC windowDC = GetDC(Game_Platform->Window);
                 glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)6);
 
                 // Mere Color
-                glGenBuffers(1, &OBuffer->glData.ColorVBO);
-                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.ColorVBO);                
+                glGenBuffers(1, &Game_Platform->glData.ColorVBO);
+                glBindBuffer(GL_ARRAY_BUFFER, Game_Platform->glData.ColorVBO);                
                 glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), &g_color_buffer_data, GL_STATIC_DRAW);
 
                 glEnableVertexAttribArray(3);
@@ -687,11 +687,11 @@ HDC windowDC = GetDC(Game_Platform->Window);
                 glBindVertexArray(0);
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-                glGenVertexArrays(1, &OBuffer->glData.PlaneVAOs);
-                glGenBuffers(1, &OBuffer->glData.PlaneVBO);
+                glGenVertexArrays(1, &Game_Platform->glData.PlaneVAOs);
+                glGenBuffers(1, &Game_Platform->glData.PlaneVBO);
 
-                glBindVertexArray(OBuffer->glData.PlaneVAOs);       
-                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.PlaneVBO);
+                glBindVertexArray(Game_Platform->glData.PlaneVAOs);       
+                glBindBuffer(GL_ARRAY_BUFFER, Game_Platform->glData.PlaneVBO);
                 glBufferData(GL_ARRAY_BUFFER, sizeof(float)*sizeof(PlaneVertices), &PlaneVertices, GL_STATIC_DRAW);
 
                  //Position
@@ -707,7 +707,7 @@ HDC windowDC = GetDC(Game_Platform->Window);
                 glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(3*sizeof(float)));
 //
                 //Color
-                glBindBuffer(GL_ARRAY_BUFFER, OBuffer->glData.ColorVBO);                
+                glBindBuffer(GL_ARRAY_BUFFER, Game_Platform->glData.ColorVBO);                
                 glEnableVertexAttribArray(3);
                 glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
 
@@ -728,14 +728,14 @@ HDC windowDC = GetDC(Game_Platform->Window);
                 //===============================================================
                 
                 //printf("Succeed create OpenGL Context\n");
-                //OBuffer->glData.textureHandle = (unsigned int*)malloc(sizeof(unsigned int));
+                //Game_Platform->glData.textureHandle = (unsigned int*)malloc(sizeof(unsigned int));
 
                 // NOTE: Found it: The temptexture is local to this fx so its
                 // data and address turn to null after the fx called
 
-                //glGenTextures(1, &OBuffer->glData.textureHandle);
-                //glBindTexture(GL_TEXTURE_2D, OBuffer->glData.textureHandle );
-// OBuffer->glData.textureHandle is the name of the texture
+                //glGenTextures(1, &Game_Platform->glData.textureHandle);
+                //glBindTexture(GL_TEXTURE_2D, Game_Platform->glData.textureHandle );
+// Game_Platform->glData.textureHandle is the name of the texture
                 //last argument This is where point to the image data
                 // Why this doesn't work
                 if(FBuffer->BitmapHeight != Game_Platform->BitmapHeight){
@@ -859,7 +859,7 @@ void copyBufferData(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* 
 
     // Why if I don't pass this type of data the app will collapse as the conflict of memory
     if(!ScreenBuffer->GLDataPassed){
-        PassGLData(&BackBuffer->glData, &ScreenBuffer->glData);
+        PassGLData(&Game_Platform->glData, &ScreenBuffer->glData);
         ScreenBuffer->GLDataPassed = true;
     }
 
@@ -881,14 +881,14 @@ void copyBufferData(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* 
 void displayBufferData(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, Win32_Front_Buffer* FrontBuffer){
     printf("=====================================\n");
     printf("                 |  BackBuffer | FrontBuffer\n");
-    printf("VAOS             |  %d         | %d\n", BackBuffer->glData.VAOs, FrontBuffer->glData.VAOs);
-    printf("PlaneVAOS        |  %d         | %d\n", BackBuffer->glData.PlaneVAOs, FrontBuffer->glData.PlaneVAOs);
-    printf("VBO              |  %d         | %d\n", BackBuffer->glData.VBO, FrontBuffer->glData.VBO);
-    printf("ColorVBO         |  %d         | %d\n", BackBuffer->glData.ColorVBO, FrontBuffer->glData.ColorVBO);
-    printf("PlaneVBO         |  %d         | %d\n", BackBuffer->glData.PlaneVBO, FrontBuffer->glData.PlaneVBO);
-    printf("TextureID        |  %d         | %d\n", BackBuffer->glData.textureHandle, FrontBuffer->glData.textureHandle);
-    //printf("ProgramID        |  %d         | %d\n", BackBuffer->glData.ProgramIDs[0], FrontBuffer->glData.ProgramIDs[0]);
-    //printf("ProgramID        |  %d         | %d\n", BackBuffer->glData.ProgramIDs[1], FrontBuffer->glData.ProgramIDs[1]);
+    printf("VAOS             |  %d         | %d\n", Game_Platform->glData.VAOs, FrontBuffer->glData.VAOs);
+    printf("PlaneVAOS        |  %d         | %d\n", Game_Platform->glData.PlaneVAOs, FrontBuffer->glData.PlaneVAOs);
+    printf("VBO              |  %d         | %d\n", Game_Platform->glData.VBO, FrontBuffer->glData.VBO);
+    printf("ColorVBO         |  %d         | %d\n", Game_Platform->glData.ColorVBO, FrontBuffer->glData.ColorVBO);
+    printf("PlaneVBO         |  %d         | %d\n", Game_Platform->glData.PlaneVBO, FrontBuffer->glData.PlaneVBO);
+    printf("TextureID        |  %d         | %d\n", Game_Platform->glData.textureHandle, FrontBuffer->glData.textureHandle);
+    //printf("ProgramID        |  %d         | %d\n", Game_Platform->glData.ProgramIDs[0], FrontBuffer->glData.ProgramIDs[0]);
+    //printf("ProgramID        |  %d         | %d\n", Game_Platform->glData.ProgramIDs[1], FrontBuffer->glData.ProgramIDs[1]);
     printf("Memory Address   |0x%x |0x%x \n", FrontBuffer->BitmapMemory, Game_Platform->BitmapMemory);
     printf("DirectMem Address|0x%x size:%d |       \n", FrontBuffer->BitmapMemoryForDirectBlit, Game_Platform->BitmapMemoryForDirectBlit);
     printf("=====================================\n");
@@ -1549,8 +1549,8 @@ void ResetGLState(Win32_OffScreen_Buffer* BackBuffer, Platform_Properties* Game_
     glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
     HDC windowContext = GetDC(Game_Platform->Window);
-    wglMakeCurrent(windowContext, BackBuffer->glData.defaultContext);
-    wglDeleteContext(BackBuffer->glData.openglRC);
+    wglMakeCurrent(windowContext, Game_Platform->glData.defaultContext);
+    wglDeleteContext(Game_Platform->glData.openglRC);
 };
 
 
@@ -1571,7 +1571,7 @@ void InitCamera(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* Back
 };
 
 void Set_Projection_View(Win32_OffScreen_Buffer* BackBuffer, Platform_Properties* Game_Platform){
-    for(const GLuint& shader:BackBuffer->glData.ProgramIDs){
+    for(const GLuint& shader:Game_Platform->glData.ProgramIDs){
         glUseProgram(shader);
         setMat4(shader, "projection", !Game_Platform->SwitchCamera?BackBuffer->camera.projection:BackBuffer->camera_set[0]->projection);
         setMat4(shader, "view", !Game_Platform->SwitchCamera?BackBuffer->camera.view:BackBuffer->camera_set[0]->view);
@@ -1605,12 +1605,12 @@ WNDCLASSEXA SetUpWindowClass(Platform_Properties* Game_Platform, HINSTANCE Insta
 
 void CleanUpandExit(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* BackBuffer, Glyph_Map* map){
     
-    glDeleteVertexArrays(1, &BackBuffer->glData.VAOs);
-    glDeleteVertexArrays(1, &BackBuffer->glData.PlaneVAOs);
+    glDeleteVertexArrays(1, &Game_Platform->glData.VAOs);
+    glDeleteVertexArrays(1, &Game_Platform->glData.PlaneVAOs);
 
-    glDeleteBuffers(1, &BackBuffer->glData.VBO);
-    glDeleteBuffers(1, &BackBuffer->glData.ColorVBO);
-    glDeleteBuffers(1, &BackBuffer->glData.PlaneVBO);
+    glDeleteBuffers(1, &Game_Platform->glData.VBO);
+    glDeleteBuffers(1, &Game_Platform->glData.ColorVBO);
+    glDeleteBuffers(1, &Game_Platform->glData.PlaneVBO);
 
     for(B_shader_program* shader: BackBuffer->shaders_list){
         delete shader;

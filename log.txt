@@ -2553,3 +2553,6 @@ Why the findfirstfile doesn't search inside the given folder
 ---------------- Tue, 18 Aug 26: 09:50AM
 
 NOTE: we did it! it did loop through folder for file
+
+---------------- Wed, 19 Aug 26: 10:22AM
+
