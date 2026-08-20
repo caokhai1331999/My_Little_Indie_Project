@@ -638,6 +638,7 @@ void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_ma
             // Postion may be we use i * w * l * h
             glm::vec3 position = {(float)i%world_map->w, (i>(world_map->w*world_map->l))?(float)(i/(world_map->w*world_map->h)):0.0f, i>world_map->w?(i/world_map->w)%world_map->l:0.0f};
             // now we decide how to add matched id in Graphic object
+
             if(map->map_content[i+1]){
                 glBindVertexArray(Graphics->mesh_group[map->map_content[i]].VAO);
                 // Remember we already set all lights's basic specs before in the init graphics
@@ -651,6 +652,7 @@ void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_ma
                 glBindVertexArray(0);
                 glUseProgram(0);
             }
+
         }
     i+=2;
     };

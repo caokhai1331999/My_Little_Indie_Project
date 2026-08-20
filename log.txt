@@ -2556,3 +2556,11 @@ NOTE: we did it! it did loop through folder for file
 
 ---------------- Wed, 19 Aug 26: 10:22AM
 
+
+---------------- Thu, 20 Aug 26: 10:52AM
+
+TODO: Think about GAMEPLAY that interesting. Try to interpret it to code
+implementation
+1. roughly sketch it first( into steps)
+2. convert these steps into code line(we got to know in the interger/float level
+of these lines)
