@@ -124,7 +124,7 @@ void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
 
 // We need a pre-created Texture group
 // Sketch map and spawn entities
-void sketch_map(simple_volume_map* map, Mesh* mesh_group){
+void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
     srand(time(NULL));
     // rational map sketcher here.
     // 1. first thing first we need to decide where can the character where is not
