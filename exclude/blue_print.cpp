@@ -124,6 +124,7 @@ void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
 
 // We need a pre-created Texture group
 // Sketch map and spawn entities
+// layer of background and layer of moving entities
 void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
     srand(time(NULL));
     // rational map sketcher here.

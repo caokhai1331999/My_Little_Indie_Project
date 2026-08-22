@@ -41,6 +41,8 @@ private:
 
     int Health_Bar;
     steerer driver;
+    // Graphic ID - This one represent the VAOs, texture and light that we use to draw this entity
+    uint8 MeshID;
 };
 
 //======================LIGHT_PART==========================
@@ -143,27 +145,28 @@ typedef uint8 be_drawn_type;
 // The passable unit have to be aligned with each other
 // This group of ID mark element for the engine to drawn accordingly
 // This type will be drawn alot...
-
-typedef be_drawn_type under_shone_entity;
-typedef be_drawn_type light_source;
-// snow, mist, wind...
-typedef be_drawn_type posted_scene_effect;
-
-#define under_shone_entity (be_drawn_type)0
-#define light_source (be_drawn_type)1;
-// snow, mist, wind...
-#define posted_scene_effect (be_drawn_type)2;
-// 
-struct map_drawn_element{
-    std::vector<under_shone_entity>whole_lit_entities;
-    std::vector<light_source>light_sources;
-    std::vector<posted_scene_effect>weather_effect_group;
+//
+#define Static_or_Move(x) \
+    x ## _Static, \
+    x ## _Moving
+    
+enum map_drawn_element:be_drawn_type{
+    Static_or_Move(In_World),
+    Light_Effect = 2,
+    Shading = 3,
+    Pos_Game_Effect = 4
 };
 
 struct Mesh{
     //Use this whenever I done the dynamic array
     mesh_name name;
+// how about light options
+    map_drawn_element drawn_type;
+    uint8 light_types[3];
+
     mesh_shape_data_pointers data_pointer;
+    texture_group textures;
+
     unsigned int VAO;
     unsigned int VBO;
     unsigned int EBO;
@@ -194,16 +197,9 @@ struct environment_map{
 class graphic_property{
 private:
     // This will be geometry collection
-    B_shader_program* basic_light_shader;
-    // This is for drawing effect like fog, etc...
-    B_shader_program* post_effect_shader;
-    //unsigned int* Texture_Group; //dynamic array case
-    //std::vector<texture_group*> matched_texture_collection;
-    std::vector<Mesh>Mesh_Group;
-    // we need to add light group here.
-    // textures
-    std::vector<texture_group>texture_collection;
-    std::vector<vertices_data_structure>* Vertices_Data;    
+    std::vector<B_shader_program*>* shader_group;
+    //TODO: need to arrange the mesh order based on drawn type for the sake of calling later
+    std::vector<Mesh>* Mesh_Group;
 public:
     update_(clock_set* clock);
     B_shader_program* get_shader(return shader);
@@ -226,11 +222,11 @@ typedef uint8 entity_type;
 // Be pragmatic, think about what its real use in shader and game play(collision)
 // we need a tracker to watch all of entities in room
 struct map_unit{
+// This is just should be an entity
     // store multiple vec3 is not cheap,we need to find the
     // alternatives
     // This is for choosing suitable mesh to draw
     uint8 MeshID;
-    be_drawn_type be_drawn_type;
     // This is for position reconstruction
     uint8* space_id;
     // This is only for moving object
