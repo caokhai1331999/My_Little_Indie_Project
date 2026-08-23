@@ -71,6 +71,7 @@ unsigned int LoadCubeMap(const char* path){
       //                     . camera pos for light|  . -//-
 
 // chunk of meshes
+//
 //======================LIGHT_PART==========================
 
 //============================================================
@@ -364,30 +365,21 @@ struct game_state{
 //
 
 void init_graphic (Win32_OffScreen_Buffer* BackBuffer, graphic_property* object_group, std::vector<general_light*> light_group, const basic_shape_vertices_data* vertices_groups = nullptr){
-    // set light
-    // where is the proper place for this light group: backbuffer or object group
+    // TODO: Arrange mesh based on the drawn type attached to it.;
+    // HOW??? 
     InitOpenGl(BackBuffer);
-    // set VAOs array for data
-// NOTE: How to parse data to vertex level???
     set_whole_mesh_data(vertices_groups, object_group);
     // Light here
     turn_on_light(light_group);
     set_light_for_shader(light_group, object_group->shaders_list);
-    // we need to set this one for every shader we have.
-    // consider loading textures group separatedly here.
-
 /*
     . Ambient Light - Kind of constance to store it
     . Point Light -
                    |
-                   | take camera position as input
+                   | take camera position as inpt
                    |
     . Spot Light  -
 */
-    // set mesh;
-    // rand map
-    // set rigid body
-    //. Init Position
     glm::vec3 pos = glm::vec3(0.0f);
     // Time to init a 2D map here for every single entity in the current volumm
 }
@@ -407,7 +399,7 @@ void set_each_Mesh_up(Mesh_* mesh, const float* VBOdata, const float* EBOdata){
         
         // Load data into vertex buffer
         glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(*data)*sizeof(float), data, GL_STATIC_DRAW);        
+        glBufferData(GL_ARRAY_BUFFER, sizeof(*VBOdata)*sizeof(float), VBOdata, GL_STATIC_DRAW);        
         // Time to set vertex attribute pointers
         // POSITION
         glEnableVertexAttribArray(0);
@@ -452,6 +444,18 @@ void spawn_triangle(plane_type, map){
     ;
 };
 // First we hardcode it to see how it work, and then think about the proper approach of this one.
+mesh construct_mesh(/*what to put inside this???*/map_drawn_element drawn_type_, char* data_buffer_pointer){
+    M_Mesh temp_mesh_value = {};
+//draw type
+    M_Mesh.drawn_type = drawn_type_;
+    //texture
+    // THis one is already in the folder loop texture loader
+    M_Mesh.textures[NORMAL] = drawn_type_;    
+    M_Mesh.textures[DIFFUSE] = drawn_type_;    
+    M_Mesh.textures[SPECULAR] = drawn_type_;    
+    M_Mesh.textures[EMISSION/*if available*/] = drawn_type_;    
+    return;
+}
 
 // Still think about this one.=================================
 void set_whole_mesh_data(graphic_property* graphic_obj){
@@ -602,18 +606,53 @@ unsigned int tile_indices[] = {
 }
 
 // NOTE: Then we have something to do with the pre-lighted texels
-// we will write a function that comput normal from texture's texel data
+// we will write a function that compute normal from texture's texel data
 // (if we don't have any normal map) and compute light based on that one of the cheapest
 //
 // Apply textures group here
+// How can this one being pickily among grahic types and still decent in term of
+// performance??
+void feed_shader_data(B_shader_program* shader){
+    shader->set;
+    shader->set;
+    shader->set;
+    shader->set;
+};
+
+switch(unit.graphic_type){
+    //set textures
+// Then feed the shader based on graphic type it got
+    case map_drawn_element::In_World_Static:        
+        break;
+
+    case map_drawn_element::In_World_Moving:
+        break;
+
+    case map_drawn_element::Light_Effect:
+        break;
+
+    case map_drawn_element::Shading:
+        break;
+
+    case map_drawn_element::Pos_Game_Effect:
+        break;
+
+    default :
+        break;
+};
+
+// NOTE: We got to divide more clearly among the shader(its job and type of input it will get)
 void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_map, Camera* chosen_camera, bool32 post_effect_on){    
     // first feed shader with mesh data (Store with VAO)
     // Then update relative position of the obj(with world, or just mere screen space with text)
     // Then use each brush(shader) in brush_set to draw object
     //NOTE: if(/*in view range*/)
     for(B_shader_program* const &shader: Graphic->shader){
+        glBindVertexArray(Graphics->VAOS[/*mesh id*/]);
         shader->setMat4("projection", chosen_camera->projection); 
         shader->shader[i]->setMat4("view", chosen_camera->view);            
+        // also bind matched texture here.
+        
     };
     glUseProgram(0);
     size_t i = 0;
@@ -624,6 +663,8 @@ void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_ma
     for(moving_entity_specs* const &unit:world_map->moving_obj_group){
                 glBindVertexArray(Graphics->mesh_group[unit->basic_unit_specs.MeshID].VAO);
                 // Remember we already set all lights's basic specs before in the init graphics
+                // add switch case for type here
+
                 Graphic->shader[unit->basic_unit_specs.MeshID]->use();
                 Graphic->shader[unit->basic_unit_specs.MeshID]->setVec3("Postion["+to_string(unit->basic_unit_specs.space_id)+"]", unit->position);
                 // Set Light

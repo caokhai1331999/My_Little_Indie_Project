@@ -2573,3 +2573,10 @@ TODO:- Apply sketch map and render in group function
 
 ---------------- Sat, 22 Aug 26: 10:52AM
 
+
+---------------- Sun, 23 Aug 26: 11:33AM
+
+NOTE: The onboard gpu vram of my laptop is about 1800mb(about 2gb if I'm not
+wrong.)
+TODO: 1. draw object based on its made up graphic type(We need to account for
+the precise number of will-be_drawn objects)

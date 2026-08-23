@@ -151,42 +151,36 @@ typedef uint8 be_drawn_type;
     x ## _Moving
     
 enum map_drawn_element:be_drawn_type{
-    Static_or_Move(In_World),
-    Light_Effect = 2,
-    Shading = 3,
-    Pos_Game_Effect = 4
+    //How about normal mapping 
+    Static_or_Move(In_World), // pass entity's pos **
+    Light_Effect = 2, // pass optional's light specs **
+    Shading = 3, // still haven't decide yet
+    Pos_Game_Effect = 4 // texture, using particles engine called last
 };
 
-struct Mesh{
+struct M_Mesh{
     //Use this whenever I done the dynamic array
     mesh_name name;
 // how about light options
     map_drawn_element drawn_type;
     uint8 light_types[3];
 
-    mesh_shape_data_pointers data_pointer;
     texture_group textures;
+
+    mesh_shape_data_pointers data_pointer;
 
     unsigned int VAO;
     unsigned int VBO;
     unsigned int EBO;
 };
 // How can I make sure that all the shaders draw the same object
-struct texture_group{
-// This one will be hack for 2D game performance
-    char* name;
 
-    unsigned int normal_map;
-    unsigned int diffused_map;  
-    unsigned int specular_map;  
-
-    unsigned int emission_map;
-};
 // light based on normal map
-struct environment_map{
-    bitmap* LOD[4];
-}
-
+//struct environment_map{
+    //bitmap* LOD[4];
+//}
+//
+//
 // GROUP_EVERYTHING_UP
 //
 //
@@ -199,7 +193,7 @@ private:
     // This will be geometry collection
     std::vector<B_shader_program*>* shader_group;
     //TODO: need to arrange the mesh order based on drawn type for the sake of calling later
-    std::vector<Mesh>* Mesh_Group;
+    std::vector<M_Mesh>* Mesh_Group;
 public:
     update_(clock_set* clock);
     B_shader_program* get_shader(return shader);
@@ -212,6 +206,7 @@ public:
         basic_light_shader = new B_shader_program(shader_name+".vs", shader_name+".fs", shader_path);       
     }
 };
+
 // ====================== Map constructing ===================================
 
 typedef uint8 entity_type;
