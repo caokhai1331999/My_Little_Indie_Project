@@ -33,7 +33,7 @@
 (setq next-line-add-newlines nil)
 (setq-default truncate-lines t)
 (setq truncate-partial-width-windows nil)
-(split-window-horizontally)
+;;(split-window-horizontally)
 (setq ediff-split-window-function 'split-window-horizontally)
 (put 'upcase-region 'disabled 1)
 
@@ -184,36 +184,27 @@
   
   (defun ckhai-little-character-insert-fun()
     (interactive)
-    "add ';' at the end of line "
-    (let ((line (thing-at-point 'line t)))
+    ;;"add ';' at the end of line "
+    ;; string_match return number of matched character
+    (let ((line (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
       (cond ((string-match "//" line)
-	     (message "Line contain '//'")
+             (message "Current line: %s" line)
+	     (message "current line contain '//'")
 	     (newline-and-indent)
 	     (insert "//"))
-	    ((string-match ";" line)
-	     (message "';' matched in line")
-	     (if(eq(-(line-end-position)
-		     (+(line-beginning-position)(current-indentation))) 1 )
-		 (progn  (insert ";")
-			 (newline-and-indent))
-	       (cond ((and (>(point)(+(line-beginning-position) (current-indentation)))(<(point)(line-end-position)))
-		      (insert ";")
-		      (newline-and-indent))
-		     (t (newline-and-indent))
-		     )
-	       )
-	     )
-	    (t
-	     (if (or (<= (point) (+(line-beginning-position)(current-indentation))))
-		 (progn (newline-and-indent))
+	    ((and (not (string-match "//" line)) (not (string-match "*/" line)))
+	     (message "line is no comment")
+	     (if (not (equal (string-match ";" line) nil))
+		 (end-of-line)
+	         (insert ";")
+		 )
 	       (newline-and-indent)
 	       (insert ";")
-	       (left-char 1)
-	       )
+	       (backward-char)
 	     )
+	       )
 	    )
-    )
-  )
+      )
 
   (defun casey-source-format ()
     "Format the given file as a source file."
@@ -478,9 +469,10 @@
       ;; So eq is the equality test(compare fx) and ?\s present for white space
       (if (eq (char-before) ?\s) (delete-horizontal-space))
       ;; litterally non-space+space or space+non-space char
-      (if(looking-back "[^0-9a-zA-Z]" 1)(backward-delete-char 1))
+      (if(looking-back "[^0-9a-zA-Z;]" 1)(backward-delete-char 1))
       (let ((start (point)))
-      (skip-chars-backward "0-9A-Za-z\t" (line-beginning-position))
+	;; move the cursor through given character
+      (skip-chars-backward " 0-9A-Za-z\t" (line-beginning-position))
 	(delete-region (point) start))))
 ;;)
 
@@ -571,7 +563,7 @@
 (make-face 'font-lock-working-face)
 (make-face 'font-lock-remember-face)
 (make-face 'font-lock-solved-face)
-(modify-face 'font-lock-fixme-face "Red" nil nil t nil t nil nil)
+(modify-face 'font-lock-fixme-face "rgb:f9/26/72" nil nil t nil t nil nil)
 (modify-face 'font-lock-note-face "goldenrod" nil nil t nil t nil nil)
 (modify-face 'font-lock-jobDone-face "rgb:ff/82/47" nil nil t nil t nil nil)
 (modify-face 'font-lock-working-face "lime green" nil nil t nil t nil nil)

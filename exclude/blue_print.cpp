@@ -443,7 +443,57 @@ void spawn_vertex(uint8 size, /*what to pass here*/ ){
 void spawn_triangle(plane_type, map){
     ;
 };
+// ===============================Primitives_Data_Construction============================================
+//
 // First we hardcode it to see how it work, and then think about the proper approach of this one.
+local_persist void Load_Textures_for_OpenGL(Graphic_Properties* Graphic_obj, const char* media_folder_path){
+// Recursively loop over the folder and load group of textures here
+    //graphic_obj->texture_collection.reserve(10); 
+    texture_collection->reserve(10); 
+
+    File_Manager folder_looker;
+    std::string folder_path;
+
+    // we just need to feed the folder path for stb_image to load texture's data
+// Loop through all of the media folder for textures.
+    PVOID OldValue = NULL;
+    //Wow64DisableWow64FsRedirection(&OldValue);
+    folder_path = media_folder_path;
+    folder_path += "/*";
+    folder_looker.handle = FindFirstFileA(folder_path.c_str(), &folder_looker.find_data);
+    // which function I have to use to mark whether the maker reach the end of folder
+    bool32 load_succeeded = true;
+    if(folder_looker.handle != INVALID_HANDLE_VALUE){
+        while(load_succeeded/*reach the end of folder*/ ){
+            //stb_image(temp_image_content, path)
+            // i
+            // Win32 way        
+                // TODO: Put a null check flag hee
+                folder_path.clear();
+            folder_path = media_folder_path;
+            folder_path = folder_path + "/" + folder_looker.find_data.cFileName;
+
+            if((folder_looker.find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && (!string_contain(new string(folder_looker.find_data.cFileName),"."))){
+             Graphic_Obj->M_mesh[].textures_group = load_textures_in_folder(&folder_looker, folder_path.c_str());
+             Graphic_Obj->M_mesh[].
+             Graphic_Obj->M_mesh[].name = folder_looker.find_data.cFileName;
+            }
+
+            load_succeeded = FindNextFileA(folder_looker.handle, &folder_looker.find_data);
+//This cause thread thread violation NOTE: Be careful
+            //if(!load_succeeded)
+                //printf("Error: %s\n", loadCurrentErr());
+        }
+        //Wow64RevertWow64FsRedirection(OldValue);
+    }
+    FindClose(folder_looker.handle);
+}
+// change graphic_property* graphic_obj to vector of texture_group
+extern "C" __declspec(dllexport) void Load_Textures_for_OpenGL_(Platform_Properties* Game_Platform, Graphic_Properties* Graphic_Obj, const char* media_folder_path){
+    ReloadGLFunction(Game_Platform);
+    Load_Textures_for_OpenGL(Graphic_Obj, media_folder_path);
+};
+
 mesh construct_mesh(/*what to put inside this???*/map_drawn_element drawn_type_, char* data_buffer_pointer){
     M_Mesh temp_mesh_value = {};
 //draw type
@@ -618,30 +668,31 @@ void feed_shader_data(B_shader_program* shader){
     shader->set;
     shader->set;
 };
-
+// NOTE: So we load all but draw object pickily based on its be_drawn_type
 switch(unit.graphic_type){
     //set textures
 // Then feed the shader based on graphic type it got
-    case map_drawn_element::In_World_Static:        
+    case map_drawn_element::In_World_Static :        
         break;
 
-    case map_drawn_element::In_World_Moving:
+    case map_drawn_element::In_World_Moving :
         break;
 
-    case map_drawn_element::Light_Effect:
+    case map_drawn_element::Light_Effect :
         break;
 
-    case map_drawn_element::Shading:
+    case map_drawn_element::Shading :
         break;
 
-    case map_drawn_element::Pos_Game_Effect:
+    case map_drawn_element::Pos_Game_Effect :
         break;
 
     default :
         break;
 };
-
+//TODO: Focus on this one. We draw objs dynamically based on its be_drawn_type
 // NOTE: We got to divide more clearly among the shader(its job and type of input it will get)
+
 void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_map, Camera* chosen_camera, bool32 post_effect_on){    
     // first feed shader with mesh data (Store with VAO)
     // Then update relative position of the obj(with world, or just mere screen space with text)
@@ -656,29 +707,37 @@ void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_ma
     };
     glUseProgram(0);
     size_t i = 0;
+    
     //So with the catatonic object we just pass its position as an unchanged
     //
     //layout data/ InstanceID
     // How to specify entities position just above the down-ground without making looked like they're floating
+// NOTE: we got two loop here: O(n) + O(m)
+// 
     for(moving_entity_specs* const &unit:world_map->moving_obj_group){
-                glBindVertexArray(Graphics->mesh_group[unit->basic_unit_specs.MeshID].VAO);
-                // Remember we already set all lights's basic specs before in the init graphics
-                // add switch case for type here
-
-                Graphic->shader[unit->basic_unit_specs.MeshID]->use();
-                Graphic->shader[unit->basic_unit_specs.MeshID]->setVec3("Postion["+to_string(unit->basic_unit_specs.space_id)+"]", unit->position);
-                // Set Light
-                // Choose among lights here
-                glDrawElements();
+        // VAOs - shape vertice's data (at least: Position and TexCoord);
+        glBindVertexArray(Graphics->mesh_group[unit->basic_unit_specs.MeshID].VAO);
+        // Remember we already set all lights's basic specs before in the init graphics
+        // add switch case for type here
+        // Texture
+        Graphic_Obj->shader[unit->basic_unit_specs.MeshID]->use();
+       // Set Light
+        // Choose among lights; here
+        // View and Projection mat4 here
+         Graphic_Obj->shader[unit->basic_unit_specs.MeshID]->setMat4("Postion["+to_string(unit->basic_unit_specs.space_id)+"]", unit->position);        Graphic_Obj->shader;        
+        // Lastly, Entity world's position
+         Graphic_Obj->shader[unit->basic_unit_specs.MeshID]->setVec3("Postion["+to_string(unit->basic_unit_specs.space_id)+"]", unit->position);        Graphic_Obj->shader;
+        glDrawElements();
     }
 
     while(i < world_map->size){
 // Each shader represent for one layer of effect at least.
+        // Same process here for map-background-components here
         if(!world_map->map_content[i]){
             // By modding for that dimension we always have a number in its range
             // I think I done interpret the index to the entities postion in world space
             // Postion may be we use i * w * l * h
-            glm::vec3 position = {(float)i%world_map->w, (i>(world_map->w*world_map->l))?(float)(i/(world_map->w*world_map->h)):0.0f, i>world_map->w?(i/world_map->w)%world_map->l:0.0f};
+            glm::vec3 position = {(float)i%world_map->w, (i>(world_map->w*world_map->l))?(float)(i/(world_map->w*world_map->h)):0.0f, i>world_map->w?(i/world_map->w)%world_map->l:0.0f};       
             // now we decide how to add matched id in Graphic object
 
             if(map->map_content[i+1]){
@@ -694,7 +753,6 @@ void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_ma
                 glBindVertexArray(0);
                 glUseProgram(0);
             }
-
         }
     i+=2;
     };

@@ -9,6 +9,7 @@
 */
 
 //=====================SIMPLE_FILE_HANDLE========================
+
 struct File_Manager{
     WIN32_FIND_DATA find_data;
     HANDLE handle;
@@ -160,8 +161,8 @@ enum map_drawn_element:be_drawn_type{
 
 struct M_Mesh{
     //Use this whenever I done the dynamic array
-    mesh_name name;
-// how about light options
+    std::string name;
+ //how about light options
     map_drawn_element drawn_type;
     uint8 light_types[3];
 
@@ -173,6 +174,13 @@ struct M_Mesh{
     unsigned int VBO;
     unsigned int EBO;
 };
+
+// we put the texture inside the mesh -> how to load the textures and store them inside the name matched M_mesh 
+local_persist void Load_Textures_for_OpenGL(Graphic_Properties* Graphic_Obj, const char* media_folder_path);
+extern "C" __declspec(dllexport) void Load_Textures_for_OpenGL_(Platform_Properties* Game_Platform, Graphic_Properties* Graphic_Obj, const char* media_folder_path = nullptr);
+typedef void (*Load_Textures_for_OpenGL__) (Platform_Properties*, Graphic_Properties* , const char*);
+
+
 // How can I make sure that all the shaders draw the same object
 
 // light based on normal map

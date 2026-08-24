@@ -61,7 +61,6 @@ local_persist texture_group load_textures_in_folder(File_Manager* folder_looker 
 local_persist void Load_Textures_for_OpenGL(std::vector<texture_group>* texture_collection, const char* media_folder_path);
 extern "C" __declspec(dllexport) void Load_Textures_for_OpenGL_(Platform_Properties* Game_Platform, std::vector<texture_group>* texture_collection, const char* media_folder_path = nullptr);
 typedef void (*Load_Textures_for_OpenGL__) (Platform_Properties*, std::vector<texture_group>* , const char*);
-
 //-----------------For_Debugging-------------------------;
 
 

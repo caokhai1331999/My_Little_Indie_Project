@@ -2579,4 +2579,16 @@ TODO:- Apply sketch map and render in group function
 NOTE: The onboard gpu vram of my laptop is about 1800mb(about 2gb if I'm not
 wrong.)
 TODO: 1. draw object based on its made up graphic type(We need to account for
-the precise number of will-be_drawn objects)
+the precise number of will-be_drawn objects and their differences)
+
+---------------- Mon, 24 Aug 26: 09:49AM
+
+So what behind the idea of the push_rect and render_in_group function that casey
+use in his streams
+One thing I know that Casey pass pixel data (that is char*) to glDrawArray()
+after done compute it.
+NOTE: one of our main concerns is that we need to boil down the data to char
+whenever we want to pass it for drawing. Actually, right now all we can apply is
+the texture data(graphic data: light(layers of computed (VEC4) based on
+world position of these made up point light), texture(char*), camera(view_matrix
+-MAT4), VAOs-FLOAT, ....)
