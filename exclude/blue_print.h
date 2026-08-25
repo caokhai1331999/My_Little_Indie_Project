@@ -9,7 +9,6 @@
 */
 
 //=====================SIMPLE_FILE_HANDLE========================
-
 struct File_Manager{
     WIN32_FIND_DATA find_data;
     HANDLE handle;
@@ -20,6 +19,7 @@ struct File_Manager{
 std::vector<Entities*>*World_Entities_Trackers;
 
 struct Entities_Structure{
+    
     std::vector<rigid_body*>all_entities;
 };
 
@@ -100,10 +100,10 @@ enum primitive_shape{
 };
 
 //set primitives for mass drawing here
-struct vertex{
-   float* pos;
-   float* normal;
-   float* texcoord;
+struct vertex_{
+    float Positions[3];
+    float Normals[3];
+    float Texcoords[3];
 };
 
 struct triangle{
@@ -147,32 +147,39 @@ typedef uint8 be_drawn_type;
 // This group of ID mark element for the engine to drawn accordingly
 // This type will be drawn alot...
 //
-#define Static_or_Move(x) \
+#define Still_or_Movable(x) \
     x ## _Static, \
     x ## _Moving
     
 enum map_drawn_element:be_drawn_type{
     //How about normal mapping 
-    Static_or_Move(In_World), // pass entity's pos **
+    Still_or_Movable(In_World), // pass entity's pos **
     Light_Effect = 2, // pass optional's light specs **
     Shading = 3, // still haven't decide yet
     Pos_Game_Effect = 4 // texture, using particles engine called last
 };
 
+struct shape_vertices_data{
+    float* data_;
+    unsigned int* VAO;
+    unsigned int* VBO;
+    unsigned int* EBO;
+};
+
+struct shape_vertices_store{
+    shape_vertices_data triangle_data;
+    shape_vertices_data plane_data;
+    shape_vertices_data cube_data;
+};
+
 struct M_Mesh{
     //Use this whenever I done the dynamic array
     std::string name;
- //how about light options
-    map_drawn_element drawn_type;
     uint8 light_types[3];
-
+    map_drawn_element drawn_type;
+ //how about light options
+ // should I put light here
     texture_group textures;
-
-    mesh_shape_data_pointers data_pointer;
-
-    unsigned int VAO;
-    unsigned int VBO;
-    unsigned int EBO;
 };
 
 // we put the texture inside the mesh -> how to load the textures and store them inside the name matched M_mesh 
@@ -202,6 +209,7 @@ private:
     std::vector<B_shader_program*>* shader_group;
     //TODO: need to arrange the mesh order based on drawn type for the sake of calling later
     std::vector<M_Mesh>* Mesh_Group;
+    shape_vertices_store* current_shape_store;
 public:
     update_(clock_set* clock);
     B_shader_program* get_shader(return shader);

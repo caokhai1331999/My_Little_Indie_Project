@@ -216,7 +216,7 @@ void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
 // In Big inititalization : Init OpenGL
 //                          Turn On Light
 //                          Init Object: mesh, rigid body
-//
+
 
 void init_graphic (Win32_OffScreen_Buffer* BackBuffer, graphic_property* object_group, std::vector<general_light*> light_group, const basic_shape_vertices_data* vertices_groups = nullptr){
     // set light
@@ -224,7 +224,7 @@ void init_graphic (Win32_OffScreen_Buffer* BackBuffer, graphic_property* object_
     InitOpenGl(BackBuffer);
     // set VAOs array for data
 // NOTE: How to parse data to vertex level???
-    set_whole_mesh_data(vertices_groups, object_group);
+    load_primitive_vertices_data(&vertice_store);
     // Light here
     turn_on_light(light_group);
     set_light_for_shader(light_group, object_group->shaders_list);
@@ -388,41 +388,6 @@ void set_rigid_body(glm::vec3* init_pos){
     Init_Entity_Specs(body);
 }
 
-void set_each_Mesh_up(Mesh_* mesh, const float* VBOdata, const float* EBOdata){
-
-        glGenVertexArrays(1, &mesh->VAO);
-        glGenBuffers(1, &mesh->VBO);
-        glGenBuffers(1, &mesh->EBO);
-        glBindVertexArray(mesh->VAO);
-        // Good thing about struct is that their memory is sequential for all its time
-        //glVertexAttribPointer(0, 1, GL_UNSIGNED_INT, GL_FALSE, sizeof(unsigned int), (const void*)0);
-        
-        // Load data into vertex buffer
-        glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(*VBOdata)*sizeof(float), VBOdata, GL_STATIC_DRAW);        
-        // Time to set vertex attribute pointers
-        // POSITION
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)0);
-
-        // NORMAL
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(struct Vertex, Normal));
-
-        // TEXCOORDS
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(struct Vertex, TexCoords));
-
-        // TANGENT
-        //glEnableVertexAttribArray(3);
-        //glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(struct Vertex, Tangent));
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*sizeof(*EBOdata), EBOdata, GL_STATIC_DRAW);        
-
-        glBindVertexArray(0);        
-}
-
 //How to make this compact and automatically??
 //
 // calculate vertex's data(position, normal, texture coords) here
@@ -446,6 +411,7 @@ void spawn_triangle(plane_type, map){
 // ===============================Primitives_Data_Construction============================================
 //
 // First we hardcode it to see how it work, and then think about the proper approach of this one.
+
 local_persist void Load_Textures_for_OpenGL(Graphic_Properties* Graphic_obj, const char* media_folder_path){
 // Recursively loop over the folder and load group of textures here
     //graphic_obj->texture_collection.reserve(10); 
@@ -475,6 +441,7 @@ local_persist void Load_Textures_for_OpenGL(Graphic_Properties* Graphic_obj, con
 
             if((folder_looker.find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && (!string_contain(new string(folder_looker.find_data.cFileName),"."))){
              Graphic_Obj->M_mesh[].textures_group = load_textures_in_folder(&folder_looker, folder_path.c_str());
+// TODO:This one
              Graphic_Obj->M_mesh[].
              Graphic_Obj->M_mesh[].name = folder_looker.find_data.cFileName;
             }
@@ -493,8 +460,8 @@ extern "C" __declspec(dllexport) void Load_Textures_for_OpenGL_(Platform_Propert
     ReloadGLFunction(Game_Platform);
     Load_Textures_for_OpenGL(Graphic_Obj, media_folder_path);
 };
-
 mesh construct_mesh(/*what to put inside this???*/map_drawn_element drawn_type_, char* data_buffer_pointer){
+// we need to have a failed check flag for this asset loop loader
     M_Mesh temp_mesh_value = {};
 //draw type
     M_Mesh.drawn_type = drawn_type_;
@@ -508,12 +475,9 @@ mesh construct_mesh(/*what to put inside this???*/map_drawn_element drawn_type_,
 }
 
 // Still think about this one.=================================
-void set_whole_mesh_data(graphic_property* graphic_obj){
+void load_primitive_vertices_data(graphic_property* graphic_obj, shape_vertices_store* vertices_store){
     // data can be loaded from text file!!;
     // we need to copy whole data not just the address
-    graphic_obj->Mesh_Group.reserve(10);
-
-// Time to replace this with generalized concept like triangle, cube struct
 external float plane_vertices[] = {
     // positions
     // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
@@ -532,7 +496,10 @@ external unsigned int plane_indices[] =  {
     0, 1, 2, 2, 4, 0
 };
 
-    //cube
+vertices_store->plane.vertices = plane_vertices;
+vertices_store->plane.indices = plane_indices;
+set_each_Mesh_up(&vertices_store->plane);
+//cube
 float cube_vertices[] = {
       //Position           //Normal           //TexCoords
      -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
@@ -587,6 +554,10 @@ int cube_indices[] = {
     30, 31, 32, 32, 34, 30
 };
 
+vertices_store->cube.vertices = cube_vertices;
+vertices_store->cube.indices = cube_indices;
+set_each_Mesh_up(&vertices_store->cube);
+// This one is for later
     //tile-liked shapes
 float tile_vertices[] = {// vertex                    TextCoords
       //BACK FACE
@@ -641,19 +612,43 @@ unsigned int tile_indices[] = {
        24, 25, 26, 25, 24, 29,//4
        30, 31, 32, 32, 34, 30
 };    
-
-// Consider using imposter to replace actual sphere
-// Group of mesh mean group of asset and vertice data(from simple like triangle to complex like cube, cylinder or the whole model vertex)
-
-    // load basic shape first
-    // TODO: set single primive on this and test the mass drawing thing
-    // We replace vertices data with prestored simple shape one
-    // how to set, store and link these then call these vertices data
-    // when we need wisely we need a rational enough simple ID mechanism
-        set_each_Mesh_up(&graphics_obj->Mesh_Group[PLANE], plane_vertices, plane_indices);
-        set_each_Mesh_up(&graphics_obj->Mesh_Group[CUBE_SHAPE], cube_vertices, cube_indices);
-    //}
 }
+
+void set_each_Mesh_up(shape_vertices_data* shape_data){
+
+        glGenVertexArrays(1, shape_data->VAO);
+        glGenBuffers(1, shape_data->VBO);
+        glGenBuffers(1, shape_data->EBO);
+        glBindVertexArray(mesh->VAO);
+        // Good thing about struct is that their memory is sequential for all its time
+        //glVertexAttribPointer(0, 1, GL_UNSIGNED_INT, GL_FALSE, sizeof(unsigned int), (const void*)0);
+        
+        // Load data into vertex buffer
+        glBindBuffer(GL_ARRAY_BUFFER, shape_data->VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(*shape_data->vertices)*sizeof(float), VBOdata, GL_STATIC_DRAW);        
+        // Time to set vertex attribute pointers
+        // POSITION
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_), (const void*)0);
+
+        // NORMAL
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_), (const void*)offsetof(struct vertex_, Normal));
+
+        // TEXCOORDS
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_), (const void*)offsetof(struct vertex_, TexCoords));
+
+        // TANGENT
+        //glEnableVertexAttribArray(3);
+        //glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(struct vertex_, Tangent));
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shape_data->EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*sizeof(*shape_data->indices), EBOdata, GL_STATIC_DRAW);        
+
+        glBindVertexArray(0);        
+}
+
 
 // NOTE: Then we have something to do with the pre-lighted texels
 // we will write a function that compute normal from texture's texel data
@@ -669,6 +664,7 @@ void feed_shader_data(B_shader_program* shader){
     shader->set;
 };
 // NOTE: So we load all but draw object pickily based on its be_drawn_type
+
 switch(unit.graphic_type){
     //set textures
 // Then feed the shader based on graphic type it got
@@ -690,6 +686,7 @@ switch(unit.graphic_type){
     default :
         break;
 };
+
 //TODO: Focus on this one. We draw objs dynamically based on its be_drawn_type
 // NOTE: We got to divide more clearly among the shader(its job and type of input it will get)
 

@@ -187,24 +187,27 @@
     ;;"add ';' at the end of line "
     ;; string_match return number of matched character
     (let ((line (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
-      (cond ((string-match "//" line)
+      (cond ((and (not (equal (string-match-p "//" line) nil)) (not (bolp)))
              (message "Current line: %s" line)
 	     (message "current line contain '//'")
 	     (newline-and-indent)
-	     (insert "//"))
-	    ((and (not (string-match "//" line)) (not (string-match "*/" line)))
+	     (beginning-of-line)
+	     (insert "//")
+	     (end-of-line))
+	    ;; this string match didn't work
+	    ((and (equal (string-match-p "//" line) nil) (equal (string-match-p "*/" line) nil) (not (equal (string-match-p ";" line) nil)) (eolp))
 	     (message "line is no comment")
-	     (if (not (equal (string-match ";" line) nil))
-		 (end-of-line)
-	         (insert ";")
-		 )
-	       (newline-and-indent)
-	       (insert ";")
-	       (backward-char)
+	     ;; line not contain ;
+	     (end-of-line)
+	     (newline-and-indent)
+	     (insert ";")
+	     (backward-char)
 	     )
-	       )
+	    (t (newline-and-indent)
+	       )	     
 	    )
       )
+    )
 
   (defun casey-source-format ()
     "Format the given file as a source file."
@@ -469,10 +472,12 @@
       ;; So eq is the equality test(compare fx) and ?\s present for white space
       (if (eq (char-before) ?\s) (delete-horizontal-space))
       ;; litterally non-space+space or space+non-space char
+      ;; what will be killed as the first one character
       (if(looking-back "[^0-9a-zA-Z;]" 1)(backward-delete-char 1))
       (let ((start (point)))
 	;; move the cursor through given character
-      (skip-chars-backward " 0-9A-Za-z\t" (line-beginning-position))
+	;; what will be killed
+      (skip-chars-backward "0-9A-Za-z\t" (line-beginning-position))
 	(delete-region (point) start))))
 ;;)
 
