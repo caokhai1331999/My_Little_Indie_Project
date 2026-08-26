@@ -1,6 +1,6 @@
 #if !defined(PSUEDO_H)
 /* ========================================================================
-   $File: $
+ $File: $
    $Date: $
    $Revision: $
    $Creator: Cao Khai(Casey's disciple) $
@@ -134,10 +134,21 @@ struct mesh_shape_data_pointers{
 };
 
 //======================MESH_PART==========================
-//
+
+struct M_Mesh{
+    //Use this whenever I done the dynamic array
+    std::string name;
+    map_drawn_element drawn_type;
+    uint8 light_types[3];
+    // how about light options
+    // should I put light here
+    texture_group textures;
+    unsigned int VAO;
+};
+
 //===========================================================
 // PURPOSE: Create a mechanism that draw multiple object of scene using
-//instancing method and available asset.
+// instancing method and reuse available asset.
 // In terms of graphics
 // enviromental elements is just light
 
@@ -146,11 +157,12 @@ typedef uint8 be_drawn_type;
 // The passable unit have to be aligned with each other
 // This group of ID mark element for the engine to drawn accordingly
 // This type will be drawn alot...
-//
+
 #define Still_or_Movable(x) \
     x ## _Static, \
     x ## _Moving
-    
+// NOTE: Let alone this later
+// there still something we haven't figure out completely yet
 enum map_drawn_element:be_drawn_type{
     //How about normal mapping 
     Still_or_Movable(In_World), // pass entity's pos **
@@ -158,6 +170,7 @@ enum map_drawn_element:be_drawn_type{
     Shading = 3, // still haven't decide yet
     Pos_Game_Effect = 4 // texture, using particles engine called last
 };
+//==========================================================
 
 struct shape_vertices_data{
     float* data_;
@@ -170,16 +183,6 @@ struct shape_vertices_store{
     shape_vertices_data triangle_data;
     shape_vertices_data plane_data;
     shape_vertices_data cube_data;
-};
-
-struct M_Mesh{
-    //Use this whenever I done the dynamic array
-    std::string name;
-    uint8 light_types[3];
-    map_drawn_element drawn_type;
- //how about light options
- // should I put light here
-    texture_group textures;
 };
 
 // we put the texture inside the mesh -> how to load the textures and store them inside the name matched M_mesh 
@@ -232,35 +235,40 @@ typedef uint8 entity_type;
 
 // Be pragmatic, think about what its real use in shader and game play(collision)
 // we need a tracker to watch all of entities in room
+
 struct map_unit{
 // This is just should be an entity
     // store multiple vec3 is not cheap,we need to find the
     // alternatives
     // This is for choosing suitable mesh to draw
-    uint8 MeshID;
+    uint8 mesh_id;
+    uint8 shader_id;
+    uint8 primitive_data_id;
+    uint8 texture_id;
+    uint8 light_types_id;
+
     // This is for position reconstruction
     uint8* space_id;
-    // This is only for moving object
-    // This is for gameplay
+
     rigid_body* body;
+
     bool32 tangible;
     bool32 movable;
+
     map_unit(){};
 };
 
-struct moving_entity_specs{
-    map_unit basic_unit_specs;
-    glm::vec3 position;
-};
+// NOTE: This one is for object that have rigid body
 
-struct simple_volume_map{
+struct simple_volume_map{    
     // one is mesh type, the other is the position;
-    std::vector<map_unit>background_map_content;
-    // I think because of moving object object position
-    // is changeable so we need to store these
-    std::vector<moving_entity_specs>moving_obj_group;
-    int8* map_content;// replace this with array of map_unit_specs
-    size_t map_size;   
+    std::vector<map_unit>downground_content;
+    std::vector<map_unit>moving_obj_group;
+    // the lowest layer of room is alway where the background object is
+    // so from 0 -> length*breath contain the static object id
+    uint8* map_content;// we haven't decide what this value hold yet???
+    // mesh, texture, or light ID
+    size_t map_size;
     // Volumme/Room 3D size in world space
     uint16 height;
     uint16 breadth;
@@ -273,9 +281,6 @@ struct simple_volume_map{
 // How to relatively define map size based one world
 // first we have to know how big is the unit cube size to compare to the world
 // current ground size is 1(x0.375)x30(x0.5)x30(x0.5 )
-//
-//So I decide the volume will be 50x50x50
-//
 
 #define ROOM_HEIGHT (uint8)50
 #define ROOM_BREADTH (uint8)50

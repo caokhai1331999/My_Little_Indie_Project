@@ -90,6 +90,7 @@ void set_light(glm::vec3* position, std::vector<general_light*>* light_group){
 }
 
 // Manually set light here.
+//
 void turn_on_light(std::vector<general_light*>* light_group){
     // so we have to manually set it here
     // Is there anyway to automatic this one;
@@ -126,6 +127,7 @@ void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
 // We need a pre-created Texture group
 // Sketch map and spawn entities
 // layer of background and layer of moving entities
+
 void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
     srand(time(NULL));
     // rational map sketcher here.
@@ -140,6 +142,7 @@ void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
     // These objects graphical differences are the shader and its position in room
     //
     // Total object will be drawn in displaying range in room
+    // Understand data on the level of interger/float is an advantage
     uint8 Block_Object_Count = (uint8)((float)map->map_size * 0.2f);
     // all of the will be drawn obj is the under lit one
     uint8 total_objects = 10 + rand()%15;
@@ -199,6 +202,7 @@ void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
         //{
         //static one
          map->map_content[i] = rand()%(mesh_group->size()-1);
+         map->map_content[i] = rand()%(graphic_obj->VAOssize()-1);
          //moving one
          if(block_object_count > 0 && h == 0)
          map->map_content[i] = rand()%1;
@@ -255,10 +259,34 @@ void set_rigid_body(glm::vec3* init_pos){
 //
 // Hard code vertices data here
 // ========WORKING===========
-void spawn_vertex(plane_type, map){
-    Vertex vertex = {};
-    vertex.position = glm::vec3();
-    vertex.position.x;
+// NOTE: what the map give and what I can extrapolate from it??
+// Do we need to construct the vertex data from space id?
+// other from just mere position we still have normal and textcoord
+// maybe this reason is solid enough
+
+vertex_ spawn_vertex_data(uint16 spaceID){
+    vertex_ basic_vertex_data = { {{}, {}, {}}, {{}, {}, {}}, {{}, {}, {}} }; // extrapolate from this one
+    vertex_ vertex = {};    
+
+    vertex.position[] = basic_vertex_data.position *;
+    vertex.normal[] = ;
+    vertex.textcoord[] = ;
+
+    return vertex;
+}
+// NOTE: assign graphic id to the map unit to use it later for in mass instancing draw
+map_unit spawn_map_unit(uint16 spaceID){
+    map_unit temp_unit;
+    spawn_vertex();
+}
+// NOTE: On Working here
+//=====================WORKING==============================
+void construct_vertices_data(vertex* vertices, const simple_volume_map* map){
+    unsigned int maker = 0;
+    map;
+    while(marker < map->size - 1){
+        .push_back(map->spawn_map_unit(map->map_content[marker]));
+    };
 }
 //=====================WORKING==============================
 //

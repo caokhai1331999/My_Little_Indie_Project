@@ -2601,7 +2601,13 @@ NOTE: - We will let the shader compute the light. And pass the rest
       - we still stucks at the VAOS data options apt. 
 
 TODO: . Firstly, we set up VAO of triangles, plane and cube. Draw world up
-      from these. DONE! X
+      from these. DONE!
       . Consider compute a massive vertices data for custom shape
-      . Finish map(for still/moving objects) construction X
-      . Finish mesh construction based on inherent type. X
+      . Finish map(for still/moving objects) construction . DONE! 
+      . Finish mesh construction based on inherent type. X . 
+
+---------------- Wed, 26 Aug 26: 10:28AM
+
+//NOTE: Still, we haven't find the way to create and sample the right VAOS data
+//so we all we need to do is compute each vertex data of mesh if we want to dynamically draw things down
+
