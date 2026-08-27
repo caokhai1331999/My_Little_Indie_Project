@@ -483,23 +483,32 @@ local_persist void Load_Textures_for_OpenGL(Graphic_Properties* Graphic_obj, con
     }
     FindClose(folder_looker.handle);
 }
+
 // change graphic_property* graphic_obj to vector of texture_group
 extern "C" __declspec(dllexport) void Load_Textures_for_OpenGL_(Platform_Properties* Game_Platform, Graphic_Properties* Graphic_Obj, const char* media_folder_path){
     ReloadGLFunction(Game_Platform);
     Load_Textures_for_OpenGL(Graphic_Obj, media_folder_path);
 };
-mesh construct_mesh(/*what to put inside this???*/map_drawn_element drawn_type_, char* data_buffer_pointer){
+
+// NOTE: ON WORKING: construct each mesh based on type(but how to clarify these one)
+M_Mesh construct_mesh(/*what to put inside this???*/map_drawn_element drawn_type_, char* data_buffer_pointer){
 // we need to have a failed check flag for this asset loop loader
-    M_Mesh temp_mesh_value = {};
-//draw type
-    M_Mesh.drawn_type = drawn_type_;
-    //texture
-    // THis one is already in the folder loop texture loader
-    M_Mesh.textures[NORMAL] = drawn_type_;    
-    M_Mesh.textures[DIFFUSE] = drawn_type_;    
-    M_Mesh.textures[SPECULAR] = drawn_type_;    
-    M_Mesh.textures[EMISSION/*if available*/] = drawn_type_;    
-    return;
+    // name
+    M_Mesh added_mesh = {};
+    // VAO
+
+    added_mesh.drawn_type = drawn_type_;
+    // This one is already in the folder loop texture loader
+
+    // texture
+    added_mesh.textures[NORMAL] = drawn_type_;    
+    added_mesh.textures[DIFFUSE] = drawn_type_;    
+    added_mesh.textures[SPECULAR] = drawn_type_;    
+    added_mesh.textures[EMISSION/*if available*/] = drawn_type_;    
+
+    // Light
+    
+    return added_mesh;
 }
 
 // Still think about this one.=================================

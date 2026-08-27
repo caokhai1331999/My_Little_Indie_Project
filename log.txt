@@ -2608,6 +2608,10 @@ TODO: . Firstly, we set up VAO of triangles, plane and cube. Draw world up
 
 ---------------- Wed, 26 Aug 26: 10:28AM
 
-//NOTE: Still, we haven't find the way to create and sample the right VAOS data
-//so we all we need to do is compute each vertex data of mesh if we want to dynamically draw things down
+NOTE: Still, we haven't find the way to create and sample the right VAOS data
+so we all we need to do is compute each vertex data of mesh if we want to dynamically draw things down
 
+---------------- Thu, 27 Aug 26: 10:39AM
+
+TODO: . what to take out to test this time: mesh_construct and mass
+drawing(render the room)

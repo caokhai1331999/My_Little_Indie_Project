@@ -143,7 +143,7 @@ struct M_Mesh{
     // how about light options
     // should I put light here
     texture_group textures;
-    unsigned int VAO;
+    unsigned int* VAO;
 };
 
 //===========================================================
@@ -161,19 +161,32 @@ typedef uint8 be_drawn_type;
 #define Still_or_Movable(x) \
     x ## _Static, \
     x ## _Moving
+
 // NOTE: Let alone this later
 // there still something we haven't figure out completely yet
-enum map_drawn_element:be_drawn_type{
-    //How about normal mapping 
-    Still_or_Movable(In_World), // pass entity's pos **
-    Light_Effect = 2, // pass optional's light specs **
-    Shading = 3, // still haven't decide yet
-    Pos_Game_Effect = 4 // texture, using particles engine called last
-};
-//==========================================================
 
+enum special_light_type:be_drawn_type{
+    //How about normal mapping 
+    normal_map_light = 0, // pass optional's light specs **
+    shade = 1, // still haven't decide yet
+};
+
+// NOTE: where to put animation in graphic type
+enum effect_type:be_drawn_type{
+    //How about normal mapping 
+    emission = 0, // pass optional's light specs **
+    animating = 1 
+};
+
+enum effect_type:primitives_data_type{ // about VAOs - load or manually-construct these
+    //How about normal mapping 
+    emission = 0, // pass optional's light specs **
+    animating = 1 
+};
+
+//==========================================================
 struct shape_vertices_data{
-    float* data_;
+    float* data_; 
     unsigned int* VAO;
     unsigned int* VBO;
     unsigned int* EBO;
@@ -186,10 +199,10 @@ struct shape_vertices_store{
 };
 
 // we put the texture inside the mesh -> how to load the textures and store them inside the name matched M_mesh 
+
 local_persist void Load_Textures_for_OpenGL(Graphic_Properties* Graphic_Obj, const char* media_folder_path);
 extern "C" __declspec(dllexport) void Load_Textures_for_OpenGL_(Platform_Properties* Game_Platform, Graphic_Properties* Graphic_Obj, const char* media_folder_path = nullptr);
 typedef void (*Load_Textures_for_OpenGL__) (Platform_Properties*, Graphic_Properties* , const char*);
-
 
 // How can I make sure that all the shaders draw the same object
 
@@ -209,6 +222,8 @@ typedef void (*Load_Textures_for_OpenGL__) (Platform_Properties*, Graphic_Proper
 class graphic_property{
 private:
     // This will be geometry collection
+    // NOTE: instead of vector of shader.
+    // we sort them out as set(each has particular purpose)
     std::vector<B_shader_program*>* shader_group;
     //TODO: need to arrange the mesh order based on drawn type for the sake of calling later
     std::vector<M_Mesh>* Mesh_Group;
@@ -241,11 +256,14 @@ struct map_unit{
     // store multiple vec3 is not cheap,we need to find the
     // alternatives
     // This is for choosing suitable mesh to draw
-    uint8 mesh_id;
-    uint8 shader_id;
-    uint8 primitive_data_id;
-    uint8 texture_id;
-    uint8 light_types_id;
+    light_type lit_up_way;
+    effect_type extra_effect;
+
+    uint8* mesh_id;
+    uint8* shader_id;
+    uint8* primitive_data_id;
+    uint8* texture_id;
+    uint8* light_types_id;
 
     // This is for position reconstruction
     uint8* space_id;
