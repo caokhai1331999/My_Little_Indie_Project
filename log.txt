@@ -2615,3 +2615,16 @@ so we all we need to do is compute each vertex data of mesh if we want to dynami
 
 TODO: . what to take out to test this time: mesh_construct and mass
 drawing(render the room)
+
+---------------- Sat, 29 Aug 26: 08:48AM
+NOTE: Casey used normal-mapping with LOD first and then raycasting to
+approximate the real-time light-rendering .
+
+NOTE: Recall: Graphic pipeline stage(drawing and perspective)
+vertex -> triangles assembly -> rasterrize(3D -> 2D or from model space to screen
+space IIRC) -> fragment -> test and blend -> framebuffer(don't know sh*t about this)
+      - It's really interesting that we come up with a system of entity's power
+      & status that is coherently interact with each other, nothing spare.
+
+DONE!: I recall well and came up with a viable struct type that being able to
+fetch shader, light specs from graphic object

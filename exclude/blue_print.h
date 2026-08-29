@@ -17,34 +17,33 @@ struct File_Manager{
 //=====================SIMPLE_FILE_HANDLE========================
 
 std::vector<Entities*>*World_Entities_Trackers;
-
-struct Entities_Structure{
-    
-    std::vector<rigid_body*>all_entities;
-};
-
-class entity{
+class basic_entity{
 private:
     space_box collided_box;
     // This matrix will contain anything about
     //the entity in the made-up world like:
     //position, rotation, scale
-    glm::mat4 world_present_model;
-    
+    glm::mat4 world_present_model;    
+};
+
+struct GamePlay_Entity{
+
+    int storage; // ??
+
     bool32 is_moving;
     bool32 is_dead;
 
-    int current_level;
-    int storage;
+    uint16 current_level;
     // actually skill is just some set of animation that deal specific damage;
-    skills skill;
-    int stregth;
+    skills skill; // This one is fictious
+    uint16 stregth;
 
-    int Health_Bar;
+    uint16 health;
     steerer driver;
-    // Graphic ID - This one represent the VAOs, texture and light that we use to draw this entity
-    uint8 MeshID;
-};
+    // this one haven't been realistic yet
+    // This is supposed to calculate the next position of entities based on its
+    // area surrounding.
+}
 
 //======================LIGHT_PART==========================
 
@@ -134,12 +133,9 @@ struct mesh_shape_data_pointers{
 };
 
 //======================MESH_PART==========================
-
+// May be this one is no longer needed and be replaced by graphic type and vectors of shaders, lights_specs and textures.
 struct M_Mesh{
     //Use this whenever I done the dynamic array
-    std::string name;
-    map_drawn_element drawn_type;
-    uint8 light_types[3];
     // how about light options
     // should I put light here
     texture_group textures;
@@ -149,8 +145,6 @@ struct M_Mesh{
 //===========================================================
 // PURPOSE: Create a mechanism that draw multiple object of scene using
 // instancing method and reuse available asset.
-// In terms of graphics
-// enviromental elements is just light
 
 typedef uint8 be_drawn_type;
 
@@ -165,22 +159,24 @@ typedef uint8 be_drawn_type;
 // NOTE: Let alone this later
 // there still something we haven't figure out completely yet
 
-enum special_light_type:be_drawn_type{
+enum light_type__:be_drawn_type{
     //How about normal mapping 
-    normal_map_light = 0, // pass optional's light specs **
-    shade = 1, // still haven't decide yet
+    basic_light = 0, //  diffuse + ambient + specular /or any simple approximated alternative
+    emission = 2, // pass optional's light specs **
+    normal_map_light = 3, // pass optional's light specs **
+    shade = 4, // still haven't decide yet
+};
+
+
+enum shader_type__:be_drawn_type{
+    //How about normal mapping 
+    basic_light = 0, //  diffuse + ambient + specular /or any simple approximated alternative
+    animating = 1, // pass optional's light specs **
 };
 
 // NOTE: where to put animation in graphic type
 enum effect_type:be_drawn_type{
     //How about normal mapping 
-    emission = 0, // pass optional's light specs **
-    animating = 1 
-};
-
-enum effect_type:primitives_data_type{ // about VAOs - load or manually-construct these
-    //How about normal mapping 
-    emission = 0, // pass optional's light specs **
     animating = 1 
 };
 
@@ -218,7 +214,18 @@ typedef void (*Load_Textures_for_OpenGL__) (Platform_Properties*, Graphic_Proper
 //
 // How we do layer of effect on the same object
 // How to first prototype the graphic property
-// struct graphic_property{
+// NOTE: How to come up with simple enough but effective name system for grouping light and shader
+// together
+
+struct graphic_object_type{
+    light_type__ light_type_;
+    shader_type__ shader_type_;
+};
+
+#define basic_draw_type (graphic_object_type){light_type__::basic_light, shader_type__::basic_light}
+// more optional types if needed
+#define basic_draw_type (graphic_object_type){light_type__::basic_light, shader_type___::basic_lighting_shader}
+
 class graphic_property{
 private:
     // This will be geometry collection
@@ -234,7 +241,6 @@ public:
     // model path is optional
     object(char *media_folder_path = nullptr, char *light_shader_name_ = nullptr)
         : name{name} {
-//??
         std::string shader_name = light_shader_name_;
         //search inside the folder for matched source for shader
         basic_light_shader = new B_shader_program(shader_name+".vs", shader_name+".fs", shader_path);       
@@ -250,26 +256,21 @@ typedef uint8 entity_type;
 
 // Be pragmatic, think about what its real use in shader and game play(collision)
 // we need a tracker to watch all of entities in room
-
-struct map_unit{
+// NOTE: what I'm gonna do with map unit and entity
+struct map_unit{ // when to use map_unit and when to use entity
 // This is just should be an entity
     // store multiple vec3 is not cheap,we need to find the
     // alternatives
     // This is for choosing suitable mesh to draw
-    light_type lit_up_way;
-    effect_type extra_effect;
-
-    uint8* mesh_id;
-    uint8* shader_id;
-    uint8* primitive_data_id;
+// NOTE: These will be used for fectching data from graphic object
+    uint8* vertices_data_id;
     uint8* texture_id;
-    uint8* light_types_id;
-
+    uint8* mesh_id;
+    graphic_object_type graphic_type;// include light and shader type
+    // model space shape vertices data(pos, textcoord, normal)
+//=======================================================
     // This is for position reconstruction
-    uint8* space_id;
-
-    rigid_body* body;
-
+    uint16 space_id;
     bool32 tangible;
     bool32 movable;
 
