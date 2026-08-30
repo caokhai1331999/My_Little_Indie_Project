@@ -2628,3 +2628,8 @@ space IIRC) -> fragment -> test and blend -> framebuffer(don't know sh*t about t
 
 DONE!: I recall well and came up with a viable struct type that being able to
 fetch shader, light specs from graphic object
+
+---------------- Sun, 30 Aug 26: 10:57AM
+TODO: Talk more about light, we need to write an approximation for the current
+light model(This is too big and expensive if we keep compute from world space's
+position).

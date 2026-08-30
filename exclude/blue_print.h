@@ -208,9 +208,10 @@ typedef void (*Load_Textures_for_OpenGL__) (Platform_Properties*, Graphic_Proper
 //}
 //
 //
+// 
+//
+//
 // GROUP_EVERYTHING_UP
-//
-//
 //
 // How we do layer of effect on the same object
 // How to first prototype the graphic property
@@ -265,6 +266,7 @@ struct map_unit{ // when to use map_unit and when to use entity
 // NOTE: These will be used for fectching data from graphic object
     uint8* vertices_data_id;
     uint8* texture_id;
+    // This graphic_style will be supposed to replace all other ID if we did well .
     uint8* mesh_id;
     graphic_object_type graphic_type;// include light and shader type
     // model space shape vertices data(pos, textcoord, normal)
