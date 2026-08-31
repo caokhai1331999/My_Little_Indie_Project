@@ -134,10 +134,11 @@ struct mesh_shape_data_pointers{
 
 //======================MESH_PART==========================
 // May be this one is no longer needed and be replaced by graphic type and vectors of shaders, lights_specs and textures.
+//Use this whenever I done the dynamic array
+// how about light options
+// should I put light here
+
 struct M_Mesh{
-    //Use this whenever I done the dynamic array
-    // how about light options
-    // should I put light here
     texture_group textures;
     unsigned int* VAO;
 };
@@ -166,7 +167,6 @@ enum light_type__:be_drawn_type{
     normal_map_light = 3, // pass optional's light specs **
     shade = 4, // still haven't decide yet
 };
-
 
 enum shader_type__:be_drawn_type{
     //How about normal mapping 
@@ -266,8 +266,8 @@ struct map_unit{ // when to use map_unit and when to use entity
 // NOTE: These will be used for fectching data from graphic object
     uint8* vertices_data_id;
     uint8* texture_id;
-    // This graphic_style will be supposed to replace all other ID if we did well .
     uint8* mesh_id;
+    // This graphic_style will be supposed to replace all other ID if we did well .
     graphic_object_type graphic_type;// include light and shader type
     // model space shape vertices data(pos, textcoord, normal)
 //=======================================================

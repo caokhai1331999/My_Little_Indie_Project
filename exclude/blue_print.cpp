@@ -506,8 +506,7 @@ M_Mesh construct_mesh(/*what to put inside this???*/map_drawn_element drawn_type
     added_mesh.textures[SPECULAR] = drawn_type_;    
     added_mesh.textures[EMISSION/*if available*/] = drawn_type_;    
 
-    // Light
-    
+    // Light    
     return added_mesh;
 }
 

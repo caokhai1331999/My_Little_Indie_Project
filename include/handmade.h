@@ -349,7 +349,8 @@ struct OpenGLData{
 struct memory_arena{
     size_t size;
     size_t used;
-    void* base;
+    //void* base;// error: unknow size
+    uint8* base;
     // In term of linear data arrangement the Pad itself is to just separate the memory_block memory address from what come after it.
     uint64 Pad[6];
 };
@@ -360,7 +361,8 @@ struct memory_block{
 
     size_t size;
     size_t used;
-    void* base;
+    //void* base;
+    uint8* base;
     // In term of linear data arrangement the Pad itself is to just separate the memory_block memory address from what come after it.
     uint64 Pad[6];
 };
@@ -436,7 +438,7 @@ void ALLOCATE_BLOCK_MEMORY(memory_arena* arena, size_t size){
         arena->base = result;
 }
 
-/*
+
 void* ALLOCATE_BLOCK_MEMORY(memory_block* mem, size_t size){
         memory_block* block = (memory_block*)VirtualAlloc(block->base, size + sizeof(memory_block), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
         // why plus one
@@ -444,17 +446,18 @@ void* ALLOCATE_BLOCK_MEMORY(memory_block* mem, size_t size){
         block->next = mem->next; 
         block->prev = mem; 
 
-        begin_ticket_mutex(&BackBuffer.mutex);
+        begin_ticket_mutex(&Game_Platform.ticket);
         block->next->prev = block;
         block->prev->next = block;
-        end_ticket_mutex(&BackBuffer.mutex);
+        end_ticket_mutex(&Game_Platform.ticket);
 
         void* result = block->base + 1;
+
         return result;
 }
-*/
 
 
+/*
 bool32 DEALLOCATE_BLOCK_MEMORY(memory_arena* arena){
     bool32 result;
     if(arena->base){
@@ -462,8 +465,8 @@ bool32 DEALLOCATE_BLOCK_MEMORY(memory_arena* arena){
     };
     return result;
 }
+*/
 
-/*
 void DEALLOCATE_BLOCK_MEMORY(memory_block* mem){
     if(mem){
         memory_block* block = ((memory_block*)mem - 1);
@@ -473,7 +476,7 @@ void DEALLOCATE_BLOCK_MEMORY(memory_block* mem){
         VirtualFree(block->base, block->size, MEM_COMMIT|MEM_RESERVE);
     };
 }
- */
+ 
 // apply to grow vertex array
 
 void init_mem_region(size_t size, memory_block * arena){
@@ -507,10 +510,10 @@ void* push_size_(size_t size, memory_arena* arena, ticket_mutex* mutex){
 }
 */
 
-/*
+
 void* push_size_(size_t size, memory_block* sentinel, ticket_mutex* mutex){
-    void* result;
     // whenever the total requested size if bigger than the current block size: allocate new space and copymemory of the old block
+    void* result;
     if(sentinel->used + size >= sentinel->size){
         begin_ticket_mutex(mutex);
         memory_block* new_block = (memory_block*)ALLOCATE_BLOCK_MEMORY(sentinel, (size_t)DEFAULT_BLOCK_SIZE);
@@ -522,15 +525,16 @@ void* push_size_(size_t size, memory_block* sentinel, ticket_mutex* mutex){
         result = new_block->base + size;
         new_block->used += size;
         end_ticket_mutex(mutex);
+        return (result);
         // How can i access these memory in pool using index
         //CopyMemory();
     } else {
         sentinel->used += size;
         result = sentinel->base + sentinel->used;
+        return (result);
     };
-    return result;
 }
-*/
+
 
 struct Game_Memory{
 

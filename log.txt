@@ -2626,10 +2626,14 @@ space IIRC) -> fragment -> test and blend -> framebuffer(don't know sh*t about t
       - It's really interesting that we come up with a system of entity's power
       & status that is coherently interact with each other, nothing spare.
 
-DONE!: I recall well and came up with a viable struct type that being able to
+DONE!: IIRC I came up with a viable struct type that being able to
 fetch shader, light specs from graphic object
 
 ---------------- Sun, 30 Aug 26: 10:57AM
 TODO: Talk more about light, we need to write an approximation for the current
 light model(This is too big and expensive if we keep compute from world space's
 position).
+
+---------------- Mon, 31 Aug 26: 11:46AM
+
+NOTE: When I decide to choose one texture or mesh than the others
