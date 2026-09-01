@@ -13,7 +13,6 @@ struct File_Manager{
     WIN32_FIND_DATA find_data;
     HANDLE handle;
 };
-
 //=====================SIMPLE_FILE_HANDLE========================
 
 std::vector<Entities*>*World_Entities_Trackers;
@@ -119,7 +118,7 @@ struct plane{
     // Should put it in here
     unsigned int texture;
 };
-
+// or we can store volumetric's data here
 struct cube{
     vertex vertices[24];    
     index indices[24];
@@ -134,13 +133,14 @@ struct mesh_shape_data_pointers{
 
 //======================MESH_PART==========================
 // May be this one is no longer needed and be replaced by graphic type and vectors of shaders, lights_specs and textures.
-//Use this whenever I done the dynamic array
+// use this whenever I done the dynamic array
 // how about light options
 // should I put light here
-
+//NOTE: A mesh is a groups of vertex's data(all possible) in order to draw shape
 struct M_Mesh{
-    texture_group textures;
-    unsigned int* VAO;
+    // how to arrange indices data for dynamically drawing complex shape??...
+    // May be the Polygon or triangle to start with
+    // 
 };
 
 //===========================================================

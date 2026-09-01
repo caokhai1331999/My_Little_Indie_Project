@@ -169,11 +169,10 @@ void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
 
     for(size_t int i = 0; i < map->size; i++)
     {
-                // we do every single cube here which have the size of 1,1,1
-                //
-                // have to be more specificly rational about this one
-                // ground first then up
-                // what to store OMG we just need to store the mesh ID
+        // we do every single cube here which have the size of 1,1,1
+        // have to be more specificly rational about this one
+        // ground first then up
+        // what to store OMG we just need to store the mesh ID
         // need to be more rational, can not let it randome like this
         x++;
         if(x == map->w -1 ){
@@ -735,8 +734,7 @@ void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_ma
         glBindVertexArray(Graphics->VAOS[/*mesh id*/]);
         shader->setMat4("projection", chosen_camera->projection); 
         shader->shader[i]->setMat4("view", chosen_camera->view);            
-        // also bind matched texture here.
-        
+        // also bind matched texture here.        
     };
     glUseProgram(0);
     size_t i = 0;
@@ -749,6 +747,9 @@ void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_ma
 // 
     for(moving_entity_specs* const &unit:world_map->moving_obj_group){
         // VAOs - shape vertice's data (at least: Position and TexCoord);
+        if(unit->pos > /*specific number*/)
+            continue;
+        // I don't think the meshID is viable right now.
         glBindVertexArray(Graphics->mesh_group[unit->basic_unit_specs.MeshID].VAO);
         // Remember we already set all lights's basic specs before in the init graphics
         // add switch case for type here
@@ -762,7 +763,7 @@ void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_ma
          Graphic_Obj->shader[unit->basic_unit_specs.MeshID]->setVec3("Postion["+to_string(unit->basic_unit_specs.space_id)+"]", unit->position);        Graphic_Obj->shader;
         glDrawElements();
     }
-
+//NOTE: Now the background unit.
     while(i < world_map->size){
 // Each shader represent for one layer of effect at least.
         // Same process here for map-background-components here

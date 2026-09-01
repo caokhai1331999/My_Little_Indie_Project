@@ -2620,7 +2620,7 @@ drawing(render the room)
 NOTE: Casey used normal-mapping with LOD first and then raycasting to
 approximate the real-time light-rendering .
 
-NOTE: Recall: Graphic pipeline stage(drawing and perspective)
+NOTE: **Call: Graphic pipeline stage(drawing and perspective)
 vertex -> triangles assembly -> rasterrize(3D -> 2D or from model space to screen
 space IIRC) -> fragment -> test and blend -> framebuffer(don't know sh*t about this)
       - It's really interesting that we come up with a system of entity's power
@@ -2631,9 +2631,32 @@ fetch shader, light specs from graphic object
 
 ---------------- Sun, 30 Aug 26: 10:57AM
 TODO: Talk more about light, we need to write an approximation for the current
-light model(This is too big and expensive if we keep compute from world space's
+light model(This is too big and expensive if we keep computing from world space's
 position).
 
 ---------------- Mon, 31 Aug 26: 11:46AM
 
 NOTE: When I decide to choose one texture or mesh than the others
+
+---------------- Tue, 01 Sep 26: 09:44AM
+NOTE: Brain's states while start working: (Guess so)
+      1. focus
+      2. recall what happened
+      3. focus again
+      4. start to think what next
+
+** what can I apply from this pipeline - for mass drawing.
+focus on flow keep it as long as possible
+
+TODO: . make few demo of gameplay for to see if possible
+      . one thing that I need to know that which object is in drawable range
+      which is not to save a significant amount of performance(maybe later)
+NOTE: All right!!!, for the sake of mass-drawing. I think I have to know more
+      about form of memory-storage/data container.
+
+NOTE: Important question. Which kind/branch of expert that you want to be in
+this game industry(for example: gameplay, graphic/light, or physics). 
+     . To make the mass-drawing instance different from time rendering this
+     time. I have to apply light on it.
+
+TODO: We need to focus on VAOs data/pre-defined Mesh's data next time we touch this ****
