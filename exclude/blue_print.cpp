@@ -534,6 +534,7 @@ external unsigned int plane_indices[] =  {
 vertices_store->plane.vertices = plane_vertices;
 vertices_store->plane.indices = plane_indices;
 set_each_Mesh_up(&vertices_store->plane);
+
 //cube
 float cube_vertices[] = {
       //Position           //Normal           //TexCoords

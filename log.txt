@@ -2660,3 +2660,9 @@ this game industry(for example: gameplay, graphic/light, or physics).
      time. I have to apply light on it.
 
 TODO: We need to focus on VAOs data/pre-defined Mesh's data next time we touch this ****
+
+---------------- Wed, 02 Sep 26: 09:35AM
+In casey case, up to the ep I watch what casey used is not mesh but just texture
+with raycast as a approximation of 3D light.
+NOTE: Again for the sake of performance, may be we pre-compute the light and
+sample it anywhere we want to cast it.

@@ -105,8 +105,8 @@ struct vertex_{
 };
 
 struct triangle{
-    face_type_rhs face;
     vertex vertices[3];
+    face_type_rhs face;
     float size;
 };
 
@@ -126,21 +126,20 @@ struct cube{
     //unsigned int texture;
 };
 
-struct mesh_shape_data_pointers{
-    float* vertices_data;
-    unsigned int* indices;
-};
-
 //======================MESH_PART==========================
 // May be this one is no longer needed and be replaced by graphic type and vectors of shaders, lights_specs and textures.
 // use this whenever I done the dynamic array
 // how about light options
 // should I put light here
 //NOTE: A mesh is a groups of vertex's data(all possible) in order to draw shape
+
 struct M_Mesh{
     // how to arrange indices data for dynamically drawing complex shape??...
-    // May be the Polygon or triangle to start with
-    // 
+    // May be the Polygon or triangle to start
+    // NOTE: Can we spawn other vertices from these first triangle/polygon one
+    // There are two basic use cases: one is load vertices data from model(fbx, dae...), two is spawn one out
+    std::vector<vertex> vertices_data;
+    std::vector<unsigned int> indices_data;
 };
 
 //===========================================================
