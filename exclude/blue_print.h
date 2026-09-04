@@ -139,7 +139,9 @@ struct M_Mesh{
     // NOTE: Can we spawn other vertices from these first triangle/polygon one
     // There are two basic use cases: one is load vertices data from model(fbx, dae...), two is spawn one out
     std::vector<vertex> vertices_data;
+    //vertex* vertices;
     std::vector<unsigned int> indices_data;
+    //unsigned int* indices;
 };
 
 //===========================================================

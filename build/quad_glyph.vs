@@ -33,6 +33,8 @@ void main(){
     // how to just use the orthorgraphy with unchange view
     // map to its size actually
     // vec4 GlyphPos = GlyphPoses[gl_InstanceID];
+    float scale = 0.25f;
+    // we need to define the plane more specificly;
     gl_Position = projection * vec4(aPos.x > 0.0f?((GlyphPos.x) + GlyphPos.w):(GlyphPos.x), (aPos.y > 0.0f)?((GlyphPos.y) + GlyphPos.z):(GlyphPos.y), 0.0f, 1.0f);
     
     // gl_Position = vec4(aPos.xy, 0.0f, 1.0f);

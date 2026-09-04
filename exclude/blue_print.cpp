@@ -278,6 +278,11 @@ map_unit spawn_map_unit(uint16 spaceID){
     map_unit temp_unit;
     spawn_vertex();
 }
+
+void OutputLightingTexture(Voxel* table){
+    uint16* lookupAt = table[][][];
+}
+
 // NOTE: On Working here
 //=====================WORKING==============================
 void construct_vertices_data(vertex* vertices, const simple_volume_map* map){
