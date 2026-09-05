@@ -2684,3 +2684,6 @@ reconstruct
 TODO: How can I one load the model with mesh, 2 use the already-created simple
 one and then how can create simple one that matched the desired shape that I
 want.
+
+---------------- Sat, 05 Sep 26: 10:22AM
+

@@ -132,6 +132,24 @@ struct cube{
 // how about light options
 // should I put light here
 //NOTE: A mesh is a groups of vertex's data(all possible) in order to draw shape
+// union enable its member have the same memory location
+struct{
+    union v3{
+        struct v3{
+            float x, y;
+        }
+        float E[2];
+    }    
+}
+// function
+inline v3
+v3 v3(float x_val, float y_val, float z_val){
+    v3 result = {};
+    result.x = x_val ;
+    result.y = y_val ;
+    result.z = z_val ;
+    return result;
+}
 
 struct M_Mesh{
     // how to arrange indices data for dynamically drawing complex shape??...

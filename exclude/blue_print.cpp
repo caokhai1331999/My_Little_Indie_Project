@@ -495,10 +495,27 @@ extern "C" __declspec(dllexport) void Load_Textures_for_OpenGL_(Platform_Propert
 };
 
 // NOTE: ON WORKING: construct each mesh based on type(but how to clarify these one)
-M_Mesh construct_mesh(/*what to put inside this???*/map_drawn_element drawn_type_, char* data_buffer_pointer){
+// imagine all contain in a cube (cube play as anchor role)
+vertex_ spawn_vertex(uint16 index_from_origin){
+    vertex_ value;
+    value.position[0] = (index_from_origin * 1.0f);
+    value.position[1];
+    value.position[2];
+
+    value.textcoord =;
+    value.normal =;
+    return value;
+}
+
+M_Mesh construct_mesh(/*what to put inside this???*/map_drawn_element drawn_type_, const char* data_buffer_pointer){
 // we need to have a failed check flag for this asset loop loader
     // name
     M_Mesh added_mesh = {};
+    vertex_ temp_vertex = {};
+
+    for(unsigned int i; i < sizeof(*data_buffer_pointer); i++){
+        added_mesh = (*data_buffer_pointer)[i]
+    }
     // VAO
 
     added_mesh.drawn_type = drawn_type_;
@@ -508,7 +525,7 @@ M_Mesh construct_mesh(/*what to put inside this???*/map_drawn_element drawn_type
     added_mesh.textures[NORMAL] = drawn_type_;    
     added_mesh.textures[DIFFUSE] = drawn_type_;    
     added_mesh.textures[SPECULAR] = drawn_type_;    
-    added_mesh.textures[EMISSION/*if available*/] = drawn_type_;    
+    added_mesh.textures[EMISSION] = drawn_type_;    /*if available*/
 
     // Light    
     return added_mesh;
