@@ -2728,3 +2728,16 @@ NOTE: Actually the vertices pos of nearly stay the same except z value
 ---------------- Sun, 13 Sep 26: 11:22AM
 
 TODO: Try to finish the 
+
+---------------- Mon, 14 Sep 26: 09:19AM
+
+NOTE: So far, we can say that all code basics boil down to data and the control
+of it. And data per say in the basic form is int, char . Actually they are just
+differenct presentation of binary data which allow us to do something like this:
+float b = 32.0f
+int32 a = (int32)b;
+
+      . Talking about finite state machine. we at every state I use specific
+      code which is referred by point in the states holding object.
+      . we need to influence in re/deference function pointer and use it as a
+      type .

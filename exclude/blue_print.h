@@ -233,6 +233,7 @@ struct plane{
 // should I put light here
 //NOTE: A mesh is a groups of vertex's data(all possible) in order to draw shape
 // union enable its member have the same memory location
+
 struct v3{
     union {
         struct {

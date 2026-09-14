@@ -35,7 +35,6 @@
 #include <stdio.h>
 #include <cmath>
 #include <iostream>
-
 #if !defined
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"

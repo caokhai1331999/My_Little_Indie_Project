@@ -751,9 +751,13 @@ int CALLBACK WinMain
                         int i = 0;
                         std::string matrixName_;
 
-                            char index[1];
-                            char indexx[2];
-
+                        char index[1];
+                        char indexx[2];
+// =====================Test_arb_function_pointer====================
+                        GLuint test_frame_buffer;
+                        glGenFramebuffers(1, &test_frame_buffer);
+                        glBindFramebuffer(GL_READ_FRAMEBUFFER, test_frame_buffer);
+// =====================Test_arb_function_pointer====================
                             
 #ifdef STD_140
                     //printf("Little beast flag on\n");

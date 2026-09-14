@@ -142,7 +142,7 @@ void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
     uint8 object_count_down = total_objects;
     uint8 rand_id = 0;
     map_unit_specs temp_unit = {};
-
+    //NOTE: Store all the position inside a mere uint32 value
     while(object_count_down > 0){
         rand_id = rand()%plane_size;
         if(!plane_ids[rand_id]){
