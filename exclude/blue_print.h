@@ -113,7 +113,7 @@ struct plane{
     vertex top_right_point;
     vertex bottom_left_point;
     vertex bottom_right_point;
-
+// Or just a central point of plane
     float central_point_pos[3];
     
     face_type_rhs face;
@@ -268,7 +268,6 @@ struct M_Mesh{
     // NOTE: Can we spawn other vertices from these first triangle/polygon one
     // There are two basic use cases: one is load vertices data from model(fbx, dae...), two is spawn one out
     std::vector<vertex> vertices_data;// need to replace this if we choose cube as an only optimal option
-    std::vector<plane>plane_group;
     //vertex* vertices;
     std::vector<unsigned int> indices_data;
     //unsigned int* indices;
@@ -409,16 +408,17 @@ struct entity_power_system{
 // This may be drawn be simple shape or small model
 struct map_unit{ 
 // NOTE: These will be used for fectching data from graphic object
-    uint8* vertices_data_id;
-    uint8* texture_id;
-    uint8* mesh_id;
-    // uint8* model_id;
+    uint8 vertices_data_id;
+    uint8 texture_id;
+    uint8 mesh_id;
+    // uint8 model_id;
     // This graphic_style will be supposed to replace all other ID if we did well .
     graphic_object_type graphic_type;// include light and shader type
     // model space shape vertices data(pos, textcoord, normal)
 //=======================================================
     // This is for position reconstruction
     uint16 space_id;// also the pos of the center of quad
+
     bool32 tangible;
     bool32 movable;
 
@@ -433,7 +433,8 @@ struct simple_volume_map{
     std::vector<map_unit>moving_obj_group;
     // the lowest layer of room is alway where the background object is
     // so from 0 -> length*breath contain the static object id
-    uint8* map_content;// we haven't decide what this value hold yet???
+// voxel space ids here
+    map_unit* map_content;// we haven't decide what this value hold yet???
     // mesh, texture, or light ID
     size_t map_size;
     // Volumme/Room 3D size in world space

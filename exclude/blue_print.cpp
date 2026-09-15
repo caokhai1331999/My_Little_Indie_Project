@@ -115,53 +115,49 @@ void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
 // We need a pre-created Texture group
 // Sketch map and spawn entities
 // layer of background and layer of moving entities
+// This map size  is 100 x 100 x 100
 
 void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
     srand(time(NULL));
-    // rational map sketcher here.
-    // 1. first thing first we need to decide where can the character where is not
     int x = 0;
     int y = 0;
     int h = 0;
     //for(int y = 0; y < map->height; y++){
         //for(int x = 0; x < map->breadth; x++){
             //for(int z = 0; z < map->length; z++)
-    // We distribute the drawn type here
-    // These objects graphical differences are the shader and its position in room
-    //
     // Total object will be drawn in displaying range in room
     // Understand data on the level of interger/float is an advantage
-    uint8 Block_Object_Count = (uint8)((float)map->map_size * 0.2f);
     // all of the will be drawn obj is the under lit one
+
+    uint8 Block_Object_Count = (uint8)((float)map->map_size * 0.2f);
     uint8 total_objects = 10 + rand()%15;
     uint8 plane_size = map->breadth * map->length;
-    bool32 plane_ids [plane_size] = {};
-
+    map_unit content[total_objects];
+    bool32 space_ids_taken[plane_size] = {};// 0 is ,1 is taken
     // spawn moving objects here
+
     map->moving_obj_group.reserve((size_t)total_objects);
     uint8 object_count_down = total_objects;
+
     uint8 rand_id = 0;
-    map_unit_specs temp_unit = {};
-    //NOTE: Store all the position inside a mere uint32 value
+    map_unit temp_unit = {};
+
     while(object_count_down > 0){
         rand_id = rand()%plane_size;
-        if(!plane_ids[rand_id]){
-            plane_ids[rand_id] = 1;
-            temp_unit.space_id = rand_id;
-            map->moving_obj_group.push_back(map_unit_specs);
-            object_count_down--;
-        }else{
+        // NOTE: check whether slot at that space id is occupied or not;
+        if(space_ids_taken[rand_id]){
             continue;
-        }
+        }else{
+            temp_unit.space_id = rand_id;
+            temp_unit. = rand_id;
+            map->moving_obj_group.push_back(temp_unit);
+
+            object_count_down--;
+        };
     }
 
     for(size_t int i = 0; i < map->size; i++)
     {
-        // we do every single cube here which have the size of 1,1,1
-        // have to be more specificly rational about this one
-        // ground first then up
-        // what to store OMG we just need to store the mesh ID
-        // need to be more rational, can not let it randome like this
         x++;
         if(x == map->w -1 ){
             x -= map->w - 1;
@@ -188,15 +184,15 @@ void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
 */
         //{
         //static one
-         map->map_content[i] = rand()%(mesh_group->size()-1);
-         map->map_content[i] = rand()%(graphic_obj->VAOssize()-1);
+         map->map_content[i].meshID = rand()%(mesh_group->size()-1);
          //moving one
          if(block_object_count > 0 && h == 0)
          map->map_content[i] = rand()%1;
-         if(!(*map->map_content))
-            block_object_count--;
-        // how shrewly decide drawn type for these entities of map
-         map->map_content[i+1] = (be_drawn_type)rand()%((uint8)2);        
+         if(!(*map->map_content[i])){
+             // how shrewly decide drawn type for these entities of map
+             block_object_count--;
+             map->map_content[i+1] = temp_unit;   
+         }
         //}
     }
 }

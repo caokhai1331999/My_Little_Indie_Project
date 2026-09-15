@@ -2739,5 +2739,9 @@ int32 a = (int32)b;
 
       . Talking about finite state machine. we at every state I use specific
       code which is referred by point in the states holding object.
-      . we need to influence in re/deference function pointer and use it as a
+      . we need to influence in re/deference function's pointer and use it as a
       type .
+
+---------------- Tue, 15 Sep 26: 10:43AM
+
+NOTE:, 
