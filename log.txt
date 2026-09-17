@@ -2748,3 +2748,12 @@ NOTE:,
 
 ---------------- Wed, 16 Sep 26: 03:24PM
 
+
+---------------- Thu, 17 Sep 26: 10:45AM
+Now I understand why learnOpenGl author didn't make 3D game in the course and
+why it took Casey more than a decade to make a 3D game engine from scratch. It's
+because, instead of just texture they have to deal with models and complex shape
+'s vertices data (with the scale of millions entities: this is huge)
+
+NOTE: In my beautiful dream, I can sketch fairly complicated shapes vertices
+data from just a 32bit signed integer

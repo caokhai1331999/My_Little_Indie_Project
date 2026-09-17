@@ -109,16 +109,12 @@ struct triangle{
 };
 
 struct plane{
-    vertex top_left_point;
-    vertex top_right_point;
-    vertex bottom_left_point;
-    vertex bottom_right_point;
 // Or just a central point of plane
     float central_point_pos[3];
     
-    face_type_rhs face;
-    vertex vertices[4];
+    bool32 face_camera;// Is this necessary. This must be costly if we have millions of plane like this
     float size;
+    vertex vertices[4];
     float vertices_data[??];
 };
 

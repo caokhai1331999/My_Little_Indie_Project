@@ -108,6 +108,7 @@ void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
 
 #if TEST_DYNAMICALLY_ALLOCATION
     map->map_content = (unsigned int*)VirtualAlloc(map->map_content, map_size);
+//NOTE: How can I access the member of this manual-allocated container
 #else
     map->map_content.reserve(map->map_size);
 }
@@ -116,7 +117,7 @@ void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
 // Sketch map and spawn entities
 // layer of background and layer of moving entities
 // This map size  is 100 x 100 x 100
-
+//NOTE: Working: here
 void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
     srand(time(NULL));
     int x = 0;
@@ -140,7 +141,7 @@ void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
     uint8 object_count_down = total_objects;
 
     uint8 rand_id = 0;
-    map_unit temp_unit = {};
+    map_unit unit = {};
 
     while(object_count_down > 0){
         rand_id = rand()%plane_size;
@@ -148,10 +149,12 @@ void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
         if(space_ids_taken[rand_id]){
             continue;
         }else{
-            temp_unit.space_id = rand_id;
-            temp_unit. = rand_id;
-            map->moving_obj_group.push_back(temp_unit);
+            temp_unit.space_id = rand_id;// From this space Id I want to construct the vertices data of this cube or ....
 
+            unit. = rand_id;
+            map->moving_obj_group.push_back(unit);
+
+            space_ids_taken[rand_id] = true;
             object_count_down--;
         };
     }
@@ -196,6 +199,7 @@ void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
         //}
     }
 }
+
 // So the map is the place to store entities position
 // ====================== Map constructing ===========================
 
@@ -247,7 +251,7 @@ void set_rigid_body(glm::vec3* init_pos){
 // other from just mere position we still have normal and textcoord
 // maybe this reason is solid enough
 
-vertex_ spawn_polygon_vertex_data(plane* plane_info, uint8 vertexID, simple_volume_map* world_map/*something like plane dim*/){
+vertex_ spawn_polygon_vertex_data(plane* plane_info, uint8 vertexID/*something like plane dim*/){
     // mark the id of the vertex to intrapolate the normal and textcoord
     float origin_pos[3] = {0.0f, 0.0f, 0.0f};// we need to have
 // pos from spaceID
@@ -259,23 +263,16 @@ vertex_ spawn_polygon_vertex_data(plane* plane_info, uint8 vertexID, simple_volu
     vertex.normal = glm::normalize(glm::cos(plane_info->face_angle_) * original_vector);
     // x(0 or 1), y(0 or -1)
     vertex.textcoord = {vertexID<2?0:1, vertexID%2!=0?0:-1};
-
     return vertex;
 }
 // NOTE: assign graphic id to the map unit to use it later for in mass instancing draw
 // IMPORTANT!!: how can I draw out a sketch of object 
-map_unit spawn_map_unit(uint16 spaceID, ){
+map_unit spawn_map_unit(uint16 spaceID, simple_volume_map* world_map){
 //NOTE: one thing we are stupid about is that we have to know the plane or polygon we need to draw
     map_unit temp_unit;
     spawn_vertex();
 }
 
-void OutputLightingTexture(Voxel* table){
-    uint16* lookupAt = table[][][];
-}
-
-// NOTE: On Working here
-//=====================WORKING==============================
 void construct_plane_vertices_data(vertex* vertices, const simple_volume_map* map){
     plane current_plane = {};
     
@@ -283,6 +280,15 @@ void construct_plane_vertices_data(vertex* vertices, const simple_volume_map* ma
         map.push_back(map->spawn_map_unit(map->map_content[marker]));
     };
 }
+
+cube spawn_cube(spaceID){
+    
+};
+
+void OutputLightingTexture(Voxel* table){
+    uint16* lookupAt = table[][][];
+}
+
 //=====================WORKING==============================
 //
 // Handshake cross check for collision between entities and entities with background
