@@ -118,7 +118,7 @@ void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
 // layer of background and layer of moving entities
 // This map size  is 100 x 100 x 100
 //NOTE: Working: here
-void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
+void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     srand(time(NULL));
     int x = 0;
     int y = 0;
@@ -131,6 +131,7 @@ void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
     // all of the will be drawn obj is the under lit one
 
     uint8 Block_Object_Count = (uint8)((float)map->map_size * 0.2f);
+
     uint8 total_objects = 10 + rand()%15;
     uint8 plane_size = map->breadth * map->length;
     map_unit content[total_objects];
@@ -142,23 +143,25 @@ void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
 
     uint8 rand_id = 0;
     map_unit unit = {};
-
+// First background/static object
     while(object_count_down > 0){
         rand_id = rand()%plane_size;
         // NOTE: check whether slot at that space id is occupied or not;
         if(space_ids_taken[rand_id]){
             continue;
         }else{
-            temp_unit.space_id = rand_id;// From this space Id I want to construct the vertices data of this cube or ....
+            unit.space_id = rand_id;// From this space Id I want to construct the vertices data of this cube or ....
 
-            unit. = rand_id;
+            unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);
+            unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);
+            unit.vertices_data_id = rand()%((uint8)graphic_object.number_of_shape - 1);
+            
             map->moving_obj_group.push_back(unit);
-
             space_ids_taken[rand_id] = true;
             object_count_down--;
         };
     }
-
+// Then moving one
     for(size_t int i = 0; i < map->size; i++)
     {
         x++;
@@ -186,8 +189,6 @@ void sketch_room_map(simple_volume_map* map, Mesh* mesh_group){
 #else
 */
         //{
-        //static one
-         map->map_content[i].meshID = rand()%(mesh_group->size()-1);
          //moving one
          if(block_object_count > 0 && h == 0)
          map->map_content[i] = rand()%1;
@@ -274,8 +275,7 @@ map_unit spawn_map_unit(uint16 spaceID, simple_volume_map* world_map){
 }
 
 void construct_plane_vertices_data(vertex* vertices, const simple_volume_map* map){
-    plane current_plane = {};
-    
+    plane current_plane = {};    
     while(marker < map->size - 1){
         map.push_back(map->spawn_map_unit(map->map_content[marker]));
     };

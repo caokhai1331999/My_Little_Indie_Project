@@ -2757,3 +2757,9 @@ because, instead of just texture they have to deal with models and complex shape
 
 NOTE: In my beautiful dream, I can sketch fairly complicated shapes vertices
 data from just a 32bit signed integer
+
+---------------- Fri, 18 Sep 26: 10:45AM
+
+TODO: Finish the sketching map function for background/static and moving object
+first.
+

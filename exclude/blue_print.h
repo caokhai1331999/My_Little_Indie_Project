@@ -114,12 +114,14 @@ struct plane{
     
     bool32 face_camera;// Is this necessary. This must be costly if we have millions of plane like this
     float size;
+
     vertex vertices[4];
     float vertices_data[??];
 };
 
 struct cube{
-    // What bind these face together. We need to come up with a formula to keep these in bound
+    // What bind these face together.
+    // We need to come up with a formula to keep these in bound
     plane front_face;
     plane back_face;
 
@@ -361,15 +363,26 @@ struct graphic_object_type{
 // more optional types if needed
 #define basic_draw_type (graphic_object_type){light_type__::basic_light, shader_type___::basic_lighting_shader}
 
+struct texture{
+    char* content;  
+};
+
 class graphic_property{
 private:
     // This will be geometry collection
     // NOTE: instead of vector of shader.
     // we sort them out as set(each has particular purpose)
-    std::vector<B_shader_program*>* shader_group;
+    std::vector<B_shader_program*>* post_effect_shader_group;
+    std::vector<B_shader_program*>* basic_shader_group;
     //TODO: need to arrange the mesh order based on drawn type for the sake of calling later
-    std::vector<M_Mesh>* Mesh_Group;
+    std::vector<M_Mesh>* background_mesh_group;
+    std::vector<M_Mesh>* moving_mesh_group;
+
+    texture* texture_group;
+    size_t texture_group_size;
+
     shape_vertices_store* current_shape_store;
+    size_t number_of_shape;
 public:
     update_(clock_set* clock);
     B_shader_program* get_shader(return shader);
