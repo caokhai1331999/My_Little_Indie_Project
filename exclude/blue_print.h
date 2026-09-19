@@ -438,8 +438,7 @@ struct map_unit{
 
 struct simple_volume_map{    
     // one is mesh type, the other is the position;
-    std::vector<map_unit>on_ground_entities;
-    std::vector<map_unit>moving_obj_group;
+    std::vector<map_unit>obj_group;
     // the lowest layer of room is alway where the background object is
     // so from 0 -> length*breath contain the static object id
 // voxel space ids here

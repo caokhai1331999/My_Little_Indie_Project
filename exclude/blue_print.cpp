@@ -123,6 +123,7 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     int x = 0;
     int y = 0;
     int h = 0;
+
     //for(int y = 0; y < map->height; y++){
         //for(int x = 0; x < map->breadth; x++){
             //for(int z = 0; z < map->length; z++)
@@ -144,6 +145,7 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     uint8 rand_id = 0;
     map_unit unit = {};
 // First background/static object
+    // we then have to make these entities interact with each other
     while(object_count_down > 0){
         rand_id = rand()%plane_size;
         // NOTE: check whether slot at that space id is occupied or not;
@@ -151,12 +153,13 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
             continue;
         }else{
             unit.space_id = rand_id;// From this space Id I want to construct the vertices data of this cube or ....
-
+            //unit.moving = 
             unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);
             unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);
             unit.vertices_data_id = rand()%((uint8)graphic_object.number_of_shape - 1);
             
-            map->moving_obj_group.push_back(unit);
+            map->obj_group.push_back(unit);
+// Then background
             space_ids_taken[rand_id] = true;
             object_count_down--;
         };
