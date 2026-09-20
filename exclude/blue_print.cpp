@@ -58,9 +58,8 @@ unsigned int LoadCubeMap(const char* path){
 //                     + tree
 //    . moving entities : + river
 //                        + animals
-//    . weather elements : + wind
-//                         + snow
-//                         + mist
+//    . weather elements(light effect/ particle) : + wind, snow, mist....
+
       //  components's properties: . collided volume
       //                           . moving information: T, S, R.
       //                           . primitive for drawing:(mesh)
@@ -117,6 +116,11 @@ void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
 // Sketch map and spawn entities
 // layer of background and layer of moving entities
 // This map size  is 100 x 100 x 100
+mesh* sketch_mesh(// some map in here){
+    mesh* result;
+    
+};
+
 //NOTE: Working: here
 void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     srand(time(NULL));
@@ -127,24 +131,25 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     //for(int y = 0; y < map->height; y++){
         //for(int x = 0; x < map->breadth; x++){
             //for(int z = 0; z < map->length; z++)
-    // Total object will be drawn in displaying range in room
     // Understand data on the level of interger/float is an advantage
     // all of the will be drawn obj is the under lit one
 
     uint8 Block_Object_Count = (uint8)((float)map->map_size * 0.2f);
 
+    uint8 room_ground_size = map->breadth * map->length;
+
     uint8 total_objects = 10 + rand()%15;
-    uint8 plane_size = map->breadth * map->length;
-    map_unit content[total_objects];
-    bool32 space_ids_taken[plane_size] = {};// 0 is ,1 is taken
-    // spawn moving objects here
 
     map->moving_obj_group.reserve((size_t)total_objects);
     uint8 object_count_down = total_objects;
 
+    map_unit content[total_objects];
+    bool32 space_ids_taken[plane_size] = {};// 0 is empty 1 is taken
+    // spawn moving objects here
     uint8 rand_id = 0;
     map_unit unit = {};
-// First background/static object
+
+    // First background/static object
     // we then have to make these entities interact with each other
     while(object_count_down > 0){
         rand_id = rand()%plane_size;
@@ -154,7 +159,7 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
         }else{
             unit.space_id = rand_id;// From this space Id I want to construct the vertices data of this cube or ....
             //unit.moving = 
-            unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);
+            unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);//!!!
             unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);
             unit.vertices_data_id = rand()%((uint8)graphic_object.number_of_shape - 1);
             

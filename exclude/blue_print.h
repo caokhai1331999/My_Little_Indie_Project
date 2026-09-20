@@ -308,6 +308,12 @@ enum effect_type:be_drawn_type{
     animating = 1 
 };
 
+enum object_drawn_type:be_drawn_type{
+    Still_or_Movable(Background),
+    Still_or_Movable(Object),
+    Weather
+};
+
 //==========================================================
 
 uint32* pixel_data;
