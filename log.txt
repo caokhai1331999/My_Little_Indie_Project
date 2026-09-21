@@ -2770,3 +2770,6 @@ first.
     // NOTE:@Prototype we have the updated spaceid of character every frame and by comparing to the overlapped background entity
     // which got the same or related space id background entities. We save alot of performances by get rid of
     // uneccessary loop check
+
+---------------- Mon, 21 Sep 26: 11:33AM
+

@@ -116,9 +116,21 @@ void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
 // Sketch map and spawn entities
 // layer of background and layer of moving entities
 // This map size  is 100 x 100 x 100
-mesh* sketch_mesh(// some map in here){
-    mesh* result;
-    
+mesh sketch_shape_mesh(/*some map in here*/bool32* space_id_vertices_map){
+    // try using bit shift, operation on this
+    // we'll do the complex shape molding
+     mesh result;
+     vertex vertices[/*how we can define the size of it???*/sizeof(*space_id_vertices_map)];
+     unsigned int indices[/*size*/sizeof(*space_id_vertices_map)];
+     for(unsigned int i = 0; i < sizeof(*space_id_vertices_map); i++){
+         if((*space_id_vertices_map)[i]){
+             vertices[i] = {i/(h*l), i/(w*l), i/(w*h)};
+             indices[i] = (*space_id_vertices_map)[i];  
+         };
+     };
+     result.vertices = vertices;
+     result.indices = indices;
+     return result;
 };
 
 //NOTE: Working: here
