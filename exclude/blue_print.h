@@ -403,7 +403,12 @@ public:
 
 // ====================== Map constructing ===================================
 
-typedef uint8 entity_type;
+typedef uint8 world_entity_type;
+enum entity_type:world_entity_type{
+    BackGround,// also intangible
+    Block,
+    Moving
+};
 // We then bind single texture/simple model
 // to specific object id
 // This is for game play
@@ -449,6 +454,8 @@ struct simple_volume_map{
     // so from 0 -> length*breath contain the static object id
 // voxel space ids here
     map_unit* map_content;// we haven't decide what this value hold yet???
+// for quick check for the avalable slot at that space id at every room per voxel
+    bool32* tracking_table;
     // mesh, texture, or light ID
     size_t map_size;
     // Volumme/Room 3D size in world space

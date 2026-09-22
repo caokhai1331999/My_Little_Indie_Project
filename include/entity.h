@@ -40,6 +40,39 @@ typedef moving_type basic_moving_type;
 typedef moving_type complex_moving_type;
 
 
+typedef uint8 be_drawn_type;
+
+// The passable unit have to be aligned with each other
+// This group of ID mark element for the engine to drawn accordingly
+// This type will be drawn alot...
+
+#define Still_or_Movable(x) \
+    x ## _Static, \
+    x ## _Moving
+
+// NOTE: Let alone this later
+// there still something we haven't figure out completely yet
+
+enum light_type__:be_drawn_type{
+    //How about normal mapping 
+    basic_light = 0, //  diffuse + ambient + specular /or any simple approximated alternative
+    emission = 2, // pass optional's light specs **
+    normal_map_light = 3, // pass optional's light specs **
+    shade = 4, // still haven't decide yet
+};
+
+enum shader_type__:be_drawn_type{
+    //How about normal mapping 
+    light = 0, //  diffuse + ambient + specular /or any simple approximated alternative
+    animating = 1, // pass optional's light specs **
+};
+
+// NOTE: where to put animation in graphic type
+enum effect_type:be_drawn_type{
+    //How about normal mapping 
+    animating = 1 
+};
+
 //-----------------For_Debugging-------------------------
 
 struct File_Manager{

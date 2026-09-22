@@ -2767,9 +2767,15 @@ first.
 
 ---------------- Sun, 20 Sep 26: 10:22AM
 
-    // NOTE:@Prototype we have the updated spaceid of character every frame and by comparing to the overlapped background entity
-    // which got the same or related space id background entities. We save alot of performances by get rid of
-    // uneccessary loop check
+// NOTE:@Prototype we have the updated spaceid of character every frame and by
+// comparing to the overlapped background entity which got the same or related
+// space id background entities. We save alot of performances by get rid of
+// uneccessary loop check
 
 ---------------- Mon, 21 Sep 26: 11:33AM
 
+
+---------------- Tue, 22 Sep 26: 11:16AM
+
+NOTE: what to learn more: the pixel color data(uint32-ARGB). How can Casey biasly pre-compute
+them up based on the LOD(simulate the attenuation of point light) 

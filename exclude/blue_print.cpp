@@ -133,6 +133,8 @@ mesh sketch_shape_mesh(/*some map in here*/bool32* space_id_vertices_map){
      return result;
 };
 
+//NOTE: bind pre-loaded VAOS(vertice's data(pos, normal, texcoord, its indices...)), (uint32-ARGB)Texture
+    // , add some uniforms(light,..) -> draw elements
 //NOTE: Working: here
 void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     srand(time(NULL));
@@ -146,41 +148,62 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     // Understand data on the level of interger/float is an advantage
     // all of the will be drawn obj is the under lit one
 
-    uint8 Block_Object_Count = (uint8)((float)map->map_size * 0.2f);
-
     uint8 room_ground_size = map->breadth * map->length;
+    uint8 room_size = room_ground_size * map->height;
 
-    uint8 total_objects = 10 + rand()%15;
+    uint8 block_objects = (uint8)(room_ground_size * (float)(20 + (rand()%10))/100);
+    uint8 background_objects = (uint8)(room_ground_size * (float)(25 + rand()%10)/100);
+    uint8 moving_objects = (uint8)(room_ground_size * (float)(15 + rand()%10)/100);
+
+    uint8 total_objects = block_objects + intangible_objects + moving_objects;
 
     map->moving_obj_group.reserve((size_t)total_objects);
-    uint8 object_count_down = total_objects;
 
-    map_unit content[total_objects];
-    bool32 space_ids_taken[plane_size] = {};// 0 is empty 1 is taken
+    uint8 block_objects_count_down = block_objects;
+    uint8 background_objects_count_down = background_objects;
+    uint8 moving_objects_count_down = moving_objects;
+    
+    map_unit current_room_content[total_objects];
+    bool32 space_ids_taken[room_size] = {};// 0 is empty 1 is taken
     // spawn moving objects here
     uint8 rand_id = 0;
+
     map_unit unit = {};
 
     // First background/static object
     // we then have to make these entities interact with each other
-    while(object_count_down > 0){
-        rand_id = rand()%plane_size;
+    while(block_objects_count_down > 0 || intangible_objects_count_down > 0 || moving_objects_count_down > 0){
+        rand_id = rand()%(room_size - 1);
         // NOTE: check whether slot at that space id is occupied or not;
         if(space_ids_taken[rand_id]){
             continue;
         }else{
+            // Background, blocking object
+            world_entity_type rand_type = rand()%2;
+
             unit.space_id = rand_id;// From this space Id I want to construct the vertices data of this cube or ....
-            //unit.moving = 
-            unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);//!!!
+            //TODO: Define what is the main differences among these enities type in term of graphic(VAOs, texture, light) 
+            unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);
             unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);
             unit.vertices_data_id = rand()%((uint8)graphic_object.number_of_shape - 1);
             
             map->obj_group.push_back(unit);
 // Then background
             space_ids_taken[rand_id] = true;
-            object_count_down--;
+            switch(rand_type){
+                case entity_type::BackGround:
+                    background_objects_count_down--;                    
+                    break;
+                case entity_type::Block:
+                    block_objects_count_down--;
+                    break;
+                case entity_type::Moving:
+                    moving_objects_count_down--;
+                    break;
+            };
         };
     }
+
 // Then moving one
     for(size_t int i = 0; i < map->size; i++)
     {
