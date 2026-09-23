@@ -2779,3 +2779,7 @@ first.
 
 NOTE: what to learn more: the pixel color data(uint32-ARGB). How can Casey biasly pre-compute
 them up based on the LOD(simulate the attenuation of point light) 
+
+---------------- Wed, 23 Sep 26: 01:25PM
+
+Working line: 189 File: blue_print.cpp

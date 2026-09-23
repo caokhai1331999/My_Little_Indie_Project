@@ -431,7 +431,8 @@ struct map_unit{
     uint8 vertices_data_id;
     uint8 texture_id;
     uint8 mesh_id;
-    // uint8 model_id;
+
+    uint8 model_id;
     // This graphic_style will be supposed to replace all other ID if we did well .
     graphic_object_type graphic_type;// include light and shader type
     // model space shape vertices data(pos, textcoord, normal)
