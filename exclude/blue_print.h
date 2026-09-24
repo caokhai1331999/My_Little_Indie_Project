@@ -122,13 +122,13 @@ struct plane{
 struct cube{
     // What bind these face together.
     // We need to come up with a formula to keep these in bound
-    plane front_face;
-    plane back_face;
-
+    // 4 point different on yz plane
+    // so  y +/- size(based on up or down)
+    // and z +/- size(based on front or back)
     float central_point_pos[3];
+    // vertex vertices[8];
     float size;
 //NOTE: On Working
-    float vertices_data[??];
 };
 
 struct voxel{
