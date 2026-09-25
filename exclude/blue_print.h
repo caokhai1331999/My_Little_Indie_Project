@@ -112,11 +112,21 @@ struct plane{
 // Or just a central point of plane
     float central_point_pos[3];
     
-    bool32 face_camera;// Is this necessary. This must be costly if we have millions of plane like this
     float size;
+    vertex vertices[8];
+};
 
-    vertex vertices[4];
-    float vertices_data[??];
+#define up_or_down(x) \
+    x ## _up, \
+    x ## _down
+
+#define front_or_back(x) \
+    up_or_down(x ## _front),                     \
+    up_or_down(x ## _back)
+
+enum cube_vertices_order {
+        front_or_back(right),
+        front_or_back(left)
 };
 
 struct cube{

@@ -25,6 +25,20 @@ NONE
 */
 typedef uint8 direction;
 // This one is lefthanded coor sys
+
+#define up_or_down(x) \
+    x ## _up, \
+    x ## _down
+
+#define front_or_back(x) \
+    up_or_down(x ## _front),                     \
+    up_or_down(x ## _back)
+
+enum cube_vertices_order {
+        front_or_back(right),
+        front_or_back(left)
+};
+
 enum FACE_DIRECTION {
     BACKWARD = (direction)0,
     LEFT = (direction)1,
@@ -68,11 +82,12 @@ enum shader_type__:be_drawn_type{
 };
 
 // NOTE: where to put animation in graphic type
+/*
 enum effect_type:be_drawn_type{
     //How about normal mapping 
     animating = 1 
 };
-
+*/
 //-----------------For_Debugging-------------------------
 
 struct File_Manager{
