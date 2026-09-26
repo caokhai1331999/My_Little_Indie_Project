@@ -196,10 +196,11 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
                 case Object_Moving:
                     break;
             }
+ 
             unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);
             unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);
             unit.model_id = rand()%((uint8)graphic_object.texture_group_size - 1);
-            unit.vertices_data_id = rand()%((uint8)graphic_object.number_of_shape - 1);
+            unit.vertices_data_id = rand()%((uint8)graphic_object.number_of_shape - 1);/*This line is superfluous*/
             
             map->obj_group.push_back(unit);
 // Then background

@@ -2791,3 +2791,16 @@ Working Lines:128, File:blue_print.h
 ---------------- Fri, 25 Sep 26: 11:58AM
 
 Working Lines:129, File:blue_print.h
+
+---------------- Sat, 26 Sep 26: 12:11PM
+NOTE: Next: Decide to get rid of one of two structs : memory_arena or
+memory_block
+      . Still I haven't understand the concept of sentinal in memory_block that
+      Casey used
+
+      . We all know that the current model file used vertex as a single most
+      basic primitive. How can we change them to something else. 
+
+      . How can I use cube/triangle as a basic primitive to mass-draw stuff.
+
+TODO: Understand and apply uint8 pointer and int uint32 memory

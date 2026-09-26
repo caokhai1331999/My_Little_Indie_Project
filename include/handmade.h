@@ -345,15 +345,6 @@ struct OpenGLData{
     }
 };
 
-struct memory_arena{
-    size_t size;
-    size_t used;
-    //void* base;// error: unknow size
-    uint8* base;
-    // In term of linear data arrangement the Pad itself is to just separate the memory_block memory address from what come after it.
-    uint64 Pad[6];
-};
-
 struct memory_block{
     memory_block* prev;
     memory_block* next;
