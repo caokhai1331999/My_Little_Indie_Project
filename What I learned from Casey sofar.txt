@@ -76,9 +76,13 @@ So Based on Casey: there are 3 kinds of surface that we need to replicate :
                    . Reflectant/Specular
 To Casey, when doing 2D games we just need to do the approximation of it cause
                    artist already did majority of the light job
-  . So we came up with something called Light Probes:
-  He refer to lookup table just like one that Kesse did
-  Then He think about solutions: normal map, or on the mesh. He will make a
+  . So we came up with something called Light Probes **:
+    .. Alright, when Casey refer to word "Probes": what he meant is a big
+                   light texture is pre-computed in cpu-> sent down to gpu
+                   (by function like glText(sub)image). Then use coord in
+                   look-up function to retrieve them in gpu stage
+    He refer to lookup table just like one that Kesse did
+    Then He think about solutions: normal map, or on the mesh. He will make a
                    small resolution bitmap/lightmap to simulate the light
                    from source.
 
@@ -86,6 +90,18 @@ To Casey, when doing 2D games we just need to do the approximation of it cause
 simulate light for limited hardward and 2D game.
 . When reading something necessary, first apply something that is suitable to
 us and what we understand, NOT ALL.
+. NOTE: complement. : Casey propose a 3 plate scheme(include 3 layers that
+control/blend normal value at every texel there are)
+He intend to use blurness(less pixel image) to replicate the dullness/shininess
+of the material from texture data. Then he map the rgb from 0-255( 2bit per value
+of texel total 4 values (rgba)) to -1.0-1.0 to make matched normal value for
+each texel. Normal in 2D is not the same at 3D
+2D x, y,  z
+   |   \ /
+   v   / \
+3D x  y   z
+. NOTE: Understand the Gist and apply in our case. Don't mimick the whole
+implementation.
 
 19. Time for motion in play.
 001. The Equation of Motion.
@@ -228,3 +244,24 @@ In order to add new to first we have to:
              if(*dest == expect)
                 *dest++ = *source++;
       
+22. light value on Pixel Writings
+. bit shifting to increase alpha channel
+. UV(UltraViolet) is the intensity of light(0->255 or 0%->100%)
+
+23. Voxel-lookup struture for better light-solution.
+. first of all casey merge light reflect and emit color together to produce the
+result.
+. we also need to align the voxel so that it cover the entire camera space. 
+
+24. Always try to break method, concept down to the basic data type level, one
+frame operation. Rationalize it to bits wise operation if possible
+For ex: Pixel data is ARGB - which uint32 (8 bits x 4 elements) so 4 bytes per
+pixel
+
+25. So the lookup process that Casey do is a nest coordinate loop that perform
+the lookup job based on the index(x and y)
+    . In linked-list there is a dummy value called sentinel which got a
+    first(which point to the last) and last pointers(which point to the first)
+    (in this case that is nothing else but itself). And its existence is to
+    maintain the integrity of the whole structure. Without forcing the app to
+    constantly check for null pointer

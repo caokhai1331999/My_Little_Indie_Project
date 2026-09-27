@@ -22,7 +22,7 @@ private:
     // This matrix will contain anything about
     //the entity in the made-up world like:
     //position, rotation, scale
-    glm::mat4 world_present_model;    
+    glm::mat4 world_present_model;
 };
 
 struct GamePlay_Entity{

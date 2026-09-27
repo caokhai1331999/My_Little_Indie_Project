@@ -114,7 +114,7 @@ void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
 
 // We need a pre-created Texture group
 // Sketch map and spawn entities
-// layer of background and layer of moving entities
+// layer of background and layer moving entities
 // This map size  is 100 x 100 x 100
 mesh sketch_shape_mesh(/*some map in here*/bool32* space_id_vertices_map){
     // try using bit shift, operation on this
@@ -163,6 +163,7 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     uint8 background_objects_count_down = background_objects;
     uint8 moving_objects_count_down = moving_objects;
     
+
     map_unit current_room_content[total_objects];
     bool32 space_ids_taken[room_size] = {};// 0 is empty 1 is taken
     // spawn moving objects here

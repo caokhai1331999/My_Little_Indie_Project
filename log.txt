@@ -2804,3 +2804,6 @@ memory_block
       . How can I use cube/triangle as a basic primitive to mass-draw stuff.
 
 TODO: Understand and apply uint8 pointer and int uint32 memory
+
+---------------- Sun, 27 Sep 26: 10:50AM
+
