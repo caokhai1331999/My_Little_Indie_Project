@@ -46,8 +46,13 @@ int CALLBACK WinMain
   WNDCLASSEXA WindowClass = SetUpWindowClass(&Game_Platform, Instance);
     //HWND Window = {};
 
-  
-  // NOTE: I forgot to init window
+  memory_block* linked_list;
+  linked_list->prev = &linked_list;
+  linked_list->next = &linked_list;
+
+  // How we pull out data of member from this list
+  linked_list = (memory_block*)ALLOCATE_BLOCK_MEMORY(linked_list->base, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+
   HMODULE AniLib = {};
   
   TimeSet.PerfCountFrequency = (int64)(TimeSet.PerfCountFrequencyResult.QuadPart);  

@@ -138,6 +138,7 @@ mesh sketch_shape_mesh(/*some map in here*/bool32* space_id_vertices_map){
 //NOTE: Working: here
 void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     srand(time(NULL));
+
     int x = 0;
     int y = 0;
     int h = 0;
@@ -163,7 +164,6 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     uint8 background_objects_count_down = background_objects;
     uint8 moving_objects_count_down = moving_objects;
     
-
     map_unit current_room_content[total_objects];
     bool32 space_ids_taken[room_size] = {};// 0 is empty 1 is taken
     // spawn moving objects here
@@ -722,18 +722,14 @@ void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_ma
     for(B_shader_program* const &shader: Graphic->shader){
         glBindVertexArray(Graphics->VAOS[/*mesh id*/]);
         shader->setMat4("projection", chosen_camera->projection); 
-        shader->shader[i]->setMat4("view", chosen_camera->view);            
-        // also bind matched texture here.        
+        shader->shader[i]->setMat4("view", chosen_camera->view);
+        // also bind matched texture here.
     };
     glUseProgram(0);
     size_t i = 0;
-    
-    //So with the catatonic object we just pass its position as an unchanged
-    //
-    //layout data/ InstanceID
-    // How to specify entities position just above the down-ground without making looked like they're floating
-// NOTE: we got two loop here: O(n) + O(m)
-// 
+// NOTE: we got two loop here: O(n) + O(m) +...etc
+    // BackGround first
+    // Then Entities
     for(moving_entity_specs* const &unit:world_map->moving_obj_group){
         // VAOs - shape vertice's data (at least: Position and TexCoord);
         if(unit->pos > /*specific number*/)
@@ -779,7 +775,7 @@ void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_ma
         }
     i+=2;
     };
-
+// Post-Effect
     if(post_effect_on){
         glUseProgram(Graphic->shader[effect]);
         glBindVertexArray(Graphic->VAOs[effect]);
@@ -813,4 +809,4 @@ private:
 public:
     void set_rigid_body();
     void move();
-}
+};

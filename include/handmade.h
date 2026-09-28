@@ -344,19 +344,39 @@ struct OpenGLData{
         textureHandle = 0;
     }
 };
-
+// The memory_block itself is just a method to enumerate/track the data live inside the memory we allocate
+// what actually point to the data is the base pointer inside that struct
 struct memory_block{
     memory_block* prev;
     memory_block* next;
 
     size_t size;
     size_t used;
-    //void* base;
-    uint8* base;
+    //void* base;  What is this???
     // In term of linear data arrangement the Pad itself is to just separate the memory_block memory address from what come after it.
     uint64 Pad[6];
 };
 
+/*
+  // 
+  sentinel.prev = sentinel.next = &sentinel; NOTE: start up with a list always point to itself
+  // So whenever we want to add something
+  memory_block next_block;
+
+  next_block->prev = pass_one;
+  next_block->next = pass_one->next;
+
+  pass_one->next = next_block;
+  return next_block;
+
+  // Remove one block
+  linked_list.prev->next = linked_list.next;
+  linked_list.next->prev = linked_list.prev;
+  // deallocate(linked_list);
+  memory_block* delete_block = linked_list;
+  linked_list = linked_list->next;
+  delete delete_block;
+*/
 
 struct Platform_Properties{
         
@@ -419,21 +439,12 @@ void init_arena_memory(memory_arena* arena, size_t init_size){
     arena->used = 0;
 }
 
-// apply to grow vertex array
-void ALLOCATE_BLOCK_MEMORY(memory_arena* arena, size_t size){
-        // why plus one
-        begin_ticket_mutex(&Game_Platform.ticket);
-        uint8* result = (uint8*)VirtualAlloc(arena->base, size + sizeof(memory_arena), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
-        end_ticket_mutex(&Game_Platform.ticket);
-        arena->base = result;
-}
-
-
 void* ALLOCATE_BLOCK_MEMORY(memory_block* mem, size_t size){
+    // the base is the 0
         memory_block* block = (memory_block*)VirtualAlloc(block->base, size + sizeof(memory_block), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
         // why plus one
 
-        block->next = mem->next; 
+        block->next = mem->next; // This is sentinel
         block->prev = mem; 
 
         begin_ticket_mutex(&Game_Platform.ticket);
@@ -445,16 +456,15 @@ void* ALLOCATE_BLOCK_MEMORY(memory_block* mem, size_t size){
 
         return result;
 }
-
-
 /*
-bool32 DEALLOCATE_BLOCK_MEMORY(memory_arena* arena){
-    bool32 result;
-    if(arena->base){
-        result = VirtualFree(arena->base, arena->size, MEM_COMMIT|MEM_RESERVE);
-    };
-    return result;
-}
+  // Inside main.cpp
+  memory_block* linked_list;
+  linked_list->prev = &linked_list;
+  linked_list->next = &linked_list;
+  // base
+  // size
+
+  linked_list = (memory_block*)ALLOCATE_BLOCK_MEMORY(linked_list, size);
 */
 
 void DEALLOCATE_BLOCK_MEMORY(memory_block* mem){
@@ -462,7 +472,6 @@ void DEALLOCATE_BLOCK_MEMORY(memory_block* mem){
         memory_block* block = ((memory_block*)mem - 1);
         block->prev->next = block->next;
         block->next->prev = block->prev;
-
         VirtualFree(block->base, block->size, MEM_COMMIT|MEM_RESERVE);
     };
 }

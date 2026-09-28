@@ -211,7 +211,6 @@ void* GetAllFunctionPointerFromLib(const HMODULE lib, const char* name){
     return p;
 }
 
-
 void* LoadFunctionFromDLL(const char *DLLName,
                           const char *FuncName) {
     // Create function pointer that needed hot loading for debug

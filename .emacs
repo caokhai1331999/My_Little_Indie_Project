@@ -187,13 +187,12 @@
     ;;"add ';' at the end of line "
     ;; string_match return number of matched character
     (let ((line (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
-      (cond ((and (not (equal (string-match-p "//" line) nil)) (not (bolp)))
+      (cond ((and (not (equal (string-match-p "//" line) nil)) (equal (string-match-p ";" line) nil) (not (bolp)))
              (message "Current line: %s" line)
 	     (message "current line contain '//'")
 	     (newline-and-indent)
-	     (beginning-of-line)
-	     (insert "//")
-	     (end-of-line))
+	     ;;(insert "\t")
+	     (insert "// "))
 	    ;; this string match didn't work
 	    ((and (equal (string-match-p "//" line) nil) (equal (string-match-p "*/" line) nil) (not (equal (string-match-p ";" line) nil)) (eolp))
 	     (message "line is no comment")
@@ -423,7 +422,7 @@
 		(goto-char end)
 		(newline)
 		(yank)
-		(move-beginning-of-line nil)
+		;;(move-beginning-of-line nil)
 		(message "region cloned")))
 
     (progn (kill-ring-save (point-at-bol) (point-at-eol))
@@ -470,16 +469,20 @@
   (interactive)
   (save-excursion
       ;; So eq is the equality test(compare fx) and ?\s present for white space
-      (if (eq (char-before) ?\s) (delete-horizontal-space))
-      ;; litterally non-space+space or space+non-space char
-      ;; what will be killed as the first one character
-      (if(looking-back "[^0-9a-zA-Z;]" 1)(backward-delete-char 1))
-      (let ((start (point)))
+    (cond ((eq (char-before) ?\s) (delete-horizontal-space))
+	  ;; (looking-back "\n" 1)
+	  ((looking-back "[^;a-z0-9A-Z]" 1)
+	   (backward-delete-char 1)
+	   )
+	  (t (let ((start (point)))
 	;; move the cursor through given character
 	;; what will be killed
-      (skip-chars-backward "0-9A-Za-z\t" (line-beginning-position))
-	(delete-region (point) start))))
-;;)
+	       (skip-chars-backward "0-9A-Za-z\t" (line-beginning-position))
+	       (delete-region (point) start))
+	)))
+      ;; litterally non-space+space or space+non-space char
+      ;; what will be killed as the first one character
+    )
 
 (defun append-rectangles-side-by-side (start1 end1 start2 end2)
   "Append rectangle between START1 and END1 to the right of rectangle between START2 and END2."
@@ -667,17 +670,42 @@
   (interactive "*")
   (insert (format-time-string "---------------- %a, %d %b %y: %I:%M%p")))
 
+(defun insert-latest-working-info()
+  (interactive "*")
+  ;;save-buffers-kill-emacs is what called after we press C-x C-c
+  (if (equal (get-file-buffer log-file) nil)
+      (if (file-exists-p log-file)
+	  (progn (find-file log-file))
+	(progn (cd "../")
+	       (find-file log-file)))
+    )
+  (if (not (equal (get-file-buffer log-file) nil))
+      (let ((pos (car buffer-undo-list)))
+	 (end-of-buffer)
+	 (insert (format "Working Lines:%d, File:%s" (line-number-at-pos pos) (file-name-nondirectory (buffer-file-name))))
+	 )
+    )
+  )
+
+(defun add-working-info-and-close()
+  (interactive)
+  (insert-latest-working-info)
+  (save-buffers-kill-emacs)
+  )
+
 (defun load-todo()
   (interactive)
-  (if (file-exists-p todo-file)
-      (progn (find-file todo-file))
-    (progn (cd "../")
-	   (find-file todo-file)))
-  (end-of-buffer)
-  (newline-and-indent)
-  (insert-timeofday)
-  (newline-and-indent)
-  (newline-and-indent))
+  (if (equal (get-file-buffer todo-file) nil)
+      (if (file-exists-p todo-file)
+	  (progn (find-file todo-file))
+	(progn (cd "../")
+	       (find-file todo-file)))
+    (end-of-buffer)
+    (newline-and-indent)
+    (insert-timeofday)
+    (newline-and-indent)
+    (newline-and-indent))
+  )
 
 (defun load-log ()
   (interactive)
@@ -685,8 +713,7 @@
       (progn (find-file log-file))
     (progn (cd "../")
 	   (find-file log-file)))
-  (end-of-buffer) 
-  
+  (end-of-buffer)   
   (newline-and-indent)
   (insert-timeofday)
   (newline-and-indent)
@@ -798,6 +825,9 @@
 (global-unset-key (kbd "C-x o"))
 (global-unset-key (kbd "C-<backspace>"))
 (global-unset-key (kbd "M-<backspace>"))
+
+;;(global-unset-key (kbd "C-x C-c"))
+;;(define-key global-map (kbd "C-x C-c") 'add-working-info-and-close)
 
 					;comment
 (global-unset-key (kbd "M-;"))
