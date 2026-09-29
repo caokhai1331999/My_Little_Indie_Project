@@ -124,7 +124,12 @@ mesh sketch_shape_mesh(/*some map in here*/bool32* space_id_vertices_map){
      unsigned int indices[/*size*/sizeof(*space_id_vertices_map)];
      for(unsigned int i = 0; i < sizeof(*space_id_vertices_map); i++){
          if((*space_id_vertices_map)[i]){
-             vertices[i] = {i/(h*l), i/(w*l), i/(w*h)};
+             // Position 
+             vertices[i].position = {i/(h*l), i/(w*l), i/(w*h)};
+             // Textcoord
+             vertices[i].textcoord = {i/(h*l), i/(w*l), i/(w*h)};
+             // Normal
+             vertices[i].normal = {i/(h*l), i/(w*l), i/(w*h)};
              indices[i] = (*space_id_vertices_map)[i];  
          };
      };
@@ -197,14 +202,15 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
                 case Object_Moving:
                     break;
             }
- 
+
+            // The order of the graphic object is also the type to be called
             unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);
             unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);
             unit.model_id = rand()%((uint8)graphic_object.texture_group_size - 1);
             unit.vertices_data_id = rand()%((uint8)graphic_object.number_of_shape - 1);/*This line is superfluous*/
             
             map->obj_group.push_back(unit);
-// Then background
+            // Then background
             space_ids_taken[rand_id] = true;
             switch(rand_type){
                 case entity_type::BackGround:

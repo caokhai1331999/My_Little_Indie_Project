@@ -254,11 +254,25 @@ struct Game_Input{
 #define DEFAULT_BLOCK_SIZE MEGABYTES(30)
 
 struct ticket_mutex{
-    // keep in mind that the volatile is type that can be delared as an object and modified by hardware
+    // keep in mind that the volatile is type that can be delared as an object and modified by
+    // multiple threads( hardware)
     uint64 volatile ticket;
     // serving is current intercepting thread which id is taken from getthreadid.
     uint64 volatile serving;
     // the ticket loop is just waiting until the thread left/retire before the other get in to execute that line of code again.
+};
+
+// The memory_block itself is just a method to enumerate/track the data live inside the memory we allocate
+// what actually point to the data is the base pointer inside that struct
+struct memory_block{
+    memory_block* prev;
+    memory_block* next;
+
+    size_t size;
+    size_t used;
+    //void* base;  What is this???
+    // In term of linear data arrangement the Pad itself is to just separate the memory_block memory address from what come after it.
+    uint64 Pad[6];
 };
 
 struct win32Dimension{
@@ -267,7 +281,6 @@ struct win32Dimension{
     int Height{720};
     int Width{1280};
 }Dimens;
-
 
 struct Clock_Set{
   // This one is how many count per Second
@@ -285,7 +298,6 @@ struct Clock_Set{
 
     uint64 LastCycleCounts = 0;
     uint64 EndCycleCounts = 0;
-
 
     float TimeCounter = 0.0f;
     float WaitTimeCounter = 0.0f;
@@ -344,18 +356,6 @@ struct OpenGLData{
         textureHandle = 0;
     }
 };
-// The memory_block itself is just a method to enumerate/track the data live inside the memory we allocate
-// what actually point to the data is the base pointer inside that struct
-struct memory_block{
-    memory_block* prev;
-    memory_block* next;
-
-    size_t size;
-    size_t used;
-    //void* base;  What is this???
-    // In term of linear data arrangement the Pad itself is to just separate the memory_block memory address from what come after it.
-    uint64 Pad[6];
-};
 
 /*
   // 
@@ -378,6 +378,8 @@ struct memory_block{
   delete delete_block;
 */
 
+
+
 struct Platform_Properties{
         
     BITMAPINFO Bitmapinfo;
@@ -396,6 +398,8 @@ struct Platform_Properties{
 
     HWND Window;
     RECT ClientRect;
+
+    Memory_Block Sentinel;
     void* BitmapMemory;
     void* BitmapMemoryForDirectBlit;
 
@@ -411,6 +415,8 @@ global_variable Platform_Properties Game_Platform = {};
 local_persist uint64 AtomicAddUint64(uint64* addend, uint64 value);
 global_variable void begin_ticket_mutex(ticket_mutex* mutex);
 global_variable void end_ticket_mutex(ticket_mutex* mutex);
+void* ALLOCATE_BLOCK_MEMORY(memory_block* aimed_block = nullptr, size_t size = 0);
+void DEALLOCATE_BLOCK_MEMORY(memory_block* aimed_block = nullptr);
 
 local_persist uint64 AtomicAddUint64(uint64 volatile *addend, uint64 value){
 // use this to create threadId based ticket and loop through them.
@@ -422,38 +428,40 @@ local_persist uint64 AtomicAddUint64(uint64 volatile *addend, uint64 value){
 }
 
 global_variable void begin_ticket_mutex(ticket_mutex* mutex){
+// One thread get in
     uint64 ticket = AtomicAddUint64(&mutex->ticket, 1);
-    // mutex->ticket is now auto change
-    // But why when the ticket equal to ticket thread id that we know it get out.
-    // 
-        while(ticket != mutex->serving);
+        // But why when the ticket equal to ticket thread
+        // id that we know it get out.
+    while(ticket != mutex->serving);
+    // This one keep the thread while inside;
 }
 
 global_variable void end_ticket_mutex(ticket_mutex* mutex){
+    // Whenever the ticket equal to the threadId that mean the thread get out of code lines
+    // and bring instruction to the core
     AtomicAddUint64(&mutex->serving, 1);
-    // Whenever the ticket equal to the threadId that mean the thread get out of code lines and bring instruction to the core
 }
 // ZII
-void init_arena_memory(memory_arena* arena, size_t init_size){
-    arena->size = init_size;
-    arena->used = 0;
-}
 
-void* ALLOCATE_BLOCK_MEMORY(memory_block* mem, size_t size){
+// How can I accumulate the total_size
+void* ALLOCATE_BLOCK_MEMORY(Platform_Properties* Game_Platform, size_t size){
     // the base is the 0
-        memory_block* block = (memory_block*)VirtualAlloc(block->base, size + sizeof(memory_block), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+        memory_block* block = (memory_block*)VirtualAlloc(0, size + sizeof(memory_block), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
         // why plus one
+        assert(block);
 
-        block->next = mem->next; // This is sentinel
-        block->prev = mem; 
-
+        block->size = size;
+        memory_block* sentinel = &Game_Platform->sentinel;
         begin_ticket_mutex(&Game_Platform.ticket);
+
+        block->prev = sentinel->next; // This is sentinel
+        block->next = sentinel; 
+
         block->next->prev = block;
         block->prev->next = block;
         end_ticket_mutex(&Game_Platform.ticket);
 
-        void* result = block->base + 1;
-
+        void* result = block + 1;
         return result;
 }
 /*
@@ -467,14 +475,16 @@ void* ALLOCATE_BLOCK_MEMORY(memory_block* mem, size_t size){
   linked_list = (memory_block*)ALLOCATE_BLOCK_MEMORY(linked_list, size);
 */
 
-void DEALLOCATE_BLOCK_MEMORY(memory_block* mem){
+void DEALLOCATE_BLOCK_MEMORY(memory_block* aimed_block){
     if(mem){
-        memory_block* block = ((memory_block*)mem - 1);
+        memory_block* block = ((memory_block*)aimed_block - 1);
+        assert(block);
         block->prev->next = block->next;
         block->next->prev = block->prev;
-        VirtualFree(block->base, block->size, MEM_COMMIT|MEM_RESERVE);
+        VirtualFree(block, block->size, MEM_COMMIT|MEM_RESERVE);
     };
 }
+
  
 // apply to grow vertex array
 
@@ -540,8 +550,6 @@ struct Game_Memory{
     bool32 IsInitialized; 
     uint64 PermanentStorageSize;
     void* PermanentStorage;
-    uint64 TransientStorageSize;
-    void* TransientStorage;
 };
 
 // set memory here

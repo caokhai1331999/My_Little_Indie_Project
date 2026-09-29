@@ -2810,3 +2810,8 @@ TODO: Understand and apply uint8 pointer and int uint32 memory
 
 ---------------- Mon, 28 Sep 26: 11:31AM
 
+
+---------------- Tue, 29 Sep 26: 12:25PM
+Just found out the median is an exact member/number in any list. which can be
+completely random among the members(there are no rules, pattern or formula along
+them).

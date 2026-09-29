@@ -51,7 +51,7 @@ int CALLBACK WinMain
   linked_list->next = &linked_list;
 
   // How we pull out data of member from this list
-  linked_list = (memory_block*)ALLOCATE_BLOCK_MEMORY(linked_list->base, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+  memory_block* first_block = (memory_block*)ALLOCATE_BLOCK_MEMORY(linked_list, MEGABYTES(4));
 
   HMODULE AniLib = {};
   
