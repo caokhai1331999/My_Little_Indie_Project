@@ -306,7 +306,7 @@ enum light_type__:be_drawn_type{
     shade = 4, // still haven't decide yet
 };
 
-enum shader_type__:be_drawn_type{
+enum shader_type__{
     //How about normal mapping 
     basic_light = 0, //  diffuse + ambient + specular /or any simple approximated alternative
     animating = 1, // pass optional's light specs **
@@ -318,10 +318,18 @@ enum effect_type:be_drawn_type{
     animating = 1 
 };
 
+// In term of graphical, 
 enum object_drawn_type:be_drawn_type{
     Still_or_Movable(Background),
     Still_or_Movable(Object),
     Weather
+};
+
+
+struct complete_entity_type{
+    bool32 light_source;
+    uint8 number_of_point_lights;  
+    uint8 number_of_shade;  
 };
 
 //==========================================================
@@ -353,7 +361,6 @@ extern "C" __declspec(dllexport) void Load_Textures_for_OpenGL_(Platform_Propert
 typedef void (*Load_Textures_for_OpenGL__) (Platform_Properties*, Graphic_Properties* , const char*);
 
 // How can I make sure that all the shaders draw the same object
-
 // light based on normal map
 //struct environment_map{
     //bitmap* LOD[4];
@@ -412,13 +419,6 @@ public:
 };
 
 // ====================== Map constructing ===================================
-
-typedef uint8 world_entity_type;
-enum entity_type:world_entity_type{
-    BackGround,// also intangible
-    Block,
-    Moving
-};
 // We then bind single texture/simple model
 // to specific object id
 // This is for game play
@@ -464,7 +464,7 @@ struct simple_volume_map{
     // the lowest layer of room is alway where the background object is
     // so from 0 -> length*breath contain the static object id
 // voxel space ids here
-    map_unit* map_content;// we haven't decide what this value hold yet???
+    map_unit map_content[/*Rooms Objects Count*/];// we haven't decide what this value hold yet???
 // for quick check for the avalable slot at that space id at every room per voxel
     bool32* tracking_table;
     // mesh, texture, or light ID

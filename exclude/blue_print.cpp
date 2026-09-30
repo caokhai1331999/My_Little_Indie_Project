@@ -168,9 +168,10 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     uint8 block_objects_count_down = block_objects;
     uint8 background_objects_count_down = background_objects;
     uint8 moving_objects_count_down = moving_objects;
-    
+
     map_unit current_room_content[total_objects];
     bool32 space_ids_taken[room_size] = {};// 0 is empty 1 is taken
+
     // spawn moving objects here
     uint8 rand_id = 0;
     object_drawn_type rand_graphic_type = 0;
@@ -186,28 +187,15 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
             continue;
         }else{
             // Background, blocking object
-            world_entity_type rand_type = rand()%2;
-            rand_graphic_type = (object_drawn_type)rand()%4;
+            // NOTE: This one I use the no-brainer Monte Carlo method
+            rand_graphic_type = (object_drawn_type)(rand()%4 + rand_type);
             unit.space_id = rand_id;// From this space Id I want to construct the vertices data of this cube or ....
             //TODO: Define what is the main differences among these enities type in term of graphic(VAOs, texture, light)
-            // 
-            switch(rand_graphic_type){
-                // NOTE: In Graphic term: what element that seperate being drawn object to cagorized them by types???
-                case Background_Static:
-                    break;
-                case Background_Moving:
-                    break;
-                case Object_Static:
-                    break;
-                case Object_Moving:
-                    break;
-            }
 
             // The order of the graphic object is also the type to be called
-            unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);
             unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);
+            unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);
             unit.model_id = rand()%((uint8)graphic_object.texture_group_size - 1);
-            unit.vertices_data_id = rand()%((uint8)graphic_object.number_of_shape - 1);/*This line is superfluous*/
             
             map->obj_group.push_back(unit);
             // Then background

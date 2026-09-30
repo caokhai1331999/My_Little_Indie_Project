@@ -2813,5 +2813,16 @@ TODO: Understand and apply uint8 pointer and int uint32 memory
 
 ---------------- Tue, 29 Sep 26: 12:25PM
 Just found out the median is an exact member/number in any list. which can be
-completely random among the members(there are no rules, pattern or formula along
-them).
+completely random among the members(there can be no rules, pattern or formula
+among them).
+
+---------------- Wed, 30 Sep 26: 11:56AM
+
+TODO: We first present to entities with mere cube to test mass-drawing function
+and light on world. (More Viable)
+      Then complete the custom decent-complex model drawing entities (Hard)
+
+NOTE: The question is what affect the entities look in game:
+       . Shape(vertices position)
+       . Texture(uint32* pixels)
+       . Light(global illumination(ambient) + Point lights)
