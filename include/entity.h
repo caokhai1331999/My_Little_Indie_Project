@@ -75,19 +75,38 @@ enum light_type__:be_drawn_type{
     shade = 4, // still haven't decide yet
 };
 
-enum shader_type__:be_drawn_type{
+enum shader_type__{
     //How about normal mapping 
-    light = 0, //  diffuse + ambient + specular /or any simple approximated alternative
+    basic_light_ = 0, //  diffuse + ambient + specular /or any simple approximated alternative
     animating = 1, // pass optional's light specs **
 };
 
-// NOTE: where to put animation in graphic type
-/*
-enum effect_type:be_drawn_type{
-    //How about normal mapping 
-    animating = 1 
+// In term of graphical, 
+enum object_drawn_type:be_drawn_type{
+    Light_Source,
+    Under_Lit,
+    Effect
 };
-*/
+
+// This may scale up to a graphical type mechanism just to define
+// Texture, Light, or any graphical property for any random entity
+// NOTE: Currently here is just a bunch of flag to determine whether
+// I put which kind of graphic property on drawn object
+
+struct complete_entity_type{
+    object_drawn_type graphical_type;
+    // we know that light source won't cast shade.
+    bool32 cast_shade;
+    // If we use light probes we wouldn't need to know number of
+    // point light there are
+    uint8 effecting_point_lights;
+    uint16 Effect_Range;
+};
+
+#define Room_Under_Lit_Object (complete_entity_type){object_drawn_type::Under_Lit, true, 1}
+#define Room_Light_Source (complete_entity_type){object_drawn_type::Light_Source, true, 0}
+//==========================================================
+
 //-----------------For_Debugging-------------------------
 
 struct File_Manager{

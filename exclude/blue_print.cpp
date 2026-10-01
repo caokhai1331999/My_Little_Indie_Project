@@ -1,4 +1,4 @@
-/* ========================================================================
+`/* ========================================================================
    $file: $
    $Date: $
    $Revision: $
@@ -191,8 +191,8 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
             rand_graphic_type = (object_drawn_type)(rand()%4 + rand_type);
             unit.space_id = rand_id;// From this space Id I want to construct the vertices data of this cube or ....
             //TODO: Define what is the main differences among these enities type in term of graphic(VAOs, texture, light)
-
             // The order of the graphic object is also the type to be called
+
             unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);
             unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);
             unit.model_id = rand()%((uint8)graphic_object.texture_group_size - 1);
@@ -675,6 +675,7 @@ void set_each_Mesh_up(shape_vertices_data* shape_data){
 // Apply textures group here
 // How can this one being pickily among grahic types and still decent in term of
 // performance??
+
 void feed_shader_data(B_shader_program* shader){
     shader->set;
     shader->set;

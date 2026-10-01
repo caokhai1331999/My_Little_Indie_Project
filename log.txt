@@ -2826,3 +2826,6 @@ NOTE: The question is what affect the entities look in game:
        . Shape(vertices position)
        . Texture(uint32* pixels)
        . Light(global illumination(ambient) + Point lights)
+
+---------------- Thu, 01 Oct 26: 01:48PM
+

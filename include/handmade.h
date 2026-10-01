@@ -399,7 +399,7 @@ struct Platform_Properties{
     HWND Window;
     RECT ClientRect;
 
-    Memory_Block Sentinel;
+    memory_block sentinel;
     void* BitmapMemory;
     void* BitmapMemoryForDirectBlit;
 
@@ -452,14 +452,14 @@ void* ALLOCATE_BLOCK_MEMORY(Platform_Properties* Game_Platform, size_t size){
 
         block->size = size;
         memory_block* sentinel = &Game_Platform->sentinel;
-        begin_ticket_mutex(&Game_Platform.ticket);
+        begin_ticket_mutex(&Game_Platform->ticket);
 
         block->prev = sentinel->next; // This is sentinel
         block->next = sentinel; 
 
         block->next->prev = block;
         block->prev->next = block;
-        end_ticket_mutex(&Game_Platform.ticket);
+        end_ticket_mutex(&Game_Platform->ticket);
 
         void* result = block + 1;
         return result;
@@ -476,7 +476,7 @@ void* ALLOCATE_BLOCK_MEMORY(Platform_Properties* Game_Platform, size_t size){
 */
 
 void DEALLOCATE_BLOCK_MEMORY(memory_block* aimed_block){
-    if(mem){
+    if(aimed_block){
         memory_block* block = ((memory_block*)aimed_block - 1);
         assert(block);
         block->prev->next = block->next;
@@ -487,16 +487,6 @@ void DEALLOCATE_BLOCK_MEMORY(memory_block* aimed_block){
 
  
 // apply to grow vertex array
-
-void init_mem_region(size_t size, memory_block * arena){
-    arena->size = size;
-    arena->base = (uint8*)VirtualAlloc(arena->base, arena->size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE );
-}
-
-void free_mem_region(memory_block* arena){
-    if(arena->base)
-    VirtualFree(arena->base, arena->size, MEM_COMMIT|MEM_RESERVE);
-}
 
 //inline memory_index Get_Alignment_Offset(memory_arena* block, size_t alignment){
     //;
@@ -524,14 +514,13 @@ void* push_size_(size_t size, memory_block* sentinel, ticket_mutex* mutex){
     // whenever the total requested size if bigger than the current block size: allocate new space and copymemory of the old block
     void* result;
     if(sentinel->used + size >= sentinel->size){
-        begin_ticket_mutex(mutex);
-        memory_block* new_block = (memory_block*)ALLOCATE_BLOCK_MEMORY(sentinel, (size_t)DEFAULT_BLOCK_SIZE);
+        memory_block* new_block = (memory_block*)ALLOCATE_BLOCK_MEMORY(&Game_Platform, (size_t)DEFAULT_BLOCK_SIZE);
         // casey lock it inside the something call tick mutex, to prevent any one/app else use these kind of thread while it's on working.
 // This one is not thread-safe
         // so currently, we haven't touch this growing aray yet.
         // focus on draw scene and load gl pointer on little beast.
 
-        result = new_block->base + size;
+        result = new_block + size;
         new_block->used += size;
         end_ticket_mutex(mutex);
         return (result);
@@ -539,7 +528,7 @@ void* push_size_(size_t size, memory_block* sentinel, ticket_mutex* mutex){
         //CopyMemory();
     } else {
         sentinel->used += size;
-        result = sentinel->base + sentinel->used;
+        result = sentinel + sentinel->used;
         return (result);
     };
 }
