@@ -399,7 +399,8 @@ struct Platform_Properties{
     HWND Window;
     RECT ClientRect;
 
-    memory_block sentinel;
+    memory_block* sentinel;
+    memory_block* linked_list_memory;
     void* BitmapMemory;
     void* BitmapMemoryForDirectBlit;
 
@@ -451,7 +452,7 @@ void* ALLOCATE_BLOCK_MEMORY(Platform_Properties* Game_Platform, size_t size){
         assert(block);
 
         block->size = size;
-        memory_block* sentinel = &Game_Platform->sentinel;
+        memory_block* sentinel = Game_Platform->sentinel;
         begin_ticket_mutex(&Game_Platform->ticket);
 
         block->prev = sentinel->next; // This is sentinel
@@ -510,11 +511,11 @@ void* push_size_(size_t size, memory_arena* arena, ticket_mutex* mutex){
 */
 
 
-void* push_size_(size_t size, memory_block* sentinel, ticket_mutex* mutex){
+void* push_size_(size_t size, Platform_Properties* Game_Platform){
     // whenever the total requested size if bigger than the current block size: allocate new space and copymemory of the old block
     void* result;
-    if(sentinel->used + size >= sentinel->size){
-        memory_block* new_block = (memory_block*)ALLOCATE_BLOCK_MEMORY(&Game_Platform, (size_t)DEFAULT_BLOCK_SIZE);
+    if(Game_Platform->linked_list_memory->used + size >= Game_Platform->linked_list_memory->size){
+        memory_block* new_block = (memory_block*)ALLOCATE_BLOCK_MEMORY(Game_Platform, (size_t)DEFAULT_BLOCK_SIZE);
         // casey lock it inside the something call tick mutex, to prevent any one/app else use these kind of thread while it's on working.
 // This one is not thread-safe
         // so currently, we haven't touch this growing aray yet.
@@ -522,13 +523,13 @@ void* push_size_(size_t size, memory_block* sentinel, ticket_mutex* mutex){
 
         result = new_block + size;
         new_block->used += size;
-        end_ticket_mutex(mutex);
+        Game_Platform->linked_list_memory = new_block;
         return (result);
         // How can i access these memory in pool using index
         //CopyMemory();
     } else {
-        sentinel->used += size;
-        result = sentinel + sentinel->used;
+        Game_Platform->linked_list_memory->used += size;
+        result = Game_Platform->linked_list_memory + Game_Platform->linked_list_memory->used;
         return (result);
     };
 }

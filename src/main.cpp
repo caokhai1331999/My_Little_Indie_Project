@@ -46,12 +46,17 @@ int CALLBACK WinMain
   WNDCLASSEXA WindowClass = SetUpWindowClass(&Game_Platform, Instance);
     //HWND Window = {};
 
-  memory_block* linked_list;
-  linked_list->prev = &linked_list;
-  linked_list->next = &linked_list;
+  size_t block_size = (size_t)MEGABYTES(4);
+  Game_Platform.sentinel = (memory_block*)VirtualAlloc(0, block_size + sizeof(memory_block), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
 
+  Game_Platform.sentinel->next = Game_Platform.sentinel;
+  Game_Platform.sentinel->prev = Game_Platform.sentinel;
+  Game_Platform.linked_list_memory = Game_Platform.sentinel;
   // How we pull out data of member from this list
-  memory_block* first_block = (memory_block*)ALLOCATE_BLOCK_MEMORY(linked_list, MEGABYTES(4));
+  float* test_array = (float*)push_size_(3*sizeof(float), &Game_Platform);
+  test_array[0] = 3.0f;
+  test_array[1] = 4.0f;
+  test_array[2] = 3.0f;
 
   HMODULE AniLib = {};
   
@@ -154,15 +159,13 @@ int CALLBACK WinMain
 
             Game_Memory game_memory = {};
             game_memory.PermanentStorageSize = MEGABYTES(128);
-            game_memory.TransientStorageSize = MEGABYTES((uint64)6);
+            uint64 TotalSize = game_memory.PermanentStorageSize;
 
-            uint64 TotalSize = game_memory.PermanentStorageSize + game_memory.TransientStorageSize;
             
             game_memory.PermanentStorage = VirtualAlloc(BaseAddress , TotalSize,  MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
-            game_memory.TransientStorage = ((uint8*)game_memory.PermanentStorage + game_memory.PermanentStorageSize);
             //=====================================================
 
-          if(game_memory.TransientStorage && game_memory.PermanentStorage){
+          if(game_memory.PermanentStorage){
               
               debug_read_file_result result2;
               debug_read_file_result result;

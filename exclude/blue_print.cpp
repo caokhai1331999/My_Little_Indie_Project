@@ -195,11 +195,11 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
 
             unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);
             unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);
-            unit.model_id = rand()%((uint8)graphic_object.texture_group_size - 1);
+            unit.model_id = rand()%((uint8)graphic_object.model_group_size - 1);
             
             map->obj_group.push_back(unit);
-            // Then background
             space_ids_taken[rand_id] = true;
+            // Then background
             switch(rand_type){
                 case entity_type::BackGround:
                     background_objects_count_down--;                    

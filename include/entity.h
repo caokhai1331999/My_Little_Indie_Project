@@ -92,20 +92,26 @@ enum object_drawn_type:be_drawn_type{
 // Texture, Light, or any graphical property for any random entity
 // NOTE: Currently here is just a bunch of flag to determine whether
 // I put which kind of graphic property on drawn object
+//==========================================================
 
-struct complete_entity_type{
+typedef struct complete_entity_type{
     object_drawn_type graphical_type;
     // we know that light source won't cast shade.
     bool32 cast_shade;
     // If we use light probes we wouldn't need to know number of
     // point light there are
-    uint8 effecting_point_lights;
-    uint16 Effect_Range;
-};
+    uint8 number_of_point_lights;
+    uint16 effect_range;
 
-#define Room_Under_Lit_Object (complete_entity_type){object_drawn_type::Under_Lit, true, 1}
-#define Room_Light_Source (complete_entity_type){object_drawn_type::Light_Source, true, 0}
-//==========================================================
+} Entity_Graphic_Type;
+
+// This may scale up to a graphical type mechanism just to define
+// Texture, Light, or any graphical property for any random entity
+// NOTE: Currently here is just a bunch of flag to determine whether
+// I put which kind of graphic property on drawn object
+
+#define Room_Under_Lit_Object (Entity_Graphic_Type){object_drawn_type::Under_Lit, true, 1, 0}
+#define Room_Light_Source (Entity_Graphic_Type){object_drawn_type::Light_Source, false, 0, 100}
 
 //-----------------For_Debugging-------------------------
 

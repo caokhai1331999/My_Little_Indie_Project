@@ -324,14 +324,14 @@ enum object_drawn_type:be_drawn_type{
 // NOTE: Currently here is just a bunch of flag to determine whether
 // I put which kind of graphic property on drawn object
 
-struct complete_entity_type{
+typedef struct complete_entity_type{
     object_drawn_type graphical_type;
     // we know that light source won't cast shade.
     bool32 cast_shade;
     // If we use light probes we wouldn't need to know number of
     // point light there are
     uint8 number_of_point_lights;
-};
+} Entity_Graphic_Type;
 
 // This may scale up to a graphical type mechanism just to define
 // Texture, Light, or any graphical property for any random entity
@@ -348,8 +348,8 @@ struct complete_entity_type{
     uint16 Effect_Range;
 };
 
-#define Room_Under_Lit_Object (complete_entity_type){object_drawn_type::Under_Lit, true, 1}
-#define Room_Light_Source (complete_entity_type){object_drawn_type::Light_Source, true, 0}
+#define Room_Under_Lit_Object (Entity_Graphic_Type){object_drawn_type::Under_Lit, true, 1}
+#define Room_Light_Source (Entity_Graphic_Type){object_drawn_type::Light_Source, true, 0}
 
 //==========================================================
 
@@ -395,16 +395,6 @@ typedef void (*Load_Textures_for_OpenGL__) (Platform_Properties*, Graphic_Proper
 // How to first prototype the graphic property
 // NOTE: How to come up with simple enough but effective name system for grouping light and shader
 // together
-
-struct graphic_object_type{
-    light_type__ light_type_;
-    shader_type__ shader_type_;
-};
-
-#define basic_draw_type (graphic_object_type){light_type__::basic_light, shader_type__::basic_light}
-// more optional types if needed
-#define basic_draw_type (graphic_object_type){light_type__::basic_light, shader_type___::basic_lighting_shader}
-
 struct texture{
     char* content;  
 };
@@ -420,11 +410,11 @@ private:
     std::vector<M_Mesh>* background_mesh_group;
     std::vector<M_Mesh>* moving_mesh_group;
 
+    Model_ Model_Collection[];
     texture* texture_group;
     size_t texture_group_size;
 
     shape_vertices_store* current_shape_store;
-    size_t number_of_shape;
 public:
     update_(clock_set* clock);
     B_shader_program* get_shader(return shader);
