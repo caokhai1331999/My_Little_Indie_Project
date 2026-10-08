@@ -40,7 +40,8 @@ struct GamePlay_Entity{
     // this one haven't been realistic yet
     // This is supposed to calculate the next position of entities based on its
     // area surrounding.
-}
+    complete_graphical_type room_graphical_type;
+};
 
 //======================LIGHT_PART==========================
 
@@ -281,7 +282,7 @@ struct M_Mesh{
     //unsigned int* indices;
 };
 
-//===========================================================
+//================================Graphical_Flag==========================================
 // PURPOSE: Create a mechanism that draw multiple object of scene using
 // instancing method and reuse available asset.
 
@@ -324,21 +325,16 @@ enum object_drawn_type:be_drawn_type{
 // NOTE: Currently here is just a bunch of flag to determine whether
 // I put which kind of graphic property on drawn object
 
-typedef struct complete_entity_type{
-    object_drawn_type graphical_type;
-    // we know that light source won't cast shade.
-    bool32 cast_shade;
-    // If we use light probes we wouldn't need to know number of
-    // point light there are
-    uint8 number_of_point_lights;
-} Entity_Graphic_Type;
-
+enum In_Room_Entity{
+    Ground,
+    AboveGround,
+};
 // This may scale up to a graphical type mechanism just to define
 // Texture, Light, or any graphical property for any random entity
 // NOTE: Currently here is just a bunch of flag to determine whether
 // I put which kind of graphic property on drawn object
 
-struct complete_entity_type{
+struct complete_graphical_type{
     object_drawn_type graphical_type;
     // we know that light source won't cast shade.
     bool32 cast_shade;
@@ -348,10 +344,18 @@ struct complete_entity_type{
     uint16 Effect_Range;
 };
 
-#define Room_Under_Lit_Object (Entity_Graphic_Type){object_drawn_type::Under_Lit, true, 1}
-#define Room_Light_Source (Entity_Graphic_Type){object_drawn_type::Light_Source, true, 0}
+char* DecentLooked_Light_Shader_Source = "
+  #version 330
+  // texel_data + effect = result;
+  void main(){
+      
+  }
+";
 
-//==========================================================
+#define Room_Under_Lit_Object (complete_graphical_type){object_drawn_type::Under_Lit, true, 1, 0}
+#define Room_Light_Source (complete_graphical_type){object_drawn_type::Light_Source, true, 0, 200}
+
+//================================Graphical_Flag==========================================
 
 uint32* pixel_data;
 // rgba or argb
@@ -408,10 +412,11 @@ private:
     std::vector<B_shader_program*>* basic_shader_group;
     //TODO: need to arrange the mesh order based on drawn type for the sake of calling later
     std::vector<M_Mesh>* background_mesh_group;
-    std::vector<M_Mesh>* moving_mesh_group;
+    std::vector<M_Mesh>* moving_entity_mesh_group;
 
     Model_ Model_Collection[];
     texture* texture_group;
+
     size_t texture_group_size;
 
     shape_vertices_store* current_shape_store;
@@ -450,10 +455,10 @@ struct map_unit{
     uint8 vertices_data_id;
     uint8 texture_id;
     uint8 mesh_id;
-
     uint8 model_id;
+
     // This graphic_style will be supposed to replace all other ID if we did well .
-    graphic_object_type graphic_type;// include light and shader type
+    complete_graphical_type graphic_type;
     // model space shape vertices data(pos, textcoord, normal)
 //=======================================================
     // This is for position reconstruction
@@ -473,7 +478,7 @@ struct simple_volume_map{
     // the lowest layer of room is alway where the background object is
     // so from 0 -> length*breath contain the static object id
 // voxel space ids here
-    map_unit map_content[/*Rooms Objects Count*/];// we haven't decide what this value hold yet???
+    map_unit* map_content;// we haven't decide what this value hold yet???
 // for quick check for the avalable slot at that space id at every room per voxel
     bool32* tracking_table;
     // mesh, texture, or light ID
@@ -482,13 +487,14 @@ struct simple_volume_map{
     uint16 height;
     uint16 breadth;
     uint16 length;
-};
+};// One per room
 
 struct Game_State{
     std::vector<entity>entities;
     std::vector<map_unit>map_objects;
     uint8 current_room_id;
     std::vector<simple_volume_map>world_map;
+    simple_volume_map* world_map;
 };
 // We spawn/randomize new map everytime we change room
 // Think about this is the volume/room not the mere flat ground

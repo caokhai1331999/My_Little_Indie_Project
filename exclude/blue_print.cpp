@@ -1,4 +1,4 @@
-`/* ========================================================================
+/* ========================================================================
    $file: $
    $Date: $
    $Revision: $
@@ -8,7 +8,6 @@
 #include "psuedo.h"
 
 // Handshake cross check for collision between entities and entities with background
-
 // TileMap contain array of positions in xz plane
 // wherein x is analogous to y and z is similar to x in 2D coordinates
 //
@@ -157,24 +156,25 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     uint8 room_ground_size = map->breadth * map->length;
     uint8 room_size = room_ground_size * map->height;
 
-    uint8 block_objects = (uint8)(room_ground_size * (float)(20 + (rand()%10))/100);
-    uint8 background_objects = (uint8)(room_ground_size * (float)(25 + rand()%10)/100);
-    uint8 moving_objects = (uint8)(room_ground_size * (float)(15 + rand()%10)/100);
-
+    uint8 ground_objects = (uint8)(room_ground_size * (float)(25 + rand()%10)/100);
+    uint8 above_ground_objects = (uint8)(room_ground_size * (float)(15 + rand()%10)/100);
+    uint8 blocker = above_ground_objects * 10 / 100;
+    
     uint8 total_objects = block_objects + intangible_objects + moving_objects;
 
-    map->moving_obj_group.reserve((size_t)total_objects);
-
+    // This one is just for producing mere entities for game
+    // it's not supposed to define how we draw them
     uint8 block_objects_count_down = block_objects;
     uint8 background_objects_count_down = background_objects;
     uint8 moving_objects_count_down = moving_objects;
 
-    map_unit current_room_content[total_objects];
+    map->moving_obj_group.reserve((size_t)total_objects);
+    map_unit current_room_content[total_objects];// here what we use to store unit
     bool32 space_ids_taken[room_size] = {};// 0 is empty 1 is taken
 
     // spawn moving objects here
     uint8 rand_id = 0;
-    object_drawn_type rand_graphic_type = 0;
+    complete_graphical_type rand_graphic_type = {};
 
     map_unit unit = {};
 
@@ -186,17 +186,20 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
         if(space_ids_taken[rand_id]){
             continue;
         }else{
-            // Background, blocking object
+            // Ground_Object
             // NOTE: This one I use the no-brainer Monte Carlo method
             rand_graphic_type = (object_drawn_type)(rand()%4 + rand_type);
-            unit.space_id = rand_id;// From this space Id I want to construct the vertices data of this cube or ....
-            //TODO: Define what is the main differences among these enities type in term of graphic(VAOs, texture, light)
+            unit.space_id = rand_id;
+            // From this space Id I want to construct the vertices data of this cube or ....
+            // TODO: Define what is the main differences among these enities type in term of graphic(VAOs, texture, light)
             // The order of the graphic object is also the type to be called
 
             unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);
             unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);
             unit.model_id = rand()%((uint8)graphic_object.model_group_size - 1);
-            
+
+            unit.entity_type = Room_Under_Lit_Object;
+
             map->obj_group.push_back(unit);
             space_ids_taken[rand_id] = true;
             // Then background
@@ -490,6 +493,7 @@ void spawn_vertex(uint8 size, /*what to pass here*/ ){
 void spawn_triangle(plane_type, map){
     ;
 };
+
 // ===============================Primitives_Data_Construction============================================
 //
 // First we hardcode it to see how it work, and then think about the proper approach of this one.
@@ -774,7 +778,7 @@ void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_ma
     if(post_effect_on){
         glUseProgram(Graphic->shader[effect]);
         glBindVertexArray(Graphic->VAOs[effect]);
-        glSetVec2(glm::vec2(ScreenH, ScreenW), "screen_dimesion");
+        glSetVec2(glm::vec2(ScreenH, ScreenW), "screen_dimension");
         glDrawElements();
     }
 

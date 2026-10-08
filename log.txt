@@ -2832,3 +2832,22 @@ NOTE: The question is what affect the entities look in game:
 
 ---------------- Fri, 02 Oct 26: 12:24PM
 
+
+---------------- Sun, 04 Oct 26: 11:29AM
+
+
+---------------- Mon, 05 Oct 26: 12:02AM
+
+
+---------------- Mon, 05 Oct 26: 11:13AM
+
+Fix the gl pointer's losses in little beast(copy glad_wgl.c to include).
+
+---------------- Tue, 06 Oct 26: 12:17PM
+
+
+---------------- Wed, 07 Oct 26: 08:59AM
+
+
+---------------- Thu, 08 Oct 26: 10:12AM
+TODO: avoid re-read the code part, try to remember what is their job

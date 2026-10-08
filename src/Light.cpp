@@ -267,7 +267,6 @@ void set_environmental_light(B_shader_program* shader, const global_light* envir
         shader->setVec3("dirLight.ambient", envir_light->dirLight.ambient);
         shader->setVec3("dirLight.diffuse", envir_light->dirLight.diffuse);
         shader->setVec3("dirLight.specular", envir_light->dirLight.specular);
-
     
     std::string light_name;
     for(int i = 0; i < 2; i++){

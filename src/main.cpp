@@ -169,7 +169,7 @@ int CALLBACK WinMain
               
               debug_read_file_result result2;
               debug_read_file_result result;
-              BMPContent =  DEBUGReadBMP("Harry_and_Accomplices_rescaled.bmp",&result);
+              //BMPContent =  DEBUGReadBMP("Harry_and_Accomplices_rescaled.bmp",&result);
             //  =============================================
             //BMPContent = DEBUGReadBMP("adventure_.jpg", &result);
             // printf("About to read image\n");
@@ -224,8 +224,8 @@ int CALLBACK WinMain
 
                 copyBufferData(&Game_Platform, &BackBuffer, &ScreenBuffer);
                 //LoadFont(&test_platform, &Game_Platform, &BackBuffer, &Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
-                LoadFont(&Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
-                //LoadFont(&Game_Platform, &Glyphs_Map, "./media/arial.ttf");
+                //LoadFont(&Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
+                LoadFont(&Glyphs_Map, "./media/arial.ttf");
                 
                 //????
                 //glm::mat4 View = glm::mat4(1.0f);
@@ -363,9 +363,7 @@ int CALLBACK WinMain
                 }
                 glUseProgram(0);
 
-                set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
-                //Set_environmental_light(&Game_Platform, &BackBuffer, BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
-                //Set_environmental_light(&Game_Platform, &BackBuffer, BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
+                //set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
                 set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
                 set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
 //=================================================
@@ -789,7 +787,6 @@ int CALLBACK WinMain
                         //if(Transform_->size() > 0){
                             glBindBuffer(GL_UNIFORM_BUFFER, UBO);
                             glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4)* 52, Transform_->data());
-                            glBindBuffer(GL_UNIFORM_BUFFER, UBO);
                             glBindBuffer(GL_UNIFORM_BUFFER, 0);
                         //}
 
@@ -811,8 +808,8 @@ indexx);
                                     //BackBuffer.shaders_list[0]->setMat4(matrixName_.c_str(), matrix_);
                                     BackBuffer.shaders_list[0]->setMat4(matrixName_.c_str(), (*Transform_)[i]);
 
-                                    if(!showMsPF){
-                                        printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string(matrix_).c_str());
+                                    if(showMsPF){
+                                        //printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string(matrix_).c_str());
                                         printf("uniform name %s :%s\n", matrixName_.c_str(), glm::to_string((*Transform_)[i]).c_str());
                                     }                                        
                                 };

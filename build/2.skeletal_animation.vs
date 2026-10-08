@@ -39,14 +39,14 @@ struct VS_OUT{
 
 out VS_OUT fs_in;
 
-// uniform mat4[MAX_BONES] finalBoneMatrices;
+uniform mat4[MAX_BONES] finalBoneMatrices;
 // out vec2 TexCoord;
 // out vec3 Normal;
 // out vec3 FragPos;
 
-layout (std140) uniform finalBone{
- mat4 finalBoneMatrices [MAX_BONES];
-};
+// layout (std140) uniform finalBone{
+//  mat4 finalBoneMatrices [MAX_BONES];
+// };
 
 
 void main()
@@ -74,7 +74,7 @@ void main()
         fs_in.tangentpointLight_Pos[i] = TBN * pointLight_Pos[i];
     }
 
-    //// Normal = vec3(0.0f);
+    // Normal = vec3(0.0f);
     vec4 totalPosition = vec4(0.0f);
 
 mat4 totalBoneMatrices = mat4(1.0f);
@@ -94,8 +94,8 @@ totalPosition = vec4(aPos, 1.0f);
 continue;
 }
 
-vec4 localPosition = finalBone.finalBoneMatrices[boneids[i]] * vec4(aPos, 1.0f);
- // vec4 localPosition = finalBoneMatrices[boneids[i]] * vec4(aPos, 1.0f);
+// vec4 localPosition = finalBone.finalBoneMatrices[boneids[i]] * vec4(aPos, 1.0f);
+ vec4 localPosition = finalBoneMatrices[boneids[i]] * vec4(aPos, 1.0f);
 totalPosition += localPosition * weights[i];
 
 // vec3 localNormal = mat3(transpose(inverse(finalBone.finalBoneMatrices[boneids[i]]))) * aNormal;

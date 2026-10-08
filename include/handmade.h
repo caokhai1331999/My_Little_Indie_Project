@@ -22,8 +22,8 @@
 #if !defined
 #define GLAD_LIB
 #include <glad/glad_wgl.h>
-#include <glad/glad_wgl.c>
 //#include <glad/glad.h>
+#include <glad/glad_wgl.c>
 //#include <glad/glad.c>
 #endif
 
@@ -741,15 +741,16 @@ void* GetAnyGLFuncAddress(const char* name)
 };
 
 extern "C" void reload_gl_function_pointer (struct Platform_Properties* Game_Platform){
-    begin_ticket_mutex(&Game_Platform->ticket);
     HDC tempDC = GetDC(Game_Platform->Window);
     if(wglMakeCurrent(tempDC, Game_Platform->glData.openglRC)){
+        begin_ticket_mutex(&Game_Platform->ticket);
         bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
+        assert(success);
         if (!success)
             bool success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
         assert(success);
+        end_ticket_mutex(&Game_Platform->ticket);
     };
-    end_ticket_mutex(&Game_Platform->ticket);
 }
 
 extern "C" void ReloadGLFunction (Platform_Properties* Game_Platform){
@@ -763,9 +764,14 @@ extern "C" void ReloadGLFunction (Platform_Properties* Game_Platform){
         }
 
         bool success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);
-        if (!success)
-            bool success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
-        assert(success);
+        //int success = gladLoadWGLLoader((GLADloadproc)wglGetProcAddress, tempDC);
+        printf("Success Status value is: %d\n", success);
+
+        if (!success){
+            //success = gladLoadGLLoader((GLADloadproc)wglGetProcAddress);            
+            success = gladLoadGLLoader((GLADloadproc)GetAnyGLFuncAddress);
+            assert(success);            
+        }
     };
     end_ticket_mutex(&Game_Platform->ticket);
 }
