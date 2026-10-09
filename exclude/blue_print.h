@@ -333,6 +333,8 @@ enum In_Room_Entity{
 // Texture, Light, or any graphical property for any random entity
 // NOTE: Currently here is just a bunch of flag to determine whether
 // I put which kind of graphic property on drawn object
+// Two aspects to consider: One is how the object being drawn itself
+//                          Two is how it affect others appearance in game
 
 struct complete_graphical_type{
     object_drawn_type graphical_type;

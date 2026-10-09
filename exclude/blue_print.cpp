@@ -137,9 +137,10 @@ mesh sketch_shape_mesh(/*some map in here*/bool32* space_id_vertices_map){
      return result;
 };
 
-//NOTE: bind pre-loaded VAOS(vertice's data(pos, normal, texcoord, its indices...)), (uint32-ARGB)Texture
+// NOTE: Working
+// pre-define the initial position of and graphic type of object/entity in room
+// NOTE: bind pre-loaded VAOS(vertice's data(pos, normal, texcoord, its indices...)), (uint32-ARGB)Texture
     // , add some uniforms(light,..) -> draw elements
-//NOTE: Working: here
 void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     srand(time(NULL));
 

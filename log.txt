@@ -2851,3 +2851,8 @@ Fix the gl pointer's losses in little beast(copy glad_wgl.c to include).
 
 ---------------- Thu, 08 Oct 26: 10:12AM
 TODO: avoid re-read the code part, try to remember what is their job
+
+---------------- Fri, 09 Oct 26: 10:23AM
+
+NOTE: Is it all the entity, objects being drawn the same. Or there are core
+difference to separate them apart.
