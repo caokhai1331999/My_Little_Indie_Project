@@ -48,9 +48,9 @@ int CALLBACK WinMain
 
   size_t block_size = (size_t)MEGABYTES(4);
   Game_Platform.sentinel = (memory_block*)VirtualAlloc(0, block_size + sizeof(memory_block), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
-
   Game_Platform.sentinel->next = Game_Platform.sentinel;
   Game_Platform.sentinel->prev = Game_Platform.sentinel;
+  Game_Platform.sentinel->size = block_size;
   Game_Platform.linked_list_memory = Game_Platform.sentinel;
   // How we pull out data of member from this list
   float* test_array = (float*)push_size_(3*sizeof(float), &Game_Platform);

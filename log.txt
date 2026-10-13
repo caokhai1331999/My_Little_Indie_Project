@@ -2855,4 +2855,18 @@ TODO: avoid re-read the code part, try to remember what is their job
 ---------------- Fri, 09 Oct 26: 10:23AM
 
 NOTE: Is it all the entity, objects being drawn the same. Or there are core
-difference to separate them apart.
+differences to separate them apart.
+
+---------------- Sat, 10 Oct 26: 10:16AM
+
+
+---------------- Sun, 11 Oct 26: 09:58AM
+
+
+---------------- Mon, 12 Oct 26: 10:40AM
+
+TODO: Make the sketch room scene fundamentally work first with hard-coded asset
+picker. Then we move on to the more elaborated-mechanism
+
+---------------- Tue, 13 Oct 26: 09:35AM
+

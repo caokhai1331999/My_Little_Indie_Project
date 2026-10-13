@@ -144,7 +144,7 @@ struct cube{
 
 struct voxel{
     //NOTE: what contain inside this struct???: Pos, light,
-    voxel* first;
+    voxel* prev;
     voxel* next;
 };
 
@@ -328,13 +328,12 @@ enum object_drawn_type:be_drawn_type{
 enum In_Room_Entity{
     Ground,
     AboveGround,
+    Blocker
 };
 // This may scale up to a graphical type mechanism just to define
 // Texture, Light, or any graphical property for any random entity
 // NOTE: Currently here is just a bunch of flag to determine whether
 // I put which kind of graphic property on drawn object
-// Two aspects to consider: One is how the object being drawn itself
-//                          Two is how it affect others appearance in game
 
 struct complete_graphical_type{
     object_drawn_type graphical_type;
@@ -354,10 +353,16 @@ char* DecentLooked_Light_Shader_Source = "
   }
 ";
 
-#define Room_Under_Lit_Object (complete_graphical_type){object_drawn_type::Under_Lit, true, 1, 0}
+// NOTE: which features should separate the asset from each others
+// to be worth called types
+struct Asset_Id_System{
+    int16 ;
+};
+
+#define Room_Common_Under_Lit_Object (complete_graphical_type){object_drawn_type::Under_Lit, true, 1, 0}
 #define Room_Light_Source (complete_graphical_type){object_drawn_type::Light_Source, true, 0, 200}
 
-//================================Graphical_Flag==========================================
+//=================================Graphical_Flag==========================================
 
 uint32* pixel_data;
 // rgba or argb
@@ -412,9 +417,17 @@ private:
     // we sort them out as set(each has particular purpose)
     std::vector<B_shader_program*>* post_effect_shader_group;
     std::vector<B_shader_program*>* basic_shader_group;
+
+     // For manual memory container
+    B_shader_program* post_effect_shader_group;
+    B_shader_program* basic_shader_group;
     //TODO: need to arrange the mesh order based on drawn type for the sake of calling later
     std::vector<M_Mesh>* background_mesh_group;
     std::vector<M_Mesh>* moving_entity_mesh_group;
+
+    // For manual memory container
+    M_Mesh* background_mesh_group;
+    M_Mesh* moving_entity_mesh_group;
 
     Model_ Model_Collection[];
     texture* texture_group;
@@ -459,8 +472,11 @@ struct map_unit{
     uint8 mesh_id;
     uint8 model_id;
 
-    // This graphic_style will be supposed to replace all other ID if we did well .
+    bool32 blocker;
     complete_graphical_type graphic_type;
+
+    // This graphic_style will be supposed to replace all other ID if we did well .
+    In_Room_Entity layer_type;
     // model space shape vertices data(pos, textcoord, normal)
 //=======================================================
     // This is for position reconstruction
@@ -477,10 +493,10 @@ struct map_unit{
 struct simple_volume_map{    
     // one is mesh type, the other is the position;
     std::vector<map_unit>obj_group;
+    map_unit* room_obj;
     // the lowest layer of room is alway where the background object is
     // so from 0 -> length*breath contain the static object id
-// voxel space ids here
-    map_unit* map_content;// we haven't decide what this value hold yet???
+    // voxel space ids here
 // for quick check for the avalable slot at that space id at every room per voxel
     bool32* tracking_table;
     // mesh, texture, or light ID

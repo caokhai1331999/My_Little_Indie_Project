@@ -455,7 +455,7 @@ void* ALLOCATE_BLOCK_MEMORY(Platform_Properties* Game_Platform, size_t size){
         memory_block* sentinel = Game_Platform->sentinel;
         begin_ticket_mutex(&Game_Platform->ticket);
 
-        block->prev = sentinel->next; // This is sentinel
+        block->prev = sentinel->next; // This is sentinel and of the chain node
         block->next = sentinel; 
 
         block->next->prev = block;

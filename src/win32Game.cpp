@@ -1599,11 +1599,13 @@ void CalDelayedRatio(float* DelayedRatio, Clock_Set* Time_Set, Win32_OffScreen_B
 };
 
 WNDCLASSEXA SetUpWindowClass(Platform_Properties* Game_Platform, HINSTANCE Instance){
-    WNDCLASSEXA WindowClass = {};
+  WNDCLASSEXA WindowClass = {};
   WindowClass.cbSize = sizeof(WNDCLASSEXA);
   WindowClass.style = CS_HREDRAW|CS_VREDRAW;
   //HERE main windowcallback main job
   //WindowClass.lpfnWndProc = BackBuffer->wndproc;
+  // How this work just by calling the function name
+  // So the WNDPROC itself is a function
   WindowClass.lpfnWndProc = MainWindowCallBack;
   WindowClass.hInstance = Instance;
   WindowClass.lpszClassName = "First Game Window Class";

@@ -137,7 +137,6 @@ mesh sketch_shape_mesh(/*some map in here*/bool32* space_id_vertices_map){
      return result;
 };
 
-// NOTE: Working
 // pre-define the initial position of and graphic type of object/entity in room
 // NOTE: bind pre-loaded VAOS(vertice's data(pos, normal, texcoord, its indices...)), (uint32-ARGB)Texture
     // , add some uniforms(light,..) -> draw elements
@@ -148,11 +147,11 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     int y = 0;
     int h = 0;
 
-    //for(int y = 0; y < map->height; y++){
-        //for(int x = 0; x < map->breadth; x++){
-            //for(int z = 0; z < map->length; z++)
-    // Understand data on the level of interger/float is an advantage
-    // all of the will be drawn obj is the under lit one
+ //for(int y = 0; y < map->height; y++){
+     //for(int x = 0; x < map->breadth; x++){
+         //for(int z = 0; z < map->length; z++)
+ // Understand data on the level of interger/float is an advantage
+ // all of the will be drawn obj is the under lit one
 
     uint8 room_ground_size = map->breadth * map->length;
     uint8 room_size = room_ground_size * map->height;
@@ -161,16 +160,16 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     uint8 above_ground_objects = (uint8)(room_ground_size * (float)(15 + rand()%10)/100);
     uint8 blocker = above_ground_objects * 10 / 100;
     
-    uint8 total_objects = block_objects + intangible_objects + moving_objects;
+    uint8 total_objects = ground_objects + above_ground_objects;
 
     // This one is just for producing mere entities for game
     // it's not supposed to define how we draw them
-    uint8 block_objects_count_down = block_objects;
-    uint8 background_objects_count_down = background_objects;
-    uint8 moving_objects_count_down = moving_objects;
+    uint8 blocker_count_down = block_objects;
+    uint8 ground_objects_count_down = ground_objects;
+    uint8 above_ground_objects_count_down = above_ground_objects;
 
     map->moving_obj_group.reserve((size_t)total_objects);
-    map_unit current_room_content[total_objects];// here what we use to store unit
+    map_unit current_room_content[total_objects] = push_size(total_objects*sizeof(map_unit),,);// here what we use to store unit
     bool32 space_ids_taken[room_size] = {};// 0 is empty 1 is taken
 
     // spawn moving objects here
@@ -181,7 +180,7 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
 
     // First background/static object
     // we then have to make these entities interact with each other
-    while(block_objects_count_down > 0 || intangible_objects_count_down > 0 || moving_objects_count_down > 0){
+    while(above_ground_objects_count_down > 0 || ground_objects_count_down > 0){
         rand_id = rand()%(room_size - 1);
         // NOTE: check whether slot at that space id is occupied or not;
         if(space_ids_taken[rand_id]){
@@ -192,27 +191,35 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
             rand_graphic_type = (object_drawn_type)(rand()%4 + rand_type);
             unit.space_id = rand_id;
             // From this space Id I want to construct the vertices data of this cube or ....
-            // TODO: Define what is the main differences among these enities type in term of graphic(VAOs, texture, light)
-            // The order of the graphic object is also the type to be called
+            // 
+            // NOTE: Working: Keep using Monte Carlo or not cause I got no suitable approach
+            // about this one. These line is totally random when come to decide which asset will be loaded
+            unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);// Asset fetched from folder loop
+            unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);//??
+            unit.model_id = rand()%((uint8)graphic_object.model_group_size - 1);//Not used yet
+            
+            // NOTE: Temporarily assign its type is the common under lit one
+            unit.graphic_type = Room_Common_Under_Lit_Object;
+            unit.layer_type = rand()%1;
 
-            unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);
-            unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);
-            unit.model_id = rand()%((uint8)graphic_object.model_group_size - 1);
-
-            unit.entity_type = Room_Under_Lit_Object;
+            if(blocker_count_down > 0){
+                unit.blocker = (bool32)rand()%1;
+                if(unit.blocker)
+                    blocker_count_down--;
+            }else{
+                unit.blocker = false;   
+            }
 
             map->obj_group.push_back(unit);
+            /*OR : map->obj_group_[rand_id] = unit*/
             space_ids_taken[rand_id] = true;
             // Then background
-            switch(rand_type){
-                case entity_type::BackGround:
+            switch(unit.layer_type){
+                case In_Room_Entity::Ground:
                     background_objects_count_down--;                    
                     break;
-                case entity_type::Block:
-                    block_objects_count_down--;
-                    break;
-                case entity_type::Moving:
-                    moving_objects_count_down--;
+                case In_Room_Entity::AboveGround:
+                    above_ground_objects_count_down--;
                     break;
             };
         };
@@ -498,7 +505,6 @@ void spawn_triangle(plane_type, map){
 // ===============================Primitives_Data_Construction============================================
 //
 // First we hardcode it to see how it work, and then think about the proper approach of this one.
-
 local_persist void Load_Textures_for_OpenGL(Graphic_Properties* Graphic_obj, const char* media_folder_path){
 // Recursively loop over the folder and load group of textures here
     //graphic_obj->texture_collection.reserve(10); 
@@ -671,7 +677,6 @@ void set_each_Mesh_up(shape_vertices_data* shape_data){
 
         glBindVertexArray(0);        
 }
-
 
 // NOTE: Then we have something to do with the pre-lighted texels
 // we will write a function that compute normal from texture's texel data
