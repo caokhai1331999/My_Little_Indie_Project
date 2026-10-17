@@ -2866,7 +2866,23 @@ differences to separate them apart.
 ---------------- Mon, 12 Oct 26: 10:40AM
 
 TODO: Make the sketch room scene fundamentally work first with hard-coded asset
-picker. Then we move on to the more elaborated-mechanism
+picker. Then we move on to the more elaborated-mechanism.
 
 ---------------- Tue, 13 Oct 26: 09:35AM
 
+
+---------------- Thu, 15 Oct 26: 01:21PM
+
+
+---------------- Fri, 16 Oct 26: 10:50AM
+
+NOTE: Consider dive deeper than the shader layer to see what we can do to get easier
+generalize the process to produce best mass-drawing mechanism without
+sacrificing too much performance
+
+---------------- Sat, 17 Oct 26: 12:31PM
+
+NOTE: Casey divide the ground to a certain number of chunks which contain a
+number of tiles and number of entities on it. The reason behind the chunk
+concept is to narrow the number of entities surround it have to check down
+significantly.

@@ -15,8 +15,6 @@
 //===========================================================================
 //NOTE: THIS BLOCK IS IN THE ATTEMPT OF CREATING ROOM/WORLD LIGHT
 // We light up billboard/flat card using the environment/global light set up
-// So We apply one big light source we call sun. And everyobjects have to apply
-// its feature and change its look based on its position or intensity.
 
 // Light
 // May be loop over all of shader to apply this evironment 
@@ -104,11 +102,8 @@ void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
     map->length = ROOM_LENGTH;
     map->map_size = (size_t)(2 * map->height * map->breadth * map->length)+1;
 
-#if TEST_DYNAMICALLY_ALLOCATION
     map->map_content = (unsigned int*)VirtualAlloc(map->map_content, map_size);
 //NOTE: How can I access the member of this manual-allocated container
-#else
-    map->map_content.reserve(map->map_size);
 }
 
 // We need a pre-created Texture group
@@ -140,7 +135,7 @@ mesh sketch_shape_mesh(/*some map in here*/bool32* space_id_vertices_map){
 // pre-define the initial position of and graphic type of object/entity in room
 // NOTE: bind pre-loaded VAOS(vertice's data(pos, normal, texcoord, its indices...)), (uint32-ARGB)Texture
     // , add some uniforms(light,..) -> draw elements
-void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
+void sketch_room_map(simple_volume_map* map){
     srand(time(NULL));
 
     int x = 0;
@@ -169,7 +164,7 @@ void sketch_room_map(simple_volume_map* map, graphic_property* graphic_object){
     uint8 above_ground_objects_count_down = above_ground_objects;
 
     map->moving_obj_group.reserve((size_t)total_objects);
-    map_unit current_room_content[total_objects] = push_size(total_objects*sizeof(map_unit),,);// here what we use to store unit
+    map_unit current_room_content[total_objects] = push_size(total_objects*sizeof(map_unit), , );// here what we use to store unit
     bool32 space_ids_taken[room_size] = {};// 0 is empty 1 is taken
 
     // spawn moving objects here

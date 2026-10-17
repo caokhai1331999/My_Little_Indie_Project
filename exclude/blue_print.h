@@ -26,7 +26,6 @@ private:
 };
 
 struct GamePlay_Entity{
-    int storage; // ??
     bool32 is_moving;
     bool32 is_dead;
 
@@ -467,16 +466,16 @@ struct entity_power_system{
 // This may be drawn be simple shape or small model
 struct map_unit{ 
 // NOTE: These will be used for fectching data from graphic object
-    uint8 vertices_data_id;
-    uint8 texture_id;
     uint8 mesh_id;
     uint8 model_id;
+    uint8 vertices_data_id;
+    uint8 texture_id;
 
     bool32 blocker;
     complete_graphical_type graphic_type;
 
     // This graphic_style will be supposed to replace all other ID if we did well .
-    In_Room_Entity layer_type;
+    In_Room_Entity layer_type;// equal to low or high entity based on casey idea
     // model space shape vertices data(pos, textcoord, normal)
 //=======================================================
     // This is for position reconstruction
@@ -505,13 +504,13 @@ struct simple_volume_map{
     uint16 height;
     uint16 breadth;
     uint16 length;
-};// One per room
+};// NOTE: One per room and the world contain a lot of these room
 
 struct Game_State{
     std::vector<entity>entities;
     std::vector<map_unit>map_objects;
     uint8 current_room_id;
-    std::vector<simple_volume_map>world_map;
+    //std::vector<simple_volume_map>world_map;
     simple_volume_map* world_map;
 };
 // We spawn/randomize new map everytime we change room
