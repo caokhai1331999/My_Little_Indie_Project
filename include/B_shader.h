@@ -94,6 +94,7 @@ public:
     
     void setBool(const char* name, const bool value);
     void setInt(const std::string name, const int value);
+    void setInt(const char* name, const int value);
     void setFloat(const char* name, const float value);
     void setFloat(const std::string name, const float value);
 

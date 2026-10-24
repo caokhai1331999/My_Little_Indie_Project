@@ -57,7 +57,7 @@ void B_shader::loadShader(char* name, ShaderType type){
 
             if((ReadFile(shader_file, SourceCode, file_size.QuadPart, &ByteRead, NULL))){
 
-                printf("Load file: %s successfully, File size is %d\n", name, ByteRead);
+                //printf("Load file: %s successfully, File size is %d\n", name, ByteRead);
             
                 //First Create an empty shader object by glCreateShader 
                 // BUG here
@@ -80,10 +80,11 @@ void B_shader::loadShader(char* name, ShaderType type){
 
                 checkCompileErrors(ShaderID, type, name);
                 const GLubyte* ver = glGetString(GL_VERSION);
-                if (ver)
-                    printf("OpenGL version: %s\n", ver);
-                else
-                    printf("glGetString(GL_VERSION) returned NULL\n");
+
+                //if (ver)
+                    //printf("OpenGL version: %s\n", ver);
+                //else
+                    //printf("glGetString(GL_VERSION) returned NULL\n");
 
                 //glDeleteShader(shaderID);
                 DEBUGFreeFileMemory(SourceCode);
@@ -125,8 +126,8 @@ void checkCompileErrors(GLuint shader, const ShaderType type, const char* progra
                    programName, infoLength, (char *)infoLog);
           }
         } else {
-          printf("Success linking and compiling programme name: %s\n",
-                 (char *)programName);
+          //printf("Success linking and compiling programme name: %s\n",
+                 //(char *)programName);
         }
     }
     else
@@ -140,9 +141,9 @@ void checkCompileErrors(GLuint shader, const ShaderType type, const char* progra
             glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLength);            
             infoLog = (char *)malloc((size_t)infoLength);
             glGetShaderInfoLog(shader, infoLength, NULL, infoLog);
-            printf("ERROR::SHADER_COMPILING_ERROR of type: %s, of programname %s, infoLength:%d, detail: %s\n", type?"Fragment":"Vertex", programName, (int)infoLength, (char* )infoLog);
+            //printf("ERROR::SHADER_COMPILING_ERROR of type: %s, of programname %s, infoLength:%d, detail: %s\n", type?"Fragment":"Vertex", programName, (int)infoLength, (char* )infoLog);
         } else {
-            printf("Success compiling shader type: %s of programme name %s\n", type?"Fragment":"Vertex", programName);
+            //printf("Success compiling shader type: %s of programme name %s\n", type?"Fragment":"Vertex", programName);
           }
     }
 };
@@ -158,7 +159,7 @@ GLuint B_shader_program::setupGLprogram(const char* programName){
     ProgramID = tempProgramID;
     checkCompileErrors(tempProgramID, programme_, programName);
 
-    printf("Program ID: %d %d\n", ProgramID, tempProgramID);
+    //printf("Program ID: %d %d\n", ProgramID, tempProgramID);
     
     if(glGetError() != GL_NO_ERROR){
     //printf("OpenGL Error: %d\n", glGetError());
@@ -183,7 +184,7 @@ void B_shader_program::ReLoadShaderCode(){
     glLinkProgram(GetProgramID());
 
     checkCompileErrors(GetProgramID(), programme_, GetProgramName());
-    printf("Program ID: %d %d\n", ProgramID, GetProgramID());
+    //printf("Program ID: %d %d\n", ProgramID, GetProgramID());
     
     if(glGetError() != GL_NO_ERROR){
     //printf("OpenGL Error: %d\n", glGetError());
@@ -265,7 +266,7 @@ void tempSetEnviLight(B_shader_program* shader, Camera* camera){
 void CheckShader(GLuint shaderId, GLuint programId, char* name){
     if(glIsProgram(shaderId)){
         //useProgram(ScreenBuffer.glData.ProgramIDs[0]);
-        printf("Program ID: %d\n", shaderId);
+        //printf("Program ID: %d\n", shaderId);
     } else {
         //glDebugMessageCallback(MessageCallback, 0);
         checkCompileErrors(shaderId, programId, name);
@@ -284,7 +285,6 @@ void B_shader_program::setBool(const char* name, const bool value){
 };
 
 void B_shader_program::setInt(const std::string name, const int value){
-
     glUniform1i(glGetUniformLocation(ProgramID, name.c_str()), value);
     if(name.c_str()==""){
         printf("name content is NULL\n");
@@ -292,6 +292,23 @@ void B_shader_program::setInt(const std::string name, const int value){
     if(&value == 0x00){
         printf("value content is NULL\n");        
     }
+};
+
+void B_shader_program::setInt(const char* name, const int value){
+    GLint location = glGetUniformLocation(ProgramID, name);
+    if(name ==""){
+        printf("name content is NULL\n");
+    }
+    if(&value == 0x00){
+        printf("value content is NULL\n");        
+    }
+
+    if(location == -1){
+        printf("This uniform %s in %s is not found\n", name, GetProgramName());
+    }  else {
+        glUniform1i(glGetUniformLocation(ProgramID, name), value);
+        //printf("This uniform %s location in %s location is %d\n", name, GetProgramName(), location);
+    }; 
 };
 
 void B_shader_program::setFloat(const std::string name, const float value){

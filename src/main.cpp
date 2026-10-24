@@ -31,7 +31,7 @@ int CALLBACK WinMain
     QueryPerformanceFrequency(&(TimeSet.PerfCountFrequencyResult));
 
     float ColorOffset = 0.0f;
-    Glyph_Map Glyphs_Map = {};    
+    Glyph_Map Glyphs_Map = {};
 
     bool32 collided_  = false;
     bool32 along1 = true;  
@@ -169,7 +169,7 @@ int CALLBACK WinMain
               
               debug_read_file_result result2;
               debug_read_file_result result;
-              //BMPContent =  DEBUGReadBMP("Harry_and_Accomplices_rescaled.bmp",&result);
+              //BMPContent =  DEBUGReadBMP("./media/Harry_and_Accomplices_rescaled.bmp",&result);
             //  =============================================
             //BMPContent = DEBUGReadBMP("adventure_.jpg", &result);
             // printf("About to read image\n");
@@ -336,7 +336,7 @@ int CALLBACK WinMain
 
                 BackBuffer.shaders_list[0]->use();
                 BackBuffer.shaders_list[0]->setMat4( "projection", Chosen_Camera->projection);
-                
+                glUseProgram(0);
                 GLuint UBO;
                 int k = 0;                
 
@@ -366,14 +366,6 @@ int CALLBACK WinMain
                 //set_environmental_light(BackBuffer.shaders_list[0], &envir_light, Chosen_Camera);
                 set_environmental_light(BackBuffer.shaders_list[2], &envir_light, Chosen_Camera);
                 set_environmental_light(BackBuffer.shaders_list[3], &envir_light, Chosen_Camera);
-//=================================================
-                // L, R, B, T
-                glm::mat4 othorForGlyph = glm::ortho(0.0f, (float)100.0f, (float)100.0f, 0.0f);
-                BackBuffer.shaders_list[4]->use();
-                BackBuffer.shaders_list[4]->setMat4("projection", othorForGlyph);
-                BackBuffer.shaders_list[4]->setInt("material.diffused_texture", Glyphs_Map.TextureID);
-//==================================================
-                glUseProgram(0);
 
                 while (GlobalRunning) {
                   if(first_announce) {
@@ -639,8 +631,7 @@ int CALLBACK WinMain
                     }
 
                     //DrawFont(&Game_Platform, &BackBuffer, BackBuffer.glData.PlaneVAOs, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
-                    DrawFont(&Game_Platform, &BackBuffer, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
-
+                    DrawFont(&Game_Platform, BackBuffer.shaders_list[4], &Glyphs_Map, test_string.c_str(), &rect);
 
 //========================================================================
                     drawTile(&BackBuffer.TileProperty, BackBuffer.shaders_list[2]);
@@ -791,6 +782,7 @@ int CALLBACK WinMain
                         //}
 
 #else
+                            BackBuffer.shaders_list[0]->use();
                             if (Transform_ != nullptr){
                                 //for(glm::mat4 const &matrix_ : Transform_) {
                                 for(int i = 0; i < 52; i++) {
@@ -804,7 +796,6 @@ index); } else { sprintf(indexx, "%d", i);
 indexx);
                                     }
 
-                                    BackBuffer.shaders_list[0]->use();
                                     //BackBuffer.shaders_list[0]->setMat4(matrixName_.c_str(), matrix_);
                                     BackBuffer.shaders_list[0]->setMat4(matrixName_.c_str(), (*Transform_)[i]);
 
@@ -828,13 +819,14 @@ indexx);
                             BackBuffer.shaders_list[0]->setMat4("WorldToCamera", WorldToCamera);                                
                             }
 
-                    BackBuffer.shaders_list[0]->setBool("is_moving", is_moving);
+                            BackBuffer.shaders_list[0]->use();
+                            BackBuffer.shaders_list[0]->setBool("is_moving", is_moving);
 
 //Why the later shader texture drawing work but not the one above
                     //Render
                     brushID = BackBuffer.shaders_list[0]->GetProgramID();
                     DDraw(dancing_vampire, &brushID);
-
+                    glUseProgram(0);
                       //if(showMsPF){
                           //glm::vec2 TexCoordToShow;
                           //int TextureID;

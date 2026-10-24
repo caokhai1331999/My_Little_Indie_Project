@@ -584,7 +584,8 @@ struct Glyph_Property{
 struct Glyph_Map{
     std::vector<Glyph_Property*>Glyph_list;
     stbtt_fontinfo FontInfo;
-    unsigned int TextureID;
+    //unsigned int TextureID;
+    GLuint TextureID;
     Glyph_Map(){
         Glyph_list.reserve(100);
         TextureID = 0;

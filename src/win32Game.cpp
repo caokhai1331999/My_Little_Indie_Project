@@ -716,7 +716,7 @@ HDC windowDC = GetDC(Game_Platform->Window);
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, planeindices);
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(planeIndices), &planeIndices, GL_STATIC_DRAW);
 
-                printf("hmm... Size of Vertices:%d\n", (int)(sizeof(PlaneVertices)/sizeof(float)));
+                //printf("hmm... Size of Vertices:%d\n", (int)(sizeof(PlaneVertices)/sizeof(float)));
 
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
                 glBindVertexArray(0);
@@ -1621,6 +1621,10 @@ void CleanUpandExit(Platform_Properties* Game_Platform, Win32_OffScreen_Buffer* 
     glDeleteBuffers(1, &Game_Platform->glData.VBO);
     glDeleteBuffers(1, &Game_Platform->glData.ColorVBO);
     glDeleteBuffers(1, &Game_Platform->glData.PlaneVBO);
+
+    for(unsigned int const &texture_id: *(Game_Platform->glData.texture_id_list)){
+        glDeleteTextures(1, &texture_id);
+    }
 
     for(B_shader_program* shader: BackBuffer->shaders_list){
         delete shader;

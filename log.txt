@@ -2885,4 +2885,45 @@ sacrificing too much performance
 NOTE: Casey divide the ground to a certain number of chunks which contain a
 number of tiles and number of entities on it. The reason behind the chunk
 concept is to narrow the number of entities surround it have to check down
-significantly.
+significantly every frame.
+
+---------------- Sun, 18 Oct 26: 11:28AM
+TODO: list out what important things that we don't understand(The order is based
+the importance of it):
+      1. Pixel(uint8-ARGB) overwrite() and bit shifting to make alpha denser
+      2. Texture coord in OpenGL(we all know that the indice between to plane
+      forming triangles have to be linear a ,b ,c -> b, c, d)
+      3. Explicit insight of byte and bit of C type.
+
+NOTE: There ares something wrong with the new implemented sampler2D binding
+way. It null out the texture data
+
+---------------- Mon, 19 Oct 26: 12:26PM
+
+NOTE: Diagnose: The data is overflown number is wrong but it did transfer to the
+api
+
+---------------- Tue, 20 Oct 26: 04:15PM
+
+NOTE: what I have checked: . data NULL (v)
+                           . uniform name confused
+                           . valid binding point
+                           . shader's validity
+                           . texture data transfer(cpu -> gpu) process
+
+---------------- Wed, 21 Oct 26: 12:41PM
+
+NOTE: Font Texture passed to glyp_shader failed the depth test
+      The debugger detected the non-generated texture name "33984"
+
+---------------- Thu, 22 Oct 26: 10:40AM
+
+
+---------------- Fri, 23 Oct 26: 10:46AM
+
+NOTE: Through the nsight graphic frame debugger. It seem like the font texture
+then being cover by the unknown null texture with the name "33987"
+ --> We suffered from the severe memory leaking here. line: 168 file: light.cpp
+
+---------------- Sat, 24 Oct 26: 10:15AM
+
