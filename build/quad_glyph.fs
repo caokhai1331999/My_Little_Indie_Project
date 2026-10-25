@@ -25,14 +25,12 @@ uniform sampler2D diffused_texture_;
     
     if(sampled != vec4(0.0f, 0.0f, 0.0f, 0.0f)){
         // if(sampled.a == 0.0f){
-        /*
           if(sampled.r == 0.0f){
           discard;
           }else{                 
-          // FragColor = vec4(sampled.a, sampled.a, sampled.a/2, sampled.a/3);
+          FragColor = vec4(sampled.a, sampled.a, sampled.a/2, sampled.a/3);
           }
-         */
-        FragColor = vec4(sampled.rgb, 1.0f);
+        // FragColor = vec4(sampled.rgb, 1.0f);
         }else{
             FragColor = FragColorr;
         }

@@ -159,7 +159,7 @@ unsigned int SetupTileTexture(const char* path){
     }
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0);        
+    glBindTexture(GL_TEXTURE_2D, 0);        
     return textureID;
 }
 
@@ -228,8 +228,8 @@ void drawTile(const TileGLObject* TileObj, B_shader_program* const Brush){
             //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         //}
     //}
-    glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
     glUseProgram(0);
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(0);
 };

@@ -178,6 +178,8 @@ void DrawFont(const Platform_Properties* Game_Platform, B_shader_program* shader
     int drawtime = 0;
     // TODO: we may want to define the id of glyphs in list
     // based on the character value itself
+    glActiveTexture((GLuint)map->TextureID);
+    glBindTexture(GL_TEXTURE_2D, (GLuint)map->TextureID);
     while(test_text[i] != '\0'){
         // underlying argument is the i (index)
         if((test_text[i] >= 'A' && test_text[i] <= 'Z') || (test_text[i] >= 'a' && test_text[i] <= 'z')){
@@ -220,19 +222,18 @@ void DrawFont(const Platform_Properties* Game_Platform, B_shader_program* shader
                 current_glyp_specs = glm::vec4(current_glyp_specs.x * 0.025f, current_glyp_specs.y * 0.025f, current_glyp_specs.w * 0.025f, current_glyp_specs.z * 0.025f);
                 shader->setVec4(name.c_str(), current_glyp_specs);
 // NOTE: This produce incomplete texture
-                glActiveTexture((GLuint)map->TextureID);
-                glBindTexture(GL_TEXTURE_2D, (GLuint)map->TextureID);
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, glyp_p->w, glyp_p->h, 0, GL_RED, GL_UNSIGNED_BYTE, glyp_p->upside_down_bitmap);
                 glGenerateMipmap(GL_TEXTURE_2D);
                 shader->setInt("diffused_texture_", (GLuint)map->TextureID);
-// why sometime it turned to garbage "33987"(name) value            
+// why sometime it turned to garbage "33987"(name) value        
+       shader->use();
                 glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
                 //glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, 1);
                 //printf("Draw %d times\n", drawtime);
                 //drawtime++;
                 // Always a good practice to set everything back to default once configured
-                glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0);
-                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, 0);
+                glActiveTexture(0);
             }
             i++;
         }else{
@@ -246,8 +247,8 @@ void DrawFont(const Platform_Properties* Game_Platform, B_shader_program* shader
         }
     }
 
-    glBindTexture(GL_TEXTURE_2D, GL_TEXTURE0);
-    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glActiveTexture(0);
     glBindVertexArray(0);
     glUseProgram(0);
 }
