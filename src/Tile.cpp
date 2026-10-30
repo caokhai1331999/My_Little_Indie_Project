@@ -231,5 +231,5 @@ void drawTile(const TileGLObject* TileObj, B_shader_program* const Brush){
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
     glUseProgram(0);
-    glActiveTexture(0);
+    glActiveTexture(GL_TEXTURE0);
 };

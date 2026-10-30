@@ -223,7 +223,6 @@ int CALLBACK WinMain
                     }
 
                 copyBufferData(&Game_Platform, &BackBuffer, &ScreenBuffer);
-                //LoadFont(&test_platform, &Game_Platform, &BackBuffer, &Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
                 //LoadFont(&Glyphs_Map, "./media/FiraCode-VariableFont_wght.ttf");
                 LoadFont(&Glyphs_Map, "./media/arial.ttf");
                 
@@ -473,8 +472,7 @@ int CALLBACK WinMain
                     }
 
                     DeviceContext = GetDC(Game_Platform.Window);
-                    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);             
-
+                    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
                     //GameUpdateAndRender(&game_memory, BMPContent, NewInput, &State, &ScreenBuffer , &SoundBuffer, NULL);
  
                     //__rdtsc() is an intrinsict (the one which looked like a function call

@@ -12,6 +12,14 @@
 // wherein x is analogous to y and z is similar to x in 2D coordinates
 //
 
+//=========================Font_Drawing==================================
+
+static void merge_glyph_bitmap(unsigned char* dest, const unsigned char* source, rect_* rect){
+    
+};
+
+//=========================Font_Drawing==================================
+
 //===========================================================================
 //NOTE: THIS BLOCK IS IN THE ATTEMPT OF CREATING ROOM/WORLD LIGHT
 // We light up billboard/flat card using the environment/global light set up

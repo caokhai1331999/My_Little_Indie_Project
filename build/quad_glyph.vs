@@ -8,7 +8,7 @@ layout(location = 3) in vec3 VertexColor;
 
 out vec2 TextCoord;
 out vec4 FragColorr;
-out vec4 GlyphPos_;
+out vec2 GlyphSize;
 
 // uniform vec4 GlyphPoses[20];
 uniform vec4 GlyphPos;
@@ -33,15 +33,12 @@ void main(){
     // how to just use the orthorgraphy with unchange view
     // map to its size actually
     // vec4 GlyphPos = GlyphPoses[gl_InstanceID];
-    float scale = 0.25f;
     // we need to define the plane more specificly;
-    gl_Position = projection * vec4(aPos.x > 0.0f?((GlyphPos.x) + GlyphPos.w):(GlyphPos.x), (aPos.y > 0.0f)?((GlyphPos.y) + GlyphPos.z):(GlyphPos.y), 0.0f, 1.0f);
-    
+    gl_Position = projection * vec4(aPos.x > 0.0f?(GlyphPos.x + GlyphPos.w):GlyphPos.x, (aPos.y > 0.0f)?((GlyphPos.y) + GlyphPos.z):(GlyphPos.y), 0.0f, 1.0f);
     // gl_Position = vec4(aPos.xy, 0.0f, 1.0f);
-    // GlypSize = GlyphPos.zw;
-    // gl_Position = projection * vec4(Pos.x * aPos.x, Pos.y * aPos.y, 0.0f, 1.0f);
+    // gl_Position = projection * vec4(GlyphPos.x * aPos.x, GlyphPos.y * aPos.y, 0.0f, 1.0f);
 
-    GlyphPos_ = GlyphPos;
+    GlyphSize.xy = GlyphPos.wz;
     TextCoord = aTextCoord;
     FragColorr = vec4(VertexColor,1.0f);
 }

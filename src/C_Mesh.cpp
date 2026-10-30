@@ -119,6 +119,6 @@ void Draw(Mesh* mesh, GLuint* progID){
         glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(mesh->indices.size()), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
         // Always a good practice to set everything back to default once configured
-        glActiveTexture(0);
+        glActiveTexture(GL_TEXTURE0);
         glUseProgram(0);
 };

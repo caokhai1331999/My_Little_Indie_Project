@@ -431,7 +431,7 @@ internal unsigned int TextureFromFile(const char *path, const string &directory,
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
             stbi_image_free(data);
-            glActiveTexture(0);            
+            glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, 0);            
         } else {
             std::cout << "Texture failed to load at path: " << filename.c_str() << std::endl;

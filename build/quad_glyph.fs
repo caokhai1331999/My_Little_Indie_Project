@@ -1,8 +1,7 @@
 #version 330 core
 
 in vec4 FragColorr;
-in vec2 GlyphSpecs;
-in vec4 GlyphPos_;
+in vec2 GlyphSize;
 out vec4 FragColor;
 
 uniform float colorOffset;
@@ -17,18 +16,18 @@ struct Material{
 };
 // This one automatically bound by the glBindTexture
 uniform Material material;
-uniform sampler2D diffused_texture_;
- void main(){
-     // vec4 sampled = texture(material.diffused_texture, vec2(TextCoord.x, TextCoord.y));
-     vec4 sampled = texture(diffused_texture_, vec2(TextCoord.x, TextCoord.y));
+
+void main(){
+     vec4 sampled = texture(material.diffused_texture, vec2(TextCoord.x, TextCoord.y));
     // vec4 sampled = texture(material.diffused_texture, vec2(TextCoord.x > 0.0f?GlyphPos_.x + GlyphPos_.w: 0.0f, TextCoord.y > 0.0f?GlyphPos_.y + GlyphPos_.z : 0.0f));
     
     if(sampled != vec4(0.0f, 0.0f, 0.0f, 0.0f)){
         // if(sampled.a == 0.0f){
-          if(sampled.r == 0.0f){
-          discard;
+        if(sampled.rgb == vec3(0.0f, 0.0f, 0.0f)){
+              discard;
           }else{                 
-          FragColor = vec4(sampled.a, sampled.a, sampled.a/2, sampled.a/3);
+              // FragColor = vec4(1.0f, sampled);
+            FragColor = vec4(sampled.r, 0.3f, 0.2f, 1.0f);
           }
         // FragColor = vec4(sampled.rgb, 1.0f);
         }else{

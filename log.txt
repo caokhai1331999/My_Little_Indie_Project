@@ -2932,3 +2932,37 @@ then being cover by the unknown null texture with the name "33987"
 
 NOTE: Solved it pass the ENUM GL_TEXTURE0 in the glBindTexture is a typo mistake
 which lead to unknown memory leaked mistake. Issued A1 solved.
+
+---------------- Mon, 26 Oct 26: 10:11AM
+
+
+---------------- Tue, 27 Oct 26: 11:05AM
+
+
+---------------- Wed, 28 Oct 26: 11:17AM
+
+maybe the 0.025 scale ratio mess the texture up
+NOTE: xoff/yoff are the offset it pixel space from the glyph origin to the top-left of the bitmap
+
+NOTE: issues A1 still have one typo cause that is the glActiveTexture() doesn't
+accept the 0 as the argument and The GL_TEXTURE0+ expression is recommend inside
+its argument scope : A1
+
+---------------- Thu, 29 Oct 26: 11:25AM
+
+NOTE: The original bitmap got from stb_getcodepointbitmap is basically wrong
+size
+Issue A2: Glyph is distorted
+The scale for pixel height is too small and the pixel transfer is wrong is the
+order -> which lead to twisting glyph
+
+One cause is the pixel tall of this screen is way bigger than the laptop one
+
+---------------- Fri, 30 Oct 26: 11:21AM
+
+NOTE: A2: One more cause is the way we transfer from uint8 type to uint32 is
+wrong
+   -->issue A3: Transfer data from uint8 to uint32(byte) misunderstandings.
+   Guess on this: Uint32 enlarge the glyp 4 times bigger which is unwanted
+- Can we consider merging bitmap data into a big rectangle instead of drawing
+each glyph per rect.

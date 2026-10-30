@@ -93,6 +93,7 @@ struct global_light{
 global_variable global_light envir_light = {};
 
 void LoadFont(Glyph_Map* map = nullptr, const char* path = nullptr);
+static bool32 Belong_To_Group(const char character = '\0', const char* string = nullptr);
 static void IncreaseFontAlpha(const unsigned char* source, void* dest, const Glyph_Property* glyp);
 void DrawFont(const Platform_Properties* Game_Platform, B_shader_program* shader = nullptr, const Glyph_Map* map = nullptr, const char* string = nullptr, const Rect_* rect = nullptr);
 static glm::vec4 CalcGlypProperty(const glm::vec4* glyp_specs = nullptr, const Rect_* rect = nullptr);
