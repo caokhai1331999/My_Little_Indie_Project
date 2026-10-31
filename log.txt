@@ -2191,7 +2191,7 @@ NEW ISSUES: . Curved glyph's data(such as: Q, O, a, r) is distorted and tilted b
 
 ---------------- Wed, 01 Jul 26: 11:24AM
 
-The mistaken scalepixelheight caused the glyph distorted
+The mistaken scalepixelheight caused the glyph distorted : A2
 One more bug is that I messed up ly swap w and h and feed them to the shader
 
 TODO: Consider regroup inherent components and update/render them in one call
@@ -2952,7 +2952,8 @@ its argument scope : A1
 
 NOTE: The original bitmap got from stb_getcodepointbitmap is basically wrong
 size
-Issue A2: Glyph is distorted
+Issue A2: Glyph is distorted (duplicated issues: Aready solved it in 01/Jul)
+
 The scale for pixel height is too small and the pixel transfer is wrong is the
 order -> which lead to twisting glyph
 
@@ -2966,3 +2967,7 @@ wrong
    Guess on this: Uint32 enlarge the glyp 4 times bigger which is unwanted
 - Can we consider merging bitmap data into a big rectangle instead of drawing
 each glyph per rect.
+
+---------------- Sat, 31 Oct 26: 10:45AM
+
+TODO: Define what we lack of to fully draw a room with low and high entities

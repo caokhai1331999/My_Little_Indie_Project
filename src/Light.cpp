@@ -106,13 +106,15 @@ void LoadFont(Glyph_Map* map, const char* path){
 
             //bitmap = (unsigned char* )malloc(sizeof(unsigned char) * glyph->h * glyph->w);
 
-            if(belong_to_group(c, "bdfhijkl")){
+            if(belong_to_group(c, "bdfkhjgpqy")){
+                Pixel_Height_Scale = 290;
+            }else if(belong_to_group(c, "it")){
                 Pixel_Height_Scale = 240;
             }else{
-                Pixel_Height_Scale = 220;                
+                Pixel_Height_Scale = 200;
             }
-            
-            bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, 240.0f), c, &glyph->w, &glyph->h, &glyph->Xoffset, &glyph->Yoffset);
+
+            bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, Pixel_Height_Scale), c, &glyph->w, &glyph->h, &glyph->Xoffset, &glyph->Yoffset);
 
             assert(bitmap);
 
@@ -184,7 +186,10 @@ void DrawFont(const Platform_Properties* Game_Platform, B_shader_program* shader
     //glm::mat4 current_glyp_specs_ = glm::mat4(1.0f);
     glm::mat4 test_mat;
     std::string name = "GlyphPos";
-    const char* test_text = "u ery o\0";
+// y, j, h, k is twisted
+    // i, p, q, k, l : okay
+    // r, o is okay with height of 200
+    const char* test_text = "j k r i to yh\0";
     int drawtime = 0;
     // TODO: we may want to define the id of glyphs in list
     // based on the character value itself
