@@ -401,6 +401,7 @@ struct Platform_Properties{
 
     memory_block* sentinel;
     memory_block* linked_list_memory;
+
     void* BitmapMemory;
     void* BitmapMemoryForDirectBlit;
 

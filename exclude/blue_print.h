@@ -16,6 +16,7 @@ struct File_Manager{
 //=====================SIMPLE_FILE_HANDLE========================
 
 std::vector<Entities*>*World_Entities_Trackers;
+
 class basic_entity{
 private:
     space_box collided_box;
@@ -143,6 +144,9 @@ struct cube{
 
 struct voxel{
     //NOTE: what contain inside this struct???: Pos, light,
+    uint16 space_id;
+    bool32 occupied;
+
     voxel* prev;
     voxel* next;
 };
@@ -319,6 +323,11 @@ enum object_drawn_type:be_drawn_type{
     Effect
 };
 
+enum presenting_unit{
+    texture,
+    model
+}
+
 // This may scale up to a graphical type mechanism just to define
 // Texture, Light, or any graphical property for any random entity
 // NOTE: Currently here is just a bunch of flag to determine whether
@@ -327,6 +336,7 @@ enum object_drawn_type:be_drawn_type{
 enum In_Room_Entity{
     Ground,
     AboveGround,
+    High,
     Blocker
 };
 // This may scale up to a graphical type mechanism just to define
@@ -488,7 +498,6 @@ struct map_unit{
 };
 
 // NOTE: This one is for object that have rigid body
-
 struct simple_volume_map{    
     // one is mesh type, the other is the position;
     std::vector<map_unit>obj_group;
@@ -496,8 +505,9 @@ struct simple_volume_map{
     // the lowest layer of room is alway where the background object is
     // so from 0 -> length*breath contain the static object id
     // voxel space ids here
+    voxel* voxel_group;// for what: spaceID, light_dispersing
 // for quick check for the avalable slot at that space id at every room per voxel
-    bool32* tracking_table;
+    //bool32* tracking_table; // Now in voxel group
     // mesh, texture, or light ID
     size_t map_size;
     // Volumme/Room 3D size in world space
@@ -509,10 +519,11 @@ struct simple_volume_map{
 struct Game_State{
     std::vector<entity>entities;
     std::vector<map_unit>map_objects;
-    uint8 current_room_id;
+    uint8 focused_room_id;
     //std::vector<simple_volume_map>world_map;
     simple_volume_map* world_map;
 };
+
 // We spawn/randomize new map everytime we change room
 // Think about this is the volume/room not the mere flat ground
 //

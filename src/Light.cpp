@@ -25,7 +25,8 @@ static void IncreaseFontAlpha(const unsigned char* source, void* dest, const Gly
     // so why we take the DestRow of uint8
     for(uint8 y = 0; y < glyp->h; y++){
     // Turn the bitmap upside down
-        uint8* Dest = DestRow;// If Turn Dest to uint32 it turned pixels misranged
+        //uint32* Dest = (uint32*)DestRow;
+        uint8* Dest = DestRow;
         // still don't know why
         for(uint8 x = 0; x < glyp->w; x++){
             if(*Source == NULL){
@@ -86,7 +87,7 @@ void LoadFont(Glyph_Map* map, const char* path){
             bitmap = stbtt_GetCodepointBitmap(&map->FontInfo, 0, stbtt_ScaleForPixelHeight(&map->FontInfo, Pixel_Height_Scale), c, &glyph->w, &glyph->h, &glyph->Xoffset, &glyph->Yoffset);
 
             assert(bitmap);// bitmap is legit
-            glyph->upside_down_bitmap = (uint32* )malloc(sizeof(uint32) * glyph->h * glyph->w);
+            glyph->upside_down_bitmap = malloc(glyph->h * glyph->w * sizeof(uint32));
             //glyph->upside_down_bitmap = VirtualAlloc(0, sizeof(uint32) * glyph->h * glyph->w, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
             IncreaseFontAlpha(bitmap, glyph->upside_down_bitmap, glyph);
             
@@ -106,9 +107,11 @@ void LoadFont(Glyph_Map* map, const char* path){
 
             //bitmap = (unsigned char* )malloc(sizeof(unsigned char) * glyph->h * glyph->w);
 
-            if(belong_to_group(c, "bdfkhjgpqy")){
+            if(belong_to_group(c, "bdkhgpqy")){
+                Pixel_Height_Scale = 270;// This one is okay
+            }else if(belong_to_group(c, "jf")){
                 Pixel_Height_Scale = 290;
-            }else if(belong_to_group(c, "it")){
+            }else if(belong_to_group(c, "ite")){
                 Pixel_Height_Scale = 240;
             }else{
                 Pixel_Height_Scale = 200;
@@ -119,7 +122,7 @@ void LoadFont(Glyph_Map* map, const char* path){
             assert(bitmap);
 
             //glyph->upside_down_bitmap = VirtualAlloc(0, sizeof(uint32) * glyph->h * glyph->w, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
-            glyph->upside_down_bitmap = malloc(sizeof(uint32) * glyph->h * glyph->w);
+            glyph->upside_down_bitmap = malloc(glyph->h * glyph->w * sizeof(uint32));
             IncreaseFontAlpha(bitmap, glyph->upside_down_bitmap, glyph);
             
             assert(glyph->upside_down_bitmap);
@@ -186,10 +189,7 @@ void DrawFont(const Platform_Properties* Game_Platform, B_shader_program* shader
     //glm::mat4 current_glyp_specs_ = glm::mat4(1.0f);
     glm::mat4 test_mat;
     std::string name = "GlyphPos";
-// y, j, h, k is twisted
-    // i, p, q, k, l : okay
-    // r, o is okay with height of 200
-    const char* test_text = "j k r i to yh\0";
+    const char* test_text = "Querty Too See\0";
     int drawtime = 0;
     // TODO: we may want to define the id of glyphs in list
     // based on the character value itself

@@ -80,7 +80,29 @@ unsigned int LoadCubeMap(const char* path){
 
 //============================================================
 // Think about set this light group shrewly
-//
+// ============================== Set up Voxel ============================== 
+// first member of group is defaultly sentinel
+set_voxel_in_group(voxel* voxel_group, const int16 current_voxel_id){
+    //voxel* new_voxel = malloc(sizeof(voxel));
+
+    voxel* sentinel = voxel_group[0];
+    voxel* pointed_voxel = voxel_group[current_voxel_id]
+    
+    pointed_voxel->spaceID = spaceID;
+    pointed_voxel->occupied = false;
+
+    pointed_voxel->next = sentinel;
+    pointed_voxel->prev = sentinel->prev;
+
+    sentinel->prev->next = pointed_voxel;// 
+    sentinel->prev = pointed_voxel;
+// last node
+
+    return new_voxel;
+}
+
+// ============================== Set up Voxel ============================== 
+
 void distribute_light(std::vector<general_light*>light_group){
     // Normal map global light here;
     (*light_group)[spot_light]->pos;
@@ -143,36 +165,50 @@ mesh sketch_shape_mesh(/*some map in here*/bool32* space_id_vertices_map){
 // pre-define the initial position of and graphic type of object/entity in room
 // NOTE: bind pre-loaded VAOS(vertice's data(pos, normal, texcoord, its indices...)), (uint32-ARGB)Texture
     // , add some uniforms(light,..) -> draw elements
-void sketch_room_map(simple_volume_map* map){
+void sketch_room_map(simple_volume_map* map, Platform_Properties* Game_Platform){
     srand(time(NULL));
 
     int x = 0;
     int y = 0;
     int h = 0;
 
- //for(int y = 0; y < map->height; y++){
-     //for(int x = 0; x < map->breadth; x++){
-         //for(int z = 0; z < map->length; z++)
- // Understand data on the level of interger/float is an advantage
- // all of the will be drawn obj is the under lit one
+    voxel* sentinel = malloc(sizeof(voxel));
 
-    uint8 room_ground_size = map->breadth * map->length;
+    sentinel->prev = sentinel;
+    sentinel->next = sentinel;
+
+    voxel* voxel_group = malloc(sizeof(voxel) * map->breadth * map->length + 1);
+    voxel_group[0] = sentinel;
+
+    // Understand data on the level of interger/float is an advantage
+    // all of the will be drawn obj is the under lit one
+
+    for(int x = 0; x < map->breadth * map->length; x++){
+        set_voxel_in_group(voxel_group, (uint16)x);
+    } 
+
+    uint8 ground_size = map->breadth * map->length;// bottom slice square
     uint8 room_size = room_ground_size * map->height;
 
-    uint8 ground_objects = (uint8)(room_ground_size * (float)(25 + rand()%10)/100);
-    uint8 above_ground_objects = (uint8)(room_ground_size * (float)(15 + rand()%10)/100);
-    uint8 blocker = above_ground_objects * 10 / 100;
+    uint8 low_entities = (uint8)(room_ground_size * (float)(25 + rand()%10)/100);
+    uint8 high_entities = (uint8)(room_ground_size * (float)(15 + rand()%10)/100);
+    uint8 blocker = high_entities * 10 / 100;
     
-    uint8 total_objects = ground_objects + above_ground_objects;
+    uint8 total_objects = low_entities + high_entities;
 
     // This one is just for producing mere entities for game
     // it's not supposed to define how we draw them
-    uint8 blocker_count_down = block_objects;
-    uint8 ground_objects_count_down = ground_objects;
-    uint8 above_ground_objects_count_down = above_ground_objects;
+    //uint8 blocker_count_down = block_objects;
 
+    uint8 low_entities_count_down = low_entities;// low-entities
+    uint8 high_entities_count_down = high_entities;// high-entities
+
+#if DYNAMICAL_MEMORY
+    map_unit current_room_content[total_objects] = push_size(total_objects*sizeof(map_unit), Game_Platform->linked_list_memory);// here what we use to store unit
+#else
     map->moving_obj_group.reserve((size_t)total_objects);
-    map_unit current_room_content[total_objects] = push_size(total_objects*sizeof(map_unit), , );// here what we use to store unit
+#endif
+
     bool32 space_ids_taken[room_size] = {};// 0 is empty 1 is taken
 
     // spawn moving objects here
@@ -183,7 +219,44 @@ void sketch_room_map(simple_volume_map* map){
 
     // First background/static object
     // we then have to make these entities interact with each other
-    while(above_ground_objects_count_down > 0 || ground_objects_count_down > 0){
+    for(int i = 0; i < high_entities; i++){
+        rand_id = rand()%(ground_size - 1);
+        // Ground_Object
+        // NOTE: This one I use the no-brainer Monte Carlo method
+        if(space_ids_taken[rand_id]) {
+            while(space_ids_taken[id]){
+                rand_id = rand()%(ground_size - 1);
+            }            
+        }
+        rand_graphic_type = (object_drawn_type)(rand()%4 + rand_type);
+        // From this space Id I want to construct the vertices data of this cube or ....
+        // ================================= On Working =================================
+        // NOTE: Working: Keep using Monte Carlo or not cause I got no suitable approach
+        // about this one. These line is totally random when come to decide which asset will be loaded
+        unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);// Asset fetched from folder loop
+        unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);//??
+        unit.model_id = rand()%((uint8)graphic_object.model_group_size - 1);//Not used yet
+
+        // ================================= On Working =================================
+        // NOTE: Temporarily assign its type is the common under lit one
+        unit.graphic_type = Room_Common_Under_Lit_Object;
+        unit.layer_type = 0;// Maybe this one is unecessary
+
+        if(blocker_count_down > 0){
+            unit.blocker = (bool32)rand()%1;
+            if(unit.blocker)
+                blocker_count_down--;
+        }else{
+            unit.blocker = false;   
+        }
+// NOTE: So the blocker is directly linked to particular mesh and texture id.
+        //map->obj_group.push_back(unit);
+        map->obj_group_[rand_id] = unit;
+        space_ids_taken[rand_id] = true;
+    }
+    
+    while(high_entities_count_down > 0){
+        // middle layer
         rand_id = rand()%(room_size - 1);
         // NOTE: check whether slot at that space id is occupied or not;
         if(space_ids_taken[rand_id]){
@@ -202,70 +275,17 @@ void sketch_room_map(simple_volume_map* map){
             unit.model_id = rand()%((uint8)graphic_object.model_group_size - 1);//Not used yet
             
             // NOTE: Temporarily assign its type is the common under lit one
-            unit.graphic_type = Room_Common_Under_Lit_Object;
-            unit.layer_type = rand()%1;
 
-            if(blocker_count_down > 0){
-                unit.blocker = (bool32)rand()%1;
-                if(unit.blocker)
-                    blocker_count_down--;
-            }else{
-                unit.blocker = false;   
-            }
+            unit.graphic_type = Room_Common_Under_Lit_Object;
+            unit.layer_type = 1;
+            unit.blocker = true;   
 
             map->obj_group.push_back(unit);
-            /*OR : map->obj_group_[rand_id] = unit*/
+            map->obj_group_[rand_id] = unit;
             space_ids_taken[rand_id] = true;
-            // Then background
-            switch(unit.layer_type){
-                case In_Room_Entity::Ground:
-                    background_objects_count_down--;                    
-                    break;
-                case In_Room_Entity::AboveGround:
-                    above_ground_objects_count_down--;
-                    break;
-            };
         };
     }
 
-// Then moving one
-    for(size_t int i = 0; i < map->size; i++)
-    {
-        x++;
-        if(x == map->w -1 ){
-            x -= map->w - 1;
-            z++;
-        };
-
-        if(z == map->l-1){
-            h++;
-            z -= map->l-1;
-        }
-
-        // All right. First simple approach is we make the majority of room
-        // passable then sprinkle few block objects on the way.
-/*
-#if TEST_DYNAMICALLY_ALLOCATION
-        {
-        *map->map_content++ = rand()%(mesh_group->size()-1);
-        if(block_object_count > 0)
-        *map->map_content++ = rand()%1;
-        if(*map->map_content == 0)
-            block_object_count--;
-        }
-#else
-*/
-        //{
-         //moving one
-         if(block_object_count > 0 && h == 0)
-         map->map_content[i] = rand()%1;
-         if(!(*map->map_content[i])){
-             // how shrewly decide drawn type for these entities of map
-             block_object_count--;
-             map->map_content[i+1] = temp_unit;   
-         }
-        //}
-    }
 }
 
 // So the map is the place to store entities position
@@ -353,6 +373,7 @@ cube spawn_cube(spaceID){
 };
 
 void OutputLightingTexture(Voxel* table){
+    // x, y, z
     uint16* lookupAt = table[][][];
 }
 
@@ -737,7 +758,7 @@ void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_ma
     size_t i = 0;
 // NOTE: we got two loop here: O(n) + O(m) +...etc
     // BackGround first
-    // Then Entities
+    // Then High Entities
     for(moving_entity_specs* const &unit:world_map->moving_obj_group){
         // VAOs - shape vertice's data (at least: Position and TexCoord);
         if(unit->pos > /*specific number*/)
@@ -746,17 +767,16 @@ void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_ma
         glBindVertexArray(Graphics->mesh_group[unit->basic_unit_specs.MeshID].VAO);
         // Remember we already set all lights's basic specs before in the init graphics
         // add switch case for type here
-        // Texture
         Graphic_Obj->shader[unit->basic_unit_specs.MeshID]->use();
-       // Set Light
+        // Texture
+        glBindTexture();
+        // Set Light
         // Choose among lights; here
         // View and Projection mat4 here
-         Graphic_Obj->shader[unit->basic_unit_specs.MeshID]->setMat4("Postion["+to_string(unit->basic_unit_specs.space_id)+"]", unit->position);        Graphic_Obj->shader;        
-        // Lastly, Entity world's position
-         Graphic_Obj->shader[unit->basic_unit_specs.MeshID]->setVec3("Postion["+to_string(unit->basic_unit_specs.space_id)+"]", unit->position);        Graphic_Obj->shader;
-        glDrawElements();
+        Graphic_Obj->shader[unit->basic_unit_specs.MeshID]->setMat4("Postion["+to_string(unit->basic_unit_specs.space_id)+"]", unit->position);        
+        glDrawElements(GL_TRIANGLES, 6, 0,);
     }
-//NOTE: Now the background unit.
+//NOTE: Now the background unit/ low entities.
     while(i < world_map->size){
 // Each shader represent for one layer of effect at least.
         // Same process here for map-background-components here
@@ -766,7 +786,6 @@ void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_ma
             // Postion may be we use i * w * l * h
             glm::vec3 position = {(float)i%world_map->w, (i>(world_map->w*world_map->l))?(float)(i/(world_map->w*world_map->h)):0.0f, i>world_map->w?(i/world_map->w)%world_map->l:0.0f};       
             // now we decide how to add matched id in Graphic object
-
             if(map->map_content[i+1]){
                 glBindVertexArray(Graphics->mesh_group[map->map_content[i]].VAO);
                 // Remember we already set all lights's basic specs before in the init graphics
