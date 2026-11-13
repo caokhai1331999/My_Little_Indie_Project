@@ -2988,7 +2988,29 @@ space id as a core information.
 
 ---------------- Wed, 04 Nov 26: 11:21AM
 
-TODO: Experiment some kind of art using particular texture + cube/plane + simple
+TODO: . Experiment some kind of art-style presentation using particular texture + cube/plane + simple
 light.
- . On The way finishing the sketch_room_map(place entities in room and decide
- its graphical asset)
+      . On The way finishing the sketch_room_map(place entities in room and decide
+ its g raphical asset)
+
+---------------- Fri, 06 Nov 26: 11:05AM
+
+
+---------------- Sat, 07 Nov 26: 11:36AM
+
+
+---------------- Sun, 08 Nov 26: 11:26AM
+
+
+---------------- Mon, 09 Nov 26: 12:01PM
+
+
+---------------- Tue, 10 Nov 26: 11:00AM
+
+
+---------------- Thu, 12 Nov 26: 10:16AM
+
+NOTE: If we have time consider making some cool move for character.
+
+---------------- Fri, 13 Nov 26: 01:05PM
+

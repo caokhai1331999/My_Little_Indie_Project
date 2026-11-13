@@ -49,6 +49,7 @@ struct basic_light_specs{
     glm::vec3 ambient;
     glm::vec3 specular;
     glm::vec3 diffuse;
+    glm::vec3 emission;
 };
 
 struct dir_light_specs{
@@ -302,12 +303,12 @@ typedef uint8 be_drawn_type;
 // NOTE: Let alone this later
 // there still something we haven't figure out completely yet
 
-enum light_type__:be_drawn_type{
+struct light_type{
     //How about normal mapping 
-    basic_light = 0, //  diffuse + ambient + specular /or any simple approximated alternative
-    emission = 2, // pass optional's light specs **
-    normal_map_light = 3, // pass optional's light specs **
-    shade = 4, // still haven't decide yet
+    bool32 basic_light = 0, //  diffuse + ambient + specular /or any simple approximated alternative
+    bool32 emission = 0, // pass optional's light specs **
+    bool32 normal_map_light = 0, // pass optional's light specs **
+    bool32 shade = 0, // still haven't decide yet
 };
 
 enum shader_type__{
@@ -317,16 +318,19 @@ enum shader_type__{
 };
 
 // In term of graphical, 
-enum object_drawn_type:be_drawn_type{
-    Light_Source,
-    Under_Lit,
-    Effect
-};
+//================================ON WORKING================================
 
+enum object_drawn_type:be_drawn_type{
+    Light_Source, // emission
+    Under_Lit, // (posed major)affected by light probe/or point + direct light(ambient)
+               // (optionally spotlight)
+    Effect// emission on it and the affect areas
+};
+//================================ON WORKING================================
 enum presenting_unit{
     texture,
     model
-}
+};
 
 // This may scale up to a graphical type mechanism just to define
 // Texture, Light, or any graphical property for any random entity
@@ -334,22 +338,20 @@ enum presenting_unit{
 // I put which kind of graphic property on drawn object
 
 enum In_Room_Entity{
-    Ground,
-    AboveGround,
-    High,
-    Blocker
+    Low,
+    High
 };
 // This may scale up to a graphical type mechanism just to define
 // Texture, Light, or any graphical property for any random entity
 // NOTE: Currently here is just a bunch of flag to determine whether
 // I put which kind of graphic property on drawn object
 
+// If we use light probes we wouldn't need to know number of
+// point light there are
 struct complete_graphical_type{
-    object_drawn_type graphical_type;
-    // we know that light source won't cast shade.
-    bool32 cast_shade;
-    // If we use light probes we wouldn't need to know number of
-    // point light there are
+    object_drawn_type in_room_lit_type;
+
+    primitive_shape unit_shape;// currently use plane
     uint8 effecting_point_lights;
     uint16 Effect_Range;
 };
@@ -382,23 +384,41 @@ uint8 r  = pixel_data >>  0;
 
 struct shape_vertices_data{
     float* data_; 
+
     unsigned int* VAO;
     unsigned int* VBO;
     unsigned int* EBO;
 };
 
-struct shape_vertices_store{
-    shape_vertices_data triangle_data;
-    shape_vertices_data plane_data;
-    shape_vertices_data cube_data;
+#define TRIANGLE (shape_vertices_data){}
+#define PLANE (shape_vertices_data){}
+#define CUBE  (shape_vertices_data){}
+
+struct map_unit{ 
+// NOTE: These will be used for fectching data from graphic object
+    uint8 mesh_id;
+    uint8 model_id;
+    uint8 vertices_data_id;
+    uint8 texture_id;
+
+    bool32 blocker;
+    complete_graphical_type graphic_properties;
+
+    // This graphic_style will be supposed to replace all other ID if we did well .
+    In_Room_Entity layer_type;// equal to low or high entity based on casey idea
+    // model space shape vertices data(pos, textcoord, normal)
+//=======================================================
+    // This is for position reconstruction
+    uint16 space_id;// also the pos of the center of quad
+    bool32 tangible;
+    bool32 movable;
+    map_unit(){};
 };
 
 // we put the texture inside the mesh -> how to load the textures and store them inside the name matched M_mesh 
-
 local_persist void Load_Textures_for_OpenGL(Graphic_Properties* Graphic_Obj, const char* media_folder_path);
 extern "C" __declspec(dllexport) void Load_Textures_for_OpenGL_(Platform_Properties* Game_Platform, Graphic_Properties* Graphic_Obj, const char* media_folder_path = nullptr);
 typedef void (*Load_Textures_for_OpenGL__) (Platform_Properties*, Graphic_Properties* , const char*);
-
 // How can I make sure that all the shaders draw the same object
 // light based on normal map
 //struct environment_map{
@@ -474,28 +494,6 @@ struct entity_power_system{
 // replace them with the integer and do bitwise operator on them
 
 // This may be drawn be simple shape or small model
-struct map_unit{ 
-// NOTE: These will be used for fectching data from graphic object
-    uint8 mesh_id;
-    uint8 model_id;
-    uint8 vertices_data_id;
-    uint8 texture_id;
-
-    bool32 blocker;
-    complete_graphical_type graphic_type;
-
-    // This graphic_style will be supposed to replace all other ID if we did well .
-    In_Room_Entity layer_type;// equal to low or high entity based on casey idea
-    // model space shape vertices data(pos, textcoord, normal)
-//=======================================================
-    // This is for position reconstruction
-    uint16 space_id;// also the pos of the center of quad
-
-    bool32 tangible;
-    bool32 movable;
-
-    map_unit(){};
-};
 
 // NOTE: This one is for object that have rigid body
 struct simple_volume_map{    

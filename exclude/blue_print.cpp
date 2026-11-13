@@ -82,6 +82,7 @@ unsigned int LoadCubeMap(const char* path){
 // Think about set this light group shrewly
 // ============================== Set up Voxel ============================== 
 // first member of group is defaultly sentinel
+
 set_voxel_in_group(voxel* voxel_group, const int16 current_voxel_id){
     //voxel* new_voxel = malloc(sizeof(voxel));
 
@@ -101,6 +102,7 @@ set_voxel_in_group(voxel* voxel_group, const int16 current_voxel_id){
     return new_voxel;
 }
 
+
 // ============================== Set up Voxel ============================== 
 
 void distribute_light(std::vector<general_light*>light_group){
@@ -117,7 +119,7 @@ void set_light(glm::vec3* position, std::vector<general_light*>* light_group){
 
 // Manually set light here.
 //
-void turn_on_light(std::vector<general_light*>* light_group){
+void prepare_lighting(std::vector<general_light*>* light_group){
     // so we have to manually set it here
     // Is there anyway to automatic this one;
 }
@@ -140,12 +142,17 @@ void init_volume_map(simple_map* map, std::vector<Mesh*>*Mesh_Group){
 // Sketch map and spawn entities
 // layer of background and layer moving entities
 // This map size  is 100 x 100 x 100
-mesh sketch_shape_mesh(/*some map in here*/bool32* space_id_vertices_map){
+
+// NOTE: This one present my attempt to draw a shape's vertices manually
+mesh sketch_shape_mesh(/*some map in here*/bool32* space_id_vertices_map, shape){
+    // We produce normalized data: 0.0f -> 1.0f
+
     // try using bit shift, operation on this
     // we'll do the complex shape molding
      mesh result;
      vertex vertices[/*how we can define the size of it???*/sizeof(*space_id_vertices_map)];
      unsigned int indices[/*size*/sizeof(*space_id_vertices_map)];
+
      for(unsigned int i = 0; i < sizeof(*space_id_vertices_map); i++){
          if((*space_id_vertices_map)[i]){
              // Position 
@@ -161,10 +168,11 @@ mesh sketch_shape_mesh(/*some map in here*/bool32* space_id_vertices_map){
      result.indices = indices;
      return result;
 };
+// NOTE: If we use texture and plane as primitives we exclude this function out for a while
 
 // pre-define the initial position of and graphic type of object/entity in room
-// NOTE: bind pre-loaded VAOS(vertice's data(pos, normal, texcoord, its indices...)), (uint32-ARGB)Texture
-    // , add some uniforms(light,..) -> draw elements
+// NOTE: bind pre-loaded VAOS(vertice's data(pos, normal, texcoord, its indices...)),
+// (uint32-ARGB)Texture, add some uniforms(light,..) -> draw elements
 void sketch_room_map(simple_volume_map* map, Platform_Properties* Game_Platform){
     srand(time(NULL));
 
@@ -192,8 +200,8 @@ void sketch_room_map(simple_volume_map* map, Platform_Properties* Game_Platform)
 
     uint8 low_entities = (uint8)(room_ground_size * (float)(25 + rand()%10)/100);
     uint8 high_entities = (uint8)(room_ground_size * (float)(15 + rand()%10)/100);
-    uint8 blocker = high_entities * 10 / 100;
-    
+
+    uint8 blocker = high_entities * 10 / 100;    
     uint8 total_objects = low_entities + high_entities;
 
     // This one is just for producing mere entities for game
@@ -202,6 +210,13 @@ void sketch_room_map(simple_volume_map* map, Platform_Properties* Game_Platform)
 
     uint8 low_entities_count_down = low_entities;// low-entities
     uint8 high_entities_count_down = high_entities;// high-entities
+
+    // Light
+    unit.graphic_properties.in_room_lit_type = Under_Lit;
+
+    // shape
+    unit.graphic_properties.unit_shape = PLANE;
+    //unit.graphic_properties.unit_shape = CUBE;
 
 #if DYNAMICAL_MEMORY
     map_unit current_room_content[total_objects] = push_size(total_objects*sizeof(map_unit), Game_Platform->linked_list_memory);// here what we use to store unit
@@ -220,7 +235,7 @@ void sketch_room_map(simple_volume_map* map, Platform_Properties* Game_Platform)
     // First background/static object
     // we then have to make these entities interact with each other
     for(int i = 0; i < high_entities; i++){
-        rand_id = rand()%(ground_size - 1);
+        rand_id = rand()%(ground_size - 1)+ground_size;
         // Ground_Object
         // NOTE: This one I use the no-brainer Monte Carlo method
         if(space_ids_taken[rand_id]) {
@@ -228,18 +243,37 @@ void sketch_room_map(simple_volume_map* map, Platform_Properties* Game_Platform)
                 rand_id = rand()%(ground_size - 1);
             }            
         }
-        rand_graphic_type = (object_drawn_type)(rand()%4 + rand_type);
+
+        rand_graphic_type.in_room_lit_type = Under_Lit;
         // From this space Id I want to construct the vertices data of this cube or ....
+
         // ================================= On Working =================================
         // NOTE: Working: Keep using Monte Carlo or not cause I got no suitable approach
         // about this one. These line is totally random when come to decide which asset will be loaded
+#if sketch_manually
         unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);// Asset fetched from folder loop
-        unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);//??
+        unit.graphic_properties.unit_shape = PLANE;
+        unit.graphic_properties.unit_shape = CUBE;
+// Light type
+        switch(rand_graphic_type){
+            case :
+                break;
+            case :
+                break;
+            case :
+                break;
+            case :
+                break;
+        }
+// Shape
+        unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);//
+#else
+// Exceptionally: using the whole costly model
         unit.model_id = rand()%((uint8)graphic_object.model_group_size - 1);//Not used yet
-
         // ================================= On Working =================================
+#endif
         // NOTE: Temporarily assign its type is the common under lit one
-        unit.graphic_type = Room_Common_Under_Lit_Object;
+        unit.graphic_properties = Room_Common_Under_Lit_Object;
         unit.layer_type = 0;// Maybe this one is unecessary
 
         if(blocker_count_down > 0){
@@ -257,11 +291,13 @@ void sketch_room_map(simple_volume_map* map, Platform_Properties* Game_Platform)
     
     while(high_entities_count_down > 0){
         // middle layer
-        rand_id = rand()%(room_size - 1);
+        rand_id = (rand()%(ground_size - 1)) + 2*ground_size;
+        if(space_ids_taken[rand_id]) {
+            while(space_ids_taken[id]){
+                rand_id = (rand()%(ground_size - 1)) + (2 * ground_size);// The 2nd layer
+            }            
+        }
         // NOTE: check whether slot at that space id is occupied or not;
-        if(space_ids_taken[rand_id]){
-            continue;
-        }else{
             // Ground_Object
             // NOTE: This one I use the no-brainer Monte Carlo method
             rand_graphic_type = (object_drawn_type)(rand()%4 + rand_type);
@@ -271,16 +307,16 @@ void sketch_room_map(simple_volume_map* map, Platform_Properties* Game_Platform)
             // NOTE: Working: Keep using Monte Carlo or not cause I got no suitable approach
             // about this one. These line is totally random when come to decide which asset will be loaded
             unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);// Asset fetched from folder loop
-            unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);//??
-            unit.model_id = rand()%((uint8)graphic_object.model_group_size - 1);//Not used yet
-            
+
+            //unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);
+            //unit.model_id = rand()%((uint8)graphic_object.model_group_size - 1);//Not used yet
             // NOTE: Temporarily assign its type is the common under lit one
 
-            unit.graphic_type = Room_Common_Under_Lit_Object;
             unit.layer_type = 1;
             unit.blocker = true;   
 
-            map->obj_group.push_back(unit);
+            //map->obj_group.push_back(unit);
+
             map->obj_group_[rand_id] = unit;
             space_ids_taken[rand_id] = true;
         };
@@ -305,7 +341,7 @@ void init_graphic (Win32_OffScreen_Buffer* BackBuffer, graphic_property* object_
 // NOTE: How to parse data to vertex level???
     load_primitive_vertices_data(&vertice_store);
     // Light here
-    turn_on_light(light_group);
+    prepare_lighting(light_group);
     set_light_for_shader(light_group, object_group->shaders_list);
     // we need to set this one for every shader we have.
     // consider loading textures group separatedly here.
@@ -457,7 +493,7 @@ void set_light(glm::vec3* position, std::vector<general_light*>* light_group){
 }
 
 // Manually set light here.
-void turn_on_light(std::vector<general_light*>* light_group){
+void prepare_lighting(std::vector<general_light*>* light_group){
     // so we have to manually set it here
     // Is there anyway to automatic this one;
 }
@@ -487,7 +523,7 @@ void init_graphic (Win32_OffScreen_Buffer* BackBuffer, graphic_property* object_
     InitOpenGl(BackBuffer);
     set_whole_mesh_data(vertices_groups, object_group);
     // Light here
-    turn_on_light(light_group);
+    prepare_lighting(light_group);
     set_light_for_shader(light_group, object_group->shaders_list);
 /*
     . Ambient Light - Kind of constance to store it
