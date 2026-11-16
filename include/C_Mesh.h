@@ -67,8 +67,8 @@ struct Bone_Info{
 
 struct Texture{
     unsigned int id;
-
-    string type;
+    size_t size;
+    string type;//what the use of this type?
     string path;
 };
 

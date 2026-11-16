@@ -251,22 +251,11 @@ void sketch_room_map(simple_volume_map* map, Platform_Properties* Game_Platform)
         // NOTE: Working: Keep using Monte Carlo or not cause I got no suitable approach
         // about this one. These line is totally random when come to decide which asset will be loaded
 #if sketch_manually
-        unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);// Asset fetched from folder loop
+        unit.texture_id = rand()%((uint8)ArrayCount(Game_Platform->Graphic_Properties.texture_group_for_ground));// Asset fetched from folder loop
         unit.graphic_properties.unit_shape = PLANE;
-        unit.graphic_properties.unit_shape = CUBE;
-// Light type
-        switch(rand_graphic_type){
-            case :
-                break;
-            case :
-                break;
-            case :
-                break;
-            case :
-                break;
-        }
-// Shape
-        unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);//
+        // unit.graphic_properties.unit_shape = CUBE;
+        // Shape
+        // unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);
 #else
 // Exceptionally: using the whole costly model
         unit.model_id = rand()%((uint8)graphic_object.model_group_size - 1);//Not used yet
@@ -297,17 +286,18 @@ void sketch_room_map(simple_volume_map* map, Platform_Properties* Game_Platform)
                 rand_id = (rand()%(ground_size - 1)) + (2 * ground_size);// The 2nd layer
             }            
         }
-        // NOTE: check whether slot at that space id is occupied or not;
+            // NOTE: check whether slot at that space id is occupied or not;
             // Ground_Object
             // NOTE: This one I use the no-brainer Monte Carlo method
             rand_graphic_type = (object_drawn_type)(rand()%4 + rand_type);
             unit.space_id = rand_id;
+
             // From this space Id I want to construct the vertices data of this cube or ....
             // 
             // NOTE: Working: Keep using Monte Carlo or not cause I got no suitable approach
             // about this one. These line is totally random when come to decide which asset will be loaded
-            unit.texture_id = rand()%((uint8)graphic_object.texture_group_size - 1);// Asset fetched from folder loop
 
+            unit.texture_id = rand()%((uint8)ArrayCount(Game_Platform->Graphic_Properties.texture_group_for_entities));// Asset fetched from folder loop
             //unit.mesh_id = rand()%((uint8)graphic_object.static_mesh_group.size() - 1);
             //unit.model_id = rand()%((uint8)graphic_object.model_group_size - 1);//Not used yet
             // NOTE: Temporarily assign its type is the common under lit one
@@ -321,6 +311,9 @@ void sketch_room_map(simple_volume_map* map, Platform_Properties* Game_Platform)
             space_ids_taken[rand_id] = true;
         };
     }
+
+// Light sources here
+// And Finally Effect(Fog, rain,...)
 
 }
 
@@ -704,7 +697,6 @@ unsigned int tile_indices[] = {
 }
 
 void set_each_Mesh_up(shape_vertices_data* shape_data){
-
         glGenVertexArrays(1, shape_data->VAO);
         glGenBuffers(1, shape_data->VBO);
         glGenBuffers(1, shape_data->EBO);
@@ -784,6 +776,10 @@ void render_room_scene (Graphic_Properties* Graphic, simple_volume_map* world_ma
     // Then update relative position of the obj(with world, or just mere screen space with text)
     // Then use each brush(shader) in brush_set to draw object
     //NOTE: if(/*in view range*/)
+    // How many Room/Global aspect/element that affect object in room looks
+    // global light.
+    // Self Illuminate object
+    // Effect(This one is at the framebuffer to save performace cause mainly just happened in the screen space)
     for(B_shader_program* const &shader: Graphic->shader){
         glBindVertexArray(Graphics->VAOS[/*mesh id*/]);
         shader->setMat4("projection", chosen_camera->projection); 

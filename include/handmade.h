@@ -511,14 +511,14 @@ void* push_size_(size_t size, memory_arena* arena, ticket_mutex* mutex){
 }
 */
 
-
 void* push_size_(size_t size, Platform_Properties* Game_Platform){
     // whenever the total requested size if bigger than the current block size: allocate new space and copymemory of the old block
     void* result;
     if(Game_Platform->linked_list_memory->used + size >= Game_Platform->linked_list_memory->size){
         memory_block* new_block = (memory_block*)ALLOCATE_BLOCK_MEMORY(Game_Platform, (size_t)DEFAULT_BLOCK_SIZE);
+
         // casey lock it inside the something call tick mutex, to prevent any one/app else use these kind of thread while it's on working.
-// This one is not thread-safe
+        // This one is not thread-safe
         // so currently, we haven't touch this growing aray yet.
         // focus on draw scene and load gl pointer on little beast.
 
@@ -535,9 +535,7 @@ void* push_size_(size_t size, Platform_Properties* Game_Platform){
     };
 }
 
-
 struct Game_Memory{
-
     bool32 IsInitialized; 
     uint64 PermanentStorageSize;
     void* PermanentStorage;

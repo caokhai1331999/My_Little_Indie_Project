@@ -280,10 +280,13 @@ struct M_Mesh{
     // May be the Polygon or triangle to start
     // NOTE: Can we spawn other vertices from these first triangle/polygon one
     // There are two basic use cases: one is load vertices data from model(fbx, dae...), two is spawn one out
+#if MANUAL_ALLOCATION // Create this flag in the compile command
     std::vector<vertex> vertices_data;// need to replace this if we choose cube as an only optimal option
-    //vertex* vertices;
     std::vector<unsigned int> indices_data;
-    //unsigned int* indices;
+#else
+    vertex* vertices;
+    unsigned int* indices;
+#endif
 };
 
 //================================Graphical_Flag==========================================
@@ -327,10 +330,6 @@ enum object_drawn_type:be_drawn_type{
     Effect// emission on it and the affect areas
 };
 //================================ON WORKING================================
-enum presenting_unit{
-    texture,
-    model
-};
 
 // This may scale up to a graphical type mechanism just to define
 // Texture, Light, or any graphical property for any random entity
@@ -349,9 +348,9 @@ enum In_Room_Entity{
 // If we use light probes we wouldn't need to know number of
 // point light there are
 struct complete_graphical_type{
-    object_drawn_type in_room_lit_type;
-
+    object_drawn_type in_room_lit_type;    
     primitive_shape unit_shape;// currently use plane
+
     uint8 effecting_point_lights;
     uint16 Effect_Range;
 };
@@ -396,12 +395,11 @@ struct shape_vertices_data{
 
 struct map_unit{ 
 // NOTE: These will be used for fectching data from graphic object
-    uint8 mesh_id;
-    uint8 model_id;
-    uint8 vertices_data_id;
-    uint8 texture_id;
+    uint8 texture_id;// Need to have a clear clarification( divide them down to type)
 
+    uint8 model_id;
     bool32 blocker;
+
     complete_graphical_type graphic_properties;
 
     // This graphic_style will be supposed to replace all other ID if we did well .
@@ -436,7 +434,9 @@ typedef void (*Load_Textures_for_OpenGL__) (Platform_Properties*, Graphic_Proper
 // NOTE: How to come up with simple enough but effective name system for grouping light and shader
 // together
 struct texture{
-    char* content;  
+    // we already free this one after assign pass
+    // it to the gpu
+    char* content;
 };
 
 class graphic_property{
@@ -458,12 +458,11 @@ private:
     M_Mesh* background_mesh_group;
     M_Mesh* moving_entity_mesh_group;
 
-    Model_ Model_Collection[];
-    texture* texture_group;
+    Model_* Model_Collection;// Expensive data here
 
-    size_t texture_group_size;
+    Texture* texture_group_for_ground;
+    Texture* texture_group_for_entities;
 
-    shape_vertices_store* current_shape_store;
 public:
     update_(clock_set* clock);
     B_shader_program* get_shader(return shader);
